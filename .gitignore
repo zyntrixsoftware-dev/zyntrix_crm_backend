@@ -1,0 +1,25 @@
+# ── Environment files (NEVER commit these) ──
+.env
+Backend/.env
+Frontend/.env
+*.env.local
+
+# ── Always keep the example files ──
+!.env.example
+!Backend/.env.example
+!Frontend/.env.example
+
+# ── Node ──
+node_modules/
+Backend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Logs ──
+*.log
+logs/
+
+# ── OS ──
+.DS_Store
+Thumbs.db

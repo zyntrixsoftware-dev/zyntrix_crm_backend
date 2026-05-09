@@ -1,0 +1,493 @@
+requireAuth();
+
+const grid = document.getElementById("grid");
+const monthYear = document.getElementById("monthYear");
+const punchInfo = document.getElementById("punchInfo");
+const punchCount = document.getElementById("punchCount");
+const summary = document.getElementById("summary");
+const todayHours = document.getElementById("todayHours");
+const statusEl = document.getElementById("status");
+const todayStatus = document.getElementById("todayStatus");
+const punchBtn = document.getElementById("punchBtn");
+const shiftDate = document.getElementById("shiftDate");
+const todayDate = document.getElementById("todayDate");
+const startTime = document.getElementById("startTime");
+const endTime = document.getElementById("endTime");
+const expectedTime = document.getElementById("expectedTime");
+const searchInput = document.getElementById("searchInput");
+const topClock = document.getElementById("topClock");
+const notificationButton = document.getElementById("notificationButton");
+const notificationCount = document.getElementById("notificationCount");
+const notificationBadge = document.getElementById("notificationBadge");
+const notificationsList = document.getElementById("notificationsList");
+const viewAllNotifications = document.getElementById("viewAllNotifications");
+const missedPunchLink = document.getElementById("missedPunchLink");
+const requestLeaveBtn = document.getElementById("requestLeaveBtn");
+const swapShiftBtn = document.getElementById("swapShiftBtn");
+
+const SHIFT_START = { hour: 9, minute: 0 };
+const SHIFT_END = { hour: 18, minute: 0 };
+const BREAK_MINUTES = 60;
+
+let attendance = [];
+let currentDate = startOfMonth(new Date());
+let selectedDate = stripTime(new Date());
+let showAllNotifications = false;
+
+function stripTime(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+// FIX: use UTC date to match backend — prevents date mismatch in IST and other timezones
+function getLocalDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function key(date) {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function getDateFromKey(dateKey) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function isSameDay(a, b) {
+  return key(a) === key(b);
+}
+
+function isPastDay(date) {
+  return stripTime(date) < stripTime(new Date());
+}
+
+function isFutureDay(date) {
+  return stripTime(date) > stripTime(new Date());
+}
+
+function displayDate(date) {
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  });
+}
+
+function shortDate(date) {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+function formatTime(time) {
+  return new Date(time).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function getShift(date) {
+  const workingDay = date.getDay() !== 0;
+
+  return {
+    workingDay,
+    startLabel: "09:00 AM",
+    endLabel: "06:00 PM",
+    totalLabel: workingDay ? "8 hours" : "Off day",
+    breakLabel: workingDay ? "1 hour" : "-"
+  };
+}
+
+function getShiftDateTime(date, shiftTime) {
+  const d = stripTime(date);
+  d.setHours(shiftTime.hour, shiftTime.minute, 0, 0);
+  return d;
+}
+
+function getMinutes(start, end) {
+  return Math.max(0, Math.floor((new Date(end) - new Date(start)) / 60000));
+}
+
+function formatDuration(minutes) {
+  return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+}
+
+function calc(start, end) {
+  return formatDuration(getMinutes(start, end));
+}
+
+function getRecord(dateKey) {
+  return attendance.find((record) => record.date === dateKey);
+}
+
+function getStatusForDate(date, record) {
+  const shift = getShift(date);
+  const now = new Date();
+  const shiftEnd = getShiftDateTime(date, SHIFT_END);
+
+  if (!shift.workingDay) return "Off";
+  if (record?.punchIn && record?.punchOut) return "Completed";
+  if (record?.punchIn) return "Working";
+  if (isPastDay(date) || (isSameDay(date, now) && now > shiftEnd)) return "Absent";
+  return "Scheduled";
+}
+
+function isPayday(date) {
+  const day = date.getDate();
+  const nextDay = new Date(date);
+  nextDay.setDate(day + 1);
+
+  return day === 15 || nextDay.getMonth() !== date.getMonth();
+}
+
+async function loadAttendance() {
+  const res = await apiRequest("/attendance/my");
+  attendance = Array.isArray(res) ? res : [];
+}
+
+function render(date) {
+  grid.innerHTML = "";
+
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const start = new Date(firstDay);
+  const query = searchInput.value.trim().toLowerCase();
+
+  start.setDate(firstDay.getDate() - firstDay.getDay());
+
+  monthYear.textContent = date.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric"
+  });
+
+  for (let i = 0; i < 42; i++) {
+    const dayDate = new Date(start);
+    dayDate.setDate(start.getDate() + i);
+
+    const dayKey = key(dayDate);
+    const rec = getRecord(dayKey);
+    const status = getStatusForDate(dayDate, rec);
+    const shift = getShift(dayDate);
+    const div = document.createElement("button");
+    const searchable = `${dayKey} ${displayDate(dayDate)} ${status}`.toLowerCase();
+
+    div.type = "button";
+    div.className = "day";
+    div.textContent = dayDate.getDate();
+    div.title = `${displayDate(dayDate)} - ${status}`;
+
+    if (dayDate.getMonth() !== month) div.classList.add("outside");
+    if (!shift.workingDay) div.classList.add("non-working");
+    if (shift.workingDay && !rec?.punchIn) div.classList.add("scheduled");
+    if (rec?.punchIn) div.classList.add("punched");
+    if (status === "Absent") div.classList.add("attention");
+    if (isSameDay(dayDate, new Date())) div.classList.add("today");
+    if (isPayday(dayDate)) div.classList.add("payday");
+    if (isSameDay(selectedDate, dayDate)) div.classList.add("selected");
+    if (query && !searchable.includes(query)) div.classList.add("is-hidden");
+
+    div.onclick = () => {
+      selectedDate = stripTime(dayDate);
+      render(currentDate);
+      updateUI();
+    };
+
+    grid.appendChild(div);
+  }
+}
+
+function updateSelectedShift() {
+  const dateKey = key(selectedDate);
+  const rec = getRecord(dateKey);
+  const shift = getShift(selectedDate);
+  const status = getStatusForDate(selectedDate, rec);
+  const isTodaySelected = isSameDay(selectedDate, new Date());
+
+  shiftDate.textContent = displayDate(selectedDate);
+  startTime.textContent = shift.startLabel;
+  endTime.textContent = shift.endLabel;
+  statusEl.textContent = status;
+
+  if (!shift.workingDay) {
+    punchCount.textContent = "0";
+    punchInfo.textContent = "No shift scheduled for this day.";
+    summary.textContent = shift.totalLabel;
+    punchBtn.innerText = "Off Day";
+    punchBtn.disabled = true;
+    return;
+  }
+
+  punchBtn.disabled = false;
+
+  if (!rec) {
+    punchCount.textContent = "0";
+    punchInfo.textContent = "No punch recorded for this day.";
+    summary.textContent = shift.totalLabel;
+    punchBtn.innerText = isTodaySelected ? "+ Add Punch" : "Go To Today";
+    return;
+  }
+
+  punchCount.textContent = rec.punchOut ? "2" : "1";
+  punchInfo.innerHTML = `
+    Punch In: ${formatTime(rec.punchIn)}${rec.punchOut ? `<br>Punch Out: ${formatTime(rec.punchOut)}` : ""}
+  `;
+
+  if (rec.punchIn && rec.punchOut) {
+    summary.textContent = calc(rec.punchIn, rec.punchOut);
+    punchBtn.innerText = isTodaySelected ? "Completed" : "View Today";
+  } else {
+    summary.textContent = calc(rec.punchIn, new Date());
+    punchBtn.innerText = isTodaySelected ? "Punch Out" : "View Today";
+  }
+}
+
+function updateTodaySummary() {
+  const today = new Date();
+  const todayKey = getLocalDate();
+  const rec = getRecord(todayKey);
+  const status = getStatusForDate(today, rec);
+
+  todayDate.textContent = shortDate(today);
+  todayStatus.textContent = status;
+  expectedTime.textContent = "Expected in 09:00 AM";
+
+  if (rec?.punchIn && rec?.punchOut) {
+    todayHours.textContent = calc(rec.punchIn, rec.punchOut);
+  } else if (rec?.punchIn) {
+    todayHours.textContent = calc(rec.punchIn, new Date());
+  } else {
+    todayHours.textContent = "00:00";
+  }
+}
+
+function updateUI() {
+  updateSelectedShift();
+  updateTodaySummary();
+  renderNotifications();
+}
+
+function getNotifications() {
+  const now = new Date();
+  const today = stripTime(now);
+  const todayRecord = getRecord(getLocalDate());
+  const todayShift = getShift(today);
+  const yesterday = new Date(today);
+  const notices = [];
+
+  yesterday.setDate(today.getDate() - 1);
+
+  if (todayShift.workingDay && !todayRecord?.punchIn && now < getShiftDateTime(today, SHIFT_START)) {
+    notices.push({
+      type: "info",
+      title: "Shift reminder",
+      text: "Your shift starts at 09:00 AM today",
+      time: formatTime(now)
+    });
+  }
+
+  if (todayShift.workingDay && !todayRecord?.punchIn && now >= getShiftDateTime(today, SHIFT_START)) {
+    notices.push({
+      type: "red",
+      title: "Punch pending",
+      text: "You have not punched in for today's shift yet",
+      time: formatTime(now)
+    });
+  }
+
+  if (todayRecord?.punchIn && !todayRecord?.punchOut) {
+    notices.push({
+      type: "info",
+      title: "Punch out reminder",
+      text: "Remember to punch out when your shift ends",
+      time: formatTime(now)
+    });
+  }
+
+  if (getShift(yesterday).workingDay && !getRecord(key(yesterday))?.punchOut) {
+    notices.push({
+      type: "red",
+      title: "Missed punch",
+      text: `Check your punch record for ${shortDate(yesterday)}`,
+      time: formatTime(now)
+    });
+  }
+
+  if (!notices.length) {
+    notices.push({
+      type: "info",
+      title: "All caught up",
+      text: "No attendance action is pending right now",
+      time: formatTime(now)
+    });
+  }
+
+  return notices;
+}
+
+function renderNotifications() {
+  const notices = getNotifications();
+  const visible = showAllNotifications ? notices : notices.slice(0, 2);
+
+  notificationCount.textContent = notices.length;
+  notificationBadge.textContent = notices.length;
+  notificationsList.innerHTML = "";
+  viewAllNotifications.textContent = showAllNotifications ? "Show less" : "View all";
+
+  visible.forEach((notice) => {
+    const item = document.createElement("div");
+    item.className = "notification-item";
+    item.innerHTML = `
+      <div class="notification-icon ${notice.type === "red" ? "red" : "blue"}">${notice.type === "red" ? "△" : "i"}</div>
+      <div>
+        <strong>${notice.title}</strong>
+        <p>${notice.text}</p>
+      </div>
+      <time>${notice.time}</time>
+    `;
+    notificationsList.appendChild(item);
+  });
+}
+
+function updateClock() {
+  const now = new Date();
+  topClock.textContent = now.toLocaleString([], {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+
+  if (isSameDay(selectedDate, now)) updateUI();
+}
+
+async function punchIn() {
+  const res = await apiRequest("/attendance/punch-in", "POST");
+
+  if (res.msg) {
+    alert(res.msg);
+    return;
+  }
+
+  await refreshToday();
+}
+
+async function punchOut() {
+  const res = await apiRequest("/attendance/punch-out", "POST");
+
+  if (res.msg) {
+    alert(res.msg);
+    return;
+  }
+
+  await refreshToday();
+}
+
+async function refreshToday() {
+  await loadAttendance();
+  goToday();
+}
+
+function handlePunch() {
+  if (!isSameDay(selectedDate, new Date())) {
+    goToday();
+    alert("Punch actions are available for today's shift.");
+    return;
+  }
+
+  const todayRecord = getRecord(getLocalDate());
+
+  if (!getShift(new Date()).workingDay) {
+    alert("There is no scheduled shift today.");
+  } else if (!todayRecord || !todayRecord.punchIn) {
+    punchIn();
+  } else if (!todayRecord.punchOut) {
+    punchOut();
+  } else {
+    alert("Already completed for today");
+  }
+}
+
+function goToday() {
+  selectedDate = stripTime(new Date());
+  currentDate = startOfMonth(new Date());
+  render(currentDate);
+  updateUI();
+}
+
+function showActionMessage(action) {
+  const savedKey = `attendance_${action}_${getLocalDate()}`;
+  localStorage.setItem(savedKey, new Date().toISOString());
+  alert(`${action === "leave" ? "Leave request" : "Shift swap request"} saved locally for ${shortDate(new Date())}.`);
+}
+
+document.getElementById("prev").onclick = () => {
+  currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+  render(currentDate);
+};
+
+document.getElementById("next").onclick = () => {
+  currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+  render(currentDate);
+};
+
+searchInput.addEventListener("input", () => render(currentDate));
+
+document.addEventListener("keydown", (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+    event.preventDefault();
+    searchInput.focus();
+  }
+});
+
+notificationButton.addEventListener("click", () => {
+  document.querySelector(".notifications-panel").scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+viewAllNotifications.addEventListener("click", (event) => {
+  event.preventDefault();
+  showAllNotifications = !showAllNotifications;
+  renderNotifications();
+});
+
+missedPunchLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  alert("Missed punch requests are not connected to the backend yet. Please contact HR for correction.");
+});
+
+requestLeaveBtn.addEventListener("click", () => showActionMessage("leave"));
+swapShiftBtn.addEventListener("click", () => showActionMessage("swap"));
+
+document.querySelectorAll("[data-action]").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    const action = link.dataset.action;
+
+    if (action === "profile") {
+      alert("Profile details are shown in the top-right and sidebar for now.");
+    } else if (action === "settings") {
+      alert("Settings are not available yet.");
+    } else {
+      alert("This module is coming soon.");
+    }
+  });
+});
+
+async function init() {
+  await loadAttendance();
+  render(currentDate);
+  updateUI();
+  updateClock();
+}
+
+setInterval(updateClock, 1000);
+init();

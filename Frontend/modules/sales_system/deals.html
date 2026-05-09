@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deals — Zyntrix CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#080e18; --bg2:#0d1624; --bg3:#111e30; --bg4:#162436; --bg5:#1c2e42;
+  --surface:#0f1d2e; --surface2:#162336;
+  --accent:#00e5b0; --accent2:#00c99a; --accent-dim:rgba(0,229,176,0.10); --accent-glow:rgba(0,229,176,0.22);
+  --blue:#3d8ef0; --blue-dim:rgba(61,142,240,0.12);
+  --amber:#f5a623; --amber-dim:rgba(245,166,35,0.12);
+  --rose:#ff4d6d; --rose-dim:rgba(255,77,109,0.12);
+  --purple:#b57bee; --purple-dim:rgba(181,123,238,0.12);
+  --orange:#ff7d40; --orange-dim:rgba(255,125,64,0.12);
+  --teal:#22d3ee; --teal-dim:rgba(34,211,238,0.12);
+  --text:#e8f0fe; --text2:#8ba3bf; --text3:#4e6680;
+  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.11);
+  --font:'Instrument Sans',sans-serif; --display:'Syne',sans-serif; --mono:'DM Mono',monospace;
+  --radius:14px; --sidebar:260px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden;}
+.shell{display:flex;height:100vh;}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;position:relative;}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:260px;background:radial-gradient(ellipse at 30% 0%,rgba(0,229,176,0.06) 0%,transparent 70%);pointer-events:none;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.brand{padding:22px 20px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.brand-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:800;color:var(--bg);flex-shrink:0;box-shadow:0 0 20px rgba(0,229,176,0.3);}
+.brand-text{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.brand-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px;letter-spacing:0.5px;}
+.nav-group{padding:16px 12px 6px;}
+.nav-label{font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 8px;font-family:var(--display);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all 0.18s;margin-bottom:2px;position:relative;font-weight:500;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--accent);}
+.nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0;}
+.nav-count{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--mono);background:var(--bg4);color:var(--text2);padding:2px 7px;border-radius:6px;}
+.nav-count.hot{background:var(--rose-dim);color:var(--rose);}
+.nav-count.ok{background:var(--accent-dim);color:var(--accent);}
+.nav-divider{height:1px;background:var(--border);margin:8px 12px;}
+.sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);flex-shrink:0;}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background 0.15s;}
+.user-card:hover{background:var(--border);}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bg);flex-shrink:0;font-family:var(--display);}
+.user-name{font-size:13px;font-weight:600;color:var(--text);}
+.user-role{font-size:11px;color:var(--text3);}
+.topbar{height:64px;min-height:64px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;position:relative;}
+.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,176,0.15),transparent);}
+.page-hd{flex:1;}
+.page-title{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.page-crumb{font-size:11px;color:var(--text3);margin-top:1px;}
+.page-crumb span{color:var(--accent);}
+.search-wrap{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;min-width:240px;transition:border 0.2s;}
+.search-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%;}
+.search-wrap input::placeholder{color:var(--text3);}
+.tbtn{padding:8px 16px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:flex;align-items:center;gap:7px;transition:all 0.18s;white-space:nowrap;}
+.tbtn:hover{background:var(--bg3);}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(0,229,176,0.25);}
+.tbtn.primary:hover{background:var(--accent2);box-shadow:0 0 28px rgba(0,229,176,0.35);}
+.notif-wrap{position:relative;}
+.notif-dot{position:absolute;top:5px;right:12px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--bg2);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.sub-nav{display:flex;align-items:center;gap:4px;padding:0 28px;background:var(--bg2);border-bottom:1px solid var(--border);height:48px;}
+.snav-tab{padding:0 18px;height:100%;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;white-space:nowrap;font-family:var(--font);display:flex;align-items:center;gap:7px;background:none;border-top:none;border-left:none;border-right:none;}
+.snav-tab:hover{color:var(--text);}
+.snav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.snav-tab .tab-count{font-size:10px;font-family:var(--mono);background:var(--accent-dim);color:var(--accent);padding:1px 6px;border-radius:5px;}
+.snav-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.content{flex:1;overflow-y:auto;background:var(--bg);}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-track{background:transparent;}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.section{padding:24px 28px;}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s;cursor:default;}
+.kpi-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.kpi-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,var(--glow,rgba(0,229,176,0.06)) 0%,transparent 60%);pointer-events:none;}
+.kpi-icon{font-size:20px;margin-bottom:10px;display:block;}
+.kpi-val{font-family:var(--display);font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px;}
+.kpi-lbl{font-size:11px;color:var(--text3);margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
+.kpi-delta{font-size:11.5px;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:500;}
+.up{color:var(--accent);} .dn{color:var(--rose);} .neu{color:var(--text3);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap;}
+.card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.2px;}
+.card-sub{font-size:11.5px;color:var(--text3);margin-top:3px;}
+.card-actions{display:flex;gap:8px;flex-shrink:0;align-items:center;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;font-family:var(--mono);}
+.b-accent{background:var(--accent-dim);color:var(--accent);}
+.b-blue{background:var(--blue-dim);color:var(--blue);}
+.b-amber{background:var(--amber-dim);color:var(--amber);}
+.b-rose{background:var(--rose-dim);color:var(--rose);}
+.b-purple{background:var(--purple-dim);color:var(--purple);}
+.b-orange{background:var(--orange-dim);color:var(--orange);}
+.b-teal{background:var(--teal-dim);color:var(--teal);}
+.b-gray{background:rgba(78,102,128,0.15);color:var(--text3);}
+.btn{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:all 0.18s;}
+.btn:hover{background:var(--bg4);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 16px rgba(0,229,176,0.2);}
+.btn.primary:hover{background:var(--accent2);}
+.btn.danger{background:var(--rose-dim);border-color:transparent;color:var(--rose);}
+.btn.danger:hover{background:rgba(255,77,109,0.2);}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:7px;}
+.btn-xs{padding:3px 9px;font-size:11px;border-radius:6px;}
+.btn-icon{width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border2);background:transparent;cursor:pointer;color:var(--text2);font-size:14px;transition:all 0.15s;}
+.btn-icon:hover{background:var(--bg4);color:var(--text);}
+.prog{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width 0.8s cubic-bezier(.4,0,.2,1);}
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid var(--border2);}
+th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 16px 12px;white-space:nowrap;font-family:var(--display);}
+td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr{transition:background 0.12s;}
+tbody tr:hover td{background:rgba(255,255,255,0.015);}
+.td-main{font-weight:600;color:var(--text);font-size:13px;}
+.td-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+select{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer;transition:border 0.15s;}
+select:focus{border-color:var(--accent);}
+select option{background:var(--bg2);}
+.filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all 0.15s;font-family:var(--font);white-space:nowrap;}
+.filter-chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.filter-chip:hover:not(.active){background:var(--bg3);color:var(--text);}
+.tab-group{display:flex;gap:2px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:3px;}
+.tab-btn{padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--text2);transition:all 0.15s;background:none;border:none;font-family:var(--font);font-weight:500;}
+.tab-btn.active{background:var(--bg5);color:var(--text);}
+.overlay{display:none;position:fixed;inset:0;background:rgba(4,8,16,0.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;animation:overlayIn 0.2s ease;}
+@keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:620px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:modalUp 0.25s cubic-bezier(.34,1.56,.64,1);}
+@keyframes modalUp{from{opacity:0;transform:translateY(20px) scale(0.96);}to{opacity:1;transform:none;}}
+.modal::-webkit-scrollbar{width:4px;}
+.modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.modal-hd{padding:22px 26px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg2);z-index:1;}
+.modal-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);}
+.modal-close{background:var(--bg4);border:none;color:var(--text2);cursor:pointer;font-size:18px;width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.modal-close:hover{background:var(--bg5);color:var(--text);}
+.modal-body{padding:24px 26px;}
+.modal-ft{padding:16px 26px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:var(--bg2);position:sticky;bottom:0;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.fg{display:flex;flex-direction:column;gap:6px;}
+.fg.full{grid-column:1/-1;}
+label{font-size:11.5px;font-weight:600;color:var(--text2);letter-spacing:0.2px;font-family:var(--display);}
+input,textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border 0.15s,box-shadow 0.15s;}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+textarea{resize:vertical;min-height:80px;}
+.fg select{padding:10px 13px;}
+.ds-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:12px;font-family:var(--display);padding-bottom:8px;border-bottom:1px solid var(--border);}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-lbl{font-size:10.5px;color:var(--text3);margin-bottom:3px;font-weight:500;}
+.field-val{font-size:13px;color:var(--text);font-weight:500;}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(4,8,16,0.7);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.confirm-overlay.open{display:flex;}
+.confirm-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;width:380px;max-width:95vw;text-align:center;animation:modalUp 0.2s ease;}
+.confirm-icon{font-size:36px;margin-bottom:12px;}
+.confirm-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.confirm-msg{font-size:13px;color:var(--text2);margin-bottom:22px;}
+.confirm-btns{display:flex;gap:10px;justify-content:center;}
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);max-width:320px;animation:toastIn 0.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.toast.success{border-color:rgba(0,229,176,0.3);}
+.toast.error{border-color:rgba(255,77,109,0.3);}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(0.95);}to{opacity:1;transform:none;}}
+@keyframes toastOut{to{opacity:0;transform:translateY(6px) scale(0.96);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.ani{animation:fadeUp 0.35s ease both;}
+.ani:nth-child(1){animation-delay:.00s}.ani:nth-child(2){animation-delay:.05s}
+.ani:nth-child(3){animation-delay:.10s}.ani:nth-child(4){animation-delay:.15s}
+.ani:nth-child(5){animation-delay:.20s}.ani:nth-child(6){animation-delay:.25s}
+.dropdown{position:relative;}
+.dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--border2);border-radius:10px;min-width:170px;z-index:50;box-shadow:0 8px 32px rgba(0,0,0,0.4);overflow:hidden;}
+.dropdown-menu.open{display:block;animation:fadeUp 0.15s ease;}
+.dd-item{padding:10px 14px;font-size:13px;cursor:pointer;color:var(--text2);display:flex;align-items:center;gap:8px;transition:all 0.12s;}
+.dd-item:hover{background:var(--bg3);color:var(--text);}
+.dd-item.danger:hover{background:var(--rose-dim);color:var(--rose);}
+.dd-sep{height:1px;background:var(--border);margin:3px 0;}
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:all 0.2s;cursor:pointer;}
+.qcard:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.25);}
+.wf-bar-wrap{display:flex;flex-direction:column;gap:8px;}
+.wf-row{display:flex;align-items:center;gap:10px;}
+.wf-label{font-size:11px;color:var(--text2);width:110px;flex-shrink:0;text-align:right;}
+.wf-track{flex:1;height:22px;background:var(--bg3);border-radius:5px;overflow:hidden;position:relative;}
+.wf-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-family:var(--mono);color:var(--bg);font-weight:600;transition:width 0.9s cubic-bezier(.4,0,.2,1);}
+.wf-val{font-size:11px;font-family:var(--mono);color:var(--text2);width:70px;flex-shrink:0;}
+.health-hot{color:var(--accent);background:var(--accent-dim);}
+.health-warm{color:var(--amber);background:var(--amber-dim);}
+.health-cold{color:var(--rose);background:var(--rose-dim);}
+</style>
+</head>
+<body>
+<div class="shell">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">Z</div>
+    <div><div class="brand-text">Zyntrix CRM</div><div class="brand-sub">v2.5 · Sales Suite</div></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon">⌂</span> Dashboard</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Pipeline</div>
+    <a class="nav-item" href="pipeline.html"><span class="nav-icon">◈</span> Pipeline Board <span class="nav-count ok">18</span></a>
+    <a class="nav-item active" href="deals.html"><span class="nav-icon">⟐</span> Deals <span class="nav-count">18</span></a>
+    <a class="nav-item" href="leads.html"><span class="nav-icon">◎</span> Leads <span class="nav-count hot">42</span></a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Engagement</div>
+    <a class="nav-item" href="activities.html"><span class="nav-icon">☏</span> Activities</a>
+    <a class="nav-item" href="emails.html"><span class="nav-icon">✉</span> Emails &amp; Proposals</a>
+    <a class="nav-item" href="meetings.html"><span class="nav-icon">◷</span> Meetings <span class="nav-count hot">3</span></a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Insights</div>
+    <a class="nav-item" href="reports.html"><span class="nav-icon">↗</span> Revenue Reports</a>
+    <a class="nav-item" href="leaderboard.html"><span class="nav-icon">⬡</span> Leaderboard</a>
+    <a class="nav-item" href="playbook.html"><span class="nav-icon">⊞</span> Playbook</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Admin</div>
+    <a class="nav-item" href="settings.html"><span class="nav-icon">⊙</span> Settings</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">SK</div>
+      <div><div class="user-name">Sanjay Kumar</div><div class="user-role">Sales Manager</div></div>
+    </div>
+    <button class="tbtn" type="button" onclick="logout()" style="margin-top:8px;width:100%;justify-content:center;">⏻ Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-hd">
+      <div class="page-title">Deals</div>
+      <div class="page-crumb">Zyntrix CRM › Pipeline › <span>Deals</span></div>
+    </div>
+    <div class="search-wrap">
+      <span style="color:var(--text3);">⌕</span>
+      <input type="text" id="global-search" placeholder="Search deals, companies…" oninput="applyFilters()">
+    </div>
+    <div class="notif-wrap">
+      <button class="tbtn" onclick="openModal('notif-modal')">🔔 <span id="notif-count" style="background:var(--rose);color:#fff;font-size:10px;padding:1px 5px;border-radius:4px;">4</span></button>
+      <span class="notif-dot"></span>
+    </div>
+    <button class="tbtn primary" onclick="openNewDeal()">＋ New Deal</button>
+  </div>
+
+  <!-- SUB-NAV -->
+  <div class="sub-nav">
+    <button class="snav-tab active" onclick="switchView('all', this)">⊟ All Deals <span class="tab-count" id="tc-all">18</span></button>
+    <button class="snav-tab" onclick="switchView('won', this)">✓ Won <span class="tab-count" id="tc-won" style="background:var(--accent-dim);color:var(--accent);">0</span></button>
+    <button class="snav-tab" onclick="switchView('lost', this)">✗ Lost <span class="tab-count" id="tc-lost" style="background:var(--rose-dim);color:var(--rose);">0</span></button>
+    <button class="snav-tab" onclick="switchView('active', this)">◎ Active <span class="tab-count" id="tc-active">0</span></button>
+    <button class="snav-tab" onclick="switchView('analytics', this)">⟁ Analytics</button>
+    <div class="snav-right">
+      <select id="owner-filter" onchange="applyFilters()">
+        <option value="">All Owners</option>
+        <option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option><option>Vikram Singh</option>
+      </select>
+      <select id="period-filter" onchange="applyFilters()">
+        <option value="q2">Q2 2025</option><option value="q1">Q1 2025</option><option value="all">All Time</option>
+      </select>
+      <button class="tbtn btn-sm" onclick="exportCSV()">↓ Export</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- ALL DEALS VIEW -->
+    <div id="view-all">
+      <div class="section" style="padding-bottom:0;">
+        <div class="kpi-row">
+          <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);">
+            <span class="kpi-icon">◎</span>
+            <div class="kpi-val" id="kpi-total" style="color:var(--accent);">₹4.2Cr</div>
+            <div class="kpi-lbl">Total Pipeline Value</div>
+            <div class="kpi-delta up">▲ 23% vs Q1</div>
+          </div>
+          <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.06);">
+            <span class="kpi-icon">✓</span>
+            <div class="kpi-val" id="kpi-won" style="color:var(--accent);">₹98.5L</div>
+            <div class="kpi-lbl">Closed Won</div>
+            <div class="kpi-delta up">▲ 2 deals this month</div>
+          </div>
+          <div class="kpi-card ani" style="--glow:rgba(255,77,109,0.08);">
+            <span class="kpi-icon">✗</span>
+            <div class="kpi-val" id="kpi-lost" style="color:var(--rose);">₹8.5L</div>
+            <div class="kpi-lbl">Closed Lost</div>
+            <div class="kpi-delta dn">▼ 1 deal this month</div>
+          </div>
+          <div class="kpi-card ani" style="--glow:rgba(61,142,240,0.08);">
+            <span class="kpi-icon">⚡</span>
+            <div class="kpi-val" id="kpi-winrate" style="color:var(--blue);">68%</div>
+            <div class="kpi-lbl">Win Rate</div>
+            <div class="kpi-delta up">▲ 5% vs last Q</div>
+          </div>
+          <div class="kpi-card ani" style="--glow:rgba(245,166,35,0.08);">
+            <span class="kpi-icon">⟐</span>
+            <div class="kpi-val" id="kpi-avg" style="color:var(--amber);">₹23.3L</div>
+            <div class="kpi-lbl">Avg Deal Size</div>
+            <div class="kpi-delta up">▲ ₹2.1L vs Q1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" style="padding-top:0;padding-bottom:0;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="stage-chips">
+            <button class="filter-chip active" onclick="setStageFilter('', this)">All Stages</button>
+            <button class="filter-chip" onclick="setStageFilter('Prospecting', this)">Prospecting</button>
+            <button class="filter-chip" onclick="setStageFilter('Qualification', this)">Qualification</button>
+            <button class="filter-chip" onclick="setStageFilter('Demo Scheduled', this)">Demo</button>
+            <button class="filter-chip" onclick="setStageFilter('Proposal Sent', this)">Proposal</button>
+            <button class="filter-chip" onclick="setStageFilter('Negotiation', this)">Negotiation</button>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <select id="sort-sel" onchange="applyFilters()" style="font-size:12px;padding:6px 10px;">
+              <option value="value-desc">Value ↓</option>
+              <option value="value-asc">Value ↑</option>
+              <option value="prob-desc">Probability ↓</option>
+              <option value="close-asc">Close Date</option>
+              <option value="created-desc">Newest</option>
+            </select>
+            <div class="tab-group">
+              <button class="tab-btn active" onclick="setDealView('table', this)">⊟ Table</button>
+              <button class="tab-btn" onclick="setDealView('cards', this)">⊞ Cards</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLE VIEW -->
+      <div class="section" style="padding-top:0;" id="deals-table-wrap">
+        <div class="card ani">
+          <div class="card-hd">
+            <div><div class="card-title">All Deals</div><div class="card-sub" id="table-sub">Loading…</div></div>
+            <div class="card-actions">
+              <div id="bulk-actions" style="display:none;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-sm" onclick="bulkStage()">Move Stage</button>
+                <button class="btn btn-sm" onclick="bulkOwner()">Reassign</button>
+                <button class="btn btn-sm danger" onclick="bulkDelete()">Delete</button>
+              </div>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" id="sel-all" onchange="toggleAll(this)"></th>
+                <th>Deal / Company</th><th>Owner</th><th>Value</th><th>Stage</th><th>Probability</th><th>Health</th><th>Close Date</th><th>Source</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="deals-tbody"></tbody>
+            </table>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border);margin-top:4px;">
+            <div style="font-size:12px;color:var(--text3);" id="table-footer"></div>
+            <div style="display:flex;gap:6px;" id="pagination"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARDS VIEW -->
+      <div class="section" style="padding-top:0;display:none;" id="deals-cards-wrap">
+        <div id="deals-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;"></div>
+      </div>
+
+      <!-- BOTTOM CHARTS -->
+      <div class="section" style="padding-top:0;">
+        <div class="g21">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Deal Value by Stage</div><div class="card-sub">Pipeline ₹ distribution</div></div></div>
+            <div id="stage-waterfall" class="wf-bar-wrap"></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Owner Summary</div><div class="card-sub">Deals & revenue by rep</div></div></div>
+            <table>
+              <thead><tr><th>Rep</th><th>Deals</th><th>Revenue</th><th>Win%</th></tr></thead>
+              <tbody id="owner-summary-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WON VIEW -->
+    <div id="view-won" style="display:none;">
+      <div class="section">
+        <div class="g3" style="margin-bottom:16px;">
+          <div class="card ani" style="border-color:rgba(0,229,176,0.2);">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:8px;">Won This Quarter</div>
+            <div style="font-family:var(--display);font-size:28px;font-weight:700;color:var(--accent);" id="won-rev">₹0</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;" id="won-count">0 deals closed</div>
+          </div>
+          <div class="card ani">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:8px;">Avg Days to Close</div>
+            <div style="font-family:var(--display);font-size:28px;font-weight:700;color:var(--blue);">34</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;">Sales cycle average</div>
+          </div>
+          <div class="card ani">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:8px;">Top Source</div>
+            <div style="font-family:var(--display);font-size:24px;font-weight:700;color:var(--amber);">Referral</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;">43% of won deals</div>
+          </div>
+        </div>
+        <div class="card ani">
+          <div class="card-hd"><div><div class="card-title">Closed Won Deals</div><div class="card-sub">All successfully closed deals</div></div></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Deal</th><th>Company</th><th>Owner</th><th>Value</th><th>Closed On</th><th>Source</th><th>Product</th><th>Actions</th></tr></thead>
+              <tbody id="won-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOST VIEW -->
+    <div id="view-lost" style="display:none;">
+      <div class="section">
+        <div class="card ani" style="margin-bottom:16px;border-color:rgba(255,77,109,0.15);">
+          <div class="card-hd"><div><div class="card-title">Loss Analysis</div><div class="card-sub">Understand why deals are lost</div></div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" id="loss-reasons"></div>
+        </div>
+        <div class="card ani">
+          <div class="card-hd"><div><div class="card-title">Closed Lost Deals</div><div class="card-sub">Review & reopen opportunities</div></div></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Deal</th><th>Company</th><th>Owner</th><th>Value</th><th>Lost On</th><th>Reason</th><th>Actions</th></tr></thead>
+              <tbody id="lost-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVE VIEW -->
+    <div id="view-active" style="display:none;">
+      <div class="section">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;" id="active-cards"></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS VIEW -->
+    <div id="view-analytics" style="display:none;">
+      <div class="section">
+        <div class="g21" style="margin-bottom:16px;">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Deal Velocity Trend</div><div class="card-sub">Created vs closed — 6 months</div></div></div>
+            <div style="height:230px;position:relative;"><canvas id="velocity-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Stage Funnel</div><div class="card-sub">Deal count by stage</div></div></div>
+            <div style="height:230px;position:relative;"><canvas id="funnel-chart"></canvas></div>
+          </div>
+        </div>
+        <div class="g3" style="margin-bottom:16px;">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Win/Loss Trend</div><div class="card-sub">Monthly ratio</div></div></div>
+            <div style="height:180px;position:relative;"><canvas id="winloss-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Revenue by Source</div><div class="card-sub">Which channels deliver</div></div></div>
+            <div style="height:180px;position:relative;"><canvas id="source-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Product Mix</div><div class="card-sub">Revenue by plan</div></div></div>
+            <div style="height:180px;position:relative;"><canvas id="product-chart"></canvas></div>
+          </div>
+        </div>
+        <div class="card ani">
+          <div class="card-hd"><div><div class="card-title">Deal Age Distribution</div><div class="card-sub">Days since created · active deals</div></div></div>
+          <div id="age-dist" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- NEW/EDIT DEAL MODAL -->
+<div class="overlay" id="deal-modal" onclick="closeModal('deal-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <span class="modal-title" id="deal-modal-title">New Deal</span>
+      <button class="modal-close" onclick="closeModal('deal-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="d-id">
+      <div class="fgrid">
+        <div class="fg"><label>Deal Name *</label><input id="d-name" placeholder="e.g. ZyntrixEdu Enterprise Plan"></div>
+        <div class="fg"><label>Company *</label><input id="d-company" placeholder="Company name"></div>
+        <div class="fg"><label>Deal Value (₹) *</label><input id="d-value" type="number" placeholder="1800000"></div>
+        <div class="fg"><label>Stage *</label>
+          <select id="d-stage"><option>Prospecting</option><option>Qualification</option><option>Demo Scheduled</option><option>Proposal Sent</option><option>Negotiation</option><option>Closed Won</option><option>Closed Lost</option></select>
+        </div>
+        <div class="fg"><label>Win Probability (%)</label><input id="d-prob" type="number" min="0" max="100" value="50"></div>
+        <div class="fg"><label>Expected Close Date</label><input id="d-close" type="date"></div>
+        <div class="fg"><label>Owner</label>
+          <select id="d-owner"><option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option><option>Vikram Singh</option></select>
+        </div>
+        <div class="fg"><label>Lead Source</label>
+          <select id="d-source"><option>Referral</option><option>Website</option><option>LinkedIn</option><option>Campaign</option><option>Cold Call</option><option>Event</option></select>
+        </div>
+        <div class="fg"><label>Product / Plan</label>
+          <select id="d-product"><option>EdTech CRM — Enterprise</option><option>EdTech CRM — Business</option><option>EdTech CRM — Starter</option><option>LMS Add-on</option><option>Custom Implementation</option></select>
+        </div>
+        <div class="fg"><label>Priority</label>
+          <select id="d-priority"><option>High</option><option>Medium</option><option>Low</option></select>
+        </div>
+        <div class="fg"><label>Loss Reason (if lost)</label>
+          <select id="d-loss"><option value="">— N/A —</option><option>Price</option><option>Competitor</option><option>Budget frozen</option><option>No decision</option><option>Product fit</option></select>
+        </div>
+        <div class="fg"><label>Annual Contract Value (₹)</label><input id="d-acv" type="number" placeholder="Annual contract value"></div>
+        <div class="fg full"><label>Notes / Context</label><textarea id="d-notes" placeholder="Decision makers, blockers, key requirements…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('deal-modal')">Cancel</button>
+      <button class="btn primary" onclick="saveDeal()">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEAL DETAIL MODAL -->
+<div class="overlay" id="detail-modal" onclick="closeModal('detail-modal')">
+  <div class="modal" style="width:700px;" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <span class="modal-title" id="det-name">Deal</span>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px;" id="det-company"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="badge" id="det-stage-badge"></span>
+        <button class="modal-close" onclick="closeModal('detail-modal')">×</button>
+      </div>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-ft">
+      <button class="btn btn-sm danger" onclick="deleteFromDetail()">🗑 Delete</button>
+      <button class="btn btn-sm" onclick="editFromDetail()">Edit Deal</button>
+      <button class="btn btn-sm primary" onclick="logActivityForDeal()">＋ Log Activity</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG ACTIVITY MODAL -->
+<div class="overlay" id="activity-modal" onclick="closeModal('activity-modal')">
+  <div class="modal" style="width:500px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Log Activity</span><button class="modal-close" onclick="closeModal('activity-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="fgrid">
+        <div class="fg"><label>Activity Type</label>
+          <select id="a-type"><option>Call</option><option>Email</option><option>Meeting</option><option>Demo</option><option>Proposal Sent</option><option>Follow-up</option></select>
+        </div>
+        <div class="fg"><label>Outcome</label>
+          <select id="a-outcome"><option>Positive</option><option>Neutral</option><option>Negative</option><option>No answer</option></select>
+        </div>
+        <div class="fg"><label>Date &amp; Time</label><input id="a-date" type="datetime-local"></div>
+        <div class="fg"><label>Duration (mins)</label><input id="a-dur" type="number" value="30"></div>
+        <div class="fg full"><label>Notes</label><textarea id="a-notes" placeholder="What was discussed…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('activity-modal')">Cancel</button>
+      <button class="btn primary" onclick="logActivity()">Log Activity</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS MODAL -->
+<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
+  <div class="modal" style="width:420px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+    <div class="modal-body"><div style="display:flex;flex-direction:column;gap:10px;" id="notif-list"></div></div>
+    <div class="modal-ft"><button class="btn btn-sm" onclick="markAllRead()">Mark All Read</button></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="ci">⚠️</div>
+    <div class="confirm-title" id="ct">Are you sure?</div>
+    <div class="confirm-msg" id="cm">This cannot be undone.</div>
+    <div class="confirm-btns">
+      <button class="btn" onclick="resolveConfirm(false)">Cancel</button>
+      <button class="btn danger" id="c-ok" onclick="resolveConfirm(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* ═══ DATA ═══ */
+let DEALS = [
+  {id:1,  name:'ZyntrixEdu Enterprise',     company:'ZyntrixEdu Pvt Ltd',   owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:1850000, acv:1850000, stage:'Negotiation',     prob:85, close:'2025-05-20', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'High',   notes:'CFO involved. Legal review complete.', created:'2025-04-10', lastContact:'2025-05-06', lossReason:''},
+  {id:2,  name:'Apex Schools — LMS Bundle', company:'Apex Schools Group',   owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:920000,  acv:920000,  stage:'Proposal Sent',   prob:65, close:'2025-05-30', source:'LinkedIn',  product:'LMS Add-on',              priority:'High',   notes:'3-campus implementation requested.',  created:'2025-04-18', lastContact:'2025-05-06', lossReason:''},
+  {id:3,  name:'Global EdTech Corp',        company:'Global EdTech Corp',   owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', value:2200000, acv:2200000, stage:'Negotiation',     prob:75, close:'2025-06-05', source:'Website',   product:'EdTech CRM — Enterprise', priority:'High',   notes:'Volume discount requested.',          created:'2025-03-28', lastContact:'2025-05-05', lossReason:''},
+  {id:4,  name:'BrightPath Academy',        company:'BrightPath Academy',   owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', value:720000,  acv:720000,  stage:'Qualification',   prob:40, close:'2025-06-15', source:'Campaign',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Budget pending board approval.',       created:'2025-04-25', lastContact:'2025-04-14', lossReason:''},
+  {id:5,  name:'Vidya Network — Starter',   company:'Vidya Network',        owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:380000,  acv:380000,  stage:'Demo Scheduled',  prob:55, close:'2025-05-25', source:'Cold Call', product:'EdTech CRM — Starter',    priority:'Medium', notes:'Demo confirmed May 7.',               created:'2025-05-01', lastContact:'2025-05-03', lossReason:''},
+  {id:6,  name:'KnowledgeFirst Institute',  company:'KnowledgeFirst',       owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', value:1100000, acv:1100000, stage:'Prospecting',     prob:25, close:'2025-07-01', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'Low',    notes:'Initial outreach done. No reply.',    created:'2025-05-02', lastContact:'2025-05-02', lossReason:''},
+  {id:7,  name:'EduSmart Solutions',        company:'EduSmart Solutions',   owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:560000,  acv:560000,  stage:'Closed Won',      prob:100,close:'2025-04-30', source:'Website',   product:'EdTech CRM — Business',   priority:'Medium', notes:'Signed & implementation started.',    created:'2025-04-01', lastContact:'2025-04-30', lossReason:''},
+  {id:8,  name:'LearnFirst Academy',        company:'LearnFirst Academy',   owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:430000,  acv:430000,  stage:'Prospecting',     prob:20, close:'2025-07-15', source:'LinkedIn',  product:'EdTech CRM — Starter',    priority:'Low',    notes:'Scheduled intro call for May 12.',    created:'2025-05-03', lastContact:'2025-04-20', lossReason:''},
+  {id:9,  name:'EduFirst Network',          company:'EduFirst Network',     owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:580000,  acv:580000,  stage:'Proposal Sent',   prob:50, close:'2025-06-10', source:'Campaign',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Sent revised proposal. Awaiting.',    created:'2025-04-20', lastContact:'2025-04-18', lossReason:''},
+  {id:10, name:'Pinnacle Schools Group',    company:'Pinnacle Schools',     owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:1400000, acv:1400000, stage:'Demo Scheduled',  prob:60, close:'2025-05-28', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'High',   notes:'VP of IT is champion.',               created:'2025-04-28', lastContact:'2025-05-04', lossReason:''},
+  {id:11, name:'Sunrise Edu Foundation',    company:'Sunrise Edu',          owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', value:290000,  acv:290000,  stage:'Qualification',   prob:35, close:'2025-07-20', source:'Event',     product:'EdTech CRM — Starter',    priority:'Low',    notes:'Met at EdTech Summit.',               created:'2025-05-05', lastContact:'2025-05-05', lossReason:''},
+  {id:12, name:'NorthStar Academy',         company:'NorthStar Academy',    owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:850000,  acv:850000,  stage:'Closed Lost',     prob:0,  close:'2025-05-01', source:'LinkedIn',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Lost to competitor on price.',        created:'2025-04-05', lastContact:'2025-05-01', lossReason:'Price'},
+  {id:13, name:'MindBridge Edu',            company:'MindBridge Edu',       owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:425000,  acv:425000,  stage:'Closed Won',      prob:100,close:'2025-04-15', source:'Event',     product:'EdTech CRM — Starter',    priority:'Low',    notes:'Quick close. Happy customer.',        created:'2025-03-20', lastContact:'2025-04-15', lossReason:''},
+  {id:14, name:'Sigma Learning Solutions',  company:'Sigma Learning',       owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:670000,  acv:670000,  stage:'Closed Lost',     prob:0,  close:'2025-04-20', source:'Cold Call', product:'EdTech CRM — Business',   priority:'Medium', notes:'Budget frozen until next FY.',        created:'2025-03-15', lastContact:'2025-04-20', lossReason:'Budget frozen'},
+];
+
+let ACTIVITIES = [];
+let NOTIFICATIONS = [
+  {id:1, icon:'🎉', type:'success', title:'ZyntrixEdu moved to Negotiation!', body:'₹18.5L · Sanjay Kumar', read:false},
+  {id:2, icon:'⚠️', type:'danger',  title:'BrightPath stalled for 21 days',  body:'₹7.2L · Rahul Mehta', read:false},
+  {id:3, icon:'📞', type:'info',    title:'Apex Schools demo — Today 3 PM',  body:'Priya Nair · Zoom link sent', read:false},
+  {id:4, icon:'📊', type:'info',    title:'Q2 quota — 22 days left',         body:'₹53L needed for ₹2.4Cr target', read:false},
+];
+
+const STAGE_CFG = {
+  'Prospecting':   {col:'#4e6680', bg:'rgba(78,102,128,0.15)',  badgeCls:'b-gray',   order:0},
+  'Qualification': {col:'#3d8ef0', bg:'rgba(61,142,240,0.12)',  badgeCls:'b-blue',   order:1},
+  'Demo Scheduled':{col:'#b57bee', bg:'rgba(181,123,238,0.12)', badgeCls:'b-purple', order:2},
+  'Proposal Sent': {col:'#f5a623', bg:'rgba(245,166,35,0.12)',  badgeCls:'b-amber',  order:3},
+  'Negotiation':   {col:'#ff7d40', bg:'rgba(255,125,64,0.12)',  badgeCls:'b-orange', order:4},
+  'Closed Won':    {col:'#00e5b0', bg:'rgba(0,229,176,0.12)',   badgeCls:'b-accent', order:5},
+  'Closed Lost':   {col:'#ff4d6d', bg:'rgba(255,77,109,0.12)',  badgeCls:'b-rose',   order:6},
+};
+const OWNER_COL = {'Sanjay Kumar':'#00e5b0','Priya Nair':'#3d8ef0','Rahul Mehta':'#b57bee','Anjali Rao':'#f5a623','Vikram Singh':'#22d3ee'};
+
+let curView='all', stageFilter='', sortKey='value', sortDir='desc', dealViewMode='table';
+let page=1; const PAGE=8;
+let selectedDeals=new Set(), editingId=null, activityDealId=null, confirmResolve=null;
+let chartsBuilt=false;
+
+const fmt = n => n>=10000000?'₹'+(n/10000000).toFixed(2)+'Cr':'₹'+(n/100000).toFixed(1)+'L';
+const fmtDate = d => d?new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const daysSince = d => d?Math.floor((Date.now()-new Date(d).getTime())/86400000):0;
+const initials = n => n.split(' ').map(w=>w[0]).join('').toUpperCase();
+const weighted = d => Math.round(d.value*d.prob/100);
+
+function healthScore(d) {
+  if(d.stage==='Closed Won') return {label:'Won',cls:'health-hot',score:100};
+  if(d.stage==='Closed Lost') return {label:'Lost',cls:'health-cold',score:0};
+  let s=d.prob;
+  if(daysSince(d.lastContact)>14) s-=25;
+  if(d.priority==='High') s+=10;
+  s=Math.max(0,Math.min(100,s));
+  if(s>=65) return {label:'Healthy',cls:'health-hot',score:s};
+  if(s>=35) return {label:'Warm',cls:'health-warm',score:s};
+  return {label:'At Risk',cls:'health-cold',score:s};
+}
+
+function toast(msg,type='success'){
+  const tw=document.getElementById('toast-wrap');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  const ic=type==='success'?'✓':type==='error'?'✗':'ℹ';
+  const col=type==='success'?'var(--accent)':type==='error'?'var(--rose)':'var(--blue)';
+  t.innerHTML=`<span style="color:${col};font-size:16px;">${ic}</span>${msg}`;
+  tw.appendChild(t);
+  setTimeout(()=>{t.style.animation='toastOut 0.3s ease forwards';setTimeout(()=>t.remove(),300);},3200);
+}
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'));document.body.style.overflow='';}});
+function confirm2(title,msg,okLabel='Delete',icon='⚠️'){
+  return new Promise(resolve=>{
+    confirmResolve=resolve;
+    document.getElementById('ci').textContent=icon;
+    document.getElementById('ct').textContent=title;
+    document.getElementById('cm').textContent=msg;
+    document.getElementById('c-ok').textContent=okLabel;
+    document.getElementById('confirm-overlay').classList.add('open');
+  });
+}
+function resolveConfirm(v){document.getElementById('confirm-overlay').classList.remove('open');if(confirmResolve){confirmResolve(v);confirmResolve=null;}}
+
+function switchView(v,el){
+  curView=v;
+  ['all','won','lost','active','analytics'].forEach(id=>{const e=document.getElementById('view-'+id);if(e)e.style.display=v===id?'':'none';});
+  document.querySelectorAll('.snav-tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderCurrentView();
+}
+function renderCurrentView(){
+  updateTabCounts();
+  if(curView==='all')       renderAll();
+  if(curView==='won')       renderWon();
+  if(curView==='lost')      renderLost();
+  if(curView==='active')    renderActive();
+  if(curView==='analytics') renderAnalytics();
+}
+function updateTabCounts(){
+  document.getElementById('tc-all').textContent=DEALS.length;
+  document.getElementById('tc-won').textContent=DEALS.filter(d=>d.stage==='Closed Won').length;
+  document.getElementById('tc-lost').textContent=DEALS.filter(d=>d.stage==='Closed Lost').length;
+  document.getElementById('tc-active').textContent=DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost').length;
+}
+function getFiltered(){
+  const owner=document.getElementById('owner-filter')?.value||'';
+  const search=document.getElementById('global-search')?.value.toLowerCase()||'';
+  let data=DEALS.filter(d=>{
+    if(stageFilter&&d.stage!==stageFilter)return false;
+    if(owner&&d.owner!==owner)return false;
+    if(search&&!d.name.toLowerCase().includes(search)&&!d.company.toLowerCase().includes(search))return false;
+    if(curView==='won'&&d.stage!=='Closed Won')return false;
+    if(curView==='lost'&&d.stage!=='Closed Lost')return false;
+    if(curView==='active'&&(d.stage==='Closed Won'||d.stage==='Closed Lost'))return false;
+    return true;
+  });
+  data.sort((a,b)=>{
+    let av=sortKey==='value'?a.value:sortKey==='prob'?a.prob:sortKey==='created'?new Date(a.created).getTime():new Date(a.close).getTime();
+    let bv=sortKey==='value'?b.value:sortKey==='prob'?b.prob:sortKey==='created'?new Date(b.created).getTime():new Date(b.close).getTime();
+    return sortDir==='desc'?bv-av:av-bv;
+  });
+  return data;
+}
+function applyFilters(){
+  const sv=document.getElementById('sort-sel')?.value||'value-desc';
+  const[k,d]=sv.split('-');sortKey=k;sortDir=d;
+  renderCurrentView();
+}
+function setStageFilter(stage,el){
+  stageFilter=stage;
+  document.querySelectorAll('#stage-chips .filter-chip').forEach(c=>c.classList.remove('active'));
+  if(el)el.classList.add('active');
+  page=1;renderAll();
+}
+function setDealView(v,el){
+  dealViewMode=v;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('deals-table-wrap').style.display=v==='table'?'':'none';
+  document.getElementById('deals-cards-wrap').style.display=v==='cards'?'':'none';
+  renderAll();
+}
+function updateKPIs(){
+  const wonD=DEALS.filter(d=>d.stage==='Closed Won');
+  const lostD=DEALS.filter(d=>d.stage==='Closed Lost');
+  const active=DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost');
+  const total=wonD.length+lostD.length;
+  const winRate=total>0?Math.round(wonD.length/total*100):0;
+  document.getElementById('kpi-total').textContent=fmt(active.reduce((s,d)=>s+d.value,0));
+  document.getElementById('kpi-won').textContent=fmt(wonD.reduce((s,d)=>s+d.value,0));
+  document.getElementById('kpi-lost').textContent=fmt(lostD.reduce((s,d)=>s+d.value,0));
+  document.getElementById('kpi-winrate').textContent=winRate+'%';
+  document.getElementById('kpi-avg').textContent=fmt(DEALS.length>0?Math.round(DEALS.reduce((s,d)=>s+d.value,0)/DEALS.length):0);
+}
+function renderAll(){
+  updateKPIs();
+  const data=getFiltered();
+  if(dealViewMode==='table')renderTable(data);
+  else renderCards(data);
+  renderStageWaterfall();
+  renderOwnerSummary();
+}
+function renderTable(data){
+  const total=data.length;
+  const pages=Math.max(1,Math.ceil(total/PAGE));
+  if(page>pages)page=1;
+  const paged=data.slice((page-1)*PAGE,page*PAGE);
+  document.getElementById('table-sub').textContent=`${total} deals · ${fmt(data.reduce((s,d)=>s+d.value,0))} total`;
+  document.getElementById('table-footer').textContent=`Page ${page} of ${pages} · ${total} deals`;
+  document.getElementById('deals-tbody').innerHTML=paged.map(d=>{
+    const h=healthScore(d);
+    const probColor=d.prob>=70?'var(--accent)':d.prob>=40?'var(--amber)':'var(--rose)';
+    return `<tr>
+      <td><input type="checkbox" class="rck" value="${d.id}" onchange="rowSel(this)" ${selectedDeals.has(d.id)?'checked':''}></td>
+      <td><div class="td-main" style="cursor:pointer;" onclick="showDetail(${d.id})">${d.name}</div><div class="td-sub">${d.company}</div></td>
+      <td><div style="display:flex;align-items:center;gap:7px;"><div style="width:24px;height:24px;border-radius:50%;background:${d.oCol};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:12px;">${d.owner.split(' ')[0]}</span></div></td>
+      <td><span style="font-family:var(--mono);color:var(--accent);font-weight:600;">${fmt(d.value)}</span></td>
+      <td><span class="badge ${STAGE_CFG[d.stage]?.badgeCls||'b-gray'}">${d.stage}</span></td>
+      <td><div style="font-size:12px;font-weight:600;color:${probColor};">${d.prob}%</div><div class="prog" style="width:60px;margin-top:3px;"><div class="prog-fill" style="width:${d.prob}%;background:${probColor};"></div></div></td>
+      <td><span class="badge ${h.cls}" style="font-size:10px;">${h.label}</span></td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${d.close}</td>
+      <td><span style="font-size:11px;background:var(--bg4);padding:2px 8px;border-radius:5px;color:var(--text2);">${d.source}</span></td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-xs" onclick="showDetail(${d.id})">View</button>
+          <button class="btn btn-xs" onclick="openEditDeal(${d.id})">Edit</button>
+          <div class="dropdown">
+            <button class="btn-icon" style="width:24px;height:24px;font-size:12px;" onclick="toggleDD(event,'dd-${d.id}')">⋯</button>
+            <div class="dropdown-menu" id="dd-${d.id}">
+              <div class="dd-item" onclick="showDetail(${d.id})">👁 View Detail</div>
+              <div class="dd-item" onclick="openEditDeal(${d.id})">✎ Edit</div>
+              <div class="dd-item" onclick="activityDealId=${d.id};openModal('activity-modal')">📞 Log Activity</div>
+              <div class="dd-sep"></div>
+              <div class="dd-item" onclick="markDeal(${d.id},'Closed Won')">✓ Mark Won</div>
+              <div class="dd-item" onclick="markDeal(${d.id},'Closed Lost')">✗ Mark Lost</div>
+              <div class="dd-sep"></div>
+              <div class="dd-item danger" onclick="deleteDeal(${d.id})">🗑 Delete</div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  const pg=document.getElementById('pagination');pg.innerHTML='';
+  for(let i=1;i<=pages;i++){const b=document.createElement('button');b.className='btn btn-xs'+(i===page?' primary':'');b.textContent=i;b.onclick=()=>{page=i;renderAll();};pg.appendChild(b);}
+}
+function renderCards(data){
+  document.getElementById('deals-cards-grid').innerHTML=data.map(d=>{
+    const h=healthScore(d);
+    const probColor=d.prob>=70?'var(--accent)':d.prob>=40?'var(--amber)':'var(--rose)';
+    return `<div class="qcard" onclick="showDetail(${d.id})">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <div><div style="font-size:13px;font-weight:600;color:var(--text);">${d.name}</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">${d.company}</div></div>
+        <span class="badge ${h.cls}" style="font-size:10px;height:fit-content;">${h.label}</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:${STAGE_CFG[d.stage]?.col||'var(--accent)'};margin-bottom:10px;">${fmt(d.value)}</div>
+      <div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px;"><span>Win Probability</span><span style="color:${probColor};">${d.prob}%</span></div><div class="prog"><div class="prog-fill" style="width:${d.prob}%;background:${probColor};"></div></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="badge ${STAGE_CFG[d.stage]?.badgeCls||'b-gray'}" style="font-size:10px;">${d.stage}</span>
+        <div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;border-radius:50%;background:${d.oCol};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:11px;color:var(--text3);">📅 ${d.close.slice(5)}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderStageWaterfall(){
+  const stages=['Prospecting','Qualification','Demo Scheduled','Proposal Sent','Negotiation'];
+  const max=Math.max(...stages.map(s=>DEALS.filter(d=>d.stage===s).reduce((a,d)=>a+d.value,0)),1);
+  document.getElementById('stage-waterfall').innerHTML=stages.map(s=>{
+    const v=DEALS.filter(d=>d.stage===s).reduce((a,d)=>a+d.value,0);
+    const cfg=STAGE_CFG[s];
+    const pct=Math.round(v/max*100);
+    return `<div class="wf-row"><div class="wf-label">${s}</div><div class="wf-track"><div class="wf-fill" style="width:${pct}%;background:${cfg.col};">${DEALS.filter(d=>d.stage===s).length}d</div></div><div class="wf-val">${fmt(v)}</div></div>`;
+  }).join('');
+}
+function renderOwnerSummary(){
+  const owners=['Sanjay Kumar','Priya Nair','Rahul Mehta','Anjali Rao','Vikram Singh'];
+  const oi={'Sanjay Kumar':'SK','Priya Nair':'PN','Rahul Mehta':'RM','Anjali Rao':'AR','Vikram Singh':'VS'};
+  document.getElementById('owner-summary-tbody').innerHTML=owners.map(o=>{
+    const ods=DEALS.filter(d=>d.owner===o);
+    const won=ods.filter(d=>d.stage==='Closed Won');
+    const lost=ods.filter(d=>d.stage==='Closed Lost');
+    const total=won.length+lost.length;
+    const winPct=total>0?Math.round(won.length/total*100):0;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;border-radius:50%;background:${OWNER_COL[o]};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${oi[o]}</div><span style="font-size:12px;color:var(--text);">${o.split(' ')[0]}</span></div></td>
+      <td style="font-family:var(--mono);color:var(--text2);">${ods.length}</td>
+      <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">${fmt(ods.reduce((s,d)=>s+d.value,0))}</td>
+      <td><span style="font-size:12px;font-weight:600;color:${winPct>=60?'var(--accent)':winPct>=40?'var(--amber)':'var(--rose)'};">${winPct}%</span></td>
+    </tr>`;
+  }).join('');
+}
+function renderWon(){
+  const won=DEALS.filter(d=>d.stage==='Closed Won');
+  document.getElementById('won-rev').textContent=fmt(won.reduce((s,d)=>s+d.value,0));
+  document.getElementById('won-count').textContent=`${won.length} deals closed`;
+  document.getElementById('won-tbody').innerHTML=won.map(d=>`<tr>
+    <td><div class="td-main">${d.name}</div></td>
+    <td style="font-size:12px;color:var(--text3);">${d.company}</td>
+    <td><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:${d.oCol};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:12px;">${d.owner.split(' ')[0]}</span></div></td>
+    <td><span style="font-family:var(--mono);color:var(--accent);font-weight:700;">${fmt(d.value)}</span></td>
+    <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">${fmtDate(d.close)}</td>
+    <td><span style="font-size:11px;background:var(--bg4);padding:2px 8px;border-radius:5px;color:var(--text2);">${d.source}</span></td>
+    <td style="font-size:12px;color:var(--text3);">${d.product}</td>
+    <td><button class="btn btn-xs" onclick="showDetail(${d.id})">View</button></td>
+  </tr>`).join('');
+}
+function renderLost(){
+  const lost=DEALS.filter(d=>d.stage==='Closed Lost');
+  const reasons={};
+  lost.forEach(d=>{const r=d.lossReason||'Unknown';reasons[r]=(reasons[r]||0)+1;});
+  document.getElementById('loss-reasons').innerHTML=Object.entries(reasons).map(([r,c])=>`
+    <div style="padding:14px;background:var(--rose-dim);border-radius:10px;border:1px solid rgba(255,77,109,0.2);text-align:center;">
+      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--rose);">${c}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">${r}</div>
+    </div>`).join('');
+  document.getElementById('lost-tbody').innerHTML=lost.map(d=>`<tr>
+    <td><div class="td-main">${d.name}</div></td>
+    <td style="font-size:12px;color:var(--text3);">${d.company}</td>
+    <td><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:${d.oCol};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:12px;">${d.owner.split(' ')[0]}</span></div></td>
+    <td><span style="font-family:var(--mono);color:var(--rose);font-weight:600;">${fmt(d.value)}</span></td>
+    <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">${fmtDate(d.close)}</td>
+    <td><span class="badge b-rose">${d.lossReason||'Unknown'}</span></td>
+    <td><div style="display:flex;gap:5px;"><button class="btn btn-xs primary" onclick="reopenDeal(${d.id})">Reopen</button><button class="btn btn-xs" onclick="showDetail(${d.id})">View</button></div></td>
+  </tr>`).join('');
+}
+function renderActive(){
+  const active=DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost').sort((a,b)=>b.value-a.value);
+  document.getElementById('active-cards').innerHTML=active.map(d=>{
+    const h=healthScore(d);
+    const probColor=d.prob>=70?'var(--accent)':d.prob>=40?'var(--amber)':'var(--rose)';
+    const stale=daysSince(d.lastContact);
+    return `<div class="qcard" style="border-color:${h.label==='At Risk'?'rgba(255,77,109,0.3)':'var(--border)'};" onclick="showDetail(${d.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text);">${d.name}</div><div style="font-size:11px;color:var(--text3);">${d.company}</div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+          <span class="badge ${h.cls}" style="font-size:10px;">${h.label}</span>
+          <span class="badge ${d.priority==='High'?'b-rose':d.priority==='Medium'?'b-amber':'b-gray'}" style="font-size:10px;">${d.priority}</span>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:${STAGE_CFG[d.stage]?.col||'var(--accent)'};margin-bottom:12px;">${fmt(d.value)}</div>
+      <div class="prog" style="margin-bottom:12px;"><div class="prog-fill" style="width:${d.prob}%;background:${probColor};"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:10px;">
+        <span>Prob: <strong style="color:${probColor};">${d.prob}%</strong></span>
+        <span>Close: ${d.close.slice(5)}</span>
+        <span style="color:${stale>14?'var(--rose)':'var(--text3)'};">${stale}d ago</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="badge ${STAGE_CFG[d.stage]?.badgeCls||'b-gray'}" style="font-size:10px;">${d.stage}</span>
+        <div style="display:flex;gap:5px;" onclick="event.stopPropagation()">
+          <button class="btn btn-xs primary" onclick="markDeal(${d.id},'Closed Won')">Won</button>
+          <button class="btn btn-xs danger" onclick="markDeal(${d.id},'Closed Lost')">Lost</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderAnalytics(){
+  if(!chartsBuilt){buildCharts();chartsBuilt=true;}
+  renderAgeDist();
+}
+const chartTooltip={backgroundColor:'#0d1624',titleColor:'#e8f0fe',bodyColor:'#8ba3bf',borderColor:'#1c2e42',borderWidth:1,padding:10};
+const gridLines={color:'rgba(255,255,255,0.04)'};
+const tickStyle={color:'#4e6680',font:{size:10.5}};
+function buildCharts(){
+  new Chart(document.getElementById('velocity-chart'),{type:'bar',data:{labels:['Nov','Dec','Jan','Feb','Mar','Apr','May'],datasets:[{label:'Created',data:[4,6,5,7,4,6,3],backgroundColor:'rgba(61,142,240,0.6)',borderRadius:4},{label:'Closed',data:[2,3,4,5,3,4,2],backgroundColor:'rgba(0,229,176,0.6)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8ba3bf',font:{size:10},boxWidth:10}},tooltip:chartTooltip},scales:{x:{grid:{display:false},ticks:tickStyle},y:{grid:gridLines,ticks:tickStyle,beginAtZero:true}}}});
+  const stageData=Object.keys(STAGE_CFG).filter(s=>s!=='Closed Won'&&s!=='Closed Lost').map(s=>({label:s,count:DEALS.filter(d=>d.stage===s).length,col:STAGE_CFG[s].col}));
+  new Chart(document.getElementById('funnel-chart'),{type:'bar',data:{labels:stageData.map(s=>s.label),datasets:[{data:stageData.map(s=>s.count),backgroundColor:stageData.map(s=>s.col),borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:chartTooltip},scales:{x:{grid:gridLines,ticks:tickStyle,beginAtZero:true},y:{grid:{display:false},ticks:{color:'#8ba3bf',font:{size:10}}}}}});
+  new Chart(document.getElementById('winloss-chart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May'],datasets:[{label:'Won',data:[3,5,4,6,3],borderColor:'#00e5b0',backgroundColor:'rgba(0,229,176,0.08)',fill:true,tension:0.4,pointRadius:3},{label:'Lost',data:[2,1,3,1,2],borderColor:'#ff4d6d',backgroundColor:'rgba(255,77,109,0.08)',fill:true,tension:0.4,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8ba3bf',font:{size:10},boxWidth:10}},tooltip:chartTooltip},scales:{x:{grid:{display:false},ticks:tickStyle},y:{grid:gridLines,ticks:tickStyle,beginAtZero:true}}}});
+  const sources={};DEALS.forEach(d=>{sources[d.source]=(sources[d.source]||0)+d.value;});
+  new Chart(document.getElementById('source-chart'),{type:'doughnut',data:{labels:Object.keys(sources),datasets:[{data:Object.values(sources),backgroundColor:['#00e5b0','#3d8ef0','#b57bee','#f5a623','#22d3ee','#ff7d40'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:6}},tooltip:chartTooltip}}});
+  const products={};DEALS.forEach(d=>{products[d.product]=(products[d.product]||0)+d.value;});
+  new Chart(document.getElementById('product-chart'),{type:'doughnut',data:{labels:Object.keys(products),datasets:[{data:Object.values(products),backgroundColor:['#3d8ef0','#b57bee','#f5a623','#22d3ee','#ff7d40'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:6}},tooltip:chartTooltip}}});
+}
+function renderAgeDist(){
+  const buckets=[{label:'0–7 days',min:0,max:7,col:'#00e5b0'},{label:'8–14 days',min:8,max:14,col:'#3d8ef0'},{label:'15–30 days',min:15,max:30,col:'#f5a623'},{label:'31–60 days',min:31,max:60,col:'#ff7d40'},{label:'60+ days',min:61,max:999,col:'#ff4d6d'}];
+  const active=DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost');
+  document.getElementById('age-dist').innerHTML=buckets.map(b=>{
+    const count=active.filter(d=>{const age=daysSince(d.created);return age>=b.min&&age<=b.max;}).length;
+    const pct=active.length>0?Math.round(count/active.length*100):0;
+    return `<div style="flex:1;min-width:120px;padding:14px;background:var(--bg3);border-radius:10px;border-left:3px solid ${b.col};"><div style="font-family:var(--display);font-size:22px;font-weight:700;color:${b.col};">${count}</div><div style="font-size:11px;color:var(--text3);margin-top:3px;">${b.label}</div><div class="prog" style="margin-top:8px;"><div class="prog-fill" style="width:${pct}%;background:${b.col};"></div></div></div>`;
+  }).join('');
+}
+
+/* DEAL DETAIL */
+function showDetail(id){
+  const d=DEALS.find(x=>x.id===id);if(!d)return;
+  editingId=id;
+  document.getElementById('det-name').textContent=d.name;
+  document.getElementById('det-company').textContent=d.company;
+  const sb=document.getElementById('det-stage-badge');sb.textContent=d.stage;sb.className=`badge ${STAGE_CFG[d.stage]?.badgeCls||'b-gray'}`;
+  const h=healthScore(d);
+  const probColor=d.prob>=70?'var(--accent)':d.prob>=40?'var(--amber)':'var(--rose)';
+  const acts=ACTIVITIES.filter(a=>a.dealId===id);
+  document.getElementById('detail-body').innerHTML=`
+    <div style="margin-bottom:20px;">
+      <div class="ds-title">Deal Overview</div>
+      <div class="field-grid">
+        <div><div class="field-lbl">Deal Value</div><div class="field-val" style="color:var(--accent);font-family:var(--mono);font-size:18px;font-weight:700;">${fmt(d.value)}</div></div>
+        <div><div class="field-lbl">Weighted Value</div><div class="field-val" style="color:var(--blue);font-family:var(--mono);">${fmt(weighted(d))}</div></div>
+        <div><div class="field-lbl">Win Probability</div><div class="field-val"><span style="color:${probColor};font-family:var(--mono);font-size:16px;font-weight:700;">${d.prob}%</span></div></div>
+        <div><div class="field-lbl">Deal Health</div><div class="field-val"><span class="badge ${h.cls}">${h.label}</span></div></div>
+        <div><div class="field-lbl">Close Date</div><div class="field-val">${fmtDate(d.close)}</div></div>
+        <div><div class="field-lbl">Owner</div><div class="field-val" style="display:flex;align-items:center;gap:8px;"><span style="width:26px;height:26px;border-radius:50%;background:${d.oCol};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${d.oi}</span>${d.owner}</div></div>
+        <div><div class="field-lbl">Product</div><div class="field-val">${d.product}</div></div>
+        <div><div class="field-lbl">Source</div><div class="field-val">${d.source}</div></div>
+        <div><div class="field-lbl">Priority</div><div class="field-val"><span class="badge ${d.priority==='High'?'b-rose':d.priority==='Medium'?'b-amber':'b-gray'}">${d.priority}</span></div></div>
+        <div><div class="field-lbl">Last Contact</div><div class="field-val" style="color:${daysSince(d.lastContact)>14?'var(--rose)':'var(--text)'};">${fmtDate(d.lastContact)} (${daysSince(d.lastContact)}d ago)</div></div>
+        <div><div class="field-lbl">Created</div><div class="field-val">${fmtDate(d.created)}</div></div>
+        <div><div class="field-lbl">ACV</div><div class="field-val" style="font-family:var(--mono);">${d.acv?fmt(d.acv):'—'}</div></div>
+      </div>
+      ${d.notes?`<div style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:9px;font-size:13px;color:var(--text2);">${d.notes}</div>`:''}
+    </div>
+    <div style="margin-bottom:20px;">
+      <div class="ds-title">Stage Progress</div>
+      <div style="display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+        ${Object.keys(STAGE_CFG).filter(s=>s!=='Closed Lost').map(s=>{const cfg=STAGE_CFG[s];const isActive=s===d.stage;const isPast=cfg.order<(STAGE_CFG[d.stage]?.order||0);return `<div style="flex:1;padding:8px 4px;text-align:center;font-size:9px;font-weight:600;background:${isActive?cfg.bg:isPast?'rgba(0,229,176,0.05)':'transparent'};color:${isActive?cfg.col:isPast?'var(--accent)':'var(--text3)'};border-right:1px solid var(--border);font-family:var(--display);">${s.replace(' ','<br>')}</div>`;}).join('')}
+      </div>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div class="ds-title">Activity Log (${acts.length})</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${acts.length?acts.map(a=>`<div style="display:flex;gap:10px;padding:10px;background:var(--bg3);border-radius:9px;"><div style="width:28px;height:28px;border-radius:8px;background:${a.outcome==='Positive'?'var(--accent-dim)':a.outcome==='Negative'?'var(--rose-dim)':'var(--amber-dim)'};display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">${a.icon}</div><div><div style="font-size:12px;font-weight:500;color:var(--text);">${a.type} · <span style="color:${a.outcome==='Positive'?'var(--accent)':a.outcome==='Negative'?'var(--rose)':'var(--amber)'};">${a.outcome}</span></div><div style="font-size:11px;color:var(--text3);">${a.notes} · ${fmtDate(a.date)}</div></div></div>`).join(''):`<div style="font-size:12px;color:var(--text3);">No activities logged yet.</div>`}
+      </div>
+    </div>
+    <div>
+      <div class="ds-title">Quick Actions</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-sm primary" onclick="markDeal(${d.id},'Closed Won');closeModal('detail-modal')">✓ Mark as Won</button>
+        <button class="btn btn-sm danger" onclick="markDeal(${d.id},'Closed Lost');closeModal('detail-modal')">✗ Mark as Lost</button>
+        <button class="btn btn-sm" onclick="closeModal('detail-modal');activityDealId=${d.id};openModal('activity-modal')">📞 Log Activity</button>
+      </div>
+    </div>`;
+  openModal('detail-modal');
+}
+function editFromDetail(){closeModal('detail-modal');openEditDeal(editingId);}
+async function deleteFromDetail(){
+  const d=DEALS.find(x=>x.id===editingId);
+  const ok=await confirm2('Delete Deal?',`"${d?.name}" will be permanently removed.`,'Delete','🗑️');
+  if(ok){DEALS=DEALS.filter(x=>x.id!==editingId);closeModal('detail-modal');renderCurrentView();toast('Deal deleted.','error');}
+}
+function logActivityForDeal(){closeModal('detail-modal');activityDealId=editingId;openModal('activity-modal');}
+
+/* CRUD */
+function openNewDeal(){
+  editingId=null;
+  document.getElementById('deal-modal-title').textContent='New Deal';
+  ['d-name','d-company','d-value','d-notes','d-acv'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('d-id').value='';
+  document.getElementById('d-prob').value=50;
+  document.getElementById('d-stage').value='Prospecting';
+  document.getElementById('d-close').value='';
+  document.getElementById('d-loss').value='';
+  openModal('deal-modal');
+}
+function openEditDeal(id){
+  editingId=id;const d=DEALS.find(x=>x.id===id);if(!d)return;
+  document.getElementById('deal-modal-title').textContent='Edit Deal';
+  document.getElementById('d-id').value=id;
+  document.getElementById('d-name').value=d.name;
+  document.getElementById('d-company').value=d.company;
+  document.getElementById('d-value').value=d.value;
+  document.getElementById('d-stage').value=d.stage;
+  document.getElementById('d-prob').value=d.prob;
+  document.getElementById('d-close').value=d.close;
+  document.getElementById('d-owner').value=d.owner;
+  document.getElementById('d-source').value=d.source;
+  document.getElementById('d-priority').value=d.priority;
+  document.getElementById('d-product').value=d.product;
+  document.getElementById('d-notes').value=d.notes;
+  document.getElementById('d-acv').value=d.acv||'';
+  document.getElementById('d-loss').value=d.lossReason||'';
+  openModal('deal-modal');
+}
+function saveDeal(){
+  const name=document.getElementById('d-name').value.trim();
+  const company=document.getElementById('d-company').value.trim();
+  const value=+document.getElementById('d-value').value;
+  if(!name){toast('Deal name required.','error');return;}
+  if(!company){toast('Company required.','error');return;}
+  if(!value||value<=0){toast('Valid value required.','error');return;}
+  const owner=document.getElementById('d-owner').value;
+  const id=document.getElementById('d-id').value;
+  const data={name,company,value,stage:document.getElementById('d-stage').value,prob:+document.getElementById('d-prob').value,close:document.getElementById('d-close').value||'2025-12-31',owner,oi:initials(owner),oCol:OWNER_COL[owner]||'#00e5b0',source:document.getElementById('d-source').value,product:document.getElementById('d-product').value,priority:document.getElementById('d-priority').value,notes:document.getElementById('d-notes').value,acv:+document.getElementById('d-acv').value||value,lossReason:document.getElementById('d-loss').value};
+  if(id){Object.assign(DEALS.find(x=>x.id===+id),data);toast(`"${name}" updated!`);}
+  else{DEALS.unshift({id:Date.now(),...data,created:new Date().toISOString().slice(0,10),lastContact:new Date().toISOString().slice(0,10)});toast(`"${name}" created!`);}
+  closeModal('deal-modal');renderCurrentView();
+}
+async function deleteDeal(id){
+  const d=DEALS.find(x=>x.id===id);
+  const ok=await confirm2('Delete Deal?',`"${d?.name}" will be removed.`,'Delete','🗑️');
+  if(ok){DEALS=DEALS.filter(x=>x.id!==id);renderCurrentView();toast('Deal deleted.','error');}
+}
+function markDeal(id,stage){
+  const d=DEALS.find(x=>x.id===id);if(!d)return;
+  d.stage=stage;
+  if(stage==='Closed Won'){d.prob=100;d.close=new Date().toISOString().slice(0,10);}
+  if(stage==='Closed Lost'){d.prob=0;}
+  renderCurrentView();toast(`${d.name} marked as ${stage}!`);
+}
+function reopenDeal(id){
+  const d=DEALS.find(x=>x.id===id);if(!d)return;
+  d.stage='Prospecting';d.prob=30;
+  renderCurrentView();toast(`${d.name} reopened.`);
+}
+function rowSel(cb){if(cb.checked)selectedDeals.add(+cb.value);else selectedDeals.delete(+cb.value);document.getElementById('bulk-actions').style.display=selectedDeals.size>0?'flex':'none';}
+function toggleAll(cb){document.querySelectorAll('.rck').forEach(c=>{c.checked=cb.checked;if(cb.checked)selectedDeals.add(+c.value);else selectedDeals.delete(+c.value);});document.getElementById('bulk-actions').style.display=selectedDeals.size>0?'flex':'none';}
+async function bulkDelete(){const ok=await confirm2('Delete Selected?',`${selectedDeals.size} deal(s) will be removed.`,'Delete All','🗑️');if(ok){DEALS=DEALS.filter(d=>!selectedDeals.has(d.id));selectedDeals.clear();renderCurrentView();toast('Deals deleted.','error');}}
+function bulkStage(){const stage=prompt('Enter new stage:\nProspecting, Qualification, Demo Scheduled, Proposal Sent, Negotiation, Closed Won, Closed Lost');if(stage&&STAGE_CFG[stage]){DEALS.forEach(d=>{if(selectedDeals.has(d.id))d.stage=stage;});selectedDeals.clear();renderCurrentView();toast(`Deals moved to ${stage}.`);}}
+function bulkOwner(){const o=prompt('Reassign to:\nSanjay Kumar, Priya Nair, Rahul Mehta, Anjali Rao, Vikram Singh');if(o&&OWNER_COL[o]){DEALS.forEach(d=>{if(selectedDeals.has(d.id)){d.owner=o;d.oi=initials(o);d.oCol=OWNER_COL[o];}});selectedDeals.clear();renderCurrentView();toast(`Reassigned to ${o}.`);}}
+function logActivity(){
+  const icons={Call:'📞',Email:'✉️',Meeting:'🤝',Demo:'🎥','Proposal Sent':'📄','Follow-up':'🔄'};
+  const type=document.getElementById('a-type').value;
+  ACTIVITIES.unshift({id:Date.now(),type,icon:icons[type]||'📋',dealId:activityDealId,outcome:document.getElementById('a-outcome').value,dur:document.getElementById('a-dur').value+' min',notes:document.getElementById('a-notes').value||'Activity logged.',date:document.getElementById('a-date').value||new Date().toISOString(),rep:'Sanjay Kumar'});
+  const d=DEALS.find(x=>x.id===activityDealId);
+  if(d)d.lastContact=new Date().toISOString().slice(0,10);
+  closeModal('activity-modal');toast(`${type} logged!`);
+}
+function exportCSV(){const h=['Deal Name','Company','Owner','Value','Stage','Probability','Close Date','Source','Priority'];const rows=DEALS.map(d=>[d.name,d.company,d.owner,d.value,d.stage,d.prob+'%',d.close,d.source,d.priority]);const csv=[h,...rows].map(r=>r.join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='deals.csv';a.click();toast('CSV exported!');}
+
+/* NOTIFICATIONS */
+function renderNotifications(){
+  const ts={success:'rgba(0,229,176,0.08);border-left:3px solid var(--accent)',danger:'rgba(255,77,109,0.08);border-left:3px solid var(--rose)',info:'var(--bg3);border-left:3px solid var(--blue)'};
+  document.getElementById('notif-list').innerHTML=NOTIFICATIONS.map(n=>`<div style="display:flex;gap:12px;padding:13px 14px;background:${ts[n.type]||'var(--bg3)'};border-radius:9px;opacity:${n.read?0.5:1};"><span style="font-size:18px;">${n.icon}</span><div style="flex:1;"><div style="font-weight:600;font-size:13px;color:var(--text);">${n.title}</div><div style="font-size:11px;color:var(--text3);margin-top:3px;">${n.body}</div></div>${!n.read?`<button class="btn btn-xs" onclick="markRead(${n.id})">✓</button>`:''}</div>`).join('');
+}
+function markRead(id){const n=NOTIFICATIONS.find(x=>x.id===id);if(n)n.read=true;renderNotifications();document.getElementById('notif-count').textContent=NOTIFICATIONS.filter(n=>!n.read).length;}
+function markAllRead(){NOTIFICATIONS.forEach(n=>n.read=true);renderNotifications();document.getElementById('notif-count').textContent=0;}
+
+function toggleDD(e,id){e.stopPropagation();document.querySelectorAll('.dropdown-menu.open').forEach(m=>{if(m.id!==id)m.classList.remove('open');});document.getElementById(id)?.classList.toggle('open');}
+document.addEventListener('click',()=>document.querySelectorAll('.dropdown-menu.open').forEach(m=>m.classList.remove('open')));
+
+document.getElementById('a-date').value=new Date().toISOString().slice(0,16);
+renderNotifications();
+renderCurrentView();
+</script>
+<script src="../../assets/js/auth.js"></script>
+</body>
+</html>

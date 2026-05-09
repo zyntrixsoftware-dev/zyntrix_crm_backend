@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Zyntrix CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--bg5:#1c2e42;
+  --surface:#0f1d2e;
+  --accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,0.10);
+  --blue:#3d8ef0;--blue-dim:rgba(61,142,240,0.12);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.12);
+  --rose:#ff4d6d;--rose-dim:rgba(255,77,109,0.12);
+  --purple:#b57bee;--purple-dim:rgba(181,123,238,0.12);
+  --orange:#ff7d40;--orange-dim:rgba(255,125,64,0.12);
+  --teal:#22d3ee;--teal-dim:rgba(34,211,238,0.12);
+  --text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;
+  --radius:14px;--sidebar:260px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden;}
+.shell{display:flex;height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;position:relative;}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:260px;background:radial-gradient(ellipse at 30% 0%,rgba(0,229,176,0.06) 0%,transparent 70%);pointer-events:none;}
+.brand{padding:22px 20px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.brand-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:800;color:var(--bg);flex-shrink:0;box-shadow:0 0 20px rgba(0,229,176,0.3);}
+.brand-text{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.brand-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px;letter-spacing:0.5px;}
+.nav-group{padding:16px 12px 6px;}
+.nav-label{font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 8px;font-family:var(--display);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all 0.18s;margin-bottom:2px;position:relative;font-weight:500;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--accent);}
+.nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0;}
+.nav-count{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--mono);background:var(--bg4);color:var(--text2);padding:2px 7px;border-radius:6px;}
+.nav-count.hot{background:var(--rose-dim);color:var(--rose);}
+.nav-count.ok{background:var(--accent-dim);color:var(--accent);}
+.nav-divider{height:1px;background:var(--border);margin:8px 12px;}
+.sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);flex-shrink:0;}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background 0.15s;}
+.user-card:hover{background:var(--border);}
+.avatar-lg{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bg);flex-shrink:0;font-family:var(--display);}
+.user-name{font-size:13px;font-weight:600;color:var(--text);}
+.user-role{font-size:11px;color:var(--text3);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:64px;min-height:64px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;position:relative;}
+.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,176,0.15),transparent);}
+.page-hd{flex:1;}
+.page-title{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.page-crumb{font-size:11px;color:var(--text3);margin-top:1px;}
+.page-crumb span{color:var(--accent);}
+.tbtn{padding:8px 16px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:flex;align-items:center;gap:7px;transition:all 0.18s;white-space:nowrap;}
+.tbtn:hover{background:var(--bg3);}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(0,229,176,0.25);}
+.tbtn.primary:hover{background:var(--accent2);}
+.tbtn.danger{background:rgba(255,77,109,0.1);border-color:rgba(255,77,109,0.3);color:var(--rose);}
+.tbtn.danger:hover{background:rgba(255,77,109,0.2);}
+
+/* ── SETTINGS LAYOUT ── */
+.settings-shell{display:flex;flex:1;overflow:hidden;}
+.settings-nav{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);padding:16px 12px;overflow-y:auto;}
+.sn-section{margin-bottom:6px;}
+.sn-label{font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:8px 10px 6px;font-family:var(--display);}
+.sn-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all 0.15s;}
+.sn-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.sn-item.active{background:var(--accent-dim);color:var(--accent);}
+.sn-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.settings-content{flex:1;overflow-y:auto;background:var(--bg);}
+.settings-content::-webkit-scrollbar{width:5px;}
+.settings-content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.s-section{padding:28px 32px;}
+.s-section-title{font-family:var(--display);font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.5px;margin-bottom:4px;}
+.s-section-sub{font-size:13px;color:var(--text3);margin-bottom:24px;}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px;}
+.card:last-child{margin-bottom:0;}
+.card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.card-sub{font-size:12px;color:var(--text3);margin-bottom:18px;}
+
+/* ── FORM ELEMENTS ── */
+.form-group{margin-bottom:18px;}
+.form-group:last-child{margin-bottom:0;}
+.form-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block;}
+.form-label span{font-weight:400;color:var(--text3);margin-left:4px;}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border 0.15s;}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,176,0.08);}
+.form-input::placeholder{color:var(--text3);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+select.form-input{cursor:pointer;}
+select.form-input option{background:var(--bg2);}
+textarea.form-input{resize:vertical;min-height:80px;}
+
+/* ── TOGGLE ── */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info{flex:1;}
+.toggle-label{font-size:13px;font-weight:500;color:var(--text);}
+.toggle-desc{font-size:11.5px;color:var(--text3);margin-top:2px;}
+.toggle{width:40px;height:22px;background:var(--bg4);border-radius:11px;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;border:1px solid var(--border2);}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3);}
+.toggle.on::after{transform:translateX(18px);}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;font-family:var(--mono);}
+.b-accent{background:var(--accent-dim);color:var(--accent);}
+.b-blue{background:var(--blue-dim);color:var(--blue);}
+.b-amber{background:var(--amber-dim);color:var(--amber);}
+.b-rose{background:var(--rose-dim);color:var(--rose);}
+.b-purple{background:var(--purple-dim);color:var(--purple);}
+.b-gray{background:rgba(78,102,128,0.15);color:var(--text3);}
+
+/* ── BTN ── */
+.btn{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:all 0.18s;}
+.btn:hover{background:var(--bg4);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
+.btn.primary:hover{background:var(--accent2);}
+.btn.danger{background:var(--rose-dim);border-color:rgba(255,77,109,0.3);color:var(--rose);}
+.btn.danger:hover{background:rgba(255,77,109,0.2);}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:7px;}
+.btn-xs{padding:3px 9px;font-size:11px;border-radius:6px;}
+
+/* ── TEAM TABLE ── */
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid var(--border2);}
+th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 14px 12px;white-space:nowrap;font-family:var(--display);}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(255,255,255,0.015);}
+
+/* ── INTEGRATION CARD ── */
+.integ-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:10px;transition:all 0.2s;}
+.integ-card:last-child{margin-bottom:0;}
+.integ-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.integ-info{flex:1;}
+.integ-title{font-size:13px;font-weight:600;color:var(--text);}
+.integ-sub{font-size:11.5px;color:var(--text3);margin-top:2px;}
+.integ-status{font-size:11px;margin-top:4px;}
+
+/* ── PIPELINE STAGE ── */
+.stage-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;margin-bottom:8px;cursor:grab;}
+.stage-handle{color:var(--text3);font-size:14px;cursor:grab;}
+.stage-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.stage-name{flex:1;font-size:13px;font-weight:500;color:var(--text);}
+.stage-prob{font-family:var(--mono);font-size:12px;color:var(--text3);}
+
+/* ── PLAN CARD ── */
+.plan-card{border-radius:14px;padding:22px;position:relative;overflow:hidden;}
+.plan-card.active{background:linear-gradient(135deg,rgba(0,229,176,0.08),rgba(61,142,240,0.05));border:1px solid rgba(0,229,176,0.25);}
+.plan-card.other{background:var(--bg3);border:1px solid var(--border);}
+
+/* ── ANIMATE ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.ani{animation:fadeUp 0.3s ease both;}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);max-width:320px;animation:toastIn 0.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.toast.success{border-color:rgba(0,229,176,0.3);}
+.toast.error{border-color:rgba(255,77,109,0.3);}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(0.95);}to{opacity:1;transform:none;}}
+@keyframes toastOut{to{opacity:0;transform:translateY(6px) scale(0.96);}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">Z</div>
+    <div><div class="brand-text">Zyntrix CRM</div><div class="brand-sub">v2.5 · Sales Suite</div></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon">⌂</span> Dashboard</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Pipeline</div>
+    <a class="nav-item" href="pipeline.html"><span class="nav-icon">◈</span> Pipeline Board <span class="nav-count ok">18</span></a>
+    <a class="nav-item" href="deals.html"><span class="nav-icon">⟐</span> Deals <span class="nav-count">18</span></a>
+    <a class="nav-item" href="leads.html"><span class="nav-icon">◎</span> Leads <span class="nav-count hot">42</span></a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Engagement</div>
+    <a class="nav-item" href="activities.html"><span class="nav-icon">☏</span> Activities</a>
+    <a class="nav-item" href="emails.html"><span class="nav-icon">✉</span> Emails &amp; Proposals</a>
+    <a class="nav-item" href="meetings.html"><span class="nav-icon">◷</span> Meetings <span class="nav-count hot">3</span></a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Insights</div>
+    <a class="nav-item" href="reports.html"><span class="nav-icon">↗</span> Revenue Reports</a>
+    <a class="nav-item" href="leaderboard.html"><span class="nav-icon">⬡</span> Leaderboard</a>
+    <a class="nav-item" href="playbook.html"><span class="nav-icon">⊞</span> Playbook</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Admin</div>
+    <a class="nav-item active" href="settings.html"><span class="nav-icon">⊙</span> Settings</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar-lg">SK</div>
+      <div><div class="user-name">Sanjay Kumar</div><div class="user-role">Sales Manager</div></div>
+    </div>
+    <button class="tbtn" type="button" onclick="logout()" style="margin-top:8px;width:100%;justify-content:center;">⏻ Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="page-hd">
+      <div class="page-title">Settings</div>
+      <div class="page-crumb">Zyntrix CRM › Admin › <span>Settings</span></div>
+    </div>
+    <button class="tbtn" onclick="toast('Settings discarded.')">Discard Changes</button>
+    <button class="tbtn primary" onclick="saveSettings()">✓ Save Changes</button>
+  </div>
+
+  <!-- SETTINGS BODY -->
+  <div class="settings-shell">
+
+    <!-- LEFT SETTINGS NAV -->
+    <nav class="settings-nav">
+      <div class="sn-section">
+        <div class="sn-label">Account</div>
+        <div class="sn-item active" onclick="switchSection('profile',this)"><span class="sn-icon">👤</span> Profile</div>
+        <div class="sn-item" onclick="switchSection('password',this)"><span class="sn-icon">🔒</span> Password & Security</div>
+        <div class="sn-item" onclick="switchSection('notifications',this)"><span class="sn-icon">🔔</span> Notifications</div>
+      </div>
+      <div class="sn-section">
+        <div class="sn-label">CRM Configuration</div>
+        <div class="sn-item" onclick="switchSection('pipeline',this)"><span class="sn-icon">◈</span> Pipeline Stages</div>
+        <div class="sn-item" onclick="switchSection('fields',this)"><span class="sn-icon">⊞</span> Custom Fields</div>
+        <div class="sn-item" onclick="switchSection('sources',this)"><span class="sn-icon">◎</span> Lead Sources</div>
+        <div class="sn-item" onclick="switchSection('products',this)"><span class="sn-icon">📦</span> Products & Pricing</div>
+      </div>
+      <div class="sn-section">
+        <div class="sn-label">Team</div>
+        <div class="sn-item" onclick="switchSection('team',this)"><span class="sn-icon">⬡</span> Team Members</div>
+        <div class="sn-item" onclick="switchSection('roles',this)"><span class="sn-icon">🎖</span> Roles & Permissions</div>
+        <div class="sn-item" onclick="switchSection('quotas',this)"><span class="sn-icon">🎯</span> Quotas & Targets</div>
+      </div>
+      <div class="sn-section">
+        <div class="sn-label">Integrations</div>
+        <div class="sn-item" onclick="switchSection('integrations',this)"><span class="sn-icon">⟐</span> Integrations</div>
+        <div class="sn-item" onclick="switchSection('email-settings',this)"><span class="sn-icon">✉</span> Email Settings</div>
+        <div class="sn-item" onclick="switchSection('data',this)"><span class="sn-icon">↕</span> Data & Import</div>
+      </div>
+      <div class="sn-section">
+        <div class="sn-label">Billing</div>
+        <div class="sn-item" onclick="switchSection('billing',this)"><span class="sn-icon">💳</span> Plan & Billing</div>
+      </div>
+    </nav>
+
+    <!-- SETTINGS CONTENT -->
+    <div class="settings-content">
+
+      <!-- ════ PROFILE ════ -->
+      <div id="sec-profile" class="s-section">
+        <div class="s-section-title">Profile Settings</div>
+        <div class="s-section-sub">Manage your personal information and preferences</div>
+
+        <div class="card ani">
+          <div class="card-title">Personal Information</div>
+          <div class="card-sub">Your name and contact details visible to your team</div>
+          <div style="display:flex;align-items:flex-start;gap:24px;margin-bottom:22px;">
+            <div style="position:relative;">
+              <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:24px;font-weight:800;color:var(--bg);">SK</div>
+              <button onclick="toast('Photo upload coming soon!')" style="position:absolute;bottom:-2px;right:-2px;width:24px;height:24px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);cursor:pointer;font-size:11px;color:var(--text2);display:flex;align-items:center;justify-content:center;">✎</button>
+            </div>
+            <div style="flex:1;">
+              <div style="font-family:var(--display);font-size:16px;font-weight:700;">Sanjay Kumar</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:2px;">Sales Manager · Joined Jan 2024</div>
+              <div style="margin-top:8px;display:flex;gap:6px;">
+                <span class="badge b-accent">Admin</span>
+                <span class="badge b-blue">Sales Manager</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" value="Sanjay">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" value="Kumar">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" value="sanjay.kumar@zyntrix.in">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-input" value="+91 98765 43210">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Job Title</label>
+              <input type="text" class="form-input" value="Sales Manager">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Department</label>
+              <select class="form-input"><option selected>Sales</option><option>Marketing</option><option>Customer Success</option><option>Operations</option></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bio <span>(optional)</span></label>
+            <textarea class="form-input" placeholder="A brief description visible to your team...">Leading the EdTech sales team at Zyntrix. Focused on school and college segment in South India.</textarea>
+          </div>
+        </div>
+
+        <div class="card ani">
+          <div class="card-title">Preferences</div>
+          <div class="card-sub">Localization and display settings</div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Timezone</label>
+              <select class="form-input"><option selected>Asia/Kolkata (IST)</option><option>UTC</option><option>Asia/Dubai</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Currency</label>
+              <select class="form-input"><option selected>₹ INR</option><option>$ USD</option><option>€ EUR</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date Format</label>
+              <select class="form-input"><option selected>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Language</label>
+              <select class="form-input"><option selected>English</option><option>हिन्दी (Hindi)</option><option>తెలుగు (Telugu)</option><option>தமிழ் (Tamil)</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Number Format</label>
+              <select class="form-input"><option selected>Indian (₹1,23,456)</option><option>International (₹123,456)</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ PASSWORD ════ -->
+      <div id="sec-password" class="s-section" style="display:none;">
+        <div class="s-section-title">Password & Security</div>
+        <div class="s-section-sub">Keep your account secure</div>
+        <div class="card ani">
+          <div class="card-title">Change Password</div>
+          <div class="card-sub">Use a strong password of at least 12 characters</div>
+          <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" placeholder="Enter current password"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" placeholder="At least 12 characters"></div>
+            <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" class="form-input" placeholder="Repeat new password"></div>
+          </div>
+          <button class="btn primary btn-sm" onclick="toast('Password updated successfully!')">Update Password</button>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Two-Factor Authentication</div>
+          <div class="card-sub">Add an extra layer of security to your account</div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-label">Enable 2FA via Authenticator App</div><div class="toggle-desc">Use Google Authenticator or Authy to generate codes</div></div>
+            <div class="toggle" onclick="toggleSwitch(this)"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-label">SMS Backup Code</div><div class="toggle-desc">Send a backup code to +91 98765 43210 when 2FA is unavailable</div></div>
+            <div class="toggle on" onclick="toggleSwitch(this)"></div>
+          </div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Active Sessions</div>
+          <div class="card-sub">Devices currently logged in to your account</div>
+          <div id="sessions-list"></div>
+        </div>
+      </div>
+
+      <!-- ════ NOTIFICATIONS ════ -->
+      <div id="sec-notifications" class="s-section" style="display:none;">
+        <div class="s-section-title">Notification Settings</div>
+        <div class="s-section-sub">Choose what you want to be notified about and how</div>
+        <div class="card ani">
+          <div class="card-title">Deal Notifications</div>
+          <div class="card-sub">Alerts related to your pipeline and deals</div>
+          <div id="notif-deals"></div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Activity & Task Notifications</div>
+          <div class="card-sub">Reminders and team activity alerts</div>
+          <div id="notif-activity"></div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Report Notifications</div>
+          <div class="card-sub">Scheduled reports and performance updates</div>
+          <div id="notif-reports"></div>
+        </div>
+      </div>
+
+      <!-- ════ PIPELINE STAGES ════ -->
+      <div id="sec-pipeline" class="s-section" style="display:none;">
+        <div class="s-section-title">Pipeline Stages</div>
+        <div class="s-section-sub">Customize your sales stages and default win probability</div>
+        <div class="card ani">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div><div class="card-title" style="margin-bottom:0;">Stage Configuration</div><div style="font-size:12px;color:var(--text3);margin-top:3px;">Drag to reorder · Click to edit</div></div>
+            <button class="btn btn-sm primary" onclick="toast('New stage added!')">＋ Add Stage</button>
+          </div>
+          <div id="stage-list"></div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Stage Rules</div>
+          <div class="card-sub">Automations triggered on stage changes</div>
+          <div id="stage-rules"></div>
+        </div>
+      </div>
+
+      <!-- ════ TEAM ════ -->
+      <div id="sec-team" class="s-section" style="display:none;">
+        <div class="s-section-title">Team Members</div>
+        <div class="s-section-sub">Manage access and roles for your sales team</div>
+        <div class="card ani">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div><div class="card-title" style="margin-bottom:0;">5 Active Members</div><div style="font-size:12px;color:var(--text3);margin-top:3px;">Plan: up to 10 members</div></div>
+            <button class="btn btn-sm primary" onclick="toast('Invite sent to email!')">＋ Invite Member</button>
+          </div>
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Active</th><th>Actions</th></tr></thead>
+            <tbody id="team-table"></tbody>
+          </table>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Pending Invitations</div>
+          <div class="card-sub">Invites sent but not yet accepted</div>
+          <div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">No pending invitations</div>
+        </div>
+      </div>
+
+      <!-- ════ QUOTAS ════ -->
+      <div id="sec-quotas" class="s-section" style="display:none;">
+        <div class="s-section-title">Quotas &amp; Targets</div>
+        <div class="s-section-sub">Set Q2 2025 revenue quotas and activity targets per rep</div>
+        <div class="card ani">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="card-title" style="margin-bottom:0;">Q2 2025 Revenue Quotas</div>
+            <select class="form-input" style="width:auto;padding:6px 10px;"><option>Q2 2025</option><option>Q3 2025</option><option>Q1 2025</option></select>
+          </div>
+          <table>
+            <thead><tr><th>Rep</th><th>Revenue Quota</th><th>Deals Target</th><th>Calls Target</th><th>Demo Target</th><th>Actions</th></tr></thead>
+            <tbody id="quota-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════ INTEGRATIONS ════ -->
+      <div id="sec-integrations" class="s-section" style="display:none;">
+        <div class="s-section-title">Integrations</div>
+        <div class="s-section-sub">Connect Zyntrix CRM with your tools and platforms</div>
+        <div class="card ani">
+          <div class="card-title">Connected Integrations</div>
+          <div class="card-sub">Active connections syncing with Zyntrix</div>
+          <div id="integrations-connected"></div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Available Integrations</div>
+          <div class="card-sub">Connect additional tools to streamline your workflow</div>
+          <div id="integrations-available"></div>
+        </div>
+      </div>
+
+      <!-- ════ EMAIL SETTINGS ════ -->
+      <div id="sec-email-settings" class="s-section" style="display:none;">
+        <div class="s-section-title">Email Settings</div>
+        <div class="s-section-sub">Configure email sending, tracking, and defaults</div>
+        <div class="card ani">
+          <div class="card-title">Email Account</div>
+          <div class="card-sub">Email address used for sending from Zyntrix</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">From Name</label><input type="text" class="form-input" value="Sanjay Kumar · Zyntrix CRM"></div>
+            <div class="form-group"><label class="form-label">From Email</label><input type="email" class="form-input" value="sanjay@zyntrixcrm.in"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Email Signature</label><textarea class="form-input" style="min-height:100px;">Sanjay Kumar | Sales Manager
+Zyntrix CRM — Built for EdTech
+📞 +91 98765 43210 | 🌐 zyntrixcrm.in</textarea></div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Email Tracking</div>
+          <div id="email-tracking-toggles"></div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Sending Limits</div>
+          <div class="card-sub">Stay within provider limits to protect deliverability</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Max Emails per Day</label><input type="number" class="form-input" value="200"></div>
+            <div class="form-group"><label class="form-label">Delay Between Emails (seconds)</label><input type="number" class="form-input" value="30"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ DATA IMPORT ════ -->
+      <div id="sec-data" class="s-section" style="display:none;">
+        <div class="s-section-title">Data &amp; Import</div>
+        <div class="s-section-sub">Import leads, export data, and manage backups</div>
+        <div class="card ani">
+          <div class="card-title">Import Data</div>
+          <div class="card-sub">Upload CSV files to import leads, contacts, or deals</div>
+          <div style="border:2px dashed var(--border2);border-radius:12px;padding:32px;text-align:center;margin-bottom:16px;cursor:pointer;transition:all 0.2s;" onclick="toast('File picker opened — select your CSV file')" onmouseover="this.style.borderColor='rgba(0,229,176,0.4)'" onmouseout="this.style.borderColor='var(--border2)'">
+            <div style="font-size:32px;margin-bottom:10px;">↑</div>
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Drop your CSV file here</div>
+            <div style="font-size:12px;color:var(--text3);">or click to browse · Supports CSV, XLSX · Max 10MB</div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-sm" onclick="toast('Lead import template downloaded!')">↓ Download Lead Template</button>
+            <button class="btn btn-sm" onclick="toast('Contact import template downloaded!')">↓ Download Contact Template</button>
+            <button class="btn btn-sm" onclick="toast('Deal import template downloaded!')">↓ Download Deal Template</button>
+          </div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Export Data</div>
+          <div class="card-sub">Download your CRM data at any time</div>
+          <div style="display:flex;flex-direction:column;gap:8px;" id="export-options"></div>
+        </div>
+        <div class="card ani">
+          <div class="card-title">Import History</div>
+          <div class="card-sub">Recent data imports</div>
+          <table>
+            <thead><tr><th>File</th><th>Type</th><th>Records</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="import-history"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════ BILLING ════ -->
+      <div id="sec-billing" class="s-section" style="display:none;">
+        <div class="s-section-title">Plan &amp; Billing</div>
+        <div class="s-section-sub">Manage your subscription, usage, and invoices</div>
+        <div class="card ani" style="background:linear-gradient(135deg,rgba(0,229,176,0.08),rgba(61,142,240,0.05));border-color:rgba(0,229,176,0.2);">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span class="badge b-accent">Business Plan</span><span class="badge b-blue">Annual</span></div>
+              <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--text);">₹4,800<span style="font-size:14px;font-weight:400;color:var(--text3);">/month</span></div>
+              <div style="font-size:12px;color:var(--text3);margin-top:4px;">₹57,600/year · Next renewal: Jan 1, 2026</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+              <button class="btn btn-sm primary" onclick="toast('Upgrade options loaded...')">⚡ Upgrade to Enterprise</button>
+              <button class="btn btn-sm" onclick="toast('Invoice sent to your email!')">↓ Download Invoice</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;">
+            <div style="background:rgba(255,255,255,0.04);border-radius:9px;padding:12px;text-align:center;"><div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent);">5/10</div><div style="font-size:11px;color:var(--text3);margin-top:3px;">Team Members</div></div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:9px;padding:12px;text-align:center;"><div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--blue);">18</div><div style="font-size:11px;color:var(--text3);margin-top:3px;">Active Deals</div></div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:9px;padding:12px;text-align:center;"><div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--purple);">42</div><div style="font-size:11px;color:var(--text3);margin-top:3px;">Active Leads</div></div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:9px;padding:12px;text-align:center;"><div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--amber);">148</div><div style="font-size:11px;color:var(--text3);margin-top:3px;">Emails Sent (Mo)</div></div>
+          </div>
+        </div>
+        <div class="g2" style="margin-top:16px;">
+          <div class="card ani plan-card other" style="margin-bottom:0;">
+            <div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Starter</div>
+            <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--text3);">₹1,500<span style="font-size:12px;font-weight:400;">/mo</span></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:8px;">Up to 3 users · 500 leads · Basic reporting · Email support</div>
+          </div>
+          <div class="card ani plan-card other" style="margin-bottom:0;border-color:rgba(181,123,238,0.3);background:rgba(181,123,238,0.04);">
+            <div style="display:flex;justify-content:space-between;"><div style="font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);">Enterprise</div><span class="badge b-purple">Recommended</span></div>
+            <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--purple);">₹12,000<span style="font-size:12px;font-weight:400;">/mo</span></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:8px;">Unlimited users · Custom fields · API access · Dedicated CSM</div>
+            <button class="btn btn-sm" style="margin-top:12px;border-color:rgba(181,123,238,0.4);color:var(--purple);" onclick="toast('Sales team will reach out within 24 hrs!')">Contact Sales</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Default sections for remaining tabs -->
+      <div id="sec-fields" class="s-section" style="display:none;">
+        <div class="s-section-title">Custom Fields</div>
+        <div class="s-section-sub">Add custom data fields to leads, deals, and contacts</div>
+        <div class="card ani">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div class="card-title" style="margin-bottom:0;">Deal Custom Fields</div><button class="btn btn-sm primary" onclick="toast('New field dialog opened!')">＋ Add Field</button></div>
+          <div id="custom-fields-list"></div>
+        </div>
+      </div>
+      <div id="sec-sources" class="s-section" style="display:none;">
+        <div class="s-section-title">Lead Sources</div>
+        <div class="s-section-sub">Define where your leads come from for tracking and attribution</div>
+        <div class="card ani">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div class="card-title" style="margin-bottom:0;">Lead Sources</div><button class="btn btn-sm primary" onclick="toast('New source added!')">＋ Add Source</button></div>
+          <div id="lead-sources-list"></div>
+        </div>
+      </div>
+      <div id="sec-products" class="s-section" style="display:none;">
+        <div class="s-section-title">Products &amp; Pricing</div>
+        <div class="s-section-sub">Manage your product catalogue and pricing tiers</div>
+        <div class="card ani">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div class="card-title" style="margin-bottom:0;">Product Catalogue</div><button class="btn btn-sm primary" onclick="toast('New product added!')">＋ Add Product</button></div>
+          <div id="products-list"></div>
+        </div>
+      </div>
+      <div id="sec-roles" class="s-section" style="display:none;">
+        <div class="s-section-title">Roles &amp; Permissions</div>
+        <div class="s-section-sub">Control what each role can see and do in Zyntrix CRM</div>
+        <div class="card ani"><div id="roles-table"></div></div>
+      </div>
+
+    </div><!-- /settings-content -->
+  </div><!-- /settings-shell -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* ══ UTILS ══ */
+function toast(msg,type='success'){
+  const tw=document.getElementById('toast-wrap');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  const ic=type==='error'?'✕':'✓';
+  t.innerHTML=`<span style="color:${type==='error'?'var(--rose)':'var(--accent)'};font-size:16px;">${ic}</span>${msg}`;
+  tw.appendChild(t);
+  setTimeout(()=>{t.style.animation='toastOut 0.3s ease forwards';setTimeout(()=>t.remove(),300);},3000);
+}
+function saveSettings(){toast('Settings saved successfully!');}
+function toggleSwitch(el){el.classList.toggle('on');toast(el.classList.contains('on')?'Setting enabled':'Setting disabled');}
+
+/* ══ SECTION SWITCH ══ */
+function switchSection(id, el){
+  document.querySelectorAll('.s-section').forEach(s=>s.style.display='none');
+  const sec = document.getElementById('sec-'+id);
+  if(sec) sec.style.display='';
+  document.querySelectorAll('.sn-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  // lazy render
+  if(id==='notifications') buildNotifications();
+  if(id==='pipeline') buildPipelineStages();
+  if(id==='team') buildTeam();
+  if(id==='quotas') buildQuotas();
+  if(id==='integrations') buildIntegrations();
+  if(id==='email-settings') buildEmailSettings();
+  if(id==='data') buildDataSection();
+  if(id==='fields') buildCustomFields();
+  if(id==='sources') buildLeadSources();
+  if(id==='products') buildProducts();
+  if(id==='roles') buildRoles();
+  if(id==='password') buildSessions();
+}
+
+/* ══ NOTIFICATIONS ══ */
+function buildNotifications(){
+  const togFn = (items,elId) => {
+    const el=document.getElementById(elId);
+    if(!el||el.innerHTML.trim())return;
+    el.innerHTML=items.map(i=>`<div class="toggle-row">
+      <div class="toggle-info"><div class="toggle-label">${i.label}</div><div class="toggle-desc">${i.desc}</div></div>
+      <div class="toggle ${i.on?'on':''}" onclick="toggleSwitch(this)"></div>
+    </div>`).join('');
+  };
+  togFn([
+    {label:'Deal stage changes',desc:'When a deal moves to a new stage',on:true},
+    {label:'Deal won notification',desc:'Celebrate every closed deal',on:true},
+    {label:'Deal at risk alert',desc:'When a deal is stalled for 14+ days',on:true},
+    {label:'New deal assigned to me',desc:'When a deal is assigned to you',on:true},
+    {label:'Deal close date approaching',desc:'7 and 1 day reminders before close date',on:false},
+  ],'notif-deals');
+  togFn([
+    {label:'Task due today',desc:'Morning reminder of tasks due today',on:true},
+    {label:'Task overdue',desc:'Alert when a task passes its due date',on:true},
+    {label:'New activity logged by team',desc:'When a teammate logs a call or email',on:false},
+    {label:'Meeting reminders',desc:'15 and 60 minute reminders before meetings',on:true},
+    {label:'New lead assigned',desc:'When a lead is assigned to you',on:true},
+  ],'notif-activity');
+  togFn([
+    {label:'Weekly performance digest',desc:'Every Monday morning summary',on:true},
+    {label:'Monthly quota report',desc:'First of each month',on:true},
+    {label:'Leaderboard updates',desc:'When your ranking changes',on:false},
+    {label:'Pipeline health alert',desc:'When pipeline coverage drops below 3×',on:true},
+  ],'notif-reports');
+}
+
+/* ══ PIPELINE STAGES ══ */
+const STAGES = [
+  {name:'Prospecting',prob:20,col:'#4e6680'},
+  {name:'Qualification',prob:30,col:'#3d8ef0'},
+  {name:'Demo Scheduled',prob:45,col:'#b57bee'},
+  {name:'Proposal Sent',prob:55,col:'#f5a623'},
+  {name:'Negotiation',prob:75,col:'#ff7d40'},
+  {name:'Closed Won',prob:100,col:'#00e5b0'},
+  {name:'Closed Lost',prob:0,col:'#ff4d6d'},
+];
+function buildPipelineStages(){
+  const el=document.getElementById('stage-list');
+  if(el&&!el.innerHTML.trim()){
+    el.innerHTML=STAGES.map(s=>`<div class="stage-item">
+      <span class="stage-handle">⠿</span>
+      <div class="stage-dot" style="background:${s.col};"></div>
+      <span class="stage-name">${s.name}</span>
+      <span class="stage-prob">${s.prob}% default prob</span>
+      <div style="display:flex;gap:6px;margin-left:8px;">
+        <button class="btn btn-xs" onclick="toast('Editing stage ${s.name}...')">Edit</button>
+        ${s.name!=='Closed Won'&&s.name!=='Closed Lost'?`<button class="btn btn-xs danger" onclick="toast('Stage deleted!')">✕</button>`:''}
+      </div>
+    </div>`).join('');
+  }
+  const rl=document.getElementById('stage-rules');
+  if(rl&&!rl.innerHTML.trim()){
+    rl.innerHTML=[
+      {trigger:'Move to Demo Scheduled',action:'Create a task: Prepare demo environment',col:'var(--purple)'},
+      {trigger:'Move to Proposal Sent',action:'Send follow-up email in 48 hours',col:'var(--amber)'},
+      {trigger:'Move to Negotiation',action:'Notify Sales Manager via email',col:'var(--orange)'},
+      {trigger:'Move to Closed Won',action:'Create onboarding task + notify CS team',col:'var(--accent)'},
+    ].map(r=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;margin-bottom:8px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:${r.col};flex-shrink:0;"></div>
+      <div style="flex:1;"><div style="font-size:12.5px;font-weight:600;color:var(--text);">${r.trigger}</div><div style="font-size:11.5px;color:var(--text3);margin-top:2px;">→ ${r.action}</div></div>
+      <button class="btn btn-xs" onclick="toast('Rule editor opened!')">Edit</button>
+    </div>`).join('');
+  }
+}
+
+/* ══ TEAM ══ */
+const TEAM_MEMBERS = [
+  {name:'Sanjay Kumar',oi:'SK',col:'#00e5b0',email:'sanjay@zyntrix.in',role:'Admin',status:'Active',last:'Just now'},
+  {name:'Priya Nair',  oi:'PN',col:'#3d8ef0',email:'priya@zyntrix.in', role:'AE',   status:'Active',last:'2 hrs ago'},
+  {name:'Rahul Mehta', oi:'RM',col:'#b57bee',email:'rahul@zyntrix.in', role:'AE',   status:'Active',last:'Today'},
+  {name:'Anjali Rao',  oi:'AR',col:'#f5a623',email:'anjali@zyntrix.in',role:'AE',   status:'Active',last:'Yesterday'},
+  {name:'Vikram Singh',oi:'VS',col:'#22d3ee',email:'vikram@zyntrix.in',role:'AE',   status:'Active',last:'2 days ago'},
+];
+function buildTeam(){
+  const el=document.getElementById('team-table');
+  if(!el||el.innerHTML.trim())return;
+  el.innerHTML=TEAM_MEMBERS.map((m,i)=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:${m.col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${m.oi}</div>
+      <span style="font-weight:600;color:var(--text);">${m.name}</span>${i===0?'<span class="badge b-accent" style="font-size:10px;">You</span>':''}
+    </div></td>
+    <td style="font-size:12px;color:var(--text3);">${m.email}</td>
+    <td><span class="badge ${m.role==='Admin'?'b-accent':'b-gray'}" style="font-size:10px;">${m.role}</span></td>
+    <td><span style="display:flex;align-items:center;gap:5px;font-size:12px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);"></span>${m.status}</span></td>
+    <td style="font-size:12px;color:var(--text3);">${m.last}</td>
+    <td><div style="display:flex;gap:5px;">
+      <button class="btn btn-xs" onclick="toast('Editing ${m.name}...')">Edit</button>
+      ${i>0?`<button class="btn btn-xs danger" onclick="toast('${m.name} removed from team.')">Remove</button>`:''}
+    </div></td>
+  </tr>`).join('');
+}
+
+/* ══ QUOTAS ══ */
+function buildQuotas(){
+  const el=document.getElementById('quota-table');
+  if(!el||el.innerHTML.trim())return;
+  const quotas=[{name:'Sanjay Kumar',oi:'SK',col:'#00e5b0',rev:75,deals:12,calls:400,demos:15},
+    {name:'Priya Nair',oi:'PN',col:'#3d8ef0',rev:68,deals:10,calls:350,demos:12},
+    {name:'Rahul Mehta',oi:'RM',col:'#b57bee',rev:60,deals:9,calls:320,demos:11},
+    {name:'Anjali Rao',oi:'AR',col:'#f5a623',rev:47,deals:7,calls:280,demos:8},
+    {name:'Vikram Singh',oi:'VS',col:'#22d3ee',rev:40,deals:6,calls:250,demos:7},
+  ];
+  el.innerHTML=quotas.map(q=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:26px;height:26px;border-radius:50%;background:${q.col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${q.oi}</div>
+      <span style="font-weight:600;color:var(--text);">${q.name}</span>
+    </div></td>
+    <td><input type="text" value="₹${q.rev}L" style="width:80px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;text-align:right;"></td>
+    <td><input type="number" value="${q.deals}" style="width:60px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;text-align:right;"></td>
+    <td><input type="number" value="${q.calls}" style="width:70px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;text-align:right;"></td>
+    <td><input type="number" value="${q.demos}" style="width:60px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;text-align:right;"></td>
+    <td><button class="btn btn-xs" onclick="toast('Quota saved for ${q.name}!')">Save</button></td>
+  </tr>`).join('');
+}
+
+/* ══ INTEGRATIONS ══ */
+function buildIntegrations(){
+  const connected=[
+    {icon:'✉',name:'Gmail',sub:'sanjay@zyntrix.in · Syncing 148 emails/month',status:'Connected',statusCol:'var(--accent)',bg:'#ff4d4420'},
+    {icon:'📅',name:'Google Calendar',sub:'Calendar sync enabled · 22 meetings synced',status:'Connected',statusCol:'var(--accent)',bg:'#3d8ef020'},
+    {icon:'📊',name:'Google Sheets',sub:'Exporting reports to drive/zyntrix-reports',status:'Connected',statusCol:'var(--accent)',bg:'#00e5b020'},
+  ];
+  const available=[
+    {icon:'💬',name:'Slack',sub:'Get deal notifications and team alerts in Slack',status:'Not Connected',statusCol:'var(--text3)',bg:'#b57bee20'},
+    {icon:'📞',name:'Exotel / Twilio',sub:'Log calls automatically from your dialer',status:'Not Connected',statusCol:'var(--text3)',bg:'#f5a62320'},
+    {icon:'📄',name:'DocuSign',sub:'Send proposals for e-signature directly',status:'Not Connected',statusCol:'var(--text3)',bg:'#22d3ee20'},
+    {icon:'💰',name:'Razorpay',sub:'Track payment status of closed deals',status:'Not Connected',statusCol:'var(--text3)',bg:'#00e5b020'},
+    {icon:'🔔',name:'WhatsApp Business',sub:'Send automated reminders via WhatsApp',status:'Not Connected',statusCol:'var(--text3)',bg:'#22d3ee20'},
+    {icon:'🗂',name:'Tally / Zoho Books',sub:'Sync invoices and billing data',status:'Not Connected',statusCol:'var(--text3)',bg:'#3d8ef020'},
+  ];
+  const render=(list,elId,isConnected)=>{
+    const el=document.getElementById(elId);
+    if(!el||el.innerHTML.trim())return;
+    el.innerHTML=list.map(i=>`<div class="integ-card">
+      <div class="integ-icon" style="background:${i.bg};">${i.icon}</div>
+      <div class="integ-info"><div class="integ-title">${i.name}</div><div class="integ-sub">${i.sub}</div><div class="integ-status" style="color:${i.statusCol};">● ${i.status}</div></div>
+      <div style="display:flex;gap:6px;">
+        ${isConnected?`<button class="btn btn-xs" onclick="toast('${i.name} settings opened!')">Configure</button><button class="btn btn-xs danger" onclick="toast('${i.name} disconnected.')">Disconnect</button>`
+          :`<button class="btn btn-xs primary" onclick="toast('Connecting to ${i.name}...')">Connect</button>`}
+      </div>
+    </div>`).join('');
+  };
+  render(connected,'integrations-connected',true);
+  render(available,'integrations-available',false);
+}
+
+/* ══ EMAIL SETTINGS ══ */
+function buildEmailSettings(){
+  const el=document.getElementById('email-tracking-toggles');
+  if(!el||el.innerHTML.trim())return;
+  [
+    {label:'Track email opens',desc:'Know when recipients open your emails',on:true},
+    {label:'Track link clicks',desc:'Track clicks on links inside emails',on:true},
+    {label:'BCC me on all sent emails',desc:'Get a copy of every email sent from CRM',on:false},
+    {label:'Auto-log sent emails to deal timeline',desc:'Emails appear automatically in deal activity',on:true},
+    {label:'Unsubscribe footer',desc:'Add required unsubscribe link to bulk emails',on:true},
+  ].forEach(t=>{
+    el.innerHTML+=`<div class="toggle-row"><div class="toggle-info"><div class="toggle-label">${t.label}</div><div class="toggle-desc">${t.desc}</div></div><div class="toggle ${t.on?'on':''}" onclick="toggleSwitch(this)"></div></div>`;
+  });
+}
+
+/* ══ DATA SECTION ══ */
+function buildDataSection(){
+  const exportOpts=document.getElementById('export-options');
+  if(exportOpts&&!exportOpts.innerHTML.trim()){
+    [
+      {label:'Export All Leads (CSV)',count:'42 leads',icon:'◎'},
+      {label:'Export All Deals (CSV)',count:'18 deals',icon:'⟐'},
+      {label:'Export All Contacts (CSV)',count:'156 contacts',icon:'⊙'},
+      {label:'Export Activities Log (CSV)',count:'864 activities',icon:'☏'},
+      {label:'Export Full CRM Backup (ZIP)',count:'All data',icon:'⊞'},
+    ].forEach(e=>{
+      exportOpts.innerHTML+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;">
+        <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:14px;">${e.icon}</span><div><div style="font-size:13px;font-weight:500;color:var(--text);">${e.label}</div><div style="font-size:11px;color:var(--text3);">${e.count}</div></div></div>
+        <button class="btn btn-sm" onclick="toast('Export started — check email for download link.')">↓ Export</button>
+      </div>`;
+    });
+  }
+  const hist=document.getElementById('import-history');
+  if(hist&&!hist.innerHTML.trim()){
+    [
+      {file:'leads-may-2025.csv',type:'Leads',records:'24',status:'Success',date:'May 3, 2025'},
+      {file:'deals-q1-2025.xlsx',type:'Deals',records:'12',status:'Success',date:'Apr 1, 2025'},
+      {file:'contacts-bulk.csv',type:'Contacts',records:'88',status:'Partial',date:'Mar 15, 2025'},
+    ].forEach(r=>{
+      hist.innerHTML+=`<tr>
+        <td style="font-size:12px;color:var(--text);font-family:var(--mono);">${r.file}</td>
+        <td><span class="badge b-gray" style="font-size:10px;">${r.type}</span></td>
+        <td style="font-family:var(--mono);color:var(--text2);">${r.records}</td>
+        <td><span class="badge ${r.status==='Success'?'b-accent':'b-amber'}" style="font-size:10px;">${r.status}</span></td>
+        <td style="font-size:12px;color:var(--text3);">${r.date}</td>
+      </tr>`;
+    });
+  }
+}
+
+/* ══ CUSTOM FIELDS ══ */
+function buildCustomFields(){
+  const el=document.getElementById('custom-fields-list');
+  if(!el||el.innerHTML.trim())return;
+  const fields=[
+    {name:'School Board',type:'Dropdown',values:'CBSE, ICSE, State Board, IB, IGCSE',required:true},
+    {name:'Institution Type',type:'Dropdown',values:'School, College, Coaching Center',required:true},
+    {name:'Student Count',type:'Number',values:'—',required:false},
+    {name:'IT Budget (₹L)',type:'Number',values:'—',required:false},
+    {name:'Decision Maker Name',type:'Text',values:'—',required:false},
+    {name:'Referral Source Person',type:'Text',values:'—',required:false},
+  ];
+  el.innerHTML=fields.map(f=>`<div style="display:flex;align-items:center;gap:14px;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:7px;">
+    <span style="width:8px;height:8px;border-radius:50%;background:${f.required?'var(--accent)':'var(--text3)'};flex-shrink:0;"></span>
+    <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text);">${f.name}</div><div style="font-size:11px;color:var(--text3);">${f.type}${f.values!=='—'?' · Options: '+f.values:''}</div></div>
+    <span class="badge ${f.required?'b-rose':'b-gray'}" style="font-size:10px;">${f.required?'Required':'Optional'}</span>
+    <div style="display:flex;gap:5px;"><button class="btn btn-xs" onclick="toast('Editing field...')">Edit</button><button class="btn btn-xs danger" onclick="toast('Field deleted.')">✕</button></div>
+  </div>`).join('');
+}
+
+/* ══ LEAD SOURCES ══ */
+function buildLeadSources(){
+  const el=document.getElementById('lead-sources-list');
+  if(!el||el.innerHTML.trim())return;
+  const sources=[{name:'Referral',pct:38,col:'#00e5b0'},{name:'Website / Inbound',pct:22,col:'#3d8ef0'},{name:'LinkedIn',pct:16,col:'#b57bee'},{name:'Email Campaign',pct:12,col:'#f5a623'},{name:'Cold Call',pct:8,col:'#22d3ee'},{name:'Event / Conference',pct:4,col:'#ff7d40'}];
+  el.innerHTML=sources.map(s=>`<div style="display:flex;align-items:center;gap:14px;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:7px;">
+    <div style="width:10px;height:10px;border-radius:50%;background:${s.col};flex-shrink:0;"></div>
+    <div style="flex:1;font-size:13px;font-weight:500;color:var(--text);">${s.name}</div>
+    <div style="display:flex;align-items:center;gap:8px;width:140px;"><div style="flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;"><div style="height:100%;background:${s.col};width:${s.pct}%;border-radius:3px;"></div></div><span style="font-family:var(--mono);font-size:11px;color:${s.col};width:28px;text-align:right;">${s.pct}%</span></div>
+    <div style="display:flex;gap:5px;"><button class="btn btn-xs" onclick="toast('Editing source...')">Edit</button><button class="btn btn-xs danger" onclick="toast('Source deleted.')">✕</button></div>
+  </div>`).join('');
+}
+
+/* ══ PRODUCTS ══ */
+function buildProducts(){
+  const el=document.getElementById('products-list');
+  if(!el||el.innerHTML.trim())return;
+  const prods=[
+    {name:'EdTech CRM — Enterprise',price:'₹18.5L ACV',desc:'Full platform · Unlimited users · API access · Dedicated CSM',col:'#00e5b0'},
+    {name:'EdTech CRM — Business',price:'₹8.5L ACV',desc:'Up to 15 users · Advanced analytics · Priority support',col:'#3d8ef0'},
+    {name:'EdTech CRM — Starter',price:'₹2.5L ACV',desc:'Up to 5 users · Core CRM · Email support',col:'#b57bee'},
+    {name:'LMS Add-on',price:'₹1.5L ACV',desc:'Course management, attendance, gradebook — add to any plan',col:'#f5a623'},
+  ];
+  el.innerHTML=`<table><thead><tr><th>Product</th><th>Price</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+    ${prods.map(p=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:${p.col};"></div><span style="font-weight:600;color:var(--text);">${p.name}</span></div></td>
+      <td style="font-family:var(--mono);color:var(--accent);">${p.price}</td>
+      <td style="font-size:12px;color:var(--text3);max-width:220px;">${p.desc}</td>
+      <td><span class="badge b-accent" style="font-size:10px;">Active</span></td>
+      <td><div style="display:flex;gap:5px;"><button class="btn btn-xs" onclick="toast('Editing product...')">Edit</button><button class="btn btn-xs danger" onclick="toast('Product archived.')">Archive</button></div></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+/* ══ ROLES ══ */
+function buildRoles(){
+  const el=document.getElementById('roles-table');
+  if(!el||el.innerHTML.trim())return;
+  const roles=[
+    {name:'Admin',desc:'Full access to all features and settings',perms:['All CRM','Team Mgmt','Billing','Settings','Reports','Import/Export']},
+    {name:'Sales Manager',desc:'Manage team, view all deals and reports',perms:['All CRM','Team View','All Reports','Import/Export']},
+    {name:'Account Executive',desc:'Own deals and leads, view own performance',perms:['Own CRM','Own Reports','Activities','Emails']},
+    {name:'Viewer',desc:'Read-only access to pipeline and reports',perms:['View Deals','View Reports']},
+  ];
+  el.innerHTML=`<div class="card-title" style="margin-bottom:4px;">Roles &amp; Permissions</div><div class="card-sub" style="margin-bottom:16px;">5 members across 3 roles</div>`
+    +roles.map(r=>`<div style="padding:14px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;">
+        <div><div style="font-size:13px;font-weight:600;color:var(--text);">${r.name}</div><div style="font-size:11.5px;color:var(--text3);">${r.desc}</div></div>
+        <button class="btn btn-xs" onclick="toast('Editing ${r.name} role...')">Edit Permissions</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${r.perms.map(p=>`<span class="badge b-gray" style="font-size:10px;">${p}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+/* ══ SESSIONS ══ */
+function buildSessions(){
+  const el=document.getElementById('sessions-list');
+  if(!el||el.innerHTML.trim())return;
+  [
+    {device:'Chrome on Windows · Bengaluru, India',current:true,time:'Active now'},
+    {device:'Safari on iPhone 14 · Bengaluru, India',current:false,time:'2 hours ago'},
+    {device:'Chrome on MacBook · Mumbai, India',current:false,time:'3 days ago'},
+  ].forEach(s=>{
+    el.innerHTML+=`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:18px;">${s.device.includes('iPhone')?'📱':'💻'}</span>
+      <div style="flex:1;"><div style="font-size:13px;color:var(--text);">${s.device}</div><div style="font-size:11px;color:var(--text3);">${s.time}</div></div>
+      ${s.current?`<span class="badge b-accent" style="font-size:10px;">Current</span>`:`<button class="btn btn-xs danger" onclick="toast('Session revoked.')">Revoke</button>`}
+    </div>`;
+  });
+}
+
+/* ══ INIT ══ */
+// Profile section is shown by default, no lazy load needed
+</script>
+<script src="../../assets/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales — Zyntrix CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:    #0d1b2a;
+  --navy2:   #132236;
+  --navy3:   #1a2d42;
+  --navy4:   #203350;
+  --navy5:   #263d5e;
+  --accent:  #4f9cf9;
+  --accent2: #3b82f6;
+  --accent-dim: rgba(59,130,246,0.12);
+  --teal:    #2dd4bf;
+  --amber:   #f59e0b;
+  --rose:    #f43f5e;
+  --green:   #22c55e;
+  --purple:  #a78bfa;
+  --orange:  #fb923c;
+  --text:    #e2e8f0;
+  --text2:   #94a3b8;
+  --text3:   #64748b;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --card:    #132236;
+  --radius:  12px;
+  --sidebar: 248px;
+  --font:    'DM Sans', sans-serif;
+  --mono:    'DM Mono', monospace;
+}
+html, body { height: 100%; background: var(--navy); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.6; overflow: hidden; }
+
+/* ── LAYOUT ── */
+.shell   { display: flex; height: 100vh; }
+.sidebar { width: var(--sidebar); min-width: var(--sidebar); background: var(--navy2); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
+.main    { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar  { height: 62px; min-height: 62px; background: var(--navy2); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 14px; }
+.content { flex: 1; overflow-y: auto; padding: 24px; background: var(--navy); }
+
+/* ── SIDEBAR ── */
+.brand { padding: 20px 18px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.brand-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+.brand-ver  { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 1px; }
+.nav-section { padding: 14px 10px 6px; }
+.nav-label   { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; padding: 0 8px 8px; }
+.nav-item    { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--text2); font-size: 13px; text-decoration: none; transition: all 0.15s; margin-bottom: 1px; position: relative; }
+.nav-item:hover  { background: rgba(34,197,94,0.1); color: var(--text); }
+.nav-item.active { background: rgba(34,197,94,0.12); color: var(--green); font-weight: 500; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--green); border-radius: 0 3px 3px 0; }
+.nav-icon  { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; background: var(--rose); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px; line-height: 1.2; }
+.nav-badge.green { background: rgba(34,197,94,0.2); color: var(--green); }
+.nav-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+.sidebar-footer { margin-top: auto; padding: 14px 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.user-pill   { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.user-pill:hover { background: var(--border); }
+.avatar      { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #22c55e, #16a34a); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+.user-info   { flex: 1; min-width: 0; }
+.user-name   { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role   { font-size: 11px; color: var(--text3); }
+
+/* ── TOPBAR ── */
+.page-title { font-size: 16px; font-weight: 600; color: var(--text); flex: 1; }
+.breadcrumb { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.breadcrumb span { color: var(--text2); }
+.search-box { display: flex; align-items: center; gap: 8px; background: var(--navy3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 14px; min-width: 220px; }
+.search-box input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; font-family: var(--font); width: 100%; }
+.search-box input::placeholder { color: var(--text3); }
+.topbar-btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); display: flex; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
+.topbar-btn:hover { background: var(--navy3); }
+.topbar-btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+.topbar-btn.primary:hover { background: #16a34a; border-color: #16a34a; }
+.notif-wrap { position: relative; }
+.notif-dot  { position: absolute; top: 6px; right: 14px; width: 7px; height: 7px; background: var(--rose); border-radius: 50%; border: 2px solid var(--navy2); }
+
+/* ── GRID ── */
+.grid { display: grid; gap: 16px; }
+.g5   { grid-template-columns: repeat(5,1fr); }
+.g4   { grid-template-columns: repeat(4,1fr); }
+.g3   { grid-template-columns: repeat(3,1fr); }
+.g2   { grid-template-columns: repeat(2,1fr); }
+.g21  { grid-template-columns: 2fr 1fr; }
+.g12  { grid-template-columns: 1fr 2fr; }
+.g13  { grid-template-columns: 1fr 3fr; }
+
+/* ── CARD ── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.card-sm { padding: 16px; }
+.card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.card-sub   { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* ── KPI STRIP ── */
+.kpi-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+.kpi-cell  { background: var(--card); padding: 14px 16px; }
+.kpi-val   { font-size: 24px; font-weight: 600; line-height: 1; letter-spacing: -0.5px; }
+.kpi-lbl   { font-size: 11px; color: var(--text3); margin-top: 5px; }
+.kpi-delta { font-size: 11px; margin-top: 5px; display: flex; align-items: center; gap: 3px; }
+.up { color: var(--green); }
+.dn { color: var(--rose); }
+.neu { color: var(--text3); }
+
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.b-green  { background: rgba(34,197,94,0.13);  color: var(--green); }
+.b-amber  { background: rgba(245,158,11,0.13); color: var(--amber); }
+.b-rose   { background: rgba(244,63,94,0.13);  color: var(--rose); }
+.b-blue   { background: rgba(79,156,249,0.13); color: var(--accent); }
+.b-purple { background: rgba(167,139,250,0.13); color: var(--purple); }
+.b-teal   { background: rgba(45,212,191,0.13); color: var(--teal); }
+.b-gray   { background: rgba(100,116,139,0.13); color: var(--text3); }
+.b-orange { background: rgba(251,146,60,0.13);  color: var(--orange); }
+
+/* ── TABLE ── */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; padding: 0 14px 10px; white-space: nowrap; }
+td { padding: 12px 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text2); vertical-align: middle; }
+tr:first-child td { border-top: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.td-main { font-weight: 500; color: var(--text); }
+.td-sub  { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.td-mono { font-family: var(--mono); font-size: 12px; }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 2px; background: var(--navy3); padding: 4px; border-radius: 10px; margin-bottom: 18px; width: fit-content; }
+.tab  { padding: 7px 16px; border-radius: 7px; cursor: pointer; font-size: 13px; color: var(--text2); transition: all 0.15s; white-space: nowrap; }
+.tab.active { background: var(--navy2); color: var(--text); font-weight: 500; }
+.tab:hover:not(.active) { color: var(--text); }
+
+/* ── PROGRESS ── */
+.prog-bar  { height: 5px; background: var(--navy4); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+/* ── ANNOUNCE ── */
+.announce { display: flex; gap: 12px; align-items: flex-start; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; background: linear-gradient(90deg, rgba(34,197,94,0.08), rgba(45,212,191,0.05)); border: 1px solid rgba(34,197,94,0.22); }
+.ann-icon  { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.ann-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.ann-body  { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.ann-close { margin-left: auto; cursor: pointer; color: var(--text3); font-size: 18px; background: none; border: none; padding: 0 4px; }
+.ann-close:hover { color: var(--text); }
+
+/* ── PIPELINE STAGES ── */
+.stage-track { display: flex; gap: 0; overflow-x: auto; margin-bottom: 18px; }
+.stage-col   { flex: 0 0 180px; min-width: 180px; }
+.stage-hd    { padding: 8px 12px; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); border-bottom: none; }
+.stage-body  { border: 1px solid var(--border); border-radius: 0 0 8px 8px; padding: 8px; min-height: 120px; display: flex; flex-direction: column; gap: 8px; background: var(--navy3); margin-right: 12px; }
+.deal-card   { background: var(--navy4); border: 1px solid var(--border2); border-radius: 8px; padding: 10px; cursor: pointer; transition: all 0.15s; }
+.deal-card:hover { border-color: rgba(34,197,94,0.4); transform: translateY(-1px); }
+.deal-name   { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.deal-val    { font-size: 11px; color: var(--green); font-weight: 600; font-family: var(--mono); }
+.deal-meta   { font-size: 10px; color: var(--text3); margin-top: 5px; }
+.deal-prob   { margin-top: 6px; }
+
+/* ── TIMELINE ── */
+.timeline { display: flex; flex-direction: column; }
+.tl-item  { display: flex; gap: 14px; padding-bottom: 18px; position: relative; }
+.tl-item:last-child { padding-bottom: 0; }
+.tl-dot   { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; position: relative; z-index: 1; }
+.tl-item:not(:last-child)::before { content: ''; position: absolute; left: 15px; top: 32px; bottom: 0; width: 2px; background: var(--border2); }
+.tl-body  { flex: 1; padding-top: 4px; }
+.tl-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.tl-desc  { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.tl-time  { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
+
+/* ── LEADERBOARD ── */
+.leader-row  { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.leader-row:last-child { border-bottom: none; }
+.leader-rank { font-size: 14px; width: 24px; text-align: center; flex-shrink: 0; font-weight: 600; }
+.leader-av   { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0; }
+.leader-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.leader-role { font-size: 11px; color: var(--text3); }
+.leader-val  { margin-left: auto; text-align: right; }
+.leader-rev  { font-size: 14px; font-weight: 600; color: var(--green); font-family: var(--mono); }
+.leader-deals{ font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+/* ── TASK ITEM ── */
+.task-item  { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.task-item:last-child { border-bottom: none; }
+.task-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border2); flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.2s; }
+.task-check:hover { border-color: var(--green); }
+.task-check.done { background: var(--green); border-color: var(--green); display: flex; align-items: center; justify-content: center; }
+.task-body  { flex: 1; }
+.task-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.task-meta  { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.task-pri   { flex-shrink: 0; }
+
+/* ── SCORE RING ── */
+.score-ring { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+.score-ring canvas { position: absolute; inset: 0; }
+.score-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+
+/* ── MODAL ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.overlay.open { display: flex; }
+.modal   { background: var(--navy2); border: 1px solid var(--border2); border-radius: 16px; width: 560px; max-width: 94vw; max-height: 90vh; overflow-y: auto; }
+.modal-hd { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 15px; font-weight: 600; }
+.modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 22px; line-height: 1; }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 22px 24px; }
+.modal-ft   { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+.frow  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.fg    { display: flex; flex-direction: column; gap: 6px; margin-bottom: 0; }
+label  { font-size: 12px; font-weight: 500; color: var(--text2); }
+input, select, textarea { background: var(--navy3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; width: 100%; transition: border 0.15s; }
+input:focus, select:focus, textarea:focus { border-color: var(--green); }
+select option { background: var(--navy2); }
+textarea { resize: vertical; min-height: 80px; }
+.btn  { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.btn:hover { background: var(--navy3); }
+.btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+.btn.primary:hover { background: #16a34a; }
+.btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+
+/* ── METRIC CARD PAIR ── */
+.metric-pair { display: flex; gap: 12px; }
+.metric-box  { flex: 1; background: var(--navy3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+.metric-lbl  { font-size: 11px; color: var(--text3); }
+.metric-val  { font-size: 20px; font-weight: 600; color: var(--text); margin-top: 4px; line-height: 1; }
+
+/* ── TAG ── */
+.tag { display: inline-flex; padding: 2px 8px; background: var(--navy4); border-radius: 5px; font-size: 11px; color: var(--text2); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── FADE IN ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.card { animation: fadeUp 0.35s ease both; }
+.card:nth-child(1){animation-delay:0s} .card:nth-child(2){animation-delay:.05s}
+.card:nth-child(3){animation-delay:.1s} .card:nth-child(4){animation-delay:.15s}
+</style>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/auth.js?v=4"></script>
+</head>
+<body>
+<script>
+if (typeof requireAuth === 'function') { requireAuth(); requireModuleAccess("sales"); }
+</script>
+
+<div class="shell">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">💹</div>
+    <div>
+      <div class="brand-name">Sales CRM</div>
+      <div class="brand-ver">v2.5 · 2025</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item active" href="sales.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Pipeline</div>
+    <a class="nav-item" href="#" onclick="switchView('pipeline');return false"><span class="nav-icon">📊</span> Pipeline Board</a>
+    <a class="nav-item" href="#" onclick="openModal('deal-modal');return false"><span class="nav-icon">🤝</span> Deals <span class="nav-badge green">18</span></a>
+    <a class="nav-item" href="leads.html"><span class="nav-icon">🎯</span> Leads <span class="nav-badge">42</span></a>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <div class="nav-section">
+    <div class="nav-label">Engagement</div>
+    <a class="nav-item" href="#" onclick="openModal('activity-modal');return false"><span class="nav-icon">📞</span> Activities</a>
+    <a class="nav-item" href="#" onclick="openModal('email-modal');return false"><span class="nav-icon">✉️</span> Emails & Proposals</a>
+    <a class="nav-item" href="#"><span class="nav-icon">📅</span> Meetings</a>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <div class="nav-section">
+    <div class="nav-label">Insights</div>
+    <a class="nav-item" href="#"><span class="nav-icon">📈</span> Revenue Reports</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🏆</span> Leaderboard</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🎓</span> Sales Playbook</a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">SK</div>
+      <div class="user-info">
+        <div class="user-name">Sanjay Kumar</div>
+        <div class="user-role">Sales Manager</div>
+      </div>
+      <button onclick="if(typeof logout==='function')logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="page-title">Sales Dashboard</div>
+      <div class="breadcrumb">Zyntrix CRM <span>›</span> Sales</div>
+    </div>
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="main-search" placeholder="Search deals, leads, contacts…" oninput="filterTable(this.value)">
+    </div>
+    <div class="notif-wrap">
+      <button class="topbar-btn" onclick="openModal('notif-modal')">🔔 Notifications</button>
+      <span class="notif-dot"></span>
+    </div>
+    <button class="topbar-btn primary" onclick="openModal('deal-modal')">＋ New Deal</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ANNOUNCEMENT -->
+    <div class="announce" id="announce">
+      <span class="ann-icon">📢</span>
+      <div>
+        <div class="ann-title">Q2 2025 Target: ₹2.4 Cr — You're at 78% (₹1.87 Cr). Push hard this last month!</div>
+        <div class="ann-body">6 deals in final negotiation stage worth ₹52.4L. Close these to hit quota. Top deal: ZyntrixEdu Enterprise — ₹18.5L.</div>
+      </div>
+      <button class="ann-close" onclick="document.getElementById('announce').remove()">×</button>
+    </div>
+
+    <!-- KPI STRIP -->
+    <div class="kpi-strip" style="margin-bottom:20px;">
+      <div class="kpi-cell">
+        <div class="kpi-val" style="color:var(--green);">₹1.87Cr</div>
+        <div class="kpi-lbl">Revenue This Quarter</div>
+        <div class="kpi-delta up">▲ 14% vs Q1</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-val" style="color:var(--accent);">₹4.2Cr</div>
+        <div class="kpi-lbl">Pipeline Value</div>
+        <div class="kpi-delta up">▲ 23 new deals</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-val" style="color:var(--amber);">18</div>
+        <div class="kpi-lbl">Open Deals</div>
+        <div class="kpi-delta neu">6 in negotiation</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-val" style="color:var(--teal);">68%</div>
+        <div class="kpi-lbl">Win Rate</div>
+        <div class="kpi-delta up">▲ 5% vs last Q</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-val" style="color:var(--purple);">42</div>
+        <div class="kpi-lbl">New Leads (May)</div>
+        <div class="kpi-delta up">▲ 18 from campaigns</div>
+      </div>
+    </div>
+
+    <!-- TABS: Dashboard / Pipeline -->
+    <div class="tabs" style="margin-bottom:20px;">
+      <div class="tab active" onclick="switchView('dashboard',this)">📊 Dashboard</div>
+      <div class="tab" onclick="switchView('pipeline',this)">🗂️ Pipeline Board</div>
+      <div class="tab" onclick="switchView('leads',this)">🎯 Leads Table</div>
+      <div class="tab" onclick="switchView('activities',this)">📞 Activities</div>
+    </div>
+
+    <!-- ════════════ DASHBOARD VIEW ════════════ -->
+    <div id="view-dashboard">
+
+      <!-- ROW 1: CHARTS -->
+      <div class="grid g21" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">Revenue Trend</div>
+              <div class="card-sub">Monthly actual vs target — 2025</div>
+            </div>
+            <select style="width:auto;padding:5px 10px;font-size:12px;" onchange="updateRevenueChart(this.value)">
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+            </select>
+          </div>
+          <div style="height:210px;position:relative;"><canvas id="revenueChart" role="img" aria-label="Revenue trend chart"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">Pipeline by Stage</div>
+              <div class="card-sub">Deal value distribution</div>
+            </div>
+          </div>
+          <div style="height:210px;position:relative;"><canvas id="funnelChart" role="img" aria-label="Pipeline funnel chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ROW 2: DEALS TABLE + LEADERBOARD -->
+      <div class="grid g21" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">Active Deals</div>
+              <div class="card-sub" id="deals-count">Showing 6 of 18 deals</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <select id="stage-filter" onchange="filterDeals()" style="width:auto;padding:5px 10px;font-size:12px;">
+                <option value="">All Stages</option>
+                <option>Prospecting</option>
+                <option>Qualification</option>
+                <option>Proposal</option>
+                <option>Negotiation</option>
+                <option>Closed Won</option>
+              </select>
+              <button class="btn btn-sm primary" onclick="openModal('deal-modal')">＋ Deal</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th>Deal / Company</th><th>Owner</th><th>Value</th><th>Stage</th><th>Probability</th><th>Close Date</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="deals-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LEADERBOARD -->
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Team Leaderboard</div><div class="card-sub">Q2 2025 · Revenue closed</div></div>
+            <span class="badge b-green">Live</span>
+          </div>
+          <div id="leaderboard-list"></div>
+
+          <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+            <div class="card-title" style="font-size:13px;margin-bottom:10px;">Quota Attainment</div>
+            <div style="display:flex;flex-direction:column;gap:8px;" id="quota-bars"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3: ACTIVITY + TASKS + WIN/LOSS -->
+      <div class="grid g3" style="margin-bottom:16px;">
+
+        <!-- ACTIVITY FEED -->
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Recent Activity</div></div>
+            <button class="btn btn-sm" onclick="openModal('activity-modal')">＋ Log</button>
+          </div>
+          <div class="timeline" id="activity-feed"></div>
+        </div>
+
+        <!-- TODAY'S TASKS -->
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Today's Follow-ups</div><div class="card-sub" id="task-count">8 pending</div></div>
+            <button class="btn btn-sm primary" onclick="openModal('task-modal')">＋ Task</button>
+          </div>
+          <div id="task-list"></div>
+        </div>
+
+        <!-- WIN/LOSS + SOURCE -->
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card" style="flex:1;">
+            <div class="card-hd"><div class="card-title">Win / Loss Ratio</div></div>
+            <div style="display:flex;gap:16px;align-items:center;">
+              <div style="height:120px;position:relative;width:120px;flex-shrink:0;">
+                <canvas id="winLossChart" role="img" aria-label="Win loss pie chart"></canvas>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:8px;font-size:12px;">
+                <div style="display:flex;justify-content:space-between;"><span style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;"></span>Won</span><span style="font-weight:600;color:var(--green);">68% · 34 deals</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:8px;height:8px;background:var(--rose);border-radius:50%;display:inline-block;"></span>Lost</span><span style="font-weight:600;color:var(--rose);">24% · 12 deals</span></div>
+                <div style="display:flex;justify-content:space-between;"><span style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:8px;height:8px;background:var(--text3);border-radius:50%;display:inline-block;"></span>Stalled</span><span style="font-weight:600;color:var(--text3);">8% · 4 deals</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="flex:1;">
+            <div class="card-hd"><div class="card-title">Lead Sources</div></div>
+            <div style="height:100px;position:relative;"><canvas id="sourceChart" role="img" aria-label="Lead sources bar chart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 4: CONVERSION FUNNEL + MONTHLY TARGETS -->
+      <div class="grid g2">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Sales Conversion Funnel</div><div class="card-sub">Lead → Closed Won · This quarter</div></div>
+          </div>
+          <div style="height:200px;position:relative;"><canvas id="conversionChart" role="img" aria-label="Conversion funnel chart"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Monthly Targets vs Actuals</div><div class="card-sub">Q2 2025 — May progress</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;" id="target-list">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:var(--text2);">Revenue Closed</span><span style="font-weight:600;color:var(--green);">₹1.87Cr / ₹2.4Cr</span>
+              </div>
+              <div class="prog-bar"><div class="prog-fill" style="width:78%;background:var(--green);"></div></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px;">78% complete · ₹53L to go</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:var(--text2);">New Deals Created</span><span style="font-weight:600;color:var(--accent);">23 / 30</span>
+              </div>
+              <div class="prog-bar"><div class="prog-fill" style="width:77%;background:var(--accent2);"></div></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px;">77% · 7 more needed</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:var(--text2);">Outbound Calls</span><span style="font-weight:600;color:var(--amber);">312 / 400</span>
+              </div>
+              <div class="prog-bar"><div class="prog-fill" style="width:78%;background:var(--amber);"></div></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px;">78% · 88 calls remaining</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:var(--text2);">Proposals Sent</span><span style="font-weight:600;color:var(--purple);">18 / 20</span>
+              </div>
+              <div class="prog-bar"><div class="prog-fill" style="width:90%;background:var(--purple);"></div></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px;">90% · 2 more to send</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                <span style="color:var(--text2);">Demos Conducted</span><span style="font-weight:600;color:var(--teal);">27 / 35</span>
+              </div>
+              <div class="prog-bar"><div class="prog-fill" style="width:77%;background:var(--teal);"></div></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px;">77% · 8 demos scheduled</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /view-dashboard -->
+
+    <!-- ════════════ PIPELINE BOARD VIEW ════════════ -->
+    <div id="view-pipeline" style="display:none;">
+      <div class="card-hd" style="margin-bottom:14px;">
+        <div><div class="card-title" style="font-size:15px;">Pipeline Board — Q2 2025</div><div class="card-sub">₹4.2Cr total · Click any deal to manage</div></div>
+        <div style="display:flex;gap:8px;">
+          <select style="width:auto;padding:5px 10px;font-size:12px;"><option>All Owners</option><option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option></select>
+          <button class="btn btn-sm primary" onclick="openModal('deal-modal')">＋ Add Deal</button>
+        </div>
+      </div>
+      <div class="stage-track" id="pipeline-board"></div>
+      <div class="card" style="margin-top:14px;">
+        <div class="card-hd"><div class="card-title">Deals At Risk</div><div class="card-sub">Stalled for 14+ days — immediate action needed</div></div>
+        <table>
+          <thead><tr><th>Deal</th><th>Company</th><th>Value</th><th>Last Contact</th><th>Days Stalled</th><th>Owner</th><th>Action</th></tr></thead>
+          <tbody id="risk-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════ LEADS VIEW ════════════ -->
+    <div id="view-leads" style="display:none;">
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Lead Register</div><div class="card-sub" id="leads-count">Showing all leads</div></div>
+          <div style="display:flex;gap:8px;">
+            <select id="lead-status-filter" onchange="filterLeads()" style="width:auto;padding:5px 10px;font-size:12px;">
+              <option value="">All Statuses</option>
+              <option>New</option><option>Contacted</option><option>Qualified</option><option>Unqualified</option>
+            </select>
+            <select id="lead-source-filter" onchange="filterLeads()" style="width:auto;padding:5px 10px;font-size:12px;">
+              <option value="">All Sources</option>
+              <option>Website</option><option>Referral</option><option>LinkedIn</option><option>Campaign</option><option>Cold Call</option>
+            </select>
+            <button class="btn btn-sm primary" onclick="openModal('lead-modal')">＋ Add Lead</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Name / Company</th><th>Email</th><th>Phone</th><th>Source</th><th>Score</th><th>Status</th><th>Assigned</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="leads-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ ACTIVITIES VIEW ════════════ -->
+    <div id="view-activities" style="display:none;">
+      <div class="grid g21" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Activity Log</div><div class="card-sub">All interactions — calls, emails, meetings</div></div>
+            <div style="display:flex;gap:8px;">
+              <select style="width:auto;padding:5px 10px;font-size:12px;"><option>All Types</option><option>Call</option><option>Email</option><option>Meeting</option><option>Demo</option></select>
+              <button class="btn btn-sm primary" onclick="openModal('activity-modal')">＋ Log Activity</button>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Type</th><th>With / Deal</th><th>Outcome</th><th>Duration</th><th>Rep</th><th>Date</th><th>Notes</th></tr></thead>
+            <tbody id="activity-tbody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card">
+            <div class="card-hd"><div class="card-title">Activity Summary</div><div class="card-sub">This week</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="font-size:16px;">📞</span>Calls made</div><strong style="font-size:16px;color:var(--accent);">47</strong></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="font-size:16px;">✉️</span>Emails sent</div><strong style="font-size:16px;color:var(--purple);">128</strong></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="font-size:16px;">🎥</span>Demos held</div><strong style="font-size:16px;color:var(--teal);">8</strong></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="font-size:16px;">🤝</span>Meetings</div><strong style="font-size:16px;color:var(--amber);">12</strong></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="font-size:16px;">📄</span>Proposals</div><strong style="font-size:16px;color:var(--green);">6</strong></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><div class="card-title">Upcoming Meetings</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="padding:10px;background:rgba(59,130,246,0.08);border-radius:8px;border-left:3px solid var(--accent2);">
+                <div style="font-size:13px;font-weight:500;color:var(--text);">ZyntrixEdu Enterprise — Demo</div>
+                <div style="font-size:11px;color:var(--text3);">Today, 3:00 PM · Sanjay Kumar · Zoom</div>
+              </div>
+              <div style="padding:10px;background:var(--navy3);border-radius:8px;">
+                <div style="font-size:13px;font-weight:500;color:var(--text);">Apex Schools — Proposal Review</div>
+                <div style="font-size:11px;color:var(--text3);">May 7, 11:00 AM · Priya Nair · In-person</div>
+              </div>
+              <div style="padding:10px;background:var(--navy3);border-radius:8px;">
+                <div style="font-size:13px;font-weight:500;color:var(--text);">Global EdTech Corp — Negotiation</div>
+                <div style="font-size:11px;color:var(--text3);">May 8, 2:30 PM · Rahul Mehta · Google Meet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ════════ MODALS ════════ -->
+
+<!-- ADD DEAL MODAL -->
+<div class="overlay" id="deal-modal" onclick="closeModal('deal-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Create New Deal</span><button class="modal-close" onclick="closeModal('deal-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Deal Name *</label><input id="d-name" placeholder="e.g. ZyntrixEdu Enterprise Plan"></div>
+        <div class="fg"><label>Company *</label><input id="d-company" placeholder="Company name"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Deal Value (₹) *</label><input id="d-value" type="number" placeholder="1800000"></div>
+        <div class="fg"><label>Stage *</label>
+          <select id="d-stage"><option>Prospecting</option><option>Qualification</option><option>Demo Scheduled</option><option>Proposal Sent</option><option>Negotiation</option><option>Closed Won</option><option>Closed Lost</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Close Date *</label><input id="d-close" type="date"></div>
+        <div class="fg"><label>Win Probability (%)</label><input id="d-prob" type="number" min="0" max="100" value="50"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Owner</label>
+          <select id="d-owner"><option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option><option>Vikram Singh</option></select>
+        </div>
+        <div class="fg"><label>Product / Plan</label>
+          <select id="d-product"><option>EdTech CRM — Enterprise</option><option>EdTech CRM — Business</option><option>EdTech CRM — Starter</option><option>LMS Add-on</option><option>Custom Implementation</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0;"><label>Deal Notes</label><textarea id="d-notes" placeholder="Context, decision makers, key requirements…"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('deal-modal')">Cancel</button>
+      <button class="btn primary" onclick="createDeal()">Create Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LEAD MODAL -->
+<div class="overlay" id="lead-modal" onclick="closeModal('lead-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Add New Lead</span><button class="modal-close" onclick="closeModal('lead-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Full Name *</label><input id="l-name" placeholder="Contact name"></div>
+        <div class="fg"><label>Company</label><input id="l-company" placeholder="Company name"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Email *</label><input id="l-email" type="email" placeholder="contact@company.com"></div>
+        <div class="fg"><label>Phone</label><input id="l-phone" placeholder="+91 98765 43210"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Lead Source</label>
+          <select id="l-source"><option>Website</option><option>Referral</option><option>LinkedIn</option><option>Campaign</option><option>Cold Call</option><option>Event</option></select>
+        </div>
+        <div class="fg"><label>Assign To</label>
+          <select id="l-assign"><option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Estimated Budget (₹ LPA)</label><input id="l-budget" type="number" placeholder="5"></div>
+        <div class="fg"><label>Timeline</label>
+          <select id="l-timeline"><option>Immediate (&lt; 1 month)</option><option>Short (1–3 months)</option><option>Medium (3–6 months)</option><option>Long (6+ months)</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0;"><label>Notes</label><textarea id="l-notes" placeholder="Pain points, context, requirements…"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('lead-modal')">Cancel</button>
+      <button class="btn primary" onclick="createLead()">Add Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG ACTIVITY MODAL -->
+<div class="overlay" id="activity-modal" onclick="closeModal('activity-modal')">
+  <div class="modal" style="width:480px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Log Activity</span><button class="modal-close" onclick="closeModal('activity-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Activity Type</label>
+          <select id="a-type"><option>Call</option><option>Email</option><option>Meeting</option><option>Demo</option><option>Proposal Sent</option><option>Follow-up</option></select>
+        </div>
+        <div class="fg"><label>Related Deal / Lead</label>
+          <select id="a-deal"><option>ZyntrixEdu Enterprise</option><option>Apex Schools</option><option>Global EdTech</option><option>BrightPath Academy</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Date & Time</label><input id="a-date" type="datetime-local"></div>
+        <div class="fg"><label>Duration (mins)</label><input id="a-dur" type="number" value="30"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Outcome</label>
+          <select id="a-outcome"><option>Positive — moving forward</option><option>Neutral — follow up needed</option><option>Negative — not interested</option><option>No answer — retry</option></select>
+        </div>
+        <div class="fg"><label>Next Action</label>
+          <select id="a-next"><option>Send proposal</option><option>Schedule demo</option><option>Follow up in 3 days</option><option>Escalate to manager</option><option>Close deal</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0;"><label>Notes / Key Points</label><textarea id="a-notes" placeholder="What was discussed, objections raised, commitments made…"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('activity-modal')">Cancel</button>
+      <button class="btn primary" onclick="logActivity()">Log Activity</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TASK MODAL -->
+<div class="overlay" id="task-modal" onclick="closeModal('task-modal')">
+  <div class="modal" style="width:480px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Add Follow-up Task</span><button class="modal-close" onclick="closeModal('task-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="fg" style="margin-bottom:14px;"><label>Task Title *</label><input id="t-title" placeholder="e.g. Follow up on Apex Schools proposal"></div>
+      <div class="frow">
+        <div class="fg"><label>Due Date *</label><input id="t-due" type="date"></div>
+        <div class="fg"><label>Priority</label>
+          <select id="t-pri"><option>High</option><option>Medium</option><option>Low</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Related Deal</label>
+          <select id="t-deal"><option>ZyntrixEdu Enterprise</option><option>Apex Schools</option><option>Global EdTech</option><option>BrightPath</option><option>General</option></select>
+        </div>
+        <div class="fg"><label>Assigned To</label>
+          <select id="t-assign"><option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0;"><label>Notes</label><textarea id="t-notes" placeholder="Reminder details, context…" style="min-height:60px;"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('task-modal')">Cancel</button>
+      <button class="btn primary" onclick="addTask()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL/PROPOSAL MODAL -->
+<div class="overlay" id="email-modal" onclick="closeModal('email-modal')">
+  <div class="modal" style="width:560px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Send Proposal / Email</span><button class="modal-close" onclick="closeModal('email-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>To (Contact)</label><input id="e-to" placeholder="contact@company.com"></div>
+        <div class="fg"><label>Related Deal</label>
+          <select id="e-deal"><option>ZyntrixEdu Enterprise</option><option>Apex Schools</option><option>Global EdTech</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:14px;"><label>Subject</label><input id="e-subj" placeholder="Proposal — Zyntrix EdTech CRM · Enterprise Plan"></div>
+      <div class="fg" style="margin-bottom:14px;"><label>Template</label>
+        <select id="e-template" onchange="loadTemplate(this.value)"><option value="">Select template…</option><option value="intro">Introduction / Cold Outreach</option><option value="proposal">Proposal Cover Letter</option><option value="followup">Post-Demo Follow-up</option><option value="negotiation">Pricing Negotiation</option><option value="closing">Deal Closing Email</option></select>
+      </div>
+      <div class="fg" style="margin-bottom:0;"><label>Message</label><textarea id="e-body" style="min-height:160px;" placeholder="Compose your email or load a template above…"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('email-modal')">Cancel</button>
+      <button class="btn" onclick="alert('Draft saved!')">Save Draft</button>
+      <button class="btn primary" onclick="alert('Email sent!');closeModal('email-modal')">Send Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS MODAL -->
+<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
+  <div class="modal" style="width:420px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;padding:12px;background:rgba(34,197,94,0.08);border-radius:8px;border-left:3px solid var(--green);">
+          <span style="font-size:18px;">🎉</span>
+          <div><div style="font-weight:500;font-size:13px;color:var(--text);">ZyntrixEdu Enterprise — deal moved to Negotiation!</div><div style="font-size:12px;color:var(--text3);">₹18.5L · Sanjay Kumar · 1 hour ago</div></div>
+        </div>
+        <div style="display:flex;gap:12px;padding:12px;background:rgba(244,63,94,0.08);border-radius:8px;border-left:3px solid var(--rose);">
+          <span style="font-size:18px;">⚠️</span>
+          <div><div style="font-weight:500;font-size:13px;color:var(--text);">BrightPath Academy — stalled for 21 days</div><div style="font-size:12px;color:var(--text3);">₹7.2L · Rahul Mehta · Needs follow-up</div></div>
+        </div>
+        <div style="display:flex;gap:12px;padding:12px;background:var(--navy3);border-radius:8px;">
+          <span style="font-size:18px;">📞</span>
+          <div><div style="font-weight:500;font-size:13px;color:var(--text);">Apex Schools demo reminder — Today at 3 PM</div><div style="font-size:12px;color:var(--text3);">Priya Nair · Zoom link sent</div></div>
+        </div>
+        <div style="display:flex;gap:12px;padding:12px;background:var(--navy3);border-radius:8px;">
+          <span style="font-size:18px;">📊</span>
+          <div><div style="font-weight:500;font-size:13px;color:var(--text);">Q2 quota check — 22 days remaining</div><div style="font-size:12px;color:var(--text3);">₹53L still needed to hit ₹2.4Cr target</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═════════ DATA ═════════ */
+
+const DEALS = [
+  {id:1, name:'ZyntrixEdu Enterprise', company:'ZyntrixEdu Pvt Ltd', owner:'Sanjay Kumar', oi:'SK', col:'#22c55e', value:1850000, stage:'Negotiation', prob:85, close:'2025-05-20', source:'Referral', created:'Apr 10'},
+  {id:2, name:'Apex Schools — LMS Bundle', company:'Apex Schools Group', owner:'Priya Nair', oi:'PN', col:'#3b82f6', value:920000, stage:'Proposal Sent', prob:65, close:'2025-05-30', source:'LinkedIn', created:'Apr 18'},
+  {id:3, name:'Global EdTech Corp', company:'Global EdTech Corp', owner:'Rahul Mehta', oi:'RM', col:'#a78bfa', value:2200000, stage:'Negotiation', prob:75, close:'2025-06-05', source:'Website', created:'Mar 28'},
+  {id:4, name:'BrightPath Academy', company:'BrightPath Academy', owner:'Rahul Mehta', oi:'RM', col:'#a78bfa', value:720000, stage:'Qualification', prob:40, close:'2025-06-15', source:'Campaign', created:'Apr 25'},
+  {id:5, name:'Vidya Network — Starter', company:'Vidya Network', owner:'Anjali Rao', oi:'AR', col:'#f59e0b', value:380000, stage:'Demo Scheduled', prob:55, close:'2025-05-25', source:'Cold Call', created:'May 1'},
+  {id:6, name:'KnowledgeFirst Institute', company:'KnowledgeFirst', owner:'Vikram Singh', oi:'VS', col:'#2dd4bf', value:1100000, stage:'Prospecting', prob:25, close:'2025-07-01', source:'Referral', created:'May 2'},
+  {id:7, name:'EduSmart Solutions', company:'EduSmart Solutions', owner:'Sanjay Kumar', oi:'SK', col:'#22c55e', value:560000, stage:'Closed Won', prob:100, close:'2025-04-30', source:'Website', created:'Apr 1'},
+  {id:8, name:'LearnFirst Academy', company:'LearnFirst Academy', owner:'Priya Nair', oi:'PN', col:'#3b82f6', value:430000, stage:'Prospecting', prob:20, close:'2025-07-15', source:'LinkedIn', created:'May 3'},
+];
+
+const LEADS = [
+  {id:1, name:'Arun Sharma',     company:'EduTech Ventures',    email:'arun@eduvtech.com',    phone:'9876543210', source:'Website',   score:92, status:'Qualified',    assigned:'Sanjay Kumar', created:'May 1'},
+  {id:2, name:'Meera Pillai',    company:'Pinnacle Schools',     email:'meera@pinnacle.edu',   phone:'8765432109', source:'Referral',  score:78, status:'Contacted',    assigned:'Priya Nair',   created:'May 2'},
+  {id:3, name:'Rohan Das',       company:'NextGen Learning',     email:'rohan@nextgen.io',     phone:'7654321098', source:'LinkedIn',  score:65, status:'New',          assigned:'Rahul Mehta',  created:'May 3'},
+  {id:4, name:'Sunita Kapoor',   company:'Bright Futures Edu',   email:'sunita@bfe.com',       phone:'6543210987', source:'Campaign',  score:54, status:'New',          assigned:'Anjali Rao',   created:'May 4'},
+  {id:5, name:'Vijay Nambiar',   company:'LearnPath Systems',    email:'vijay@learnpath.in',   phone:'9432109876', source:'Cold Call', score:41, status:'Unqualified',  assigned:'Vikram Singh', created:'May 4'},
+  {id:6, name:'Kavitha Reddy',   company:'EduFirst Network',     email:'kavitha@edufirst.com', phone:'8321098765', source:'Website',   score:87, status:'Qualified',    assigned:'Sanjay Kumar', created:'May 5'},
+];
+
+const ACTIVITIES = [
+  {type:'Call',     icon:'📞', deal:'ZyntrixEdu Enterprise', outcome:'Positive', dur:'45 min', rep:'Sanjay Kumar', date:'Today 11:00 AM', notes:'Discussed pricing tiers, CFO joining next call', col:'rgba(34,197,94,0.12)', tc:'var(--green)'},
+  {type:'Demo',     icon:'🎥', deal:'Apex Schools',          outcome:'Positive', dur:'60 min', rep:'Priya Nair',   date:'Today 9:00 AM',  notes:'Great engagement, requested 3-campus proposal',   col:'rgba(59,130,246,0.12)', tc:'var(--accent)'},
+  {type:'Email',    icon:'✉️', deal:'Global EdTech',         outcome:'Neutral',  dur:'-',      rep:'Rahul Mehta',  date:'Yesterday 4 PM', notes:'Sent revised proposal with volume discount',      col:'rgba(167,139,250,0.12)', tc:'var(--purple)'},
+  {type:'Meeting',  icon:'🤝', deal:'BrightPath Academy',    outcome:'Neutral',  dur:'30 min', rep:'Rahul Mehta',  date:'May 4',          notes:'Budget approval pending board meeting',           col:'rgba(245,158,11,0.12)', tc:'var(--amber)'},
+  {type:'Call',     icon:'📞', deal:'Vidya Network',         outcome:'Positive', dur:'20 min', rep:'Anjali Rao',   date:'May 3',          notes:'Demo confirmed for May 7',                        col:'rgba(34,197,94,0.12)', tc:'var(--green)'},
+];
+
+const TASKS = [
+  {id:1, title:'Send revised proposal to ZyntrixEdu',      deal:'ZyntrixEdu Enterprise', due:'Today',  pri:'High',   done:false},
+  {id:2, title:'Follow up with Apex Schools CFO',           deal:'Apex Schools',          due:'Today',  pri:'High',   done:false},
+  {id:3, title:'Schedule Global EdTech legal review call',  deal:'Global EdTech',         due:'Today',  pri:'High',   done:true},
+  {id:4, title:'Prepare BrightPath Academy case study deck',deal:'BrightPath Academy',    due:'May 7',  pri:'Medium', done:false},
+  {id:5, title:'Cold call KnowledgeFirst Institute IT head',deal:'KnowledgeFirst',        due:'May 7',  pri:'Medium', done:false},
+  {id:6, title:'Update CRM deal notes for all Q2 deals',   deal:'General',               due:'May 8',  pri:'Low',    done:false},
+  {id:7, title:'Prepare Q2 quota review presentation',      deal:'General',               due:'May 9',  pri:'High',   done:false},
+  {id:8, title:'Research Vidya Network stakeholders on LI', deal:'Vidya Network',         due:'May 9',  pri:'Low',    done:false},
+];
+
+const LEADERBOARD = [
+  {name:'Sanjay Kumar',  init:'SK', col:'#22c55e', role:'Sales Manager',   rev:'₹68.5L', deals:8, quota:92},
+  {name:'Priya Nair',    init:'PN', col:'#3b82f6', role:'Sr. Sales Exec',  rev:'₹52.2L', deals:6, quota:78},
+  {name:'Rahul Mehta',   init:'RM', col:'#a78bfa', role:'Sales Exec',      rev:'₹38.1L', deals:5, quota:63},
+  {name:'Anjali Rao',    init:'AR', col:'#f59e0b', role:'Sales Exec',      rev:'₹24.6L', deals:4, quota:52},
+  {name:'Vikram Singh',  init:'VS', col:'#2dd4bf', role:'Jr. Sales Exec',  rev:'₹11.8L', deals:2, quota:29},
+];
+
+const PIPELINE_STAGES = [
+  {name:'Prospecting',   color:'rgba(100,116,139,0.15)', tc:'var(--text3)'},
+  {name:'Qualification', color:'rgba(59,130,246,0.12)',  tc:'var(--accent)'},
+  {name:'Demo Scheduled',color:'rgba(167,139,250,0.12)', tc:'var(--purple)'},
+  {name:'Proposal Sent', color:'rgba(245,158,11,0.12)',  tc:'var(--amber)'},
+  {name:'Negotiation',   color:'rgba(251,146,60,0.12)',  tc:'var(--orange)'},
+  {name:'Closed Won',    color:'rgba(34,197,94,0.12)',   tc:'var(--green)'},
+];
+
+const RISK_DEALS = [
+  {name:'BrightPath Academy', company:'BrightPath Academy', value:'₹7.2L', last:'Apr 14', days:22, owner:'Rahul Mehta'},
+  {name:'EduFirst Network',   company:'EduFirst Network',   value:'₹5.8L', last:'Apr 18', days:18, owner:'Anjali Rao'},
+  {name:'LearnFirst Academy', company:'LearnFirst Academy', value:'₹4.3L', last:'Apr 20', days:16, owner:'Priya Nair'},
+];
+
+const ACTIVITY_LOG = [
+  {type:'Call',    icon:'📞', deal:'ZyntrixEdu Enterprise', outcome:'Positive',         dur:'45 min', rep:'Sanjay Kumar', date:'May 6, 11:00 AM', notes:'CFO joining next call'},
+  {type:'Demo',    icon:'🎥', deal:'Apex Schools',          outcome:'Positive',         dur:'60 min', rep:'Priya Nair',   date:'May 6, 9:00 AM',  notes:'3-campus proposal requested'},
+  {type:'Email',   icon:'✉️', deal:'Global EdTech',         outcome:'Neutral',          dur:'—',      rep:'Rahul Mehta',  date:'May 5, 4:00 PM',  notes:'Revised proposal sent'},
+  {type:'Meeting', icon:'🤝', deal:'BrightPath Academy',    outcome:'Neutral',          dur:'30 min', rep:'Rahul Mehta',  date:'May 4, 2:00 PM',  notes:'Board approval pending'},
+  {type:'Call',    icon:'📞', deal:'Vidya Network',         outcome:'Positive',         dur:'20 min', rep:'Anjali Rao',   date:'May 3, 3:30 PM',  notes:'Demo confirmed May 7'},
+  {type:'Email',   icon:'✉️', deal:'KnowledgeFirst',        outcome:'No answer - retry','dur':'—',    rep:'Vikram Singh', date:'May 2, 10:00 AM', notes:'Sent intro email, no reply'},
+];
+
+const TEMPLATES = {
+  intro: `Hi [Contact Name],\n\nI'm reaching out from Zyntrix Software because I believe our EdTech CRM platform could be a great fit for [Company Name].\n\nOur platform helps institutions like yours:\n• Manage admissions and student lifecycle\n• Automate follow-ups and communications\n• Track revenue and sales performance\n\nCould we set up a 30-minute call to explore if there's a fit?\n\nBest regards,\n[Your Name]`,
+  proposal: `Dear [Contact Name],\n\nThank you for your time during our recent discussion. As promised, please find attached our tailored proposal for [Company Name].\n\nHighlighted in the proposal:\n• Recommended plan: [Plan Name] — ₹[Value]\n• Implementation timeline: 4-6 weeks\n• ROI projection: [X]% reduction in admin overhead\n\nI'd love to walk you through this in detail. Are you available for a 45-minute review call this week?\n\nWarm regards,\n[Your Name]`,
+  followup: `Hi [Contact Name],\n\nGreat connecting with you during yesterday's demo! Here's a summary of what we covered:\n\n✅ [Feature 1] — addresses your [pain point 1]\n✅ [Feature 2] — handles [requirement 2]\n✅ Implementation can begin as early as [date]\n\nNext steps: I'll send the formal proposal by [date]. Feel free to share any additional requirements.\n\nLooking forward to partnering with you!\n[Your Name]`,
+  negotiation: `Dear [Contact Name],\n\nThank you for your continued interest in Zyntrix CRM. I've reviewed your feedback with our leadership team.\n\nRevised offer:\n• Annual plan with [X]% volume discount\n• Complimentary onboarding (₹[value] waived)\n• Extended payment terms: 60 days\n\nThis offer is valid until [date]. I believe this structure works well for both parties.\n\nCan we confirm on a call by [date]?\n\nBest,\n[Your Name]`,
+  closing: `Dear [Contact Name],\n\nExcited to move forward! To finalize the agreement:\n\n1. Please review the attached SOW and sign digitally\n2. Raise PO for ₹[Amount]\n3. Share IT contact for onboarding kickoff\n\nOnce received, our implementation team will reach out within 48 hours. Welcome to the Zyntrix family!\n\nWarm regards,\n[Your Name]`,
+};
+
+let currentView = 'dashboard';
+let dealsData = [...DEALS];
+let leadsData = [...LEADS];
+let tasksData = [...TASKS];
+
+/* ═════════ HELPERS ═════════ */
+function fmt(n) { return '₹' + (n/100000).toFixed(1) + 'L'; }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open')); });
+
+const STAGE_CLS = {
+  'Prospecting':'b-gray','Qualification':'b-blue','Demo Scheduled':'b-purple',
+  'Proposal Sent':'b-amber','Negotiation':'b-orange','Closed Won':'b-green','Closed Lost':'b-rose'
+};
+
+/* ═════════ RENDER DEALS TABLE ═════════ */
+function renderDeals() {
+  const sf  = document.getElementById('stage-filter')?.value || '';
+  const q   = document.getElementById('main-search')?.value.toLowerCase() || '';
+  const data = dealsData.filter(d => {
+    if (sf && d.stage !== sf) return false;
+    if (q && !d.name.toLowerCase().includes(q) && !d.company.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('deals-count').textContent = `Showing ${data.length} of ${dealsData.length} deals`;
+  document.getElementById('deals-tbody').innerHTML = data.map(d => `
+    <tr>
+      <td>
+        <div class="td-main">${d.name}</div>
+        <div class="td-sub">${d.company}</div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:${d.col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0;">${d.oi}</div>
+          <span style="font-size:12px;">${d.owner}</span>
+        </div>
+      </td>
+      <td><span class="td-mono" style="color:var(--green);font-weight:600;">${fmt(d.value)}</span></td>
+      <td><span class="badge ${STAGE_CLS[d.stage]||'b-gray'}">${d.stage}</span></td>
+      <td>
+        <div style="font-size:12px;font-weight:600;color:${d.prob>=70?'var(--green)':d.prob>=40?'var(--amber)':'var(--rose)'};">${d.prob}%</div>
+        <div class="prog-bar" style="width:60px;margin-top:3px;"><div class="prog-fill" style="width:${d.prob}%;background:${d.prob>=70?'var(--green)':d.prob>=40?'var(--amber)':'var(--rose)'};"></div></div>
+      </td>
+      <td class="td-mono" style="font-size:11px;color:var(--text3);">${d.close}</td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-sm" onclick="openModal('deal-modal')">Edit</button>
+          <button class="btn btn-sm" onclick="openModal('activity-modal')">Log</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterDeals() { renderDeals(); }
+function filterTable(q) { renderDeals(); renderLeads(); }
+
+/* ═════════ RENDER LEADS ═════════ */
+function renderLeads() {
+  const st  = document.getElementById('lead-status-filter')?.value || '';
+  const src = document.getElementById('lead-source-filter')?.value || '';
+  const q   = document.getElementById('main-search')?.value.toLowerCase() || '';
+  const data = leadsData.filter(l => {
+    if (st  && l.status !== st) return false;
+    if (src && l.source !== src) return false;
+    if (q && !l.name.toLowerCase().includes(q) && !l.company.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('leads-count').textContent = `Showing ${data.length} leads`;
+  const LEAD_CLS = {New:'b-gray',Contacted:'b-blue',Qualified:'b-green',Unqualified:'b-rose'};
+  document.getElementById('leads-tbody').innerHTML = data.map(l => `
+    <tr>
+      <td>
+        <div class="td-main">${l.name}</div>
+        <div class="td-sub">${l.company}</div>
+      </td>
+      <td style="font-size:12px;color:var(--accent);">${l.email}</td>
+      <td class="td-mono" style="font-size:12px;">${l.phone}</td>
+      <td><span class="tag">${l.source}</span></td>
+      <td>
+        <div style="font-size:13px;font-weight:600;color:${l.score>=80?'var(--green)':l.score>=60?'var(--amber)':'var(--rose)'};">${l.score}</div>
+        <div class="prog-bar" style="width:50px;margin-top:2px;"><div class="prog-fill" style="width:${l.score}%;background:${l.score>=80?'var(--green)':l.score>=60?'var(--amber)':'var(--rose)'};"></div></div>
+      </td>
+      <td><span class="badge ${LEAD_CLS[l.status]||'b-gray'}">${l.status}</span></td>
+      <td style="font-size:12px;color:var(--text2);">${l.assigned}</td>
+      <td class="td-mono" style="font-size:11px;color:var(--text3);">${l.created}</td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-sm" onclick="openModal('activity-modal')">Call</button>
+          <button class="btn btn-sm primary" onclick="convertLead(${l.id})">Convert →</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterLeads() { renderLeads(); }
+
+/* ═════════ RENDER PIPELINE BOARD ═════════ */
+function renderPipeline() {
+  const board = document.getElementById('pipeline-board');
+  board.innerHTML = PIPELINE_STAGES.map(stage => {
+    const deals = dealsData.filter(d => d.stage === stage.name);
+    const total = deals.reduce((s,d) => s+d.value, 0);
+    return `
+      <div class="stage-col">
+        <div class="stage-hd" style="background:${stage.color};">
+          <span style="color:${stage.tc};font-size:12px;">${stage.name}</span>
+          <span class="badge b-gray">${deals.length}</span>
+        </div>
+        <div class="stage-body">
+          ${total > 0 ? `<div style="font-size:11px;color:var(--green);font-family:var(--mono);padding:4px 2px;">Total: ${fmt(total)}</div>` : ''}
+          ${deals.map(d => `
+            <div class="deal-card" onclick="openModal('deal-modal')" title="${d.name}">
+              <div class="deal-name">${d.name}</div>
+              <div class="deal-val">${fmt(d.value)}</div>
+              <div class="deal-meta">${d.owner} · Close: ${d.close}</div>
+              <div class="deal-prob">
+                <div class="prog-bar" style="margin-top:4px;"><div class="prog-fill" style="width:${d.prob}%;background:${d.prob>=70?'var(--green)':d.prob>=40?'var(--amber)':'var(--rose)'}"></div></div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px;">${d.prob}% probability</div>
+              </div>
+            </div>
+          `).join('')}
+          ${!deals.length ? `<div style="font-size:11px;color:var(--text3);padding:8px 4px;">No deals</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('risk-tbody').innerHTML = RISK_DEALS.map(r => `
+    <tr>
+      <td><div class="td-main">${r.name}</div></td>
+      <td>${r.company}</td>
+      <td class="td-mono" style="color:var(--amber);">${r.value}</td>
+      <td class="td-mono" style="font-size:11px;color:var(--text3);">${r.last}</td>
+      <td><span class="badge b-rose">${r.days} days</span></td>
+      <td style="font-size:12px;">${r.owner}</td>
+      <td><button class="btn btn-sm primary" onclick="openModal('activity-modal')">Follow Up</button></td>
+    </tr>
+  `).join('');
+}
+
+/* ═════════ RENDER ACTIVITY TIMELINE ═════════ */
+function renderActivity() {
+  document.getElementById('activity-feed').innerHTML = ACTIVITIES.map(a => `
+    <div class="tl-item">
+      <div class="tl-dot" style="background:${a.col};">${a.icon}</div>
+      <div class="tl-body">
+        <div class="tl-title">${a.type} — ${a.deal}</div>
+        <div class="tl-desc">${a.notes}</div>
+        <div class="tl-time">${a.date} · ${a.rep} · <span style="color:${a.outcome.includes('Positive')?'var(--green)':a.outcome.includes('Negative')?'var(--rose)':'var(--amber)'}">${a.outcome}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═════════ RENDER ACTIVITY TABLE ═════════ */
+function renderActivityTable() {
+  document.getElementById('activity-tbody').innerHTML = ACTIVITY_LOG.map(a => `
+    <tr>
+      <td><span style="font-size:16px;">${a.icon}</span> ${a.type}</td>
+      <td><div class="td-main">${a.deal}</div></td>
+      <td><span class="badge ${a.outcome.includes('Positive')?'b-green':a.outcome.includes('Neutral')?'b-amber':a.outcome.includes('No')?'b-gray':'b-rose'}">${a.outcome}</span></td>
+      <td class="td-mono" style="font-size:11px;">${a.dur}</td>
+      <td style="font-size:12px;">${a.rep}</td>
+      <td class="td-mono" style="font-size:11px;color:var(--text3);">${a.date}</td>
+      <td style="font-size:12px;color:var(--text3);max-width:160px;">${a.notes}</td>
+    </tr>
+  `).join('');
+}
+
+/* ═════════ RENDER TASKS ═════════ */
+function renderTasks() {
+  const pending = tasksData.filter(t => !t.done).length;
+  document.getElementById('task-count').textContent = `${pending} pending`;
+  document.getElementById('task-list').innerHTML = tasksData.slice(0,6).map(t => `
+    <div class="task-item">
+      <div class="task-check ${t.done?'done':''}" onclick="toggleTask(${t.id})">${t.done?'✓':''}</div>
+      <div class="task-body">
+        <div class="task-title" style="${t.done?'text-decoration:line-through;color:var(--text3);':''}">${t.title}</div>
+        <div class="task-meta">${t.deal} · Due: ${t.due}</div>
+      </div>
+      <div class="task-pri">
+        <span class="badge ${t.pri==='High'?'b-rose':t.pri==='Medium'?'b-amber':'b-gray'}" style="font-size:10px;">${t.pri}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleTask(id) {
+  const t = tasksData.find(x => x.id===id);
+  if (t) { t.done = !t.done; renderTasks(); }
+}
+
+/* ═════════ RENDER LEADERBOARD ═════════ */
+function renderLeaderboard() {
+  document.getElementById('leaderboard-list').innerHTML = LEADERBOARD.map((l,i) => `
+    <div class="leader-row">
+      <div class="leader-rank" style="color:${i===0?'var(--amber)':i===1?'var(--text2)':i===2?'#cd7f32':'var(--text3)'};">${['🥇','🥈','🥉','4','5'][i]}</div>
+      <div class="leader-av" style="background:${l.col};">${l.init}</div>
+      <div>
+        <div class="leader-name">${l.name}</div>
+        <div class="leader-role">${l.role}</div>
+      </div>
+      <div class="leader-val">
+        <div class="leader-rev">${l.rev}</div>
+        <div class="leader-deals">${l.deals} deals won</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('quota-bars').innerHTML = LEADERBOARD.map(l => `
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;">
+        <span>${l.init}</span><span style="color:${l.quota>=80?'var(--green)':l.quota>=50?'var(--amber)':'var(--rose)'};">${l.quota}%</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${l.quota}%;background:${l.quota>=80?'var(--green)':l.quota>=50?'var(--amber)':'var(--rose)'};"></div></div>
+    </div>
+  `).join('');
+}
+
+/* ═════════ VIEW SWITCH ═════════ */
+function switchView(view, el) {
+  currentView = view;
+  ['dashboard','pipeline','leads','activities'].forEach(v => {
+    const el2 = document.getElementById('view-'+v);
+    if (el2) el2.style.display = v===view ? 'block' : 'none';
+  });
+  if (el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+  if (view==='pipeline') renderPipeline();
+  if (view==='leads')    renderLeads();
+  if (view==='activities') renderActivityTable();
+}
+
+/* ═════════ ACTIONS ═════════ */
+function createDeal() {
+  const name = document.getElementById('d-name').value.trim();
+  if (!name) { alert('Please enter a deal name.'); return; }
+  dealsData.unshift({
+    id: Date.now(), name,
+    company: document.getElementById('d-company').value || 'Unknown',
+    owner: document.getElementById('d-owner').value,
+    oi: document.getElementById('d-owner').value.split(' ').map(w=>w[0]).join(''),
+    col: '#22c55e',
+    value: +document.getElementById('d-value').value || 0,
+    stage: document.getElementById('d-stage').value,
+    prob: +document.getElementById('d-prob').value || 50,
+    close: document.getElementById('d-close').value || '2025-12-31',
+    source: 'Manual', created: 'Today'
+  });
+  closeModal('deal-modal');
+  renderDeals();
+  alert(`Deal "${name}" created!`);
+}
+
+function createLead() {
+  const name = document.getElementById('l-name').value.trim();
+  if (!name) { alert('Please enter a name.'); return; }
+  leadsData.unshift({
+    id: Date.now(), name,
+    company: document.getElementById('l-company').value || '—',
+    email: document.getElementById('l-email').value || '—',
+    phone: document.getElementById('l-phone').value || '—',
+    source: document.getElementById('l-source').value,
+    score: Math.floor(40 + Math.random()*50),
+    status: 'New',
+    assigned: document.getElementById('l-assign').value,
+    created: 'Today'
+  });
+  closeModal('lead-modal');
+  renderLeads();
+  alert(`Lead "${name}" added!`);
+}
+
+function logActivity() {
+  const type = document.getElementById('a-type').value;
+  const deal = document.getElementById('a-deal').value;
+  closeModal('activity-modal');
+  alert(`Activity "${type}" logged for ${deal}!`);
+}
+
+function addTask() {
+  const title = document.getElementById('t-title').value.trim();
+  if (!title) { alert('Please enter a task title.'); return; }
+  tasksData.unshift({
+    id: Date.now(), title,
+    deal: document.getElementById('t-deal').value,
+    due: document.getElementById('t-due').value || 'Today',
+    pri: document.getElementById('t-pri').value,
+    done: false
+  });
+  closeModal('task-modal');
+  renderTasks();
+  alert(`Task "${title}" added!`);
+}
+
+function convertLead(id) {
+  const l = leadsData.find(x => x.id===id);
+  if (l && confirm(`Convert "${l.name}" to a deal?`)) {
+    dealsData.unshift({
+      id: Date.now(), name: l.company + ' — New Deal',
+      company: l.company, owner: l.assigned,
+      oi: l.assigned.split(' ').map(w=>w[0]).join(''),
+      col: '#22c55e', value: 500000,
+      stage: 'Qualification', prob: 30,
+      close: '2025-07-30', source: l.source, created: 'Today'
+    });
+    l.status = 'Qualified';
+    renderLeads();
+    renderDeals();
+    switchView('dashboard', document.querySelector('.tab'));
+    alert(`${l.name} converted to a deal!`);
+  }
+}
+
+function loadTemplate(key) {
+  if (!key) return;
+  document.getElementById('e-body').value = TEMPLATES[key] || '';
+}
+
+/* ═════════ CHARTS ═════════ */
+const tip = { backgroundColor:'#1a2d42', titleColor:'#e2e8f0', bodyColor:'#94a3b8', borderColor:'#263d5e', borderWidth:1 };
+const gridX = { color:'rgba(255,255,255,0.04)' };
+const tc    = { color:'#64748b', font:{size:11} };
+
+let revenueChart;
+
+function buildRevenueChart(mode) {
+  const labels = mode==='quarterly'
+    ? ['Q1 2024','Q2 2024','Q3 2024','Q4 2024','Q1 2025','Q2 2025']
+    : ['Nov','Dec','Jan','Feb','Mar','Apr','May'];
+  const actual = mode==='quarterly'
+    ? [112,138,155,178,163,187]
+    : [22,28,31,35,38,42,187];
+  const target = mode==='quarterly'
+    ? [130,150,165,185,180,240]
+    : [25,30,33,36,40,45,240];
+
+  if (revenueChart) revenueChart.destroy();
+  revenueChart = new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Actual (₹L)', data: actual, backgroundColor: 'rgba(34,197,94,0.7)', borderRadius:5, order:2 },
+        { label: 'Target (₹L)', data: target, type:'line', borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.05)', fill:true, tension:0.4, pointRadius:4, pointBackgroundColor:'#f59e0b', order:1 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{display:true, labels:{color:'#94a3b8',font:{size:10},boxWidth:10,padding:10}}, tooltip:tip },
+      scales: { x:{grid:gridX,ticks:tc}, y:{grid:gridX,ticks:{...tc,callback:v=>'₹'+v+'L'}, beginAtZero:true} }
+    }
+  });
+}
+
+function updateRevenueChart(mode) { buildRevenueChart(mode); }
+
+new Chart(document.getElementById('funnelChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Prospecting','Qualification','Demo','Proposal','Negotiation','Closed Won'],
+    datasets: [{
+      data: [145,84,52,31,18,8],
+      backgroundColor: ['rgba(100,116,139,0.6)','rgba(59,130,246,0.6)','rgba(167,139,250,0.6)','rgba(245,158,11,0.6)','rgba(251,146,60,0.6)','rgba(34,197,94,0.8)'],
+      borderRadius:5
+    }]
+  },
+  options: {
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{display:false}, tooltip:tip },
+    scales: { x:{grid:gridX,ticks:tc,beginAtZero:true}, y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}} }
+  }
+});
+
+new Chart(document.getElementById('winLossChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Won','Lost','Stalled'],
+    datasets: [{data:[68,24,8], backgroundColor:['#22c55e','#f43f5e','#64748b'], borderWidth:0, hoverOffset:3}]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false, cutout:'65%',
+    plugins: { legend:{display:false}, tooltip:tip }
+  }
+});
+
+new Chart(document.getElementById('sourceChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Website','Referral','LinkedIn','Campaign','Cold Call','Event'],
+    datasets: [{data:[18,14,9,12,7,4], backgroundColor:['#22c55e','#3b82f6','#a78bfa','#f59e0b','#2dd4bf','#fb923c'], borderRadius:4}]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{display:false}, tooltip:tip },
+    scales: { x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}}, y:{grid:gridX,ticks:tc,beginAtZero:true} }
+  }
+});
+
+new Chart(document.getElementById('conversionChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Total Leads','Contacted','Qualified','Demo Given','Proposal Sent','Won'],
+    datasets: [{
+      data: [420,280,145,88,46,34],
+      backgroundColor: 'rgba(59,130,246,0.7)', borderRadius:6
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{display:false}, tooltip:{...tip,callbacks:{label:ctx=>`${ctx.parsed.y} · ${(ctx.parsed.y/420*100).toFixed(1)}%`}} },
+    scales: { x:{grid:gridX,ticks:{color:'#94a3b8',font:{size:10}}}, y:{grid:gridX,ticks:tc,beginAtZero:true} }
+  }
+});
+
+/* ═════════ INIT ═════════ */
+buildRevenueChart('monthly');
+renderDeals();
+renderActivity();
+renderTasks();
+renderLeaderboard();
+
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+if (user?.name) {
+  document.querySelector('.user-name').textContent = user.name;
+  document.querySelector('.user-role').textContent = user.role || 'Sales';
+}
+</script>
+</body>
+</html>

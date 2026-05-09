@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRMS — Performance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:    #0d1b2a;
+  --navy2:   #132236;
+  --navy3:   #1a2d42;
+  --navy4:   #203350;
+  --accent:  #4f9cf9;
+  --accent2: #3b82f6;
+  --accent-dim: rgba(59,130,246,0.12);
+  --teal:    #2dd4bf;
+  --amber:   #f59e0b;
+  --rose:    #f43f5e;
+  --green:   #22c55e;
+  --purple:  #a78bfa;
+  --text:    #e2e8f0;
+  --text2:   #94a3b8;
+  --text3:   #64748b;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --card:    #132236;
+  --radius:  12px;
+  --sidebar: 248px;
+  --font:    'DM Sans', sans-serif;
+  --mono:    'DM Mono', monospace;
+}
+html, body { height: 100%; background: var(--navy); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.6; overflow: hidden; }
+
+/* LAYOUT */
+.shell   { display: flex; height: 100vh; }
+.sidebar { width: var(--sidebar); min-width: var(--sidebar); background: var(--navy2); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
+.main    { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar  { height: 62px; min-height: 62px; background: var(--navy2); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 14px; }
+.content { flex: 1; overflow-y: auto; padding: 24px; background: var(--navy); }
+
+/* SIDEBAR */
+.brand { padding: 20px 18px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #3b82f6, #6366f1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.brand-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+.brand-ver  { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 1px; }
+.nav-section { padding: 14px 10px 6px; }
+.nav-label   { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; padding: 0 8px 8px; }
+.nav-item    { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--text2); font-size: 13px; text-decoration: none; transition: all 0.15s; margin-bottom: 1px; position: relative; }
+.nav-item:hover  { background: var(--accent-dim); color: var(--text); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--accent2); border-radius: 0 3px 3px 0; }
+.nav-icon  { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; background: var(--rose); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px; line-height: 1.2; }
+.sidebar-footer { margin-top: auto; padding: 14px 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.user-pill   { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.user-pill:hover { background: var(--border); }
+.avatar      { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+.user-info   { flex: 1; min-width: 0; }
+.user-name   { font-size: 13px; font-weight: 500; color: var(--text); }
+.user-role   { font-size: 11px; color: var(--text3); }
+
+/* TOPBAR */
+.page-title { font-size: 16px; font-weight: 600; color: var(--text); flex: 1; }
+.search-box { display: flex; align-items: center; gap: 8px; background: var(--navy3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 14px; color: var(--text2); font-size: 13px; min-width: 220px; }
+.search-box input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; font-family: var(--font); width: 100%; }
+.search-box input::placeholder { color: var(--text3); }
+.topbar-btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.topbar-btn:hover { background: var(--navy3); }
+.topbar-btn.primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.notif-wrap { position: relative; }
+.notif-dot  { position: absolute; top: 6px; right: 14px; width: 7px; height: 7px; background: var(--rose); border-radius: 50%; border: 2px solid var(--navy2); }
+
+/* CARDS */
+.grid { display: grid; gap: 16px; }
+.g4   { grid-template-columns: repeat(4,1fr); }
+.g3   { grid-template-columns: repeat(3,1fr); }
+.g2   { grid-template-columns: repeat(2,1fr); }
+.g21  { grid-template-columns: 2fr 1fr; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.card-sub   { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* KPI */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+.kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.kpi-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
+.kpi-val   { font-size: 24px; font-weight: 700; line-height: 1; }
+.kpi-label { font-size: 12px; color: var(--text3); margin-top: 5px; }
+.kpi-change { font-size: 11px; margin-top: 6px; }
+.up { color: var(--green); } .dn { color: var(--rose); }
+
+/* BADGE */
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-green  { background: rgba(34,197,94,0.12);  color: var(--green); }
+.badge-amber  { background: rgba(245,158,11,0.12); color: var(--amber); }
+.badge-rose   { background: rgba(244,63,94,0.12);  color: var(--rose); }
+.badge-blue   { background: rgba(79,156,249,0.12); color: var(--accent); }
+.badge-purple { background: rgba(167,139,250,0.12);color: var(--purple); }
+.badge-gray   { background: rgba(100,116,139,0.12);color: var(--text3); }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; padding: 0 14px 10px; white-space: nowrap; }
+td { padding: 12px 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text2); vertical-align: middle; }
+tr:first-child td { border-top: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.td-name { font-weight: 500; color: var(--text); }
+
+/* TABS */
+.tabs { display: flex; gap: 2px; background: var(--navy3); padding: 4px; border-radius: 10px; margin-bottom: 20px; width: fit-content; }
+.tab  { padding: 7px 18px; border-radius: 7px; cursor: pointer; font-size: 13px; color: var(--text2); transition: all 0.15s; }
+.tab.active { background: var(--navy2); color: var(--text); font-weight: 500; }
+.tab:hover:not(.active) { color: var(--text); }
+
+/* PROGRESS */
+.progress-bar  { height: 6px; background: var(--navy3); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 100; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--navy2); border: 1px solid var(--border2); border-radius: 16px; width: 560px; max-width: 92vw; max-height: 88vh; overflow-y: auto; }
+.modal-head { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 16px; font-weight: 600; }
+.modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 20px; padding: 4px 8px; border-radius: 6px; }
+.modal-close:hover { background: var(--border); color: var(--text); }
+.modal-body { padding: 24px; }
+.modal-foot { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+.form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+label { font-size: 12px; font-weight: 500; color: var(--text2); }
+input, select, textarea { background: var(--navy3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; width: 100%; transition: border 0.15s; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent2); }
+select option { background: var(--navy3); }
+.btn { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.btn:hover { background: var(--navy3); }
+.btn-primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+.sep { height: 1px; background: var(--border); margin: 14px 0; }
+
+/* ANNOUNCE */
+.announce { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 10px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(167,139,250,0.06)); border: 1px solid rgba(79,156,249,0.2); }
+
+/* SCROLL */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* STAR */
+.stars { color: var(--amber); letter-spacing: 1px; }
+
+/* TOP PERFORMER CARD */
+.perf-card { background: var(--navy3); border: 1px solid var(--border2); border-radius: 10px; padding: 14px; display: flex; gap: 12px; align-items: flex-start; }
+.perf-rank { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+</style>
+<script src="../../../assets/js/api.js"></script>
+<script src="../../../assets/js/auth.js?v=3"></script>
+</head>
+<body>
+<script>requireAuth(); requireModuleAccess("hr");</script>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">👥</div>
+    <div>
+      <div class="brand-name">HRMS Pro</div>
+      <div class="brand-ver">v2.5.1</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a href="../dashboard/hr.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Talent Acquisition</div>
+    <a href="../talent_acquisition/careers_and_job_posts/careers.html" class="nav-item"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
+    <a href="../talent_acquisition/candidates/candidates.html" class="nav-item"><span class="nav-icon">👤</span> Candidates<span class="nav-badge">14</span></a>
+    <a href="../talent_acquisition/interview_panel/interviews.html" class="nav-item"><span class="nav-icon">🎤</span> Interview Panel</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Employee Lifecycle</div>
+    <a href="../employee_lifecycle/onboarding/onboarding.html" class="nav-item"><span class="nav-icon">🚀</span> Onboarding</a>
+    <a href="../employee_lifecycle/offer_letters/offer_letters.html" class="nav-item"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a href="../employee_lifecycle/orientation_sessions/orientations.html" class="nav-item"><span class="nav-icon">🎓</span> Orientations</a>
+    <a href="../employee_lifecycle/deployment/deployment.html" class="nav-item"><span class="nav-icon">🗂️</span> Deployment</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Operations</div>
+    <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
+    <a href="escalations.html" class="nav-item"><span class="nav-icon">⚠️</span> Escalations<span class="nav-badge">3</span></a>
+    <a href="performance.html" class="nav-item active"><span class="nav-icon">📊</span> Performance</a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">AR</div>
+      <div class="user-info">
+        <div class="user-name">Arjun Rao</div>
+        <div class="user-role">HR Manager</div>
+      </div>
+      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">Performance</div>
+    <div class="search-box">
+      <span style="color:var(--text3);">🔍</span>
+      <input placeholder="Search employees, reviews…">
+    </div>
+    <div class="notif-wrap">
+      <button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button>
+      <span class="notif-dot"></span>
+    </div>
+    <button class="topbar-btn primary" onclick="openModal('review-cycle-modal')">🚀 Start Review Cycle</button>
+  </div>
+
+  <div class="content">
+
+    <div class="announce">
+      <span style="font-size:22px;">📢</span>
+      <div>
+        <div style="font-weight:500;font-size:13px;color:var(--text);">Q2 2025 Performance Reviews are open — Deadline: June 15, 2025</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">142 reviews pending. All managers must complete peer assessments before the deadline.</div>
+      </div>
+      <button class="btn btn-sm btn-primary" style="flex-shrink:0;margin-left:auto;" onclick="openModal('review-cycle-modal')">View Cycle</button>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(34,197,94,0.1);">⭐</div>
+        <div class="kpi-val" style="color:var(--green);">4.2 / 5</div>
+        <div class="kpi-label">Company Avg. Rating</div>
+        <div class="kpi-change up">▲ 0.3 vs Q1</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(79,156,249,0.1);">🎯</div>
+        <div class="kpi-val" style="color:var(--accent);">78%</div>
+        <div class="kpi-label">Goals Completed</div>
+        <div class="kpi-change up">▲ 6% vs last quarter</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(245,158,11,0.1);">📋</div>
+        <div class="kpi-val" style="color:var(--amber);">142</div>
+        <div class="kpi-label">Reviews Pending</div>
+        <div class="kpi-change dn">Due June 15</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(167,139,250,0.1);">🏆</div>
+        <div class="kpi-val" style="color:var(--purple);">23</div>
+        <div class="kpi-label">Top Performers</div>
+        <div class="kpi-change" style="color:var(--text3);">Rating ≥ 4.5</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid g2" style="margin-bottom:16px;">
+      <div class="card">
+        <div class="card-hd">
+          <div>
+            <div class="card-title">Performance Distribution</div>
+            <div class="card-sub">Q2 2025 · 247 employees</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:20px;align-items:center;">
+          <div style="position:relative;width:150px;height:150px;flex-shrink:0;">
+            <canvas id="distChart"></canvas>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#22c55e;"></div><span style="color:var(--text2);">Outstanding (5★)</span></div>
+              <span style="font-weight:500;">23 <span style="color:var(--text3);font-size:11px;">(9%)</span></span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#4f9cf9;"></div><span style="color:var(--text2);">Exceeds (4–5★)</span></div>
+              <span style="font-weight:500;">74 <span style="color:var(--text3);font-size:11px;">(30%)</span></span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;"></div><span style="color:var(--text2);">Meets (3–4★)</span></div>
+              <span style="font-weight:500;">122 <span style="color:var(--text3);font-size:11px;">(49%)</span></span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#f43f5e;"></div><span style="color:var(--text2);">Needs Improvement</span></div>
+              <span style="font-weight:500;">28 <span style="color:var(--text3);font-size:11px;">(11%)</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <div>
+            <div class="card-title">Goal Completion by Department</div>
+            <div class="card-sub">Q2 2025 target progress</div>
+          </div>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="goalChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g21" style="margin-bottom:16px;">
+      <!-- Trend -->
+      <div class="card">
+        <div class="card-hd">
+          <div>
+            <div class="card-title">Avg. Performance Trend</div>
+            <div class="card-sub">Quarterly average across all departments</div>
+          </div>
+          <select style="width:auto;padding:5px 10px;font-size:12px;">
+            <option>All Departments</option>
+            <option>Engineering</option>
+            <option>Product</option>
+            <option>Sales</option>
+          </select>
+        </div>
+        <div style="position:relative;height:180px;">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Top performers -->
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Top Performers</div><span class="badge badge-purple">🏆 Q2</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="perf-card">
+            <div class="perf-rank" style="background:rgba(245,158,11,0.2);color:var(--amber);">🥇</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:500;color:var(--text);">Priya Sharma</div>
+              <div style="font-size:11px;color:var(--text3);">Engineering · Sr. Engineer</div>
+              <div style="margin-top:4px;"><span class="stars">★★★★★</span> <span style="font-size:12px;font-weight:600;color:var(--green);">4.8</span></div>
+            </div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-rank" style="background:rgba(167,139,250,0.15);color:var(--purple);">🥈</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:500;color:var(--text);">Pooja Verma</div>
+              <div style="font-size:11px;color:var(--text3);">Sales · Sales Lead</div>
+              <div style="margin-top:4px;"><span class="stars">★★★★★</span> <span style="font-size:12px;font-weight:600;color:var(--green);">4.6</span></div>
+            </div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-rank" style="background:rgba(79,156,249,0.12);color:var(--accent);">🥉</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:500;color:var(--text);">Kiran Shah</div>
+              <div style="font-size:11px;color:var(--text3);">Engineering · Tech Lead</div>
+              <div style="margin-top:4px;"><span class="stars">★★★★½</span> <span style="font-size:12px;font-weight:600;color:var(--amber);">4.4</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews table -->
+    <div class="card">
+      <div class="card-hd">
+        <div>
+          <div class="card-title">Employee Reviews — Q2 2025</div>
+          <div class="card-sub">Showing 247 employees · 105 completed · 142 pending</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-sm">📥 Export</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('review-cycle-modal')">🚀 Manage Cycle</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this)">All</div>
+        <div class="tab" onclick="switchTab(this)">Complete ✅</div>
+        <div class="tab" onclick="switchTab(this)">In Progress</div>
+        <div class="tab" onclick="switchTab(this)">Not Started</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Manager</th>
+            <th>Self Review</th>
+            <th>Peer Review</th>
+            <th>Manager Review</th>
+            <th>Rating</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;">PS</div>
+                <div class="td-name">Priya Sharma</div>
+              </div>
+            </td>
+            <td>Engineering</td>
+            <td style="font-size:12px;color:var(--text3);">Kiran Shah</td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="stars" style="font-size:12px;">★★★★★</span> <span style="font-weight:600;color:var(--green);">4.8</span></td>
+            <td><span class="badge badge-green">Complete</span></td>
+            <td><button class="btn btn-sm" onclick="openModal('scorecard-modal')">Scorecard</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#f97316);">PV</div>
+                <div class="td-name">Pooja Verma</div>
+              </div>
+            </td>
+            <td>Sales</td>
+            <td style="font-size:12px;color:var(--text3);">VP Sales</td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="stars" style="font-size:12px;">★★★★½</span> <span style="font-weight:600;color:var(--green);">4.6</span></td>
+            <td><span class="badge badge-green">Complete</span></td>
+            <td><button class="btn btn-sm">Scorecard</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#6366f1,#a78bfa);">KS</div>
+                <div class="td-name">Kiran Shah</div>
+              </div>
+            </td>
+            <td>Engineering</td>
+            <td style="font-size:12px;color:var(--text3);">CEO</td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="badge badge-amber">Pending</span></td>
+            <td><span class="badge badge-amber">Pending</span></td>
+            <td><span class="stars" style="font-size:12px;">★★★★</span> <span style="font-weight:600;color:var(--amber);">4.4</span></td>
+            <td><span class="badge badge-amber">In Progress</span></td>
+            <td><button class="btn btn-sm">Review</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#0ea5e9,#2dd4bf);">SD</div>
+                <div class="td-name">Sanjay Das</div>
+              </div>
+            </td>
+            <td>Product</td>
+            <td style="font-size:12px;color:var(--text3);">CPO</td>
+            <td><span class="badge badge-amber">Pending</span></td>
+            <td><span class="badge badge-gray">Not Started</span></td>
+            <td><span class="badge badge-gray">Not Started</span></td>
+            <td><span style="color:var(--text3);font-size:12px;">—</span></td>
+            <td><span class="badge badge-gray">Not Started</span></td>
+            <td><button class="btn btn-sm">Remind</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#10b981,#059669);">RK</div>
+                <div class="td-name">Ravi Kumar</div>
+              </div>
+            </td>
+            <td>Operations</td>
+            <td style="font-size:12px;color:var(--text3);">COO</td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="badge badge-green">Done ✓</span></td>
+            <td><span class="badge badge-amber">Pending</span></td>
+            <td><span class="stars" style="font-size:12px;">★★★★</span> <span style="font-weight:600;color:var(--amber);">4.1</span></td>
+            <td><span class="badge badge-amber">In Progress</span></td>
+            <td><button class="btn btn-sm">Review</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#f43f5e,#ec4899);">MI</div>
+                <div class="td-name">Meera Iyer</div>
+              </div>
+            </td>
+            <td>Engineering</td>
+            <td style="font-size:12px;color:var(--text3);">Kiran Shah</td>
+            <td><span class="badge badge-gray">Not Started</span></td>
+            <td><span class="badge badge-gray">Not Started</span></td>
+            <td><span class="badge badge-gray">Not Started</span></td>
+            <td><span style="color:var(--text3);font-size:12px;">—</span></td>
+            <td><span class="badge badge-gray">Not Started</span></td>
+            <td><button class="btn btn-sm">Remind</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border);margin-top:4px;">
+        <span style="font-size:12px;color:var(--text3);">Showing 6 of 247 employees</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm">← Prev</button>
+          <button class="btn btn-sm" style="background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);">1</button>
+          <button class="btn btn-sm">2</button>
+          <button class="btn btn-sm">3</button>
+          <button class="btn btn-sm">Next →</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="notif-modal" onclick="closeModal('notif-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><div class="modal-title">🔔 Notifications</div><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;display:flex;gap:12px;">
+          <span style="font-size:18px;">⏰</span>
+          <div><div style="font-weight:500;font-size:13px;">142 reviews pending — deadline June 15</div><div style="font-size:12px;color:var(--text3);">Send reminders to employees and managers</div></div>
+        </div>
+        <div style="padding:12px;background:var(--navy3);border-radius:8px;display:flex;gap:12px;">
+          <span style="font-size:18px;">🏆</span>
+          <div><div style="font-weight:500;font-size:13px;">23 top performers identified</div><div style="font-size:12px;color:var(--text3);">Consider for promotion / increment cycle</div></div>
+        </div>
+        <div style="padding:12px;background:var(--navy3);border-radius:8px;display:flex;gap:12px;">
+          <span style="font-size:18px;">📉</span>
+          <div><div style="font-weight:500;font-size:13px;">28 employees need improvement plans</div><div style="font-size:12px;color:var(--text3);">Schedule 1:1 review sessions with their managers</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="review-cycle-modal" onclick="closeModal('review-cycle-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><div class="modal-title">🚀 Manage Review Cycle — Q2 2025</div><button class="modal-close" onclick="closeModal('review-cycle-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:12px;margin-bottom:20px;font-size:13px;color:var(--text2);">
+        Cycle active: <strong style="color:var(--text);">Apr 1 – Jun 15, 2025</strong> · 105 of 247 employees reviewed (43%)
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Cycle Name</label><input value="Q2 Performance Review 2025"></div>
+        <div class="form-group"><label>Deadline</label><input type="date" value="2025-06-15"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Review Type</label>
+          <select>
+            <option>360° (Self + Peer + Manager)</option>
+            <option>Manager Only</option>
+            <option>Self + Manager</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Rating Scale</label>
+          <select>
+            <option>1–5 Stars</option>
+            <option>1–10 Points</option>
+            <option>Qualitative Only</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Send Reminders To</label>
+        <select>
+          <option>All pending employees and managers</option>
+          <option>Employees only (self review pending)</option>
+          <option>Managers only (review pending)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Custom Reminder Message</label>
+        <textarea placeholder="Hi team, please complete your Q2 performance review by June 15…" style="min-height:70px;"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('review-cycle-modal')">Cancel</button>
+      <button class="btn" style="color:var(--amber);border-color:rgba(245,158,11,0.3);">📧 Send Reminders</button>
+      <button class="btn btn-primary">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="scorecard-modal" onclick="closeModal('scorecard-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">📊 Performance Scorecard — Priya Sharma</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Engineering · Sr. Engineer · Q2 2025</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('scorecard-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <div style="font-size:32px;font-weight:700;color:var(--green);">4.8 <span style="font-size:16px;color:var(--text3);">/ 5</span></div>
+          <div class="stars" style="font-size:18px;margin-top:2px;">★★★★★</div>
+        </div>
+        <span class="badge badge-green" style="font-size:12px;padding:6px 14px;">Outstanding Performer 🏆</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+            <span style="color:var(--text2);">Technical Skills</span><span style="font-weight:600;color:var(--text);">9/10</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--accent2);"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+            <span style="color:var(--text2);">Communication</span><span style="font-weight:600;color:var(--text);">8.5/10</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:85%;background:var(--teal);"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+            <span style="color:var(--text2);">Problem Solving</span><span style="font-weight:600;color:var(--text);">9.5/10</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:95%;background:var(--green);"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+            <span style="color:var(--text2);">Teamwork &amp; Collaboration</span><span style="font-weight:600;color:var(--text);">8.8/10</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:88%;background:var(--purple);"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+            <span style="color:var(--text2);">Leadership &amp; Initiative</span><span style="font-weight:600;color:var(--text);">8/10</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:80%;background:var(--amber);"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+            <span style="color:var(--text2);">Goals Achievement</span><span style="font-weight:600;color:var(--green);">95%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:95%;background:var(--green);"></div></div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Manager Comments</div>
+      <div style="font-size:13px;color:var(--text2);background:var(--navy3);border-radius:8px;padding:12px;">
+        "Priya has consistently exceeded expectations this quarter. Her technical contributions to the backend infrastructure project were outstanding. Recommend for senior engineer → lead engineer promotion consideration in Q3."
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('scorecard-modal')">Close</button>
+      <button class="btn btn-primary">📥 Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function switchTab(el) {
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const tip = { backgroundColor:'#1e2f45', titleColor:'#e2e8f0', bodyColor:'#94a3b8', borderColor:'#243550', borderWidth:1 };
+const gridX = { color:'rgba(255,255,255,0.05)' };
+const ticks = { color:'#64748b', font:{size:11} };
+
+// Distribution donut
+new Chart(document.getElementById('distChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Outstanding', 'Exceeds', 'Meets', 'Needs Improvement'],
+    datasets: [{ data: [23,74,122,28], backgroundColor: ['#22c55e','#4f9cf9','#f59e0b','#f43f5e'], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '66%',
+    plugins: { legend: { display: false }, tooltip: { ...tip, callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } } }
+  }
+});
+
+// Goal completion bar
+new Chart(document.getElementById('goalChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Engineering', 'Sales', 'HR / Admin', 'Product', 'Operations'],
+    datasets: [{
+      label: 'Goals %',
+      data: [82, 91, 88, 76, 68],
+      backgroundColor: ['#4f9cf9','#2dd4bf','#22c55e','#a78bfa','#f59e0b'],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false }, tooltip: tip },
+    scales: {
+      x: { grid: gridX, ticks: { ...ticks, callback: v => v + '%' }, max: 100 },
+      y: { grid: { display: false }, ticks }
+    }
+  }
+});
+
+// Trend line
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: {
+    labels: ['Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025'],
+    datasets: [
+      { label: 'Engineering', data: [3.8,3.9,4.0,4.1,4.3], borderColor: '#4f9cf9', tension: 0.4, pointRadius: 4, fill: false },
+      { label: 'Sales',       data: [3.6,3.8,4.0,4.1,4.2], borderColor: '#2dd4bf', tension: 0.4, pointRadius: 4, fill: false },
+      { label: 'Product',     data: [3.7,3.7,3.9,4.0,4.0], borderColor: '#a78bfa', tension: 0.4, pointRadius: 4, fill: false }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true, labels: { color:'#94a3b8', font:{size:10}, boxWidth:10, padding:10 } }, tooltip: tip },
+    scales: {
+      x: { grid: gridX, ticks },
+      y: { grid: gridX, ticks: { ...ticks, callback: v => v.toFixed(1) + '★' }, min: 3.0, max: 5.0 }
+    }
+  }
+});
+</script>
+</body>
+</html>

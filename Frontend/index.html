@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zyntrix CRM — Login</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/api.js"></script>
+<script src="assets/js/auth.js"></script>
+</head>
+<body class="centered">
+
+<div class="login-box">
+  <h2>Zyntrix EdTech CRM</h2>
+
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Email" required autocomplete="email">
+
+    <div class="password-wrapper">
+      <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+      <span onclick="togglePassword()">👁</span>
+    </div>
+
+    <div class="login-options">
+      <label>
+        <input type="checkbox">
+        <span>Remember me</span>
+      </label>
+      <a href="#" onclick="forgotPassword()">Forgot password?</a>
+    </div>
+
+    <button type="submit">Login</button>
+  </form>
+
+  <!-- Quick Login demo buttons removed for security -->
+</div>
+
+</body>
+</html>

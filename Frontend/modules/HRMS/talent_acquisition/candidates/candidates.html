@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRMS — Candidates</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d1b2a;--navy2:#132236;--navy3:#1a2d42;--navy4:#203350;--navy5:#263d5e;
+  --accent:#4f9cf9;--accent2:#3b82f6;--accent-dim:rgba(59,130,246,0.12);
+  --teal:#2dd4bf;--amber:#f59e0b;--rose:#f43f5e;--green:#22c55e;--purple:#a78bfa;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --card:#132236;--radius:12px;--sidebar:248px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
+.content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
+
+/* SIDEBAR */
+.brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:15px;font-weight:600;color:var(--text)}
+.brand-ver{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.nav-section{padding:14px 10px 6px}
+.nav-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-item:hover{background:var(--accent-dim);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent2);border-radius:0 3px 3px 0}
+.nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
+.nav-divider{height:1px;background:var(--border);margin:8px 10px}
+.sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
+.user-pill:hover{background:var(--border)}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500;color:var(--text)}
+.user-role{font-size:11px;color:var(--text3)}
+
+/* TOPBAR */
+.page-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
+.breadcrumb{font-size:12px;color:var(--text3)}
+.breadcrumb span{color:var(--text2)}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;min-width:220px}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%}
+.search-box input::placeholder{color:var(--text3)}
+.topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.topbar-btn:hover{background:var(--navy3)}
+.topbar-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.topbar-btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.notif-wrap{position:relative}
+.notif-dot{position:absolute;top:6px;right:14px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--navy2)}
+
+/* CARDS */
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g31{grid-template-columns:3fr 1fr}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card-sm{padding:16px}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
+.card-title{font-size:14px;font-weight:600;color:var(--text)}
+.card-sub{font-size:12px;color:var(--text3);margin-top:2px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-green{background:rgba(34,197,94,0.13);color:var(--green)}
+.b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
+.b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}
+.b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
+.b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
+.b-teal{background:rgba(45,212,191,0.13);color:var(--teal)}
+.b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--navy3);padding:4px;border-radius:10px;margin-bottom:18px;overflow-x:auto}
+.tab{padding:7px 16px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;white-space:nowrap}
+.tab.active{background:var(--navy2);color:var(--text);font-weight:500}
+.tab:hover:not(.active){color:var(--text)}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px}
+td{padding:13px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
+tr:first-child td{border-top:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-main{font-weight:500;color:var(--text)}
+.td-sub{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* SCORE BAR */
+.score-bar{width:60px;height:5px;background:var(--navy4);border-radius:3px;overflow:hidden;margin-top:4px}
+.score-fill{height:100%;border-radius:3px}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:560px;max-width:94vw;max-height:90vh;overflow-y:auto}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:22px 24px}
+.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.fg{display:flex;flex-direction:column;gap:6px}
+label{font-size:12px;font-weight:500;color:var(--text2)}
+input,select,textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
+select option{background:var(--navy2)}
+textarea{resize:vertical;min-height:80px}
+.btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.btn:hover{background:var(--navy3)}
+.btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.btn.danger{background:var(--rose);border-color:var(--rose);color:#fff}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
+
+/* PROGRESS */
+.prog-bar{height:5px;background:var(--navy4);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px}
+
+/* PIPELINE KANBAN */
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+.kanban-col{flex:0 0 200px;min-width:200px}
+.kanban-hd{padding:8px 12px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;background:var(--navy3);display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:500;color:var(--text2)}
+.kanban-body{border:1px solid var(--border);border-radius:0 0 8px 8px;padding:8px;min-height:120px;display:flex;flex-direction:column;gap:8px}
+.kanban-card{background:var(--navy4);border:1px solid var(--border2);border-radius:8px;padding:10px;cursor:pointer;transition:all .15s}
+.kanban-card:hover{border-color:rgba(59,130,246,0.4);transform:translateY(-1px)}
+.k-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
+.k-role{font-size:11px;color:var(--text3)}
+.k-score{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:5px}
+
+/* PROFILE SLIDE-IN */
+.profile-panel{position:fixed;right:-440px;top:0;width:440px;height:100vh;background:var(--navy2);border-left:1px solid var(--border2);z-index:200;overflow-y:auto;transition:right .3s ease;display:flex;flex-direction:column}
+.profile-panel.open{right:0}
+.pp-overlay{display:none;position:fixed;inset:0;z-index:199}
+.pp-overlay.open{display:block}
+.pp-banner{height:90px;background:linear-gradient(135deg,#1e3a5f,#132236);flex-shrink:0}
+.pp-header{padding:0 24px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.pp-close{position:absolute;top:16px;right:16px;background:rgba(0,0,0,.3);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.pp-close:hover{background:rgba(0,0,0,.5)}
+.pp-body{flex:1;padding:20px 24px;overflow-y:auto}
+.pp-section{margin-bottom:20px}
+.pp-section-title{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.pp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.pp-row:last-child{border-bottom:none}
+.pp-label{color:var(--text3)}
+.pp-val{color:var(--text);font-weight:500}
+.skill-tag{display:inline-flex;padding:4px 10px;background:var(--navy4);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text2);margin:3px}
+.competency-row{margin-bottom:10px}
+.competency-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.competency-label span:first-child{color:var(--text2)}
+.competency-label span:last-child{color:var(--text);font-weight:500}
+.stage-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s}
+.stage-btn:hover,.stage-btn.active{background:var(--accent-dim);border-color:var(--accent2);color:var(--accent)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* TAG */
+.tag{display:inline-flex;padding:2px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text2)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{animation:fadeUp .3s ease both}
+</style>
+<script src="../../../../assets/js/api.js"></script>
+<script src="../../../../assets/js/auth.js?v=3"></script>
+</head>
+<body>
+<script>requireAuth(); requireModuleAccess("hr");</script>
+<div class="shell">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">👥</div>
+    <div><div class="brand-name">HRMS Pro</div><div class="brand-ver">v2.5 · 2025</div></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="../../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Talent Acquisition</div>
+    <a class="nav-item" href="../careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
+    <a class="nav-item active" href="candidates.html"><span class="nav-icon">👤</span> Candidates <span class="nav-badge">54</span></a>
+    <a class="nav-item" href="../interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Employee Lifecycle</div>
+    <a class="nav-item" href="../../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
+    <a class="nav-item" href="../../employee_lifecycle/offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item" href="../../employee_lifecycle/orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
+    <a class="nav-item" href="../../employee_lifecycle/deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Operations</div>
+    <a class="nav-item" href="../../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
+    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations <span class="nav-badge">3</span></a>
+    <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">AR</div>
+      <div style="flex:1;min-width:0;"><div class="user-name">Arjun Rao</div><div class="user-role">HR Manager</div></div>
+      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Candidates</div>
+      <div class="breadcrumb">HRMS Pro <span>›</span> Talent Acquisition <span>›</span> Candidates</div>
+    </div>
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="cand-search" placeholder="Search by name, role, source…" oninput="renderAll()">
+    </div>
+    <div class="notif-wrap">
+      <button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button>
+      <span class="notif-dot"></span>
+    </div>
+    <button class="topbar-btn primary" onclick="openModal('add-modal')">＋ Add Candidate</button>
+  </div>
+
+  <div class="content">
+
+    <!-- KPI ROW -->
+    <div class="grid g4" style="margin-bottom:20px;">
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--accent);">142</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Total Applicants</div>
+        <div style="font-size:11px;color:var(--green);margin-top:3px;">▲ 24 this week</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--purple);">54</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Shortlisted</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;">38% pass rate</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--amber);">28</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Interviewing</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;">Across 5 roles</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--green);">8</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Offers Extended</div>
+        <div style="font-size:11px;color:var(--green);margin-top:3px;">6 accepted ✓</div>
+      </div>
+    </div>
+
+    <!-- VIEWS -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
+      <div class="tabs" style="margin-bottom:0;flex:1;">
+        <div class="tab active" onclick="setStageFilter(this,'All')">All (142)</div>
+        <div class="tab" onclick="setStageFilter(this,'Applied')">Applied (56)</div>
+        <div class="tab" onclick="setStageFilter(this,'Shortlisted')">Shortlisted (54)</div>
+        <div class="tab" onclick="setStageFilter(this,'Interviewing')">Interviewing (28)</div>
+        <div class="tab" onclick="setStageFilter(this,'Offered')">Offered (8)</div>
+        <div class="tab" onclick="setStageFilter(this,'Rejected')">Rejected (24)</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" id="btn-list" onclick="switchView('list')" style="background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);">☰ List</button>
+        <button class="btn btn-sm" id="btn-kanban" onclick="switchView('kanban')">⊞ Pipeline</button>
+      </div>
+    </div>
+
+    <!-- FILTERS ROW -->
+    <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+      <select onchange="renderAll()" id="role-filter" style="width:auto;padding:6px 12px;font-size:12px;">
+        <option value="">All Roles</option>
+        <option>Sr. Backend Engineer</option>
+        <option>Product Manager</option>
+        <option>DevOps Engineer</option>
+        <option>Sales Dev Rep</option>
+        <option>UX Designer</option>
+      </select>
+      <select onchange="renderAll()" id="source-filter" style="width:auto;padding:6px 12px;font-size:12px;">
+        <option value="">All Sources</option>
+        <option>LinkedIn</option>
+        <option>Naukri</option>
+        <option>Referral</option>
+        <option>Direct Apply</option>
+        <option>AngelList</option>
+      </select>
+      <select onchange="renderAll()" id="sort-filter" style="width:auto;padding:6px 12px;font-size:12px;">
+        <option value="score">Sort: Score ↓</option>
+        <option value="date">Sort: Date Applied</option>
+        <option value="name">Sort: Name A–Z</option>
+      </select>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div id="list-view">
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Candidate Pipeline</div><div class="card-sub" id="cand-count">Showing all candidates</div></div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr>
+              <th>Candidate</th><th>Applied For</th><th>Source</th><th>Experience</th><th>Match Score</th><th>Stage</th><th>Applied</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="cand-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- KANBAN VIEW -->
+    <div id="kanban-view" style="display:none;">
+      <div class="kanban" id="kanban-board"></div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="grid g3" style="margin-top:16px;">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Source Breakdown</div></div>
+        <div style="height:160px;position:relative;"><canvas id="sourceChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Applications Over Time</div></div>
+        <div style="height:160px;position:relative;"><canvas id="timeChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Score Distribution</div></div>
+        <div style="height:160px;position:relative;"><canvas id="scoreChart"></canvas></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ═══ CANDIDATE PROFILE PANEL ═══ -->
+<div class="pp-overlay" id="pp-overlay" onclick="closeProfile()"></div>
+<div class="profile-panel" id="profile-panel">
+  <div class="pp-banner">
+    <button class="pp-close" onclick="closeProfile()" style="position:absolute;top:16px;right:16px;">×</button>
+  </div>
+  <div class="pp-header" style="position:relative;">
+    <div style="display:flex;align-items:flex-end;gap:14px;margin-top:-28px;margin-bottom:12px;">
+      <div id="pp-av" style="width:56px;height:56px;border-radius:50%;border:3px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#fff;flex-shrink:0;"></div>
+      <div>
+        <div id="pp-name" style="font-size:17px;font-weight:600;color:var(--text);"></div>
+        <div id="pp-role" style="font-size:12px;color:var(--text3);margin-top:2px;"></div>
+      </div>
+    </div>
+    <div id="pp-badges" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+  </div>
+  <div class="pp-body">
+    <div class="pp-section">
+      <div class="pp-section-title">Contact &amp; Details</div>
+      <div class="pp-row"><span class="pp-label">Email</span><span class="pp-val" id="pp-email"></span></div>
+      <div class="pp-row"><span class="pp-label">Phone</span><span class="pp-val" id="pp-phone"></span></div>
+      <div class="pp-row"><span class="pp-label">Experience</span><span class="pp-val" id="pp-exp"></span></div>
+      <div class="pp-row"><span class="pp-label">Source</span><span class="pp-val" id="pp-source"></span></div>
+      <div class="pp-row"><span class="pp-label">Applied</span><span class="pp-val" id="pp-date"></span></div>
+    </div>
+    <div class="pp-section">
+      <div class="pp-section-title">Competency Scores</div>
+      <div id="pp-competencies"></div>
+    </div>
+    <div class="pp-section">
+      <div class="pp-section-title">Skills</div>
+      <div id="pp-skills"></div>
+    </div>
+    <div class="pp-section">
+      <div class="pp-section-title">Move Stage</div>
+      <div id="pp-stages" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <div class="pp-section">
+      <div class="pp-section-title">HR Notes</div>
+      <textarea id="pp-notes" rows="3" placeholder="Add interview notes, observations…"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn primary" onclick="scheduleInterview()" style="flex:1;">Schedule Interview</button>
+      <button class="btn danger btn-sm" onclick="rejectCandidate()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD CANDIDATE MODAL ═══ -->
+<div class="overlay" id="add-modal" onclick="closeModal('add-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Add Candidate</span><button class="modal-close" onclick="closeModal('add-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Full Name *</label><input id="nc-name" placeholder="e.g. Kavya Reddy"></div>
+        <div class="fg"><label>Email *</label><input id="nc-email" type="email" placeholder="kavya@email.com"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Phone</label><input id="nc-phone" placeholder="+91 98765 43210"></div>
+        <div class="fg"><label>Applied For *</label>
+          <select id="nc-role"><option>Sr. Backend Engineer</option><option>Product Manager</option><option>DevOps Engineer</option><option>Sales Dev Rep</option><option>UX Designer</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Experience (Years)</label><input id="nc-exp" type="number" placeholder="5"></div>
+        <div class="fg"><label>Source</label>
+          <select id="nc-source"><option>LinkedIn</option><option>Naukri</option><option>Referral</option><option>Direct Apply</option><option>AngelList</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0;"><label>Resume Link</label><input id="nc-resume" placeholder="Paste Google Drive or URL link"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('add-modal')">Cancel</button>
+      <button class="btn primary" onclick="addCandidate()">Add Candidate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NOTIF ═══ -->
+<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
+  <div class="modal" style="width:400px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px;background:rgba(34,197,94,0.08);border-radius:8px;border-left:3px solid var(--green);font-size:13px;font-weight:500;">👤 3 new applications today — Sr. Backend Engineer</div>
+        <div style="padding:12px;background:var(--navy3);border-radius:8px;font-size:13px;">📅 Kavya Reddy — offer response pending (deadline May 5)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ───────────── DATA ───────────── */
+const STAGES=['Applied','Shortlisted','Interviewing','Offered','Rejected'];
+const STAGE_COLORS={Applied:'b-gray',Shortlisted:'b-purple',Interviewing:'b-amber',Offered:'b-blue',Rejected:'b-rose','Hired':'b-green'};
+
+let CANDIDATES=[
+  {id:1,name:'Visrutha US',init:'VU',col:'#3b82f6',email:'visrutha33@gmail.com',phone:'8825803385',role:'Full Stack Developer',qual:'Mca',loc:'Dharmapuri',exp:'2+ yrs',source:'Direct Apply',date:'Apr 28',stage:'Applied',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
+  {id:2,name:'Poosala Chandana Priya',init:'PP',col:'#a78bfa',email:'chandana5115@gmail.com',phone:'6303127946',role:'Software Engineer',qual:'BTech',loc:'Bangalore',exp:'2.4+ yrs',source:'Direct Apply',date:'Apr 27',stage:'Applied',score:82,
+   competencies:{Technical:84,Communication:77,'Problem Solving':83,'Culture Fit':79,Leadership:74},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:3,name:'SKANDA S',init:'SS',col:'#2dd4bf',email:'skandasubramanya23@gmail.com',phone:'7975910936',role:'Mobile App Development Intern',qual:'B.E',loc:'Bangalore',exp:'3 mo',source:'Direct Apply',date:'Apr 26',stage:'Shortlisted',score:74,
+   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
+   skills:["Flutter", "Dart", "Android", "Firebase"]},
+  {id:4,name:'Samyak Thool',init:'ST',col:'#f59e0b',email:'samthool@outlook.com',phone:'9370048698',role:'Software Engineer',qual:'B.SC CS',loc:'Wardha',exp:'2.3+ yrs',source:'Direct Apply',date:'Apr 25',stage:'Interviewing',score:74,
+   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:5,name:'varun',init:'VA',col:'#f43f5e',email:'sbvc.varun@gmail.com',phone:'9036469849',role:'Software Engineer',qual:'MTech, CSE',loc:'Bangalore',exp:'N/A',source:'Direct Apply',date:'Apr 24',stage:'Applied',score:62,
+   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:6,name:'Ayush Kumar',init:'AK',col:'#22c55e',email:'ayushsinha4343@gmail.com',phone:'7352186124',role:'Full Stack Developer',qual:'BTech, CSE',loc:'Gaya',exp:'2.5+ yrs',source:'Direct Apply',date:'Apr 23',stage:'Applied',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
+  {id:7,name:'Sarthak Arora',init:'SA',col:'#6366f1',email:'sarthakarora.9634@gmail.com',phone:'9760288282',role:'Associate Software Engineer',qual:'BTech,CSE',loc:'Gurugram',exp:'3.5+ yrs',source:'Direct Apply',date:'Apr 22',stage:'Shortlisted',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["Python", "JavaScript", "SQL", "Git"]},
+  {id:8,name:'Abhishek Kumar Singh',init:'AS',col:'#ec4899',email:'abhicse108@gmail.com',phone:'8429400626',role:'Back End Engineer',qual:'BTech,CSE',loc:'Bengaluru',exp:'3.5+ yrs',source:'Direct Apply',date:'Apr 21',stage:'Applied',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["Node.js", "PostgreSQL", "Docker", "REST APIs", "Redis"]},
+  {id:9,name:'Manthan Kailash Pelne',init:'MP',col:'#14b8a6',email:'manthanpelneoo7@gmail.com',phone:'7028037166',role:'Full Stack Developer',qual:'BE',loc:'Wardha, Maharashtra',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 20',stage:'Applied',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
+  {id:10,name:'Bheemavva',init:'BH',col:'#f97316',email:'bheemu343@gmail.com',phone:'8150041026',role:'Software Engineer',qual:'BE',loc:'Bengaluru',exp:'2+ yrs',source:'Direct Apply',date:'Apr 19',stage:'Interviewing',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:11,name:'M.S Swaroop',init:'MS',col:'#8b5cf6',email:'swaroopms658@gmail.com',phone:'8431950132',role:'Software Engineer',qual:'MTech CSE',loc:'Bangalore',exp:'1+ yrs',source:'Direct Apply',date:'Apr 18',stage:'Applied',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:12,name:'Sannidhi C Shenava',init:'SS',col:'#06b6d4',email:'scshenava@gmail.com',phone:'7338209150',role:'Software Engineer',qual:'MCA',loc:'Mangaluru',exp:'1+ yrs',source:'Direct Apply',date:'Apr 17',stage:'Shortlisted',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:13,name:'Balla Gayathri',init:'BG',col:'#10b981',email:'gayathriballa2001@gmail.com',phone:'9398549344',role:'Software Engineer',qual:'BTech',loc:'Andhra Pradesh',exp:'2+ yrs',source:'Direct Apply',date:'Apr 16',stage:'Applied',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:14,name:'Sahil Choudhary',init:'SC',col:'#ef4444',email:'sahil844101@gmail.com',phone:'9931004934',role:'Software Engineer',qual:'BTech CSE',loc:'Hyderabad',exp:'1+ yrs',source:'Direct Apply',date:'Apr 15',stage:'Interviewing',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:15,name:'alwin jaison',init:'AJ',col:'#3b82f6',email:'alwinjaison1@gmail.com',phone:'6364083131',role:'Software Engineer',qual:'MCA',loc:'Bangalore',exp:'N/A',source:'Direct Apply',date:'Apr 14',stage:'Applied',score:62,
+   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:16,name:'smyla lucia',init:'SL',col:'#a78bfa',email:'jsmylalucia14@gmail.com',phone:'6379297582',role:'Software Engineer',qual:'BTech',loc:'Bangalore',exp:'1+ yrs',source:'Direct Apply',date:'Apr 13',stage:'Applied',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:17,name:'Cheekati Rinku',init:'CR',col:'#2dd4bf',email:'rinkucheekati9@gmail.com',phone:'9686120042',role:'Software Developer',qual:'Bachelors of Engineering',loc:'Hubballi karnataka',exp:'9 mo',source:'Direct Apply',date:'Apr 12',stage:'Applied',score:80,
+   competencies:{Technical:82,Communication:75,'Problem Solving':81,'Culture Fit':77,Leadership:72},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:18,name:'Sahithi Ambati',init:'SA',col:'#f59e0b',email:'sahithiambati14@gmail.com',phone:'8978864465',role:'Front End Developer',qual:'BTech',loc:'Hyderabad',exp:'3+ yrs',source:'Direct Apply',date:'Apr 11',stage:'Shortlisted',score:74,
+   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
+   skills:["React", "HTML/CSS", "JavaScript", "Figma", "TypeScript"]},
+  {id:19,name:'Bhupender Bhamla',init:'BB',col:'#f43f5e',email:'bhupenderbhamla777@gmail.com',phone:'9350851551',role:'Data Anaylst',qual:'BTech',loc:'Gurugram',exp:'2 mo',source:'Direct Apply',date:'Apr 10',stage:'Applied',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["Python", "SQL", "Power BI", "Excel", "Tableau"]},
+  {id:20,name:'RAJAN C',init:'RC',col:'#22c55e',email:'rajanprabha050@gmail.com',phone:'7397635954',role:'Software Engineer',qual:'BTech',loc:'Chennai',exp:'2 mo',source:'Direct Apply',date:'Apr 9',stage:'Applied',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:21,name:'Kumar Gourav',init:'KG',col:'#6366f1',email:'kumargourav.gudu@gmail.com',phone:'8117866490',role:'Full Stack Developer',qual:'BTech',loc:'Bhubaneswar',exp:'3+ yrs',source:'Direct Apply',date:'Apr 8',stage:'Interviewing',score:74,
+   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
+   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
+  {id:22,name:'Vivek Sarvaiya',init:'VS',col:'#ec4899',email:'viveksarvaiya1873@gmail.com',phone:'9322962633',role:'AI Software Engineer',qual:'BTech',loc:'Benguluru',exp:'1+ yrs',source:'Direct Apply',date:'Apr 7',stage:'Applied',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Python", "TensorFlow", "PyTorch", "ML", "LLMs"]},
+  {id:23,name:'Darshan BK',init:'DB',col:'#14b8a6',email:'darshan.bk92@gmail.com',phone:'9916227924',role:'Data Anaylst',qual:'BE (ISE)',loc:'Bangalore',exp:'8+ yrs',source:'Direct Apply',date:'Apr 6',stage:'Shortlisted',score:82,
+   competencies:{Technical:84,Communication:77,'Problem Solving':83,'Culture Fit':79,Leadership:74},
+   skills:["Python", "SQL", "Power BI", "Excel", "Tableau"]},
+  {id:24,name:'Saad Aslam',init:'SA',col:'#f97316',email:'saadaslamdev037@gmail.com',phone:'3099084294',role:'Senior Full Stack Engineer',qual:'BTech',loc:'PAKISTAN',exp:'5+ yrs',source:'Direct Apply',date:'Apr 5',stage:'Applied',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["React", "Node.js", "AWS", "PostgreSQL", "Docker"]},
+  {id:25,name:'Aditya Pawar',init:'AP',col:'#8b5cf6',email:'adityapawar826@gmail.com',phone:'7066336757',role:'Software Engineer',qual:'BTech',loc:'Hyderabad',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 4',stage:'Applied',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:26,name:'Seema Gupta',init:'SG',col:'#06b6d4',email:'seemag7738@gmail.com',phone:'9819959176',role:'Software Engineer',qual:'B.SC',loc:'Mumbai',exp:'3 mo',source:'Direct Apply',date:'Apr 3',stage:'Applied',score:74,
+   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:27,name:'Prateek Mander',init:'PM',col:'#10b981',email:'choudharyprateek131@gmail.com',phone:'9258151068',role:'Software Engineer',qual:'B.Tech CSE AIML',loc:'Bengaluru',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 2',stage:'Shortlisted',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:28,name:'Prakhar Pandey',init:'PP',col:'#ef4444',email:'prakharp684@gmail.com',phone:'6388065025',role:'Java Developer',qual:'B.tech(CSE)',loc:'Bengaluru',exp:'2+ yrs',source:'Direct Apply',date:'Apr 1',stage:'Applied',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["Java", "Spring Boot", "MySQL", "REST APIs", "Maven"]},
+  {id:29,name:'Vishnu Teja Kilaparthi',init:'VK',col:'#3b82f6',email:'kilaparthivishnuteja@gmail.com',phone:'6304208875',role:'Software Engineer',qual:'B.Tech',loc:'Chennai',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 28',stage:'Applied',score:65,
+   competencies:{Technical:67,Communication:60,'Problem Solving':66,'Culture Fit':62,Leadership:57},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:30,name:'Avantika Dinkar Lad',init:'AL',col:'#a78bfa',email:'connectavani@gmail.com',phone:'8767938125',role:'Full Stack Developer',qual:'Arts, Commerce and Science',loc:'pune',exp:'3+ yrs',source:'Direct Apply',date:'Apr 27',stage:'Applied',score:74,
+   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
+   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
+  {id:31,name:'Aishwarya Ganeshan',init:'AG',col:'#2dd4bf',email:'ashganesh74@gmail.com',phone:'8129838593',role:'Software Engineer',qual:'BTech',loc:'Bangalore',exp:'2 mo',source:'Direct Apply',date:'Apr 26',stage:'Applied',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:32,name:'Mohammed Ammaar Hussain',init:'MH',col:'#f59e0b',email:'ammaarhussain2002@gmail.com',phone:'9849946391',role:'Software Developer',qual:'BTech',loc:'Warangal',exp:'2+ yrs',source:'Direct Apply',date:'Apr 25',stage:'Shortlisted',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:33,name:'Manav Soni',init:'MS',col:'#f43f5e',email:'soni.manav040905@gmail.com',phone:'9811012371',role:'Software Developer',qual:'B.Sc',loc:'New Delhi',exp:'N/A',source:'Direct Apply',date:'Apr 24',stage:'Applied',score:62,
+   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:34,name:'Parth Kandharkar',init:'PK',col:'#22c55e',email:'parthkandharkar@gmail.com',phone:'7875263564',role:'Software Developer',qual:'MTech',loc:'Pune',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 23',stage:'Applied',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:35,name:'ABHISHEK GANGULA',init:'AG',col:'#6366f1',email:'abhishekgangula2004@gmail.com',phone:'9515791180',role:'Software Engineer',qual:'BTech',loc:'HYDERABAD',exp:'N/A',source:'Direct Apply',date:'Apr 22',stage:'Applied',score:62,
+   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:36,name:'Abhesh M',init:'AM',col:'#ec4899',email:'abheshm@gmail.com',phone:'9074212887',role:'Software Developer',qual:'B.Com',loc:'Kochi',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 21',stage:'Applied',score:65,
+   competencies:{Technical:67,Communication:60,'Problem Solving':66,'Culture Fit':62,Leadership:57},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:37,name:'TARUN KULKARNI',init:'TK',col:'#14b8a6',email:'tarunkulkarni4@gmail.com',phone:'9632915734',role:'Full Stack Developer',qual:'MCA',loc:'Bangalore',exp:'9 mo',source:'Direct Apply',date:'Apr 20',stage:'Applied',score:80,
+   competencies:{Technical:82,Communication:75,'Problem Solving':81,'Culture Fit':77,Leadership:72},
+   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
+  {id:38,name:'Muppulakunta Keerthi',init:'MK',col:'#f97316',email:'keerthimuppulakunta@gmail.com',phone:'9014790213',role:'Data Anaylst',qual:'BTech',loc:'BENGALURU',exp:'6 mo',source:'Direct Apply',date:'Apr 19',stage:'Applied',score:80,
+   competencies:{Technical:82,Communication:75,'Problem Solving':81,'Culture Fit':77,Leadership:72},
+   skills:["Python", "SQL", "Power BI", "Excel", "Tableau"]},
+  {id:39,name:'Sahil Bhuwalka',init:'SB',col:'#8b5cf6',email:'sahilbhuwalka574@gmail.com',phone:'6363216206',role:'Software Engineer',qual:'B.E',loc:'Asansol',exp:'2.5+ yrs',source:'Direct Apply',date:'Apr 18',stage:'Applied',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:40,name:'Prateek Mander',init:'PM',col:'#06b6d4',email:'choudharyprateek131@gmail.com',phone:'9258151068',role:'Software Engineer',qual:'BTech',loc:'Bengaluru',exp:'1+ yrs',source:'Direct Apply',date:'Apr 17',stage:'Applied',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:41,name:'Mohamed Ibrahim',init:'MI',col:'#10b981',email:'mdibrahim3057@gmail.com',phone:'9500920916',role:'Software Engineer',qual:'B.E',loc:'Chennai',exp:'3+ yrs',source:'Direct Apply',date:'Apr 16',stage:'Applied',score:74,
+   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:42,name:'Rohan Chitodkar',init:'RC',col:'#ef4444',email:'rohanchitodkar27@gmail.com',phone:'7249019265',role:'Software Engineer',qual:'B.E',loc:'Pune',exp:'1 mo',source:'Direct Apply',date:'Apr 15',stage:'Applied',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:43,name:'Kumar Ram krishna',init:'KK',col:'#3b82f6',email:'ram89100@gmail.com',phone:'8073612896',role:'Software Engineer',qual:'B.E',loc:'Bengaluru',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 14',stage:'Shortlisted',score:65,
+   competencies:{Technical:67,Communication:60,'Problem Solving':66,'Culture Fit':62,Leadership:57},
+   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
+  {id:44,name:'Harshitha',init:'HA',col:'#a78bfa',email:'harshithaach0@gmail.com',phone:'8867397082',role:'BackEnd',qual:'B.E',loc:'Bengaluru',exp:'1+ yrs',source:'Direct Apply',date:'Apr 13',stage:'Applied',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Node.js", "PostgreSQL", "Docker", "REST APIs"]},
+  {id:45,name:'dinesh',init:'DI',col:'#2dd4bf',email:'dinesh.kolasani@zyntrixsoftware.com',phone:'9949887725',role:'Software Developer',qual:'b.tech',loc:'bapatla',exp:'1+ yrs',source:'LinkedIn',date:'May 1',stage:'Applied',score:63,
+   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:46,name:'Ravi',init:'RA',col:'#f59e0b',email:'ravi@gmail.com',phone:'9654782125',role:'Business Development Executive',qual:'BTech',loc:'Delhi',exp:'2+ yrs',source:'LinkedIn',date:'May 1',stage:'Applied',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["CRM", "B2B Sales", "LinkedIn", "Cold Outreach", "Negotiation"]},
+  {id:47,name:'Swapna Gajula',init:'SG',col:'#f43f5e',email:'swapnagajula683@gmail.com',phone:'918074436444',role:'Software Developer',qual:'B Tech, Artificial Intelligence and Machine Learning',loc:'G.p.Nagar',exp:'N/A',source:'Other',date:'May 1',stage:'Applied',score:62,
+   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:48,name:'Ajim Sanadi',init:'AS',col:'#22c55e',email:'ajimsanadi11@gmail.com',phone:'8983938786',role:'Software Developer',qual:'PG- DIPLOMA CDAC (PG-DAC), B.E Electrical',loc:'Maharashtra',exp:'Fresher',source:'Other',date:'May 1',stage:'Applied',score:55,
+   competencies:{Technical:57,Communication:50,'Problem Solving':56,'Culture Fit':52,Leadership:47},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:49,name:'Ajim Sanadi',init:'AS',col:'#6366f1',email:'ajimsanadi11@gmail.com',phone:'8983938786',role:'Software Developer',qual:'PG Diploma (CDAC) PG_DAC ,B.E Electrical',loc:'Maharashtra',exp:'< 1 yr',source:'Other',date:'May 1',stage:'Shortlisted',score:58,
+   competencies:{Technical:60,Communication:53,'Problem Solving':59,'Culture Fit':55,Leadership:50},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:50,name:'Navya Dhawde',init:'ND',col:'#ec4899',email:'dhawde.navya24@gmail.com',phone:'919755077877',role:'Graphic Designer',qual:'B.Tech in Computer Science Engineering (CSE)',loc:'Paras Tierea, Sector 137',exp:'N/A',source:'LinkedIn',date:'May 1',stage:'Shortlisted',score:62,
+   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
+   skills:["Figma", "Photoshop", "Illustrator", "UI/UX", "Canva"]},
+  {id:51,name:'Puspita  Akther Priya',init:'PP',col:'#14b8a6',email:'priyapuspita75@gmail.com',phone:'8801572909307',role:'Graphic Designer',qual:'Graphics design and freelancing',loc:'Bagha Jatin Road',exp:'2+ yrs',source:'LinkedIn',date:'May 1',stage:'Applied',score:68,
+   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
+   skills:["Figma", "Photoshop", "Illustrator", "UI/UX", "Canva"]},
+  {id:52,name:'Harsh Rai',init:'HR',col:'#f97316',email:'sanjaykumarr627@gmail.com',phone:'917990244768',role:'Software Developer',qual:'BTech Computer Science and Engineering',loc:'Ahmedabad, Gujarat',exp:'< 1 yr',source:'Other',date:'May 1',stage:'Applied',score:58,
+   competencies:{Technical:60,Communication:53,'Problem Solving':59,'Culture Fit':55,Leadership:50},
+   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
+  {id:53,name:'Meghana Naveen',init:'MN',col:'#8b5cf6',email:'meghnanaveen19@gmail.com',phone:'9551903103',role:'Content Writer',qual:'MBA in Business Analytics and Btech in Computer Science',loc:'Bengaluru, Karnataka',exp:'4+ yrs',source:'Naukri',date:'May 1',stage:'Applied',score:82,
+   competencies:{Technical:84,Communication:77,'Problem Solving':83,'Culture Fit':79,Leadership:74},
+   skills:["SEO", "Copywriting", "Content Strategy", "WordPress", "Analytics"]},
+  {id:54,name:'Pavan',init:'PA',col:'#06b6d4',email:'ikuttipavan5@gmail.com',phone:'9347485093',role:'Marketing Executive',qual:'Graduation',loc:'Bengaluru',exp:'1 mo',source:'LinkedIn',date:'May 2',stage:'Shortlisted',score:85,
+   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
+   skills:["SEO", "Google Ads", "Meta Ads", "Power BI", "Analytics"]}
+];
+
+let stageFilter='All';
+let currentView='list';
+let openProfileId=null;
+
+/* ───────────── FILTER + RENDER ───────────── */
+function filtered(){
+  const q=document.getElementById('cand-search').value.toLowerCase();
+  const role=document.getElementById('role-filter').value;
+  const src=document.getElementById('source-filter').value;
+  const sort=document.getElementById('sort-filter').value;
+  let res=CANDIDATES.filter(c=>{
+    if(stageFilter!=='All'&&c.stage!==stageFilter)return false;
+    if(role&&c.role!==role)return false;
+    if(src&&c.source!==src)return false;
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.role.toLowerCase().includes(q)&&!c.source.toLowerCase().includes(q))return false;
+    return true;
+  });
+  if(sort==='score') res.sort((a,b)=>b.score-a.score);
+  else if(sort==='name') res.sort((a,b)=>a.name.localeCompare(b.name));
+  return res;
+}
+
+function renderAll(){
+  const data=filtered();
+  document.getElementById('cand-count').textContent=`Showing ${data.length} candidate${data.length!==1?'s':''}`;
+  renderList(data);
+  if(currentView==='kanban') renderKanban();
+}
+
+function scoreColor(s){return s>=85?'var(--green)':s>=70?'var(--amber)':'var(--rose)';}
+
+function renderList(data){
+  document.getElementById('cand-tbody').innerHTML=data.map(c=>`
+    <tr onclick="openProfile(${c.id})" style="cursor:pointer;">
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;">${c.init}</div>
+          <div><div class="td-main">${c.name}</div><div class="td-sub">${c.email}</div></div>
+        </div>
+      </td>
+      <td><div style="font-size:13px;color:var(--text2);">${c.role}</div></td>
+      <td><span class="tag">${c.source}</span></td>
+      <td>${c.exp}</td>
+      <td>
+        <div style="font-size:13px;font-weight:600;color:${scoreColor(c.score)};">${c.score}%</div>
+        <div class="score-bar"><div class="score-fill" style="width:${c.score}%;background:${scoreColor(c.score)};"></div></div>
+      </td>
+      <td><span class="badge ${STAGE_COLORS[c.stage]||'b-gray'}">${c.stage}</span></td>
+      <td style="font-size:12px;color:var(--text3);">${c.date}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="event.stopPropagation();openProfile(${c.id})">Profile</button>
+          ${c.stage!=='Rejected'&&c.stage!=='Offered'?`<button class="btn btn-sm" style="color:var(--accent);border-color:rgba(59,130,246,0.3);" onclick="event.stopPropagation();scheduleFor(${c.id})">Interview</button>`:''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderKanban(){
+  const board=document.getElementById('kanban-board');
+  const stageOrder=['Applied','Shortlisted','Interviewing','Offered','Rejected'];
+  board.innerHTML=stageOrder.map(st=>{
+    const cards=CANDIDATES.filter(c=>c.stage===st);
+    return `
+      <div class="kanban-col">
+        <div class="kanban-hd">${st} <span class="badge ${STAGE_COLORS[st]||'b-gray'}" style="font-size:10px;">${cards.length}</span></div>
+        <div class="kanban-body">
+          ${cards.map(c=>`
+            <div class="kanban-card" onclick="openProfile(${c.id})">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">${c.init}</div>
+                <div class="k-name">${c.name}</div>
+              </div>
+              <div class="k-role">${c.role}</div>
+              <div class="k-score"><span style="color:${scoreColor(c.score)};font-weight:600;">${c.score}%</span><span style="color:var(--text3);">· ${c.source}</span></div>
+            </div>
+          `).join('')}
+          ${cards.length===0?`<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px 0;">No candidates</div>`:''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ───────────── PROFILE PANEL ───────────── */
+function openProfile(id){
+  const c=CANDIDATES.find(x=>x.id===id);
+  if(!c)return;
+  openProfileId=id;
+  document.getElementById('pp-av').textContent=c.init;
+  document.getElementById('pp-av').style.background=c.col;
+  document.getElementById('pp-name').textContent=c.name;
+  document.getElementById('pp-role').textContent=c.role+' · Applied '+c.date;
+  document.getElementById('pp-email').textContent=c.email;
+  document.getElementById('pp-phone').textContent=c.phone;
+  document.getElementById('pp-exp').textContent=c.exp;
+  document.getElementById('pp-source').textContent=c.source;
+  document.getElementById('pp-date').textContent=c.date;
+  document.getElementById('pp-badges').innerHTML=`<span class="badge ${STAGE_COLORS[c.stage]}">${c.stage}</span><span class="badge b-blue">Score: ${c.score}%</span>`;
+  document.getElementById('pp-competencies').innerHTML=Object.entries(c.competencies).map(([k,v])=>`
+    <div class="competency-row">
+      <div class="competency-label"><span>${k}</span><span>${v}/100</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${v}%;background:${scoreColor(v)};"></div></div>
+    </div>
+  `).join('');
+  document.getElementById('pp-skills').innerHTML=c.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('');
+  document.getElementById('pp-stages').innerHTML=STAGES.map(s=>`
+    <button class="stage-btn ${c.stage===s?'active':''}" onclick="moveStage(${id},'${s}')">${s}</button>
+  `).join('');
+  document.getElementById('profile-panel').classList.add('open');
+  document.getElementById('pp-overlay').classList.add('open');
+}
+
+function closeProfile(){
+  document.getElementById('profile-panel').classList.remove('open');
+  document.getElementById('pp-overlay').classList.remove('open');
+}
+
+function moveStage(id,stage){
+  const c=CANDIDATES.find(x=>x.id===id);
+  if(c){ c.stage=stage; renderAll(); openProfile(id); }
+}
+
+function scheduleFor(id){
+  window.location.href='../interview_panel/interviews.html';
+}
+function scheduleInterview(){
+  window.location.href='../interview_panel/interviews.html';
+}
+function rejectCandidate(){
+  if(openProfileId && confirm('Reject this candidate?')){
+    const c=CANDIDATES.find(x=>x.id===openProfileId);
+    if(c){ c.stage='Rejected'; renderAll(); closeProfile(); }
+  }
+}
+
+function setStageFilter(el,stage){
+  stageFilter=stage;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+function switchView(v){
+  currentView=v;
+  document.getElementById('list-view').style.display=v==='list'?'block':'none';
+  document.getElementById('kanban-view').style.display=v==='kanban'?'block':'none';
+  document.getElementById('btn-list').style.cssText=v==='list'?'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;':'';
+  document.getElementById('btn-kanban').style.cssText=v==='kanban'?'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;':'';
+  if(v==='kanban') renderKanban();
+}
+
+function addCandidate(){
+  const name=document.getElementById('nc-name').value.trim();
+  if(!name){alert('Please enter a candidate name.');return;}
+  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const colors=['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#22c55e','#f43f5e','#6366f1'];
+  CANDIDATES.unshift({
+    id:Date.now(),name,init:initials,col:colors[CANDIDATES.length%colors.length],
+    email:document.getElementById('nc-email').value,phone:document.getElementById('nc-phone').value,
+    role:document.getElementById('nc-role').value,exp:document.getElementById('nc-exp').value+'yrs',
+    source:document.getElementById('nc-source').value,date:'Today',stage:'Applied',score:Math.floor(60+Math.random()*35),
+    competencies:{Technical:70,Communication:70,'Problem Solving':70,'Culture Fit':70,Leadership:70},
+    skills:[]
+  });
+  closeModal('add-modal');
+  renderAll();
+}
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open')); closeProfile(); } });
+
+/* ───────────── CHARTS ───────────── */
+const ctd={plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}},
+  scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}}}};
+
+new Chart(document.getElementById('sourceChart'),{
+  type:'doughnut',
+  data:{labels:['LinkedIn','Naukri','Referral','Direct','AngelList'],datasets:[{data:[48,32,22,24,16],backgroundColor:['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#f43f5e'],borderWidth:0,hoverOffset:3}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:8,padding:6}},tooltip:{...ctd.plugins.tooltip}}}
+});
+new Chart(document.getElementById('timeChart'),{
+  type:'line',
+  data:{labels:['Apr 1','Apr 8','Apr 15','Apr 22','Apr 29','May 1'],datasets:[{data:[12,28,45,72,118,142],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.07)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#3b82f6'}]},
+  options:{...ctd,responsive:true,maintainAspectRatio:false}
+});
+new Chart(document.getElementById('scoreChart'),{
+  type:'bar',
+  data:{labels:['<60','60–70','70–80','80–90','90+'],datasets:[{data:[12,28,54,34,14],backgroundColor:['#f43f5e','#f59e0b','#3b82f6','#2dd4bf','#22c55e'],borderRadius:5}]},
+  options:{...ctd,responsive:true,maintainAspectRatio:false}
+});
+
+/* INIT */
+renderAll();
+</script>
+</body>
+</html>

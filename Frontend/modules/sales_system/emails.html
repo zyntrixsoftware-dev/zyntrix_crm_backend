@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Emails &amp; Proposals — Zyntrix CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#080e18; --bg2:#0d1624; --bg3:#111e30; --bg4:#162436;
+  --surface:#0f1d2e;
+  --accent:#00e5b0; --accent2:#00c99a; --accent-dim:rgba(0,229,176,0.10);
+  --blue:#3d8ef0; --blue-dim:rgba(61,142,240,0.12);
+  --amber:#f5a623; --amber-dim:rgba(245,166,35,0.12);
+  --rose:#ff4d6d; --rose-dim:rgba(255,77,109,0.12);
+  --purple:#b57bee; --purple-dim:rgba(181,123,238,0.12);
+  --teal:#22d3ee; --teal-dim:rgba(34,211,238,0.12);
+  --text:#e8f0fe; --text2:#8ba3bf; --text3:#4e6680;
+  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.11);
+  --font:'Instrument Sans',sans-serif; --display:'Syne',sans-serif; --mono:'DM Mono',monospace;
+  --radius:14px; --sidebar:260px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden;}
+.shell{display:flex;height:100vh;}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;position:relative;}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:260px;background:radial-gradient(ellipse at 30% 0%,rgba(0,229,176,0.06) 0%,transparent 70%);pointer-events:none;}
+.brand{padding:22px 20px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.brand-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:800;color:var(--bg);flex-shrink:0;box-shadow:0 0 20px rgba(0,229,176,0.3);}
+.brand-text{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.brand-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px;letter-spacing:0.5px;}
+.nav-group{padding:16px 12px 6px;}
+.nav-label{font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 8px;font-family:var(--display);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all 0.18s;margin-bottom:2px;position:relative;font-weight:500;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--accent);}
+.nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0;}
+.nav-count{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--mono);background:var(--bg4);color:var(--text2);padding:2px 7px;border-radius:6px;}
+.nav-count.hot{background:var(--rose-dim);color:var(--rose);}
+.nav-count.ok{background:var(--accent-dim);color:var(--accent);}
+.nav-divider{height:1px;background:var(--border);margin:8px 12px;}
+.sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);flex-shrink:0;}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bg);flex-shrink:0;font-family:var(--display);}
+.user-name{font-size:13px;font-weight:600;color:var(--text);}
+.user-role{font-size:11px;color:var(--text3);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:64px;min-height:64px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:12px;}
+.page-hd{flex:1;}
+.page-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-0.3px;}
+.page-crumb{font-size:11px;color:var(--text3);margin-top:1px;}
+.page-crumb span{color:var(--accent);}
+.tbtn{padding:8px 16px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:flex;align-items:center;gap:7px;transition:all 0.18s;white-space:nowrap;}
+.tbtn:hover{background:var(--bg3);}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(0,229,176,0.25);}
+.content{flex:1;overflow-y:auto;background:var(--bg);}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.section{padding:22px 28px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;}
+.card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.2px;}
+.card-sub{font-size:11.5px;color:var(--text3);margin-top:3px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;font-family:var(--mono);}
+.b-accent{background:var(--accent-dim);color:var(--accent);}
+.b-blue{background:var(--blue-dim);color:var(--blue);}
+.b-amber{background:var(--amber-dim);color:var(--amber);}
+.b-rose{background:var(--rose-dim);color:var(--rose);}
+.b-purple{background:var(--purple-dim);color:var(--purple);}
+.b-teal{background:var(--teal-dim);color:var(--teal);}
+.b-gray{background:rgba(78,102,128,0.15);color:var(--text3);}
+.btn{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:all 0.18s;}
+.btn:hover{background:var(--bg4);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:7px;}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s;}
+.kpi-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.kpi-icon{font-size:18px;margin-bottom:10px;display:block;}
+.kpi-val{font-family:var(--display);font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px;}
+.kpi-lbl{font-size:11px;color:var(--text3);margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
+.kpi-delta{font-size:11px;margin-top:8px;font-weight:500;}
+.up{color:var(--accent);} .dn{color:var(--rose);}
+.tabs{display:flex;gap:6px;padding:16px 28px 0;}
+.tab{padding:7px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:var(--font);transition:all 0.18s;}
+.tab:hover{color:var(--text);background:var(--bg3);}
+.tab.active{background:var(--accent-dim);border-color:rgba(0,229,176,0.25);color:var(--accent);}
+.prog{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;}
+/* Email table */
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid var(--border2);}
+th{text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);}
+td{padding:13px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+/* Proposal card */
+.prop-card{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:16px 18px;transition:border-color 0.18s,transform 0.18s;}
+.prop-card:hover{border-color:rgba(0,229,176,0.2);transform:translateY(-2px);}
+.prop-title{font-size:13.5px;font-weight:700;margin-bottom:4px;}
+.prop-meta{font-size:11.5px;color:var(--text3);}
+.prop-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;}
+.prop-val{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--accent);}
+/* Thread preview */
+.thread{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;}
+.thread-hd{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;background:var(--bg3);}
+.thread-hd:hover{background:var(--bg4);}
+.thread-name{font-size:13px;font-weight:600;flex:1;}
+.thread-date{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.thread-body{padding:12px 16px;font-size:12.5px;color:var(--text2);border-top:1px solid var(--border);display:none;}
+.thread.open .thread-body{display:block;}
+select{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<div class="brand"><div class="brand-mark">Z</div><div><div class="brand-text">Zyntrix CRM</div><div class="brand-sub">v2.5 · Sales Suite</div></div></div>
+<div class="nav-group"><div class="nav-label">Overview</div><a class="nav-item" href="dashboard.html" style="text-decoration:none;"><span class="nav-icon">⌂</span> Dashboard</a></div>
+<div class="nav-group"><div class="nav-label">Pipeline</div>
+<a class="nav-item" href="pipeline.html" style="text-decoration:none;"><span class="nav-icon">◈</span> Pipeline Board <span class="nav-count ok">18</span></a>
+<a class="nav-item" href="deals.html" style="text-decoration:none;"><span class="nav-icon">⟐</span> Deals <span class="nav-count">18</span></a>
+<a class="nav-item" href="leads.html" style="text-decoration:none;"><span class="nav-icon">◎</span> Leads <span class="nav-count hot">42</span></a></div>
+<div class="nav-divider"></div>
+<div class="nav-group"><div class="nav-label">Engagement</div>
+<a class="nav-item" href="activities.html" style="text-decoration:none;"><span class="nav-icon">☏</span> Activities</a>
+<a class="nav-item active" href="emails.html" style="text-decoration:none;"><span class="nav-icon">✉</span> Emails &amp; Proposals</a>
+<a class="nav-item" href="meetings.html" style="text-decoration:none;"><span class="nav-icon">◷</span> Meetings <span class="nav-count hot">3</span></a></div>
+<div class="nav-divider"></div>
+<div class="nav-group"><div class="nav-label">Insights</div>
+<a class="nav-item" href="reports.html" style="text-decoration:none;"><span class="nav-icon">↗</span> Revenue Reports</a>
+<a class="nav-item" href="leaderboard.html" style="text-decoration:none;"><span class="nav-icon">⬡</span> Leaderboard</a>
+<a class="nav-item" href="playbook.html" style="text-decoration:none;"><span class="nav-icon">⊞</span> Playbook</a></div>
+<div class="nav-divider"></div>
+<div class="nav-group"><div class="nav-label">Admin</div><a class="nav-item" href="settings.html" style="text-decoration:none;"><span class="nav-icon">⊙</span> Settings</a></div>
+<div class="sidebar-footer"><div class="user-card"><div class="avatar">SK</div><div><div class="user-name">Sanjay Kumar</div><div class="user-role">Sales Manager</div></div></div><button class="tbtn" type="button" onclick="logout()" style="margin-top:8px;width:100%;justify-content:center;">⏻ Logout</button></div>
+</aside>
+
+<div class="main">
+<div class="topbar">
+<div class="page-hd"><div class="page-title">Emails &amp; Proposals</div><div class="page-crumb">Zyntrix CRM › Engagement › <span>Emails &amp; Proposals</span></div></div>
+<select><option>This Week</option><option>This Month</option><option>Q2 2025</option></select>
+<button class="tbtn">⬇ Export</button>
+<button class="tbtn primary">✉ Compose</button>
+</div>
+<div class="content">
+
+  <!-- KPIs -->
+  <div class="section" style="padding-bottom:0;">
+    <div class="kpi-row">
+      <div class="kpi-card"><span class="kpi-icon">📤</span><div class="kpi-val" style="color:var(--blue)">183</div><div class="kpi-lbl">Emails Sent</div><div class="kpi-delta up">▲ 9% vs last wk</div></div>
+      <div class="kpi-card"><span class="kpi-icon">👁️</span><div class="kpi-val" style="color:var(--amber)">68%</div><div class="kpi-lbl">Open Rate</div><div class="kpi-delta up">▲ 4pts</div></div>
+      <div class="kpi-card"><span class="kpi-icon">🔗</span><div class="kpi-val" style="color:var(--accent)">34%</div><div class="kpi-lbl">Click Rate</div><div class="kpi-delta up">▲ 2pts</div></div>
+      <div class="kpi-card"><span class="kpi-icon">💬</span><div class="kpi-val" style="color:var(--purple)">41%</div><div class="kpi-lbl">Reply Rate</div><div class="kpi-delta up">▲ 7pts</div></div>
+      <div class="kpi-card"><span class="kpi-icon">📋</span><div class="kpi-val" style="color:var(--teal)">12</div><div class="kpi-lbl">Active Proposals</div><div class="kpi-delta up">▲ 3 new</div></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('emails',this)">✉️ Emails</button>
+    <button class="tab" onclick="switchTab('proposals',this)">📋 Proposals</button>
+    <button class="tab" onclick="switchTab('templates',this)">📑 Templates</button>
+  </div>
+
+  <!-- Emails tab -->
+  <div class="section" id="tab-emails">
+    <div class="g21" style="gap:20px;align-items:start;">
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Email Threads</div><div class="card-sub">Recent outbound &amp; replies</div></div>
+          <div style="display:flex;gap:8px;">
+            <select><option>All</option><option>Sent</option><option>Opened</option><option>Replied</option><option>No Response</option></select>
+            <input style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--text);font-size:12px;outline:none;font-family:var(--font);" placeholder="🔍 Search…" style="width:160px;"/>
+          </div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Contact / Company</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Opened</th>
+            <th>Reply</th>
+            <th>Sent</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="font-weight:600;">Anika Patel</div><div style="font-size:11px;color:var(--text3);">TechNova Solutions</div></td>
+              <td style="color:var(--text2);">CloudStack pricing deck attached</td>
+              <td><span class="badge b-accent">Opened</span></td>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">3×</td>
+              <td><span class="badge b-blue">Replied</span></td>
+              <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">May 7</td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:600;">Marcus Lee</div><div style="font-size:11px;color:var(--text3);">FinCore Ltd</div></td>
+              <td style="color:var(--text2);">Analytics Suite Pro — final proposal</td>
+              <td><span class="badge b-amber">Viewed</span></td>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">2×</td>
+              <td><span class="badge b-gray">Pending</span></td>
+              <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">May 7</td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:600;">James Okafor</div><div style="font-size:11px;color:var(--text3);">OmniSec Corp</div></td>
+              <td style="color:var(--text2);">Secure Cloud Gateway — intro</td>
+              <td><span class="badge b-rose">Not Opened</span></td>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">0×</td>
+              <td><span class="badge b-gray">—</span></td>
+              <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">May 6</td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:600;">Priya Menon</div><div style="font-size:11px;color:var(--text3);">Nexus Dynamics</div></td>
+              <td style="color:var(--text2);">Enterprise SaaS Bundle — contract draft</td>
+              <td><span class="badge b-purple">In Review</span></td>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">5×</td>
+              <td><span class="badge b-blue">Replied</span></td>
+              <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">May 6</td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:600;">Kai Tanaka</div><div style="font-size:11px;color:var(--text3);">Synapse AI</div></td>
+              <td style="color:var(--text2);">Intro + demo request follow-up</td>
+              <td><span class="badge b-accent">Opened</span></td>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">1×</td>
+              <td><span class="badge b-gray">Pending</span></td>
+              <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">May 6</td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:600;">Rhea Sharma</div><div style="font-size:11px;color:var(--text3);">DataVault Inc</div></td>
+              <td style="color:var(--text2);">Infra Upgrade Pack — post-demo summary</td>
+              <td><span class="badge b-accent">Opened</span></td>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">4×</td>
+              <td><span class="badge b-blue">Replied</span></td>
+              <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">May 5</td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:600;">Lena Horvath</div><div style="font-size:11px;color:var(--text3);">GreenField Logistics</div></td>
+              <td style="color:var(--text2);">Supply chain module — Q2 offer</td>
+              <td><span class="badge b-rose">Bounced</span></td>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--text2);">0×</td>
+              <td><span class="badge b-gray">—</span></td>
+              <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">May 5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Right panel -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Email health -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:4px;">Email Performance</div>
+          <div class="card-sub" style="margin-bottom:16px;">This week vs target</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;"><span style="color:var(--text2);">Open Rate</span><span style="font-family:var(--mono);color:var(--amber);">68% <span style="color:var(--text3);">/ 60%</span></span></div><div class="prog"><div class="prog-fill" style="width:68%;background:var(--amber);"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;"><span style="color:var(--text2);">Click Rate</span><span style="font-family:var(--mono);color:var(--accent);">34% <span style="color:var(--text3);">/ 25%</span></span></div><div class="prog"><div class="prog-fill" style="width:34%;background:var(--accent);"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;"><span style="color:var(--text2);">Reply Rate</span><span style="font-family:var(--mono);color:var(--purple);">41% <span style="color:var(--text3);">/ 35%</span></span></div><div class="prog"><div class="prog-fill" style="width:41%;background:var(--purple);"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;"><span style="color:var(--text2);">Bounce Rate</span><span style="font-family:var(--mono);color:var(--rose);">2.1% <span style="color:var(--text3);">/ &lt;3%</span></span></div><div class="prog"><div class="prog-fill" style="width:7%;background:var(--rose);"></div></div></div>
+          </div>
+        </div>
+
+        <!-- Follow-up queue -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Follow-up Queue</div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--rose-dim);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">⚠️</div>
+              <div style="flex:1;"><div style="font-size:12.5px;font-weight:600;">James Okafor</div><div style="font-size:11px;color:var(--text3);">No open · 2 days overdue</div></div>
+              <button class="btn btn-sm">Send</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--amber-dim);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">⏳</div>
+              <div style="flex:1;"><div style="font-size:12.5px;font-weight:600;">Marcus Lee</div><div style="font-size:11px;color:var(--text3);">Viewed · No reply · 1 day</div></div>
+              <button class="btn btn-sm">Send</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">✅</div>
+              <div style="flex:1;"><div style="font-size:12.5px;font-weight:600;">Kai Tanaka</div><div style="font-size:11px;color:var(--text3);">Opened · Schedule follow-up</div></div>
+              <button class="btn btn-sm">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Best time to send -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">Best Send Time</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--text3);">Top Day</div><div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent);">Tue</div></div>
+            <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--text3);">Top Hour</div><div style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--blue);">10 AM</div></div>
+          </div>
+          <div style="margin-top:10px;font-size:11.5px;color:var(--text3);">Based on your last 30 days open &amp; reply data.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proposals tab -->
+  <div class="section" id="tab-proposals" style="display:none;">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-hd">
+        <div><div class="card-title">Active Proposals</div><div class="card-sub">12 proposals in circulation · ₹1.84 Cr total value</div></div>
+        <button class="btn primary">+ New Proposal</button>
+      </div>
+      <div class="g3">
+        <div class="prop-card"><div class="prop-title">CloudStack Enterprise Bundle</div><div class="prop-meta">TechNova Solutions · Anika Patel</div><div style="margin-top:8px;"><span class="badge b-amber">Awaiting Decision</span></div><div class="prop-footer"><div class="prop-val">₹24,00,000</div><div style="font-size:11px;color:var(--text3);">Sent May 5</div></div></div>
+        <div class="prop-card"><div class="prop-title">Analytics Suite Pro</div><div class="prop-meta">FinCore Ltd · Marcus Lee</div><div style="margin-top:8px;"><span class="badge b-blue">Under Review</span></div><div class="prop-footer"><div class="prop-val">₹18,50,000</div><div style="font-size:11px;color:var(--text3);">Sent May 7</div></div></div>
+        <div class="prop-card"><div class="prop-title">Enterprise SaaS Bundle</div><div class="prop-meta">Nexus Dynamics · Priya Menon</div><div style="margin-top:8px;"><span class="badge b-purple">Negotiating</span></div><div class="prop-footer"><div class="prop-val">₹32,00,000</div><div style="font-size:11px;color:var(--text3);">Sent Apr 28</div></div></div>
+        <div class="prop-card"><div class="prop-title">Infra Upgrade Pack</div><div class="prop-meta">DataVault Inc · Rhea Sharma</div><div style="margin-top:8px;"><span class="badge b-accent">Verbal Yes</span></div><div class="prop-footer"><div class="prop-val">₹14,75,000</div><div style="font-size:11px;color:var(--text3);">Sent Apr 30</div></div></div>
+        <div class="prop-card"><div class="prop-title">Secure Cloud Gateway</div><div class="prop-meta">OmniSec Corp · James Okafor</div><div style="margin-top:8px;"><span class="badge b-gray">Draft</span></div><div class="prop-footer"><div class="prop-val">₹9,20,000</div><div style="font-size:11px;color:var(--text3);">Not sent yet</div></div></div>
+        <div class="prop-card"><div class="prop-title">AI Platform Add-on</div><div class="prop-meta">Synapse AI · Kai Tanaka</div><div style="margin-top:8px;"><span class="badge b-teal">Demo Pending</span></div><div class="prop-footer"><div class="prop-val">₹21,00,000</div><div style="font-size:11px;color:var(--text3);">Preparing</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates tab -->
+  <div class="section" id="tab-templates" style="display:none;">
+    <div class="card">
+      <div class="card-hd">
+        <div><div class="card-title">Email Templates</div><div class="card-sub">Reusable, tracked templates for your outreach</div></div>
+        <button class="btn primary">+ New Template</button>
+      </div>
+      <table>
+        <thead><tr><th>Template Name</th><th>Category</th><th>Uses</th><th>Avg Open</th><th>Avg Reply</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><div style="font-weight:600;">Cold Outreach — Tech Vertical</div><div style="font-size:11px;color:var(--text3);">Personalized intro for SaaS prospects</div></td><td><span class="badge b-blue">Prospecting</span></td><td style="font-family:var(--mono);">48</td><td style="font-family:var(--mono);color:var(--amber);">71%</td><td style="font-family:var(--mono);color:var(--accent);">38%</td><td><button class="btn btn-sm">Use</button></td></tr>
+          <tr><td><div style="font-weight:600;">Post-Demo Follow-up</div><div style="font-size:11px;color:var(--text3);">Recap + next steps after demos</div></td><td><span class="badge b-accent">Follow-up</span></td><td style="font-family:var(--mono);">34</td><td style="font-family:var(--mono);color:var(--amber);">82%</td><td style="font-family:var(--mono);color:var(--accent);">55%</td><td><button class="btn btn-sm">Use</button></td></tr>
+          <tr><td><div style="font-weight:600;">Proposal Cover Letter</div><div style="font-size:11px;color:var(--text3);">Sent with pricing deck</div></td><td><span class="badge b-purple">Proposals</span></td><td style="font-family:var(--mono);">22</td><td style="font-family:var(--mono);color:var(--amber);">74%</td><td style="font-family:var(--mono);color:var(--accent);">44%</td><td><button class="btn btn-sm">Use</button></td></tr>
+          <tr><td><div style="font-weight:600;">Contract Re-engagement</div><div style="font-size:11px;color:var(--text3);">Win back gone-quiet prospects</div></td><td><span class="badge b-rose">Re-engage</span></td><td style="font-family:var(--mono);">17</td><td style="font-family:var(--mono);color:var(--amber);">61%</td><td style="font-family:var(--mono);color:var(--accent);">29%</td><td><button class="btn btn-sm">Use</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+<script>
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['emails','proposals','templates'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === name ? 'block' : 'none';
+  });
+}
+</script>
+<script src="../../assets/js/auth.js"></script>
+</body>
+</html>

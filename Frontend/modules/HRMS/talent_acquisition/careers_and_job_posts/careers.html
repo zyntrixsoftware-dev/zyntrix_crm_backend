@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRMS — Careers &amp; Job Posts</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:    #0d1b2a; --navy2: #132236; --navy3: #1a2d42; --navy4: #203350; --navy5: #263d5e;
+  --accent: #4f9cf9; --accent2: #3b82f6; --accent-dim: rgba(59,130,246,0.12);
+  --teal: #2dd4bf; --amber: #f59e0b; --rose: #f43f5e; --green: #22c55e; --purple: #a78bfa;
+  --text: #e2e8f0; --text2: #94a3b8; --text3: #64748b;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+  --card: #132236; --radius: 12px; --sidebar: 248px;
+  --font: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
+}
+html, body { height:100%; background:var(--navy); color:var(--text); font-family:var(--font); font-size:14px; line-height:1.6; overflow:hidden; }
+.shell   { display:flex; height:100vh; }
+.sidebar { width:var(--sidebar); min-width:var(--sidebar); background:var(--navy2); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow-y:auto; }
+.main    { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.topbar  { height:62px; min-height:62px; background:var(--navy2); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:14px; }
+.content { flex:1; overflow-y:auto; padding:24px; background:var(--navy); }
+
+/* SIDEBAR */
+.brand      { padding:20px 18px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border); }
+.brand-icon { width:36px; height:36px; background:linear-gradient(135deg,#3b82f6,#6366f1); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.brand-name { font-size:15px; font-weight:600; color:var(--text); }
+.brand-ver  { font-size:10px; color:var(--text3); font-family:var(--mono); }
+.nav-section { padding:14px 10px 6px; }
+.nav-label   { font-size:10px; font-weight:500; color:var(--text3); text-transform:uppercase; letter-spacing:1px; padding:0 8px 8px; }
+.nav-item    { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:8px; cursor:pointer; color:var(--text2); font-size:13px; text-decoration:none; transition:all 0.15s; margin-bottom:1px; position:relative; }
+.nav-item:hover  { background:var(--accent-dim); color:var(--text); }
+.nav-item.active { background:var(--accent-dim); color:var(--accent); font-weight:500; }
+.nav-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:20px; background:var(--accent2); border-radius:0 3px 3px 0; }
+.nav-icon    { width:18px; text-align:center; font-size:15px; flex-shrink:0; }
+.nav-badge   { margin-left:auto; background:var(--rose); color:#fff; font-size:10px; font-weight:600; padding:2px 6px; border-radius:10px; }
+.nav-divider { height:1px; background:var(--border); margin:8px 10px; }
+.sidebar-footer { margin-top:auto; padding:14px 10px; border-top:1px solid var(--border); }
+.user-pill { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; }
+.user-pill:hover { background:var(--border); }
+.avatar    { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#6366f1); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#fff; flex-shrink:0; }
+.user-name { font-size:13px; font-weight:500; color:var(--text); }
+.user-role { font-size:11px; color:var(--text3); }
+
+/* TOPBAR */
+.page-title   { font-size:16px; font-weight:600; color:var(--text); flex:1; }
+.breadcrumb   { font-size:12px; color:var(--text3); margin-top:2px; }
+.breadcrumb span { color:var(--text2); }
+.search-box   { display:flex; align-items:center; gap:8px; background:var(--navy3); border:1px solid var(--border2); border-radius:8px; padding:7px 14px; min-width:220px; }
+.search-box input { background:none; border:none; outline:none; color:var(--text); font-size:13px; font-family:var(--font); width:100%; }
+.search-box input::placeholder { color:var(--text3); }
+.topbar-btn { padding:7px 14px; border-radius:8px; border:1px solid var(--border2); background:transparent; color:var(--text); cursor:pointer; font-size:13px; font-family:var(--font); display:flex; align-items:center; gap:6px; transition:all 0.15s; white-space:nowrap; }
+.topbar-btn:hover { background:var(--navy3); }
+.topbar-btn.primary { background:var(--accent2); border-color:var(--accent2); color:#fff; }
+.topbar-btn.primary:hover { background:var(--accent); border-color:var(--accent); }
+
+/* CARDS */
+.grid  { display:grid; gap:16px; }
+.g4    { grid-template-columns:repeat(4,1fr); }
+.g3    { grid-template-columns:repeat(3,1fr); }
+.g2    { grid-template-columns:repeat(2,1fr); }
+.g21   { grid-template-columns:2fr 1fr; }
+.card  { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.card-sm { padding:16px; }
+.card-hd { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; gap:10px; flex-wrap:wrap; }
+.card-title { font-size:14px; font-weight:600; color:var(--text); }
+.card-sub   { font-size:12px; color:var(--text3); margin-top:2px; }
+
+/* BADGES */
+.badge   { display:inline-flex; align-items:center; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:500; white-space:nowrap; }
+.b-green  { background:rgba(34,197,94,0.13);  color:var(--green); }
+.b-amber  { background:rgba(245,158,11,0.13); color:var(--amber); }
+.b-rose   { background:rgba(244,63,94,0.13);  color:var(--rose); }
+.b-blue   { background:rgba(79,156,249,0.13); color:var(--accent); }
+.b-purple { background:rgba(167,139,250,0.13); color:var(--purple); }
+.b-teal   { background:rgba(45,212,191,0.13); color:var(--teal); }
+.b-gray   { background:rgba(100,116,139,0.13); color:var(--text3); }
+
+/* TABLE */
+table    { width:100%; border-collapse:collapse; }
+th       { text-align:left; font-size:11px; font-weight:500; color:var(--text3); text-transform:uppercase; letter-spacing:0.6px; padding:0 14px 10px; }
+td       { padding:13px 14px; border-top:1px solid var(--border); font-size:13px; color:var(--text2); vertical-align:middle; }
+tr:first-child td { border-top:none; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+.td-main { font-weight:500; color:var(--text); }
+.td-sub  { font-size:11px; color:var(--text3); margin-top:1px; }
+
+/* TABS */
+.tabs    { display:flex; gap:2px; background:var(--navy3); padding:4px; border-radius:10px; margin-bottom:18px; }
+.tab     { padding:7px 16px; border-radius:7px; cursor:pointer; font-size:13px; color:var(--text2); transition:all 0.15s; white-space:nowrap; }
+.tab.active { background:var(--navy2); color:var(--text); font-weight:500; }
+.tab:hover:not(.active) { color:var(--text); }
+
+/* CHIPS */
+.chips   { display:flex; gap:6px; flex-wrap:wrap; }
+.chip    { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; background:var(--navy3); border:1px solid var(--border); border-radius:20px; font-size:12px; color:var(--text2); cursor:pointer; transition:all 0.15s; }
+.chip:hover, .chip.active { border-color:var(--accent2); color:var(--accent); background:var(--accent-dim); }
+
+/* MODAL */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:100; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
+.overlay.open { display:flex; }
+.modal   { background:var(--navy2); border:1px solid var(--border2); border-radius:16px; width:560px; max-width:94vw; max-height:90vh; overflow-y:auto; }
+.modal-hd { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.modal-title { font-size:15px; font-weight:600; }
+.modal-close { background:none; border:none; color:var(--text3); cursor:pointer; font-size:22px; line-height:1; }
+.modal-close:hover { color:var(--text); }
+.modal-body { padding:22px 24px; }
+.modal-ft   { padding:14px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+.frow  { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.fg    { display:flex; flex-direction:column; gap:6px; }
+label  { font-size:12px; font-weight:500; color:var(--text2); }
+input, select, textarea { background:var(--navy3); border:1px solid var(--border2); border-radius:8px; padding:9px 12px; color:var(--text); font-family:var(--font); font-size:13px; outline:none; width:100%; transition:border 0.15s; }
+input:focus, select:focus, textarea:focus { border-color:var(--accent2); }
+select option { background:var(--navy2); }
+textarea { resize:vertical; min-height:90px; }
+.btn  { padding:9px 18px; border-radius:8px; border:1px solid var(--border2); background:transparent; color:var(--text); cursor:pointer; font-size:13px; font-family:var(--font); font-weight:500; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s; }
+.btn:hover { background:var(--navy3); }
+.btn.primary { background:var(--accent2); border-color:var(--accent2); color:#fff; }
+.btn.primary:hover { background:var(--accent); border-color:var(--accent); }
+.btn.danger  { background:var(--rose); border-color:var(--rose); color:#fff; }
+.btn-sm { padding:5px 12px; font-size:12px; border-radius:6px; }
+
+/* PROGRESS */
+.prog-bar  { height:5px; background:var(--navy4); border-radius:3px; overflow:hidden; margin-top:4px; }
+.prog-fill { height:100%; border-radius:3px; }
+
+/* STAT MINI */
+.stat-mini { text-align:center; }
+.stat-mini .val { font-size:26px; font-weight:600; line-height:1; }
+.stat-mini .lbl { font-size:11px; color:var(--text3); margin-top:4px; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+/* JOB DETAIL PANEL */
+.job-detail { background:var(--navy3); border:1px solid var(--border2); border-radius:12px; padding:20px; margin-bottom:16px; display:none; }
+.job-detail.show { display:block; }
+.jd-hd { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.jd-title { font-size:17px; font-weight:600; color:var(--text); }
+.jd-meta  { display:flex; gap:12px; margin-top:6px; flex-wrap:wrap; }
+.jd-meta-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text3); }
+.jd-section { margin-top:14px; }
+.jd-section-title { font-size:12px; font-weight:500; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+.jd-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.jd-tag  { display:inline-flex; padding:4px 10px; background:var(--navy4); border:1px solid var(--border); border-radius:6px; font-size:12px; color:var(--text2); }
+
+/* CANDIDATE MINI CARD */
+.cand-mini { display:flex; align-items:center; gap:10px; padding:10px; background:var(--navy4); border-radius:8px; margin-bottom:8px; }
+.cand-av   { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#fff; flex-shrink:0; }
+
+/* NOTIF DOT */
+.notif-wrap { position:relative; }
+.notif-dot  { position:absolute; top:6px; right:14px; width:7px; height:7px; background:var(--rose); border-radius:50%; border:2px solid var(--navy2); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+.card { animation:fadeUp 0.3s ease both; }
+</style>
+<script src="../../../../assets/js/api.js"></script>
+<script src="../../../../assets/js/auth.js?v=3"></script>
+</head>
+<body>
+<script>requireAuth(); requireModuleAccess("hr");</script>
+<div class="shell">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">👥</div>
+    <div>
+      <div class="brand-name">HRMS Pro</div>
+      <div class="brand-ver">v2.5 · 2025</div>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="../../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Talent Acquisition</div>
+    <a class="nav-item active" href="careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
+    <a class="nav-item" href="../candidates/candidates.html"><span class="nav-icon">👤</span> Candidates <span class="nav-badge">14</span></a>
+    <a class="nav-item" href="../interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Employee Lifecycle</div>
+    <a class="nav-item" href="../../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
+    <a class="nav-item" href="../../employee_lifecycle/offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item" href="../../employee_lifecycle/orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
+    <a class="nav-item" href="../../employee_lifecycle/deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Operations</div>
+    <a class="nav-item" href="../../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
+    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations <span class="nav-badge">3</span></a>
+    <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">AR</div>
+      <div style="flex:1;min-width:0;">
+        <div class="user-name">Arjun Rao</div>
+        <div class="user-role">HR Manager</div>
+      </div>
+      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Careers &amp; Job Posts</div>
+      <div class="breadcrumb">HRMS Pro <span>›</span> Talent Acquisition <span>›</span> Careers</div>
+    </div>
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="job-search" placeholder="Search job titles, departments…" oninput="filterJobs()">
+    </div>
+    <div class="notif-wrap">
+      <button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button>
+      <span class="notif-dot"></span>
+    </div>
+    <button class="topbar-btn primary" onclick="openModal('job-modal')">＋ Post New Job</button>
+  </div>
+
+  <div class="content">
+
+    <!-- KPI STRIP -->
+    <div class="grid g4" style="margin-bottom:20px;">
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:28px;font-weight:600;color:var(--accent);">12</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Open Positions</div>
+        <div style="font-size:11px;color:var(--green);margin-top:4px;">▲ 3 added this month</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:28px;font-weight:600;color:var(--green);">4</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Positions Filled</div>
+        <div style="font-size:11px;color:var(--green);margin-top:4px;">This month</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:28px;font-weight:600;color:var(--amber);">28</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Avg. Days to Hire</div>
+        <div style="font-size:11px;color:var(--rose);margin-top:4px;">▲ 2 days vs last month</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:28px;font-weight:600;color:var(--purple);">142</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Total Applications</div>
+        <div style="font-size:11px;color:var(--green);margin-top:4px;">▲ 24 this week</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="grid g21" style="margin-bottom:20px;">
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Hiring Funnel — All Open Roles</div><div class="card-sub">Application → Hired conversion</div></div>
+        </div>
+        <div style="height:200px;position:relative;"><canvas id="funnelChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Jobs by Department</div></div>
+        <div style="height:200px;position:relative;"><canvas id="deptChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- FILTER TABS + JOB TABLE -->
+    <div class="card">
+      <div class="card-hd">
+        <div><div class="card-title">All Job Listings</div><div class="card-sub" id="job-count">Showing 5 of 12 positions</div></div>
+        <div class="chips" id="dept-chips">
+          <span class="chip active" onclick="setDeptFilter(this,'all')">All (12)</span>
+          <span class="chip" onclick="setDeptFilter(this,'Engineering')">Engineering (5)</span>
+          <span class="chip" onclick="setDeptFilter(this,'Product')">Product (3)</span>
+          <span class="chip" onclick="setDeptFilter(this,'Sales')">Sales (4)</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-sm" onclick="toggleView('table')" id="btn-table">☰ Table</button>
+          <button class="btn btn-sm" onclick="toggleView('card')" id="btn-card" style="background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);">⊞ Cards</button>
+        </div>
+      </div>
+
+      <!-- TABLE VIEW -->
+      <div id="table-view" style="display:none;">
+        <table id="jobs-table">
+          <thead><tr>
+            <th>Job Title</th><th>Department</th><th>Location</th><th>Type</th><th>CTC Range</th><th>Applications</th><th>Deadline</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="jobs-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- CARD VIEW -->
+      <div id="card-view" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ═══ JOB DETAIL PANEL (overlay) ═══ -->
+<div class="overlay" id="detail-overlay" onclick="closeModal('detail-overlay')">
+  <div class="modal" style="width:620px;" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="detail-title">Job Title</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="detail-sub">Department · Location</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('detail-overlay')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;" id="detail-badges"></div>
+      <div class="jd-section">
+        <div class="jd-section-title">Compensation</div>
+        <div style="font-size:18px;font-weight:600;color:var(--green);" id="detail-ctc"></div>
+      </div>
+      <div class="jd-section">
+        <div class="jd-section-title">Job Description</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;" id="detail-desc"></p>
+      </div>
+      <div class="jd-section">
+        <div class="jd-section-title">Required Skills</div>
+        <div class="jd-tags" id="detail-skills"></div>
+      </div>
+      <div class="jd-section" style="margin-top:16px;">
+        <div class="jd-section-title">Recent Applicants</div>
+        <div id="detail-cands"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('detail-overlay')">Close</button>
+      <button class="btn" onclick="closeModal('detail-overlay');openModal('edit-modal')">Edit Job</button>
+      <button class="btn primary" onclick="window.location.href='../candidates/candidates.html'">View All Applicants →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ POST JOB MODAL ═══ -->
+<div class="overlay" id="job-modal" onclick="closeModal('job-modal')">
+  <div class="modal" style="width:580px;" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <span class="modal-title">Post New Job</span>
+      <button class="modal-close" onclick="closeModal('job-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg" style="margin-bottom:14px;"><label>Job Title *</label><input id="nj-title" placeholder="e.g. Senior Backend Engineer"></div>
+      <div class="frow">
+        <div class="fg"><label>Department *</label>
+          <select id="nj-dept"><option>Engineering</option><option>Product</option><option>Sales</option><option>Operations</option><option>HR / Admin</option></select>
+        </div>
+        <div class="fg"><label>Location *</label><input id="nj-loc" placeholder="Bangalore / Remote / Hyderabad"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Job Type</label>
+          <select id="nj-type"><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option></select>
+        </div>
+        <div class="fg"><label>Experience Required</label><input id="nj-exp" placeholder="e.g. 4–8 years"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Min CTC (₹ LPA)</label><input id="nj-min" type="number" placeholder="12"></div>
+        <div class="fg"><label>Max CTC (₹ LPA)</label><input id="nj-max" type="number" placeholder="20"></div>
+      </div>
+      <div class="fg" style="margin-bottom:14px;"><label>Job Description *</label><textarea id="nj-desc" rows="4" placeholder="Describe responsibilities, requirements, qualifications…"></textarea></div>
+      <div class="frow">
+        <div class="fg"><label>Skills (comma separated)</label><input id="nj-skills" placeholder="Node.js, PostgreSQL, Docker…"></div>
+        <div class="fg"><label>Application Deadline</label><input id="nj-deadline" type="date"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('job-modal')">Cancel</button>
+      <button class="btn" onclick="saveDraft()">Save Draft</button>
+      <button class="btn primary" onclick="postJob()">Publish Job</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NOTIFICATIONS ═══ -->
+<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
+  <div class="modal" style="width:420px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;padding:12px;background:rgba(34,197,94,0.08);border-radius:8px;border-left:3px solid var(--green);">
+          <span style="font-size:16px;">📋</span><div><div style="font-size:13px;font-weight:500;">Sr. Backend Engineer — 3 new applications</div><div style="font-size:12px;color:var(--text3);">2 hours ago</div></div>
+        </div>
+        <div style="display:flex;gap:10px;padding:12px;background:var(--navy3);border-radius:8px;">
+          <span style="font-size:16px;">⚠️</span><div><div style="font-size:13px;font-weight:500;">DevOps Engineer — deadline in 3 days</div><div style="font-size:12px;color:var(--text3);">Application period closing soon</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────── DATA ─────────────────────── */
+const JOBS = [
+  { id:1, title:'Senior Backend Engineer', dept:'Engineering', loc:'Bangalore / Remote', type:'Full-time', exp:'4–8 years', minCtc:20, maxCtc:28, apps:23, deadline:'2025-05-20', status:'Active',
+    desc:'We are looking for a senior backend engineer to design, build, and maintain scalable APIs and microservices. You will work closely with the product and frontend teams to deliver high-quality solutions.',
+    skills:['Node.js','PostgreSQL','Redis','Docker','Kubernetes','REST APIs','GraphQL'],
+    candidates:[{name:'Abhishek Kumar Singh',init:'AS',col:'#ec4899',stage:'Shortlisted'},{name:'Kumar Gourav',init:'KG',col:'#2dd4bf',stage:'Interviewing'},{name:'Sahil Bhuwalka',init:'SB',col:'#f59e0b',stage:'Applied'}]
+  },
+  { id:2, title:'Product Manager — Growth', dept:'Product', loc:'Hyderabad', type:'Full-time', exp:'5–9 years', minCtc:24, maxCtc:32, apps:18, deadline:'2025-05-25', status:'Active',
+    desc:'Own the growth roadmap and drive product strategy to increase user acquisition and retention. You will collaborate with engineering, marketing, and design teams.',
+    skills:['Product Strategy','A/B Testing','Analytics','Roadmapping','SQL','Stakeholder Mgmt'],
+    candidates:[{name:'Sneha Mishra',init:'SM',col:'#f59e0b',stage:'Shortlisted'},{name:'Karan Bose',init:'KB',col:'#22c55e',stage:'Applied'}]
+  },
+  { id:3, title:'Sales Development Rep', dept:'Sales', loc:'Mumbai', type:'Full-time', exp:'1–3 years', minCtc:8, maxCtc:12, apps:41, deadline:'2025-05-15', status:'Active',
+    desc:'Qualify inbound leads, prospect outbound accounts, and set up demos for AEs. You will own the top of the funnel and help drive revenue growth.',
+    skills:['CRM (Salesforce)','Cold Calling','Email Outreach','LinkedIn Sales Navigator','Communication'],
+    candidates:[{name:'Amit Patel',init:'AP',col:'#f43f5e',stage:'Applied'},{name:'Riya Singh',init:'RS',col:'#a78bfa',stage:'Screening'}]
+  },
+  { id:4, title:'DevOps / Cloud Engineer', dept:'Engineering', loc:'Remote', type:'Full-time', exp:'3–6 years', minCtc:18, maxCtc:25, apps:15, deadline:'2025-06-01', status:'Draft',
+    desc:'Build and manage cloud infrastructure on AWS. Implement CI/CD pipelines, monitoring and alerting systems, and ensure 99.9% uptime SLAs.',
+    skills:['AWS','Terraform','Jenkins','Kubernetes','Prometheus','Bash','Linux'],
+    candidates:[]
+  },
+  { id:5, title:'UX / Product Designer', dept:'Product', loc:'Bangalore', type:'Full-time', exp:'3–6 years', minCtc:14, maxCtc:20, apps:29, deadline:'2025-04-30', status:'Closed',
+    desc:'Create world-class user experiences across web and mobile. Own the full design process from user research to high-fidelity prototypes.',
+    skills:['Figma','User Research','Prototyping','Design Systems','Usability Testing','Adobe XD'],
+    candidates:[{name:'Nisha Joshi',init:'NJ',col:'#f43f5e',stage:'Rejected'},{name:'Priya M.',init:'PM',col:'#2dd4bf',stage:'Hired'}]
+  },
+];
+
+let deptFilter = 'all';
+let currentView = 'card';
+
+/* ─────────────────────── RENDER ─────────────────────── */
+function renderJobs() {
+  const q = document.getElementById('job-search').value.toLowerCase();
+  let jobs = JOBS.filter(j => {
+    const matchDept = deptFilter==='all' || j.dept===deptFilter;
+    const matchQ    = !q || j.title.toLowerCase().includes(q) || j.dept.toLowerCase().includes(q) || j.loc.toLowerCase().includes(q);
+    return matchDept && matchQ;
+  });
+
+  document.getElementById('job-count').textContent = `Showing ${jobs.length} of ${JOBS.length} positions`;
+
+  if (currentView === 'table') renderTable(jobs);
+  else renderCards(jobs);
+}
+
+function statusBadge(s) {
+  const map = {Active:'b-green',Draft:'b-amber',Closed:'b-rose'};
+  return `<span class="badge ${map[s]||'b-gray'}">${s}</span>`;
+}
+
+function renderTable(jobs) {
+  const tb = document.getElementById('jobs-tbody');
+  tb.innerHTML = jobs.map(j => `
+    <tr>
+      <td>
+        <div class="td-main">${j.title}</div>
+        <div class="td-sub">${j.exp} experience</div>
+      </td>
+      <td>${j.dept}</td>
+      <td>${j.loc}</td>
+      <td>${j.type}</td>
+      <td>₹${j.minCtc}–${j.maxCtc} LPA</td>
+      <td>
+        <div style="font-weight:500;color:var(--text);">${j.apps}</div>
+        <div class="prog-bar" style="width:70px;margin-top:4px;"><div class="prog-fill" style="width:${Math.min(j.apps/50*100,100)}%;background:var(--accent2);"></div></div>
+      </td>
+      <td style="font-family:var(--mono);font-size:12px;">${j.deadline}</td>
+      <td>${statusBadge(j.status)}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="viewJob(${j.id})">View</button>
+          ${j.status!=='Closed'?`<button class="btn btn-sm" style="color:var(--rose);border-color:rgba(244,63,94,0.3);" onclick="closeJob(${j.id})">Close</button>`:''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderCards(jobs) {
+  const cv = document.getElementById('card-view');
+  cv.innerHTML = jobs.map(j => `
+    <div style="background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all 0.15s;" onmouseenter="this.style.borderColor='rgba(59,130,246,0.4)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.07)'" onclick="viewJob(${j.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div style="font-size:15px;font-weight:600;color:var(--text);">${j.title}</div>
+        ${statusBadge(j.status)}
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <span style="font-size:12px;color:var(--text3);">🏢 ${j.dept}</span>
+        <span style="font-size:12px;color:var(--text3);">📍 ${j.loc}</span>
+        <span style="font-size:12px;color:var(--text3);">⏱ ${j.type}</span>
+      </div>
+      <div style="font-size:16px;font-weight:600;color:var(--green);margin-bottom:12px;">₹${j.minCtc}–${j.maxCtc} LPA</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+        ${j.skills.slice(0,4).map(s=>`<span style="display:inline-flex;padding:3px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text2);">${s}</span>`).join('')}
+        ${j.skills.length>4?`<span style="display:inline-flex;padding:3px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text3);">+${j.skills.length-4}</span>`:''}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="font-size:12px;color:var(--text3);">👥 ${j.apps} applicants</div>
+        <div style="font-size:12px;color:var(--text3);">📅 Closes ${j.deadline}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ─────────────────────── ACTIONS ─────────────────────── */
+function viewJob(id) {
+  const j = JOBS.find(x=>x.id===id);
+  if (!j) return;
+  document.getElementById('detail-title').textContent = j.title;
+  document.getElementById('detail-sub').textContent   = `${j.dept} · ${j.loc} · ${j.type}`;
+  document.getElementById('detail-ctc').textContent   = `₹${j.minCtc}–${j.maxCtc} LPA`;
+  document.getElementById('detail-desc').textContent  = j.desc;
+  document.getElementById('detail-badges').innerHTML  =
+    statusBadge(j.status) + `<span class="badge b-blue">${j.apps} Applicants</span><span class="badge b-gray">${j.exp}</span><span class="badge b-gray">Deadline: ${j.deadline}</span>`;
+  document.getElementById('detail-skills').innerHTML  = j.skills.map(s=>`<span class="jd-tag">${s}</span>`).join('');
+  document.getElementById('detail-cands').innerHTML   = j.candidates.length
+    ? j.candidates.map(c=>`<div class="cand-mini"><div class="cand-av" style="background:${c.col};">${c.init}</div><div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--text);">${c.name}</div></div><span class="badge b-blue">${c.stage}</span></div>`).join('')
+    : `<div style="font-size:13px;color:var(--text3);padding:10px 0;">No applicants yet.</div>`;
+  openModal('detail-overlay');
+}
+
+function closeJob(id) {
+  const j = JOBS.find(x=>x.id===id);
+  if (j && confirm(`Close the job posting for "${j.title}"?`)) {
+    j.status = 'Closed'; renderJobs();
+  }
+}
+
+function setDeptFilter(el, dept) {
+  deptFilter = dept;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderJobs();
+}
+
+function filterJobs() { renderJobs(); }
+
+function toggleView(v) {
+  currentView = v;
+  document.getElementById('table-view').style.display = v==='table' ? 'block' : 'none';
+  document.getElementById('card-view').style.display  = v==='card'  ? 'grid'  : 'none';
+  document.getElementById('btn-table').style.cssText  = v==='table' ? 'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;' : '';
+  document.getElementById('btn-card').style.cssText   = v==='card'  ? 'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;' : '';
+  renderJobs();
+}
+
+function postJob() {
+  const title = document.getElementById('nj-title').value.trim();
+  if (!title) { alert('Please enter a job title.'); return; }
+  const newJob = {
+    id: JOBS.length+1,
+    title, dept: document.getElementById('nj-dept').value,
+    loc:  document.getElementById('nj-loc').value || 'TBD',
+    type: document.getElementById('nj-type').value,
+    exp:  document.getElementById('nj-exp').value || 'Open',
+    minCtc: +document.getElementById('nj-min').value || 0,
+    maxCtc: +document.getElementById('nj-max').value || 0,
+    apps: 0, deadline: document.getElementById('nj-deadline').value || '—', status: 'Active',
+    desc: document.getElementById('nj-desc').value,
+    skills: document.getElementById('nj-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
+    candidates: []
+  };
+  JOBS.unshift(newJob);
+  closeModal('job-modal');
+  renderJobs();
+}
+
+function saveDraft() {
+  const title = document.getElementById('nj-title').value.trim();
+  if (!title) { alert('Please enter a job title.'); return; }
+  alert(`Draft saved for: "${title}"`);
+  closeModal('job-modal');
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open')); });
+
+/* ─────────────────────── CHARTS ─────────────────────── */
+const ctd = {
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}},
+  scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11}}}}
+};
+
+new Chart(document.getElementById('funnelChart'),{
+  type:'bar',
+  data:{labels:['Applied','Screened','Shortlisted','Interviewed','Offered','Hired'],datasets:[{data:[142,98,54,28,14,8],backgroundColor:['rgba(59,130,246,0.8)','rgba(99,102,241,0.7)','rgba(167,139,250,0.7)','rgba(45,212,191,0.7)','rgba(245,158,11,0.7)','rgba(34,197,94,0.8)'],borderRadius:6,borderSkipped:false}]},
+  options:{...ctd,responsive:true,maintainAspectRatio:false,scales:{x:{...ctd.scales.x},y:{...ctd.scales.y,beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('deptChart'),{
+  type:'doughnut',
+  data:{labels:['Engineering','Product','Sales'],datasets:[{data:[5,3,4],backgroundColor:['#3b82f6','#a78bfa','#2dd4bf'],borderWidth:0,hoverOffset:4}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#94a3b8',font:{size:11},boxWidth:10,padding:8}},tooltip:{...ctd.plugins.tooltip}}}
+});
+
+/* ─────────────────────── INIT ─────────────────────── */
+toggleView('card');
+</script>
+</body>
+</html>

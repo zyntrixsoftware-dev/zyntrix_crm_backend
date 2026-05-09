@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timecard</title>
+<link rel="stylesheet" href="../assets/css/attendance.css">
+<link rel="stylesheet" href="../assets/css/module-pages.css">
+<link rel="stylesheet" href="../assets/css/timecard.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="brand-mark">Z</div>
+        <div>
+          <strong>Zyntrix</strong>
+          <span>EdTech CRM</span>
+        </div>
+      </div>
+
+      <nav class="side-nav" aria-label="Primary">
+        <a href="attendance.html"><span class="nav-icon">▣</span>Schedule</a>
+        <a class="active" href="timecard.html"><span class="nav-icon">◷</span>Timecard</a>
+        <a href="find-shifts.html"><span class="nav-icon">⌕</span>Find Shifts</a>
+        <a href="payroll.html"><span class="nav-icon">$</span>Payroll</a>
+      </nav>
+    </div>
+
+    <div class="sidebar-user">
+      <img src="https://i.pravatar.cc/80?img=12" alt="">
+      <div>
+        <strong id="sideUserName">Zyntrix Employee</strong>
+        <span id="sideUserEmail">employee@zyntrix.com</span>
+      </div>
+      <button class="icon-button small" type="button" aria-label="Open profile menu">⌄</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1>Timecard</h1>
+      <div class="topbar-actions">
+        <div class="top-profile">
+          <img src="https://i.pravatar.cc/80?img=12" alt="">
+          <div>
+            <strong id="userName">Zyntrix Employee</strong>
+            <span id="userRole">Employee</span>
+          </div>
+          <button onclick="logout()" type="button" aria-label="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;font-family:inherit;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="module-content">
+      <div class="time-summary">
+        <div class="summary-box">
+          <p>Total Hours</p>
+          <h2>00:00</h2>
+        </div>
+
+        <div class="summary-box">
+          <p>Overtime</p>
+          <h2>00:00</h2>
+        </div>
+
+        <div class="summary-box">
+          <p>Days Worked</p>
+          <h2>0</h2>
+        </div>
+      </div>
+
+      <div class="filters section-panel">
+        <input type="date">
+        <select>
+          <option>All</option>
+          <option>Present</option>
+          <option>Late</option>
+          <option>Absent</option>
+        </select>
+      </div>
+
+      <div class="table-card section-panel">
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Punch In</th>
+                <th>Punch Out</th>
+                <th>Hours</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="timecardBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/timecard.js"></script>
+<script>
+requireAuth();
+requireModuleAccess("attendance");
+
+const user = JSON.parse(localStorage.getItem("user"));
+if (user) {
+  document.getElementById("userName").innerText = user.name || "Zyntrix Employee";
+  document.getElementById("sideUserName").innerText = user.name || "Zyntrix Employee";
+  document.getElementById("sideUserEmail").innerText = user.email || "employee@zyntrix.com";
+  document.getElementById("userRole").innerText = user.role ? user.role.replace("_", " ") : "Employee";
+}
+</script>
+</body>
+</html>

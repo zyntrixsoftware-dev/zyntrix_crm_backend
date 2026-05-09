@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Attendance</title>
+<link rel="stylesheet" href="../assets/css/attendance.css">
+<link rel="stylesheet" href="../assets/css/module-pages.css">
+</head>
+<body>
+<div class="app">
+	<aside class="sidebar">
+		<div>
+			<div class="brand">
+				<div class="brand-mark">Z</div>
+				<div>
+					<strong>Zyntrix</strong>
+					<span>EdTech CRM</span>
+				</div>
+			</div>
+
+			<nav class="side-nav" aria-label="Primary">
+				<a href="HRMS/dashboard/hr.html"><span class="nav-icon">⚙</span>HR Dashboard</a>
+				<a class="active" href="employee-attendance.html"><span class="nav-icon">◷</span>Employee Attendance</a>
+			</nav>
+		</div>
+
+		<div class="sidebar-user">
+			<img src="https://i.pravatar.cc/80?img=15" alt="">
+			<div>
+				<strong id="sideUserName">Zyntrix HR</strong>
+				<span id="sideUserEmail">hr@zyntrix.com</span>
+			</div>
+			<button class="icon-button small" type="button" aria-label="Open profile menu">⌄</button>
+		</div>
+	</aside>
+
+	<main class="main">
+		<header class="topbar">
+			<h1>Employee Attendance</h1>
+			<div class="topbar-actions">
+				<div class="top-profile">
+					<img src="https://i.pravatar.cc/80?img=15" alt="">
+					<div>
+						<strong id="userName">Zyntrix HR</strong>
+						<span id="userRole">HR</span>
+					</div>
+					<button onclick="logout()" type="button" aria-label="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;font-family:inherit;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+				</div>
+			</div>
+		</header>
+
+		<section class="module-content">
+			<section class="section-panel">
+				<h2>Attendance Log</h2>
+				<p id="employeeMeta" class="empty-copy">Loading employee details...</p>
+				<div class="form-grid" style="grid-template-columns: 220px auto; margin: 12px 0;">
+					<input id="monthFilter" type="month">
+					<button id="loadAttendanceBtn" type="button">Load Attendance</button>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>Date</th>
+								<th>Punch In</th>
+								<th>Punch Out</th>
+								<th>Hours</th>
+							</tr>
+						</thead>
+						<tbody id="attendanceTable"></tbody>
+					</table>
+				</div>
+			</section>
+		</section>
+	</main>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/employee-attendance.js"></script>
+<script>
+requireAuth();
+requireModuleAccess("hr");
+
+const user = JSON.parse(localStorage.getItem("user"));
+if (user) {
+	document.getElementById("userName").innerText = user.name || "Zyntrix HR";
+	document.getElementById("sideUserName").innerText = user.name || "Zyntrix HR";
+	document.getElementById("sideUserEmail").innerText = user.email || "hr@zyntrix.com";
+	document.getElementById("userRole").innerText = user.role ? user.role.replace("_", " ") : "HR";
+}
+</script>
+</body>
+</html>

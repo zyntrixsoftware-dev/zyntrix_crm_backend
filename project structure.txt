@@ -1,0 +1,24 @@
+backend/
+│
+├── server.js
+├── .env
+│
+├── config/
+│   └── db.js
+│
+├── models/
+│   ├── User.js
+│   └── Attendance.js
+│
+├── routes/
+│   ├── authRoutes.js
+│   ├── attendanceRoutes.js
+│   └── hrRoutes.js
+│
+├── controllers/
+│   ├── authController.js
+│   ├── attendanceController.js
+│   └── hrController.js
+│
+└── middleware/
+    └── authMiddleware.js

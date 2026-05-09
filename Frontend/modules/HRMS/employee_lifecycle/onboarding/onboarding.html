@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRMS — Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d1b2a;--navy2:#132236;--navy3:#1a2d42;--navy4:#203350;--navy5:#263d5e;
+  --accent:#4f9cf9;--accent2:#3b82f6;--accent-dim:rgba(59,130,246,0.12);
+  --teal:#2dd4bf;--amber:#f59e0b;--rose:#f43f5e;--green:#22c55e;--purple:#a78bfa;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --card:#132236;--radius:12px;--sidebar:248px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
+.content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
+/* SIDEBAR */
+.brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:15px;font-weight:600;color:var(--text)}
+.brand-ver{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.nav-section{padding:14px 10px 6px}
+.nav-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-item:hover{background:var(--accent-dim);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent2);border-radius:0 3px 3px 0}
+.nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
+.nav-divider{height:1px;background:var(--border);margin:8px 10px}
+.sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
+.user-pill:hover{background:var(--border)}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+/* TOPBAR */
+.page-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
+.breadcrumb{font-size:12px;color:var(--text3)}
+.breadcrumb span{color:var(--text2)}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;min-width:200px}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%}
+.search-box input::placeholder{color:var(--text3)}
+.topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.topbar-btn:hover{background:var(--navy3)}
+.topbar-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.topbar-btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.notif-wrap{position:relative}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--navy2)}
+/* LAYOUT */
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g21{grid-template-columns:2fr 1fr}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card-sm{padding:16px}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
+.card-title{font-size:14px;font-weight:600;color:var(--text)}
+.card-sub{font-size:12px;color:var(--text3);margin-top:2px}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-green{background:rgba(34,197,94,0.13);color:var(--green)}
+.b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
+.b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}
+.b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
+.b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
+.b-teal{background:rgba(45,212,191,0.13);color:var(--teal)}
+.b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px}
+td{padding:12px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
+tr:first-child td{border-top:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-main{font-weight:500;color:var(--text)}
+.td-sub{font-size:11px;color:var(--text3);margin-top:1px}
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:620px;max-width:94vw;max-height:90vh;overflow-y:auto}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:22px 24px}
+.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.fg{display:flex;flex-direction:column;gap:6px}
+label{font-size:12px;font-weight:500;color:var(--text2)}
+input,select,textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
+select option{background:var(--navy2)}
+textarea{resize:vertical;min-height:80px}
+.btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.btn:hover{background:var(--navy3)}
+.btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
+/* PROGRESS */
+.prog-bar{height:6px;background:var(--navy4);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .6s}
+/* STEP TRACKER */
+.steps{display:flex;gap:0;margin-bottom:20px}
+.step{flex:1;text-align:center;position:relative}
+.step::before{content:'';position:absolute;top:14px;left:-50%;right:50%;height:2px;background:var(--border2)}
+.step:first-child::before{display:none}
+.step.done::before,.step.active::before{background:var(--accent2)}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:var(--navy2);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text3);position:relative;z-index:1}
+.step.done .step-dot{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.step.active .step-dot{border-color:var(--accent2);color:var(--accent);background:var(--accent-dim)}
+.step-label{font-size:10px;color:var(--text3);margin-top:6px;line-height:1.3}
+.step.done .step-label,.step.active .step-label{color:var(--text2)}
+/* CHECKLIST */
+.chk-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.chk-item:last-child{border-bottom:none}
+.chk-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center}
+.chk-text{flex:1;color:var(--text2)}
+.chk-text.done{color:var(--text);text-decoration:none}
+.chk-text.pending{color:var(--text3)}
+.chk-badge{flex-shrink:0}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+/* TAG */
+.tag{display:inline-flex;padding:2px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{animation:fadeUp .3s ease both}
+</style>
+<script src="../../../../assets/js/api.js"></script>
+<script src="../../../../assets/js/auth.js?v=3"></script>
+</head>
+<body>
+<script>requireAuth(); requireModuleAccess("hr");</script>
+<div class="shell">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">👥</div>
+    <div><div class="brand-name">HRMS Pro</div><div class="brand-ver">v2.5 · 2025</div></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="../../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Talent Acquisition</div>
+    <a class="nav-item" href="../../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
+    <a class="nav-item" href="../../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates <span class="nav-badge">14</span></a>
+    <a class="nav-item" href="../../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Employee Lifecycle</div>
+    <a class="nav-item active" href="onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
+    <a class="nav-item" href="../offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item" href="../orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
+    <a class="nav-item" href="../deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Operations</div>
+    <a class="nav-item" href="../../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
+    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations <span class="nav-badge">3</span></a>
+    <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">AR</div>
+      <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--text);">Arjun Rao</div><div style="font-size:11px;color:var(--text3);">HR Manager</div></div>
+      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+    </div>
+  </div>
+</aside>
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Onboarding</div>
+      <div class="breadcrumb">HRMS Pro <span>›</span> Employee Lifecycle <span>›</span> Onboarding</div>
+    </div>
+    <div class="search-box"><span>🔍</span><input type="text" id="ob-search" placeholder="Search employee…" oninput="renderTable()"></div>
+    <div class="notif-wrap"><button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button><span class="notif-dot"></span></div>
+    <button class="topbar-btn primary" onclick="openModal('start-modal')">＋ Start Onboarding</button>
+  </div>
+
+  <div class="content">
+    <!-- KPI -->
+    <div class="grid g4" style="margin-bottom:20px;">
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--amber);">6</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">In Progress</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;">Active onboardings</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--green);">3</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Completed This Week</div>
+        <div style="font-size:11px;color:var(--green);margin-top:3px;">All docs verified ✓</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--accent);">5.2</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Avg. Days to Complete</div>
+        <div style="font-size:11px;color:var(--green);margin-top:3px;">▼ 0.8 days improvement</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--green);">97%</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Completion Rate</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;">Last 90 days</div>
+      </div>
+    </div>
+
+    <!-- CHECKLIST DETAIL + PROGRESS -->
+    <div class="grid g21" style="margin-bottom:16px;">
+      <div class="card">
+        <div class="card-hd">
+          <div>
+            <div class="card-title">Onboarding Checklist — Rohit Mehra</div>
+            <div class="card-sub">Product Manager · Joined May 1, 2025</div>
+          </div>
+          <span class="badge b-amber" id="overall-pct">60% Complete</span>
+        </div>
+        <!-- Step tracker -->
+        <div class="steps" id="step-tracker">
+          <div class="step done"><div class="step-dot">✓</div><div class="step-label">Offer Accepted</div></div>
+          <div class="step done"><div class="step-dot">✓</div><div class="step-label">Docs Submitted</div></div>
+          <div class="step active"><div class="step-dot">3</div><div class="step-label">IT Setup</div></div>
+          <div class="step"><div class="step-dot">4</div><div class="step-label">Orientation</div></div>
+          <div class="step"><div class="step-dot">5</div><div class="step-label">Team Meet</div></div>
+          <div class="step"><div class="step-dot">6</div><div class="step-label">Active</div></div>
+        </div>
+
+        <div class="grid g2" style="gap:20px;">
+          <!-- Documents -->
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">📄 Documents</div>
+            <div id="doc-checklist"></div>
+          </div>
+          <!-- IT & Access -->
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">💻 IT &amp; Access Setup</div>
+            <div id="it-checklist"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;" id="hr-checklist-wrap">
+          <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">🏢 HR &amp; Admin Tasks</div>
+          <div id="hr-checklist"></div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn primary btn-sm" onclick="markAllDone()">Mark All Complete</button>
+          <button class="btn btn-sm" onclick="openModal('note-modal')">+ Add Note</button>
+          <button class="btn btn-sm" onclick="openModal('doc-modal')">Upload Document</button>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <!-- Progress ring visual -->
+        <div class="card card-sm">
+          <div class="card-hd"><div class="card-title">Overall Progress</div></div>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="position:relative;width:90px;height:90px;flex-shrink:0;">
+              <canvas id="progressRing" width="90" height="90"></canvas>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+                <span style="font-size:18px;font-weight:600;color:var(--text);" id="ring-pct">60%</span>
+              </div>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3);">Documents</span><span style="color:var(--green);">4/6 ✓</span></div>
+                <div class="prog-bar"><div class="prog-fill" style="width:66%;background:var(--green);"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;"><span style="color:var(--text3);">IT &amp; Access</span><span style="color:var(--amber);">2/6</span></div>
+                <div class="prog-bar"><div class="prog-fill" style="width:33%;background:var(--amber);"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;"><span style="color:var(--text3);">HR &amp; Admin</span><span style="color:var(--text3);">0/4</span></div>
+                <div class="prog-bar"><div class="prog-fill" style="width:0%;background:var(--accent2);"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Employee info -->
+        <div class="card card-sm">
+          <div class="card-hd"><div class="card-title">Employee Details</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Employee ID</span><span style="color:var(--text);font-family:var(--mono);font-size:12px;">EMP-00248</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Department</span><span style="color:var(--text);">Product</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Reporting To</span><span style="color:var(--text);">CPO — Sanjay Das</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Work Location</span><span style="color:var(--text);">Hyderabad</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Buddy Assigned</span><span style="color:var(--green);">Meera Iyer ✓</span></div>
+          </div>
+        </div>
+        <!-- Quick links -->
+        <div class="card card-sm">
+          <div class="card-hd"><div class="card-title">Quick Actions</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-sm primary" onclick="window.location.href='../offer_letters/offer_letters.html'">📝 View Offer Letter</button>
+            <button class="btn btn-sm" onclick="window.location.href='../orientation_sessions/orientations.html'">🎓 Schedule Orientation</button>
+            <button class="btn btn-sm" onclick="window.location.href='../deployment/deployment.html'">🗂️ Team Deployment</button>
+            <button class="btn btn-sm" onclick="alert('Welcome email sent!')">📧 Send Welcome Email</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL ONBOARDINGS TABLE -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-hd">
+        <div><div class="card-title">All Active Onboardings</div><div class="card-sub" id="ob-count">6 employees</div></div>
+        <div style="display:flex;gap:8px;">
+          <select onchange="renderTable()" id="status-filter" style="width:auto;padding:5px 10px;font-size:12px;">
+            <option value="">All Statuses</option>
+            <option>In Progress</option>
+            <option>Documents Pending</option>
+            <option>IT Setup</option>
+            <option>Completed</option>
+          </select>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Employee</th><th>Role</th><th>Start Date</th><th>Stage</th><th>Progress</th><th>Buddy</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="ob-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- CHART -->
+    <div class="grid g2">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Onboarding Timeline — May 2025</div></div>
+        <div style="height:180px;position:relative;"><canvas id="timelineChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Stage Distribution</div></div>
+        <div style="height:180px;position:relative;"><canvas id="stageChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- START ONBOARDING MODAL -->
+<div class="overlay" id="start-modal" onclick="closeModal('start-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Start New Onboarding</span><button class="modal-close" onclick="closeModal('start-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Employee Name *</label><input id="nb-name" placeholder="Full name"></div>
+        <div class="fg"><label>Employee ID</label><input id="nb-id" placeholder="Auto-generated" readonly></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Role / Designation *</label><input id="nb-role" placeholder="e.g. Software Engineer"></div>
+        <div class="fg"><label>Department *</label>
+          <select id="nb-dept"><option>Engineering</option><option>Product</option><option>Sales</option><option>Operations</option><option>HR / Admin</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Date of Joining *</label><input id="nb-doj" type="date"></div>
+        <div class="fg"><label>Work Location</label>
+          <select id="nb-loc"><option>Bangalore</option><option>Hyderabad</option><option>Mumbai</option><option>Remote</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Reporting Manager</label><input id="nb-mgr" placeholder="Manager name"></div>
+        <div class="fg"><label>Buddy / Mentor</label><input id="nb-buddy" placeholder="Assign a buddy"></div>
+      </div>
+      <div class="fg"><label>Notes</label><textarea id="nb-notes" placeholder="Any special instructions or notes for this employee…"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('start-modal')">Cancel</button>
+      <button class="btn primary" onclick="startOnboarding()">Start Onboarding</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD NOTE MODAL -->
+<div class="overlay" id="note-modal" onclick="closeModal('note-modal')">
+  <div class="modal" style="width:460px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Add HR Note</span><button class="modal-close" onclick="closeModal('note-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="fg" style="margin-bottom:14px;"><label>Note Type</label>
+        <select><option>General</option><option>Document Follow-up</option><option>IT Escalation</option><option>Manager Note</option></select>
+      </div>
+      <div class="fg"><label>Note</label><textarea rows="4" placeholder="Add your note here…"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('note-modal')">Cancel</button>
+      <button class="btn primary" onclick="alert('Note saved!');closeModal('note-modal')">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD DOC MODAL -->
+<div class="overlay" id="doc-modal" onclick="closeModal('doc-modal')">
+  <div class="modal" style="width:460px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Upload Document</span><button class="modal-close" onclick="closeModal('doc-modal')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Document Type</label>
+          <select><option>PAN Card</option><option>Aadhar Card</option><option>Educational Certificate</option><option>Relieving Letter</option><option>Passport Photo</option><option>Bank Details</option></select>
+        </div>
+        <div class="fg"><label>Verified By</label><input placeholder="HR officer name"></div>
+      </div>
+      <div class="fg" style="margin-bottom:14px;"><label>File Link / Path</label><input placeholder="Paste Google Drive or file URL"></div>
+      <div style="background:var(--navy3);border:2px dashed var(--border2);border-radius:8px;padding:24px;text-align:center;cursor:pointer;">
+        <div style="font-size:24px;margin-bottom:6px;">📎</div>
+        <div style="font-size:13px;color:var(--text2);">Click to upload or drag &amp; drop</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">PDF, JPG, PNG up to 5MB</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('doc-modal')">Cancel</button>
+      <button class="btn primary" onclick="alert('Document uploaded!');closeModal('doc-modal')">Upload</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIF -->
+<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
+  <div class="modal" style="width:400px;" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px;background:rgba(245,158,11,0.08);border-radius:8px;border-left:3px solid var(--amber);font-size:13px;"><strong>Rohit Mehra</strong> — IT setup pending for 2 days</div>
+        <div style="padding:12px;background:var(--navy3);border-radius:8px;font-size:13px;">📄 Deepa Krishnan — Relieving letter not yet submitted</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* DATA */
+const DOC_ITEMS = [
+  {text:'PAN Card copy', status:'done'},
+  {text:'Aadhar Card / ID Proof', status:'done'},
+  {text:'Educational certificates', status:'done'},
+  {text:'Educational mark sheets', status:'done'},
+  {text:'Relieving letter (prev. employer)', status:'pending'},
+  {text:'Bank account details', status:'pending'},
+];
+const IT_ITEMS = [
+  {text:'Work email created', status:'done'},
+  {text:'Domain account setup', status:'inprogress'},
+  {text:'Jira / GitHub access', status:'pending'},
+  {text:'Laptop / equipment issued', status:'pending'},
+  {text:'Security badge issued', status:'pending'},
+  {text:'VPN &amp; Slack access', status:'pending'},
+];
+const HR_ITEMS = [
+  {text:'Employment agreement signed', status:'done'},
+  {text:'PF &amp; ESI registration', status:'pending'},
+  {text:'Payroll profile created', status:'pending'},
+  {text:'Org chart updated', status:'pending'},
+];
+const EMPLOYEES = [
+  {name:'Rohit Mehra',    init:'RM', col:'#a78bfa', role:'Product Manager',      dept:'Product',     doj:'May 1',  stage:'IT Setup',           pct:60, buddy:'Meera Iyer', status:'In Progress'},
+  {name:'Vikram Nair',    init:'VN', col:'#f59e0b', role:'DevOps Engineer',       dept:'Engineering', doj:'Apr 28', stage:'Documents Pending',  pct:40, buddy:'Kiran Shah',  status:'In Progress'},
+  {name:'Deepa Krishnan', init:'DK', col:'#2dd4bf', role:'Sales Associate',       dept:'Sales',       doj:'May 3',  stage:'Documents Pending',  pct:20, buddy:'Pooja Verma', status:'In Progress'},
+  {name:'Arun Mehta',     init:'AM', col:'#22c55e', role:'Backend Developer',     dept:'Engineering', doj:'Apr 25', stage:'Orientation',        pct:80, buddy:'Priya Sharma',status:'In Progress'},
+  {name:'Priya Sharma',   init:'PS', col:'#3b82f6', role:'Full Stack Developer',  dept:'Engineering', doj:'Apr 22', stage:'Completed',          pct:100,buddy:'Kiran Shah',  status:'Completed'},
+  {name:'Ananya Das',     init:'AD', col:'#f43f5e', role:'Sales Lead',            dept:'Sales',       doj:'Apr 20', stage:'Completed',          pct:100,buddy:'Arjun Rao',   status:'Completed'},
+];
+
+function statusIcon(s){ return s==='done'?'<span style="color:var(--green);">✓</span>':s==='inprogress'?'<span style="color:var(--amber);">⟳</span>':'<span style="color:var(--text3);">○</span>'; }
+
+function renderChecklist(containerId, items){
+  document.getElementById(containerId).innerHTML = items.map(i=>`
+    <div class="chk-item">
+      <span class="chk-icon">${statusIcon(i.status)}</span>
+      <span class="chk-text ${i.status==='done'?'done':'pending'}">${i.text}</span>
+      ${i.status==='pending'?`<button class="btn btn-sm" style="font-size:10px;padding:3px 8px;" onclick="markDone(this,'${containerId}')">Mark Done</button>`:''}
+    </div>
+  `).join('');
+}
+
+function markDone(btn){
+  const item = btn.closest('.chk-item');
+  item.querySelector('.chk-icon').innerHTML='<span style="color:var(--green);">✓</span>';
+  item.querySelector('.chk-text').className='chk-text done';
+  btn.remove();
+}
+function markAllDone(){
+  document.querySelectorAll('.chk-item').forEach(item=>{
+    item.querySelector('.chk-icon').innerHTML='<span style="color:var(--green);">✓</span>';
+    const t=item.querySelector('.chk-text'); if(t) t.className='chk-text done';
+    const b=item.querySelector('.btn'); if(b) b.remove();
+  });
+  document.getElementById('overall-pct').textContent='100% Complete';
+  document.getElementById('overall-pct').className='badge b-green';
+  document.getElementById('ring-pct').textContent='100%';
+  alert('All tasks marked complete! Employee is now active.');
+}
+
+function renderTable(){
+  const q=document.getElementById('ob-search').value.toLowerCase();
+  const st=document.getElementById('status-filter').value;
+  const data=EMPLOYEES.filter(e=>{
+    if(st&&e.status!==st) return false;
+    if(q&&!e.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('ob-count').textContent=data.length+' employees';
+  document.getElementById('ob-tbody').innerHTML=data.map(e=>`
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:30px;height:30px;border-radius:50%;background:${e.col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">${e.init}</div>
+        <div><div class="td-main">${e.name}</div><div class="td-sub">${e.dept}</div></div>
+      </div></td>
+      <td>${e.role}</td>
+      <td style="font-family:var(--mono);font-size:12px;">${e.doj}</td>
+      <td><span class="tag">${e.stage}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="prog-bar" style="width:90px;"><div class="prog-fill" style="width:${e.pct}%;background:${e.pct===100?'var(--green)':e.pct>=60?'var(--accent2)':'var(--amber)'}"></div></div>
+          <span style="font-size:11px;color:var(--text3);">${e.pct}%</span>
+        </div>
+      </td>
+      <td style="font-size:12px;">${e.buddy}</td>
+      <td><span class="badge ${e.status==='Completed'?'b-green':'b-amber'}">${e.status}</span></td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-sm" onclick="alert('Managing ${e.name}...')">Manage</button>
+          ${e.status!=='Completed'?`<button class="btn btn-sm" style="color:var(--amber);border-color:rgba(245,158,11,0.3);" onclick="alert('Reminder sent to ${e.name}')">Remind</button>`:''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function startOnboarding(){
+  const n=document.getElementById('nb-name').value.trim();
+  if(!n){alert('Please enter employee name.');return;}
+  const init=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  EMPLOYEES.unshift({name:n,init,col:'#3b82f6',role:document.getElementById('nb-role').value,dept:document.getElementById('nb-dept').value,doj:'Today',stage:'Documents Pending',pct:0,buddy:document.getElementById('nb-buddy').value||'TBD',status:'In Progress'});
+  closeModal('start-modal');
+  renderTable();
+  alert(`Onboarding started for ${n}! Welcome email sent.`);
+}
+
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'))});
+
+/* PROGRESS RING */
+function drawRing(pct){
+  const c=document.getElementById('progressRing'); const ctx=c.getContext('2d');
+  const r=36,cx=45,cy=45; ctx.clearRect(0,0,90,90);
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=8; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,(-Math.PI/2)+(Math.PI*2*pct/100)); ctx.strokeStyle='#3b82f6'; ctx.lineWidth=8; ctx.lineCap='round'; ctx.stroke();
+}
+drawRing(60);
+
+/* CHARTS */
+const ctd={plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}},
+  scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}}}};
+
+new Chart(document.getElementById('timelineChart'),{
+  type:'bar',
+  data:{labels:['Apr W1','Apr W2','Apr W3','Apr W4','May W1'],datasets:[
+    {label:'Started',data:[2,3,1,4,2],backgroundColor:'rgba(59,130,246,0.7)',borderRadius:4},
+    {label:'Completed',data:[0,2,2,3,3],backgroundColor:'rgba(34,197,94,0.7)',borderRadius:4}
+  ]},
+  options:{...ctd,responsive:true,maintainAspectRatio:false,plugins:{...ctd.plugins,legend:{display:true,labels:{color:'#94a3b8',font:{size:10},boxWidth:8}}}}
+});
+new Chart(document.getElementById('stageChart'),{
+  type:'doughnut',
+  data:{labels:['Documents','IT Setup','Orientation','Active','Completed'],datasets:[{data:[2,2,1,1,2],backgroundColor:['#f43f5e','#f59e0b','#a78bfa','#3b82f6','#22c55e'],borderWidth:0,hoverOffset:4}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:8,padding:6}},tooltip:{...ctd.plugins.tooltip}}}
+});
+
+/* INIT */
+renderChecklist('doc-checklist',DOC_ITEMS);
+renderChecklist('it-checklist',IT_ITEMS);
+renderChecklist('hr-checklist',HR_ITEMS);
+renderTable();
+</script>
+</body>
+</html>

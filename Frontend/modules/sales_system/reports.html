@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revenue Reports — Zyntrix CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--bg5:#1c2e42;
+  --surface:#0f1d2e;
+  --accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,0.10);
+  --blue:#3d8ef0;--blue-dim:rgba(61,142,240,0.12);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.12);
+  --rose:#ff4d6d;--rose-dim:rgba(255,77,109,0.12);
+  --purple:#b57bee;--purple-dim:rgba(181,123,238,0.12);
+  --orange:#ff7d40;--orange-dim:rgba(255,125,64,0.12);
+  --teal:#22d3ee;--teal-dim:rgba(34,211,238,0.12);
+  --text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;
+  --radius:14px;--sidebar:260px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden;}
+.shell{display:flex;height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;position:relative;}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:260px;background:radial-gradient(ellipse at 30% 0%,rgba(0,229,176,0.06) 0%,transparent 70%);pointer-events:none;}
+.brand{padding:22px 20px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.brand-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:800;color:var(--bg);flex-shrink:0;box-shadow:0 0 20px rgba(0,229,176,0.3);}
+.brand-text{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.brand-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px;letter-spacing:0.5px;}
+.nav-group{padding:16px 12px 6px;}
+.nav-label{font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 8px;font-family:var(--display);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all 0.18s;margin-bottom:2px;position:relative;font-weight:500;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--accent);}
+.nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0;}
+.nav-count{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--mono);background:var(--bg4);color:var(--text2);padding:2px 7px;border-radius:6px;}
+.nav-count.hot{background:var(--rose-dim);color:var(--rose);}
+.nav-count.ok{background:var(--accent-dim);color:var(--accent);}
+.nav-divider{height:1px;background:var(--border);margin:8px 12px;}
+.sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);flex-shrink:0;}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background 0.15s;}
+.user-card:hover{background:var(--border);}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bg);flex-shrink:0;font-family:var(--display);}
+.user-name{font-size:13px;font-weight:600;color:var(--text);}
+.user-role{font-size:11px;color:var(--text3);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:64px;min-height:64px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;position:relative;}
+.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,176,0.15),transparent);}
+.page-hd{flex:1;}
+.page-title{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.page-crumb{font-size:11px;color:var(--text3);margin-top:1px;}
+.page-crumb span{color:var(--accent);}
+.tbtn{padding:8px 16px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:flex;align-items:center;gap:7px;transition:all 0.18s;white-space:nowrap;}
+.tbtn:hover{background:var(--bg3);}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(0,229,176,0.25);}
+.tbtn.primary:hover{background:var(--accent2);}
+.notif-wrap{position:relative;}
+.notif-dot{position:absolute;top:5px;right:12px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--bg2);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+/* ── SUB-NAV ── */
+.sub-nav{display:flex;align-items:center;gap:4px;padding:0 28px;background:var(--bg2);border-bottom:1px solid var(--border);height:48px;}
+.snav-tab{padding:0 18px;height:100%;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;white-space:nowrap;font-family:var(--font);display:flex;align-items:center;gap:7px;background:none;border-top:none;border-left:none;border-right:none;}
+.snav-tab:hover{color:var(--text);}
+.snav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.snav-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;background:var(--bg);}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.section{padding:24px 28px;}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap;}
+.card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.2px;}
+.card-sub{font-size:11.5px;color:var(--text3);margin-top:3px;}
+
+/* ── KPI CARDS ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s;}
+.kpi-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.kpi-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,var(--glow,rgba(0,229,176,0.06)) 0%,transparent 60%);pointer-events:none;}
+.kpi-icon{font-size:18px;margin-bottom:10px;display:block;}
+.kpi-val{font-family:var(--display);font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px;}
+.kpi-lbl{font-size:11px;color:var(--text3);margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
+.kpi-delta{font-size:11px;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:500;}
+.up{color:var(--accent);}.dn{color:var(--rose);}.neu{color:var(--text3);}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+.g13{display:grid;grid-template-columns:1fr 3fr;gap:16px;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;font-family:var(--mono);}
+.b-accent{background:var(--accent-dim);color:var(--accent);}
+.b-blue{background:var(--blue-dim);color:var(--blue);}
+.b-amber{background:var(--amber-dim);color:var(--amber);}
+.b-rose{background:var(--rose-dim);color:var(--rose);}
+.b-purple{background:var(--purple-dim);color:var(--purple);}
+.b-teal{background:var(--teal-dim);color:var(--teal);}
+.b-gray{background:rgba(78,102,128,0.15);color:var(--text3);}
+
+/* ── BUTTON ── */
+.btn{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:all 0.18s;}
+.btn:hover{background:var(--bg4);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
+.btn.primary:hover{background:var(--accent2);}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:7px;}
+.btn-xs{padding:3px 9px;font-size:11px;border-radius:6px;}
+
+/* ── PROGRESS ── */
+.prog{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width 0.9s cubic-bezier(.4,0,.2,1);}
+
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid var(--border2);}
+th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 14px 12px;white-space:nowrap;font-family:var(--display);}
+td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr{transition:background 0.12s;}
+tbody tr:hover td{background:rgba(255,255,255,0.015);}
+.td-main{font-weight:600;color:var(--text);font-size:13px;}
+.td-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* ── SELECT ── */
+select{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer;transition:border 0.15s;}
+select:focus{border-color:var(--accent);}
+select option{background:var(--bg2);}
+
+/* ── TARGET BAR COMPONENT ── */
+.target-row{margin-bottom:16px;}
+.target-row:last-child{margin-bottom:0;}
+.target-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px;}
+.target-name{color:var(--text2);font-weight:500;}
+.target-vals{font-family:var(--mono);font-size:12px;color:var(--text3);}
+.target-meta{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* ── METRIC MINI CARD ── */
+.mini-metric{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.mm-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;font-family:var(--display);font-weight:600;margin-bottom:6px;}
+.mm-val{font-family:var(--display);font-size:22px;font-weight:700;line-height:1;}
+.mm-sub{font-size:11px;color:var(--text3);margin-top:5px;}
+
+/* ── REPORT CARD ── */
+.rep-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:all 0.2s;cursor:pointer;}
+.rep-card:hover{border-color:var(--border2);background:var(--bg4);}
+.rep-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.rep-title{font-size:13px;font-weight:600;color:var(--text);}
+.rep-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.rep-arrow{margin-left:auto;color:var(--text3);font-size:16px;}
+
+/* ── ANIMATE ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.ani{animation:fadeUp 0.35s ease both;}
+.ani:nth-child(1){animation-delay:.00s}.ani:nth-child(2){animation-delay:.05s}
+.ani:nth-child(3){animation-delay:.10s}.ani:nth-child(4){animation-delay:.15s}
+.ani:nth-child(5){animation-delay:.20s}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);max-width:320px;animation:toastIn 0.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.toast.success{border-color:rgba(0,229,176,0.3);}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(0.95);}to{opacity:1;transform:none;}}
+@keyframes toastOut{to{opacity:0;transform:translateY(6px) scale(0.96);}}
+
+/* ── DATE RANGE PICKER MOCK ── */
+.daterange{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;}
+.daterange:hover{border-color:var(--border2);background:var(--bg4);}
+
+/* ── TREND TAG ── */
+.trend{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;}
+.trend.up{background:var(--accent-dim);color:var(--accent);}
+.trend.dn{background:var(--rose-dim);color:var(--rose);}
+.trend.neu{background:rgba(78,102,128,0.15);color:var(--text3);}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">Z</div>
+    <div><div class="brand-text">Zyntrix CRM</div><div class="brand-sub">v2.5 · Sales Suite</div></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon">⌂</span> Dashboard</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-label">Pipeline</div>
+    <a class="nav-item" href="pipeline.html"><span class="nav-icon">◈</span> Pipeline Board <span class="nav-count ok">18</span></a>
+    <a class="nav-item" href="deals.html"><span class="nav-icon">⟐</span> Deals <span class="nav-count">18</span></a>
+    <a class="nav-item" href="leads.html"><span class="nav-icon">◎</span> Leads <span class="nav-count hot">42</span></a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Engagement</div>
+    <a class="nav-item" href="activities.html"><span class="nav-icon">☏</span> Activities</a>
+    <a class="nav-item" href="emails.html"><span class="nav-icon">✉</span> Emails &amp; Proposals</a>
+    <a class="nav-item" href="meetings.html"><span class="nav-icon">◷</span> Meetings <span class="nav-count hot">3</span></a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Insights</div>
+    <a class="nav-item active" href="reports.html"><span class="nav-icon">↗</span> Revenue Reports</a>
+    <a class="nav-item" href="leaderboard.html"><span class="nav-icon">⬡</span> Leaderboard</a>
+    <a class="nav-item" href="playbook.html"><span class="nav-icon">⊞</span> Playbook</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-label">Admin</div>
+    <a class="nav-item" href="settings.html"><span class="nav-icon">⊙</span> Settings</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">SK</div>
+      <div><div class="user-name">Sanjay Kumar</div><div class="user-role">Sales Manager</div></div>
+    </div>
+    <button class="tbtn" type="button" onclick="logout()" style="margin-top:8px;width:100%;justify-content:center;">⏻ Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="page-hd">
+      <div class="page-title">Revenue Reports</div>
+      <div class="page-crumb">Zyntrix CRM › Insights › <span>Revenue Reports</span></div>
+    </div>
+    <div class="daterange" onclick="toast('Date range picker — coming soon','info')">
+      📅 Apr 1 – May 8, 2025 ▾
+    </div>
+    <select id="period-sel" onchange="switchPeriod(this.value)" style="font-size:12px;padding:7px 12px;">
+      <option value="q2">Q2 2025</option>
+      <option value="q1">Q1 2025</option>
+      <option value="fy">FY 2024-25</option>
+    </select>
+    <button class="tbtn" onclick="exportReport()">↓ Export PDF</button>
+    <button class="tbtn primary" onclick="scheduleReport()">⏱ Schedule Report</button>
+  </div>
+
+  <!-- SUB-NAV -->
+  <div class="sub-nav">
+    <button class="snav-tab active" onclick="switchTab('overview',this)">📊 Overview</button>
+    <button class="snav-tab" onclick="switchTab('monthly',this)">📅 Monthly</button>
+    <button class="snav-tab" onclick="switchTab('quarterly',this)">📆 Quarterly</button>
+    <button class="snav-tab" onclick="switchTab('byrep',this)">👤 By Rep</button>
+    <button class="snav-tab" onclick="switchTab('byproduct',this)">📦 By Product</button>
+    <button class="snav-tab" onclick="switchTab('pipeline',this)">◈ Pipeline Health</button>
+    <div class="snav-right">
+      <button class="btn btn-sm" onclick="refreshData()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ════ OVERVIEW TAB ════ -->
+    <div id="tab-overview">
+      <div class="section" style="padding-bottom:0;">
+        <div class="kpi-row">
+          <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);">
+            <span class="kpi-icon">💰</span>
+            <div class="kpi-val" style="color:var(--accent);">₹1.87Cr</div>
+            <div class="kpi-lbl">Revenue This Quarter</div>
+            <div class="kpi-delta up">▲ 14% vs Q1</div>
+          </div>
+          <div class="kpi-card ani" style="--glow:rgba(61,142,240,0.08);">
+            <span class="kpi-icon">🎯</span>
+            <div class="kpi-val" style="color:var(--blue);">78%</div>
+            <div class="kpi-lbl">Quota Attainment</div>
+            <div class="kpi-delta neu">₹53L remaining</div>
+          </div>
+          <div class="kpi-card ani" style="--glow:rgba(245,166,35,0.08);">
+            <span class="kpi-icon">📈</span>
+            <div class="kpi-val" style="color:var(--amber);">₹4.2Cr</div>
+            <div class="kpi-lbl">Active Pipeline</div>
+            <div class="kpi-delta up">▲ 23% vs Q1</div>
+          </div>
+          <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.06);">
+            <span class="kpi-icon">⚡</span>
+            <div class="kpi-val" style="color:var(--accent);">68%</div>
+            <div class="kpi-lbl">Win Rate</div>
+            <div class="kpi-delta up">▲ 5pp vs Q1</div>
+          </div>
+          <div class="kpi-card ani" style="--glow:rgba(181,123,238,0.08);">
+            <span class="kpi-icon">⏱</span>
+            <div class="kpi-val" style="color:var(--purple);">34d</div>
+            <div class="kpi-lbl">Avg Sales Cycle</div>
+            <div class="kpi-delta dn">▼ 4d vs Q1</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUOTA TARGET PROGRESS -->
+      <div class="section" style="padding-top:0;padding-bottom:0;">
+        <div class="card ani" style="background:linear-gradient(135deg,var(--bg3),var(--bg4));border-color:rgba(0,229,176,0.18);margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);">Q2 2025 Quota Progress</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:3px;">22 days remaining · ₹53L to close target</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:20px;">
+              <div style="text-align:right;"><div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);">₹1.87Cr</div><div style="font-size:11px;color:var(--text3);">Achieved</div></div>
+              <div style="font-size:20px;color:var(--text3);">/</div>
+              <div><div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);">₹2.40Cr</div><div style="font-size:11px;color:var(--text3);">Target</div></div>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <div class="prog" style="height:10px;">
+              <div class="prog-fill" style="width:78%;background:linear-gradient(90deg,var(--accent),var(--blue));box-shadow:0 0 12px rgba(0,229,176,0.4);"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:6px;">
+              <span>0</span><span style="color:var(--accent);font-weight:600;">78% complete</span><span>₹2.40Cr</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="section" style="padding-top:0;padding-bottom:0;">
+        <div class="g21" style="margin-bottom:16px;">
+          <div class="card ani">
+            <div class="card-hd">
+              <div><div class="card-title">Revenue Trend</div><div class="card-sub">Monthly actual vs target — 2025</div></div>
+              <select onchange="updateRevChart(this.value)" style="font-size:12px;padding:6px 10px;">
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+              </select>
+            </div>
+            <div style="height:240px;position:relative;"><canvas id="rev-trend-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Revenue Split</div><div class="card-sub">New vs Renewal vs Expansion</div></div></div>
+            <div style="height:240px;position:relative;"><canvas id="rev-split-chart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="g3" style="margin-bottom:16px;">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Win / Loss Ratio</div><div class="card-sub">Q2 2025</div></div></div>
+            <div style="height:160px;position:relative;"><canvas id="winloss-chart"></canvas></div>
+            <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px;font-size:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;"><span style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>Won</span><span style="color:var(--accent);font-weight:600;font-family:var(--mono);">68% · 34 deals</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;"><span style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:8px;height:8px;border-radius:50%;background:var(--rose);display:inline-block;"></span>Lost</span><span style="color:var(--rose);font-weight:600;font-family:var(--mono);">24% · 12 deals</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;"><span style="display:flex;align-items:center;gap:6px;color:var(--text2);"><span style="width:8px;height:8px;border-radius:50%;background:var(--text3);display:inline-block;"></span>Stalled</span><span style="color:var(--text3);font-weight:600;font-family:var(--mono);">8% · 4 deals</span></div>
+            </div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Revenue by Source</div><div class="card-sub">Lead channel contribution</div></div></div>
+            <div style="height:240px;position:relative;"><canvas id="source-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Conversion Funnel</div><div class="card-sub">Lead → Won · Q2 2025</div></div></div>
+            <div style="height:240px;position:relative;"><canvas id="funnel-chart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TARGETS TABLE -->
+      <div class="section" style="padding-top:0;padding-bottom:0;">
+        <div class="g21" style="margin-bottom:16px;">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Monthly Targets vs Actuals</div><div class="card-sub">Q2 2025 detail breakdown</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:14px;" id="targets-list"></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Saved Reports</div><div class="card-sub">Download or schedule</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;" id="saved-reports"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MONTHLY REVENUE TABLE -->
+      <div class="section" style="padding-top:0;">
+        <div class="card ani">
+          <div class="card-hd">
+            <div><div class="card-title">Revenue Detail — Q2 2025</div><div class="card-sub">Month-by-month breakdown</div></div>
+            <button class="btn btn-sm" onclick="exportCSV()">↓ Export CSV</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Month</th><th>Deals Closed</th><th>Revenue</th><th>Target</th><th>Attainment</th><th>vs Prior Month</th><th>Win Rate</th><th>Avg Deal</th></tr></thead>
+              <tbody id="rev-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-overview -->
+
+    <!-- ════ MONTHLY TAB ════ -->
+    <div id="tab-monthly" style="display:none;">
+      <div class="section">
+        <div class="g3" style="margin-bottom:16px;">
+          <div class="mini-metric ani"><div class="mm-label">May MTD Revenue</div><div class="mm-val" style="color:var(--accent);">₹42L</div><div class="mm-sub">vs ₹45L target</div></div>
+          <div class="mini-metric ani"><div class="mm-label">April Revenue</div><div class="mm-val" style="color:var(--blue);">₹38L</div><div class="mm-sub">93% of ₹40L target ✓</div></div>
+          <div class="mini-metric ani"><div class="mm-label">March Revenue</div><div class="mm-val" style="color:var(--amber);">₹31L</div><div class="mm-sub">86% of ₹36L target</div></div>
+        </div>
+        <div class="card ani" style="margin-bottom:16px;">
+          <div class="card-hd"><div><div class="card-title">Monthly Revenue Detail</div><div class="card-sub">Last 12 months</div></div></div>
+          <div style="height:260px;position:relative;"><canvas id="monthly-bar-chart"></canvas></div>
+        </div>
+        <div class="card ani">
+          <div class="card-hd"><div><div class="card-title">Month-over-Month Breakdown</div></div><button class="btn btn-sm" onclick="exportCSV()">↓ Export</button></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Month</th><th>Revenue</th><th>Target</th><th>% to Target</th><th>Deals Won</th><th>Avg Deal Size</th><th>MoM Growth</th></tr></thead>
+              <tbody id="monthly-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ QUARTERLY TAB ════ -->
+    <div id="tab-quarterly" style="display:none;">
+      <div class="section">
+        <div class="g2" style="margin-bottom:16px;">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Quarterly Revenue Trend</div><div class="card-sub">FY 2024-25</div></div></div>
+            <div style="height:260px;position:relative;"><canvas id="quarterly-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Quarter Comparison</div><div class="card-sub">Q2 vs Q1 2025</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;" id="qtr-comparison"></div>
+          </div>
+        </div>
+        <div class="card ani">
+          <div class="card-hd"><div><div class="card-title">Quarterly Summary</div></div><button class="btn btn-sm" onclick="exportCSV()">↓ Export</button></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Quarter</th><th>Revenue</th><th>Target</th><th>Attainment</th><th>Deals Won</th><th>Win Rate</th><th>Avg Deal</th><th>QoQ Growth</th></tr></thead>
+              <tbody id="qtr-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ BY REP TAB ════ -->
+    <div id="tab-byrep" style="display:none;">
+      <div class="section">
+        <div class="card ani" style="margin-bottom:16px;">
+          <div class="card-hd"><div><div class="card-title">Rep Performance — Q2 2025</div><div class="card-sub">Revenue, win rate & quota attainment by sales rep</div></div><button class="btn btn-sm" onclick="exportCSV()">↓ Export</button></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Rep</th><th>Revenue</th><th>Quota</th><th>Attainment</th><th>Deals Won</th><th>Win Rate</th><th>Avg Deal</th><th>Avg Cycle</th><th>Pipeline</th></tr></thead>
+              <tbody id="rep-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Revenue by Rep</div><div class="card-sub">Q2 2025 closed</div></div></div>
+            <div style="height:220px;position:relative;"><canvas id="rep-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Quota Attainment</div><div class="card-sub">% of Q2 target achieved</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;" id="rep-quota-bars"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ BY PRODUCT TAB ════ -->
+    <div id="tab-byproduct" style="display:none;">
+      <div class="section">
+        <div class="g21" style="margin-bottom:16px;">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Revenue by Product</div><div class="card-sub">Q2 2025 deal breakdown</div></div></div>
+            <div style="height:240px;position:relative;"><canvas id="product-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Product Mix</div><div class="card-sub">Share of total pipeline</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;" id="product-breakdown"></div>
+          </div>
+        </div>
+        <div class="card ani">
+          <div class="card-hd"><div><div class="card-title">Product Detail Table</div></div><button class="btn btn-sm" onclick="exportCSV()">↓ Export</button></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Product</th><th>Deals Won</th><th>Revenue</th><th>% of Total</th><th>Avg Deal Size</th><th>Win Rate</th><th>Pipeline</th></tr></thead>
+              <tbody id="product-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ PIPELINE HEALTH TAB ════ -->
+    <div id="tab-pipeline" style="display:none;">
+      <div class="section">
+        <div class="kpi-row" style="margin-bottom:16px;">
+          <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);"><span class="kpi-icon">◎</span><div class="kpi-val" style="color:var(--accent);">₹4.2Cr</div><div class="kpi-lbl">Total Pipeline</div><div class="kpi-delta up">▲ 18 active deals</div></div>
+          <div class="kpi-card ani" style="--glow:rgba(61,142,240,0.08);"><span class="kpi-icon">⚡</span><div class="kpi-val" style="color:var(--blue);">₹2.11Cr</div><div class="kpi-lbl">Weighted Forecast</div><div class="kpi-delta neu">Probability-adjusted</div></div>
+          <div class="kpi-card ani" style="--glow:rgba(245,166,35,0.08);"><span class="kpi-icon">📅</span><div class="kpi-val" style="color:var(--amber);">₹52.4L</div><div class="kpi-lbl">Closing This Month</div><div class="kpi-delta neu">6 deals in final stage</div></div>
+          <div class="kpi-card ani" style="--glow:rgba(255,77,109,0.08);"><span class="kpi-icon">⚠</span><div class="kpi-val" style="color:var(--rose);">3</div><div class="kpi-lbl">Deals At Risk</div><div class="kpi-delta dn">Stalled 14+ days</div></div>
+          <div class="kpi-card ani" style="--glow:rgba(181,123,238,0.08);"><span class="kpi-icon">📊</span><div class="kpi-val" style="color:var(--purple);">42d</div><div class="kpi-lbl">Avg Pipeline Age</div><div class="kpi-delta neu">Across all active</div></div>
+        </div>
+        <div class="g21" style="margin-bottom:16px;">
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Pipeline by Stage Value</div><div class="card-sub">₹ at each stage</div></div></div>
+            <div style="height:240px;position:relative;"><canvas id="pipeline-stage-chart"></canvas></div>
+          </div>
+          <div class="card ani">
+            <div class="card-hd"><div><div class="card-title">Pipeline Coverage Ratio</div><div class="card-sub">Pipeline vs remaining quota</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;">
+              <div style="text-align:center;padding:20px 0;">
+                <div style="font-family:var(--display);font-size:48px;font-weight:800;color:var(--accent);">7.9×</div>
+                <div style="font-size:13px;color:var(--text2);margin-top:6px;">Pipeline Coverage Ratio</div>
+                <div style="font-size:12px;color:var(--text3);margin-top:4px;">₹4.2Cr pipeline / ₹53L remaining target</div>
+                <div style="margin-top:12px;"><span class="badge b-accent">Healthy · Target is 3–5×</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="mini-metric" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;">
+                  <span style="font-size:12px;color:var(--text2);">Best Case Close</span>
+                  <span style="font-family:var(--mono);font-weight:700;color:var(--accent);">₹2.68Cr</span>
+                </div>
+                <div class="mini-metric" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;">
+                  <span style="font-size:12px;color:var(--text2);">Weighted Forecast</span>
+                  <span style="font-family:var(--mono);font-weight:700;color:var(--blue);">₹2.11Cr</span>
+                </div>
+                <div class="mini-metric" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;">
+                  <span style="font-size:12px;color:var(--text2);">Commit (75%+ prob)</span>
+                  <span style="font-family:var(--mono);font-weight:700;color:var(--amber);">₹1.38Cr</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card ani">
+          <div class="card-hd"><div><div class="card-title">Deals Closing This Month</div><div class="card-sub">Expected by May 31, 2025</div></div></div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Deal</th><th>Company</th><th>Owner</th><th>Value</th><th>Weighted</th><th>Stage</th><th>Probability</th><th>Close Date</th></tr></thead>
+              <tbody id="closing-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* ═══ DATA ═══ */
+const MONTHLY = [
+  {m:'Nov 24',rev:22,target:25,won:3,avg:7.3,mom:null},
+  {m:'Dec 24',rev:28,target:30,won:4,avg:7.0,mom:27},
+  {m:'Jan 25',rev:31,target:33,won:4,avg:7.8,mom:11},
+  {m:'Feb 25',rev:35,target:36,won:5,avg:7.0,mom:13},
+  {m:'Mar 25',rev:38,target:40,won:5,avg:7.6,mom:9},
+  {m:'Apr 25',rev:42,target:45,won:6,avg:7.0,mom:11},
+  {m:'May 25',rev:42,target:55,won:4,avg:10.5,mom:0},
+];
+const QUARTERLY = [
+  {q:'Q1 FY24',rev:68,target:75,won:10,win:62,avg:6.8,qoq:null},
+  {q:'Q2 FY24',rev:82,target:85,won:12,win:64,avg:6.8,qoq:21},
+  {q:'Q3 FY24',rev:95,target:100,won:14,win:65,avg:6.8,qoq:16},
+  {q:'Q4 FY24',rev:112,target:115,won:16,win:67,avg:7.0,qoq:18},
+  {q:'Q1 2025',rev:164,target:180,won:22,win:63,avg:7.5,qoq:46},
+  {q:'Q2 2025',rev:187,target:240,won:18,win:68,avg:10.4,qoq:14},
+];
+const REPS = [
+  {name:'Sanjay Kumar',oi:'SK',col:'#00e5b0',rev:68.5,quota:75,won:8,win:76,avg:8.6,cycle:28,pipeline:185},
+  {name:'Priya Nair',  oi:'PN',col:'#3d8ef0',rev:52.2,quota:68,won:6,win:72,avg:8.7,cycle:32,pipeline:142},
+  {name:'Rahul Mehta', oi:'RM',col:'#b57bee',rev:38.1,quota:60,won:5,win:60,avg:7.6,cycle:36,pipeline:292},
+  {name:'Anjali Rao',  oi:'AR',col:'#f5a623',rev:24.6,quota:47,won:4,win:58,avg:6.2,cycle:40,pipeline:96},
+  {name:'Vikram Singh',oi:'VS',col:'#22d3ee',rev:11.8,quota:40,won:2,win:40,avg:5.9,cycle:48,pipeline:139},
+];
+const PRODUCTS = [
+  {name:'EdTech CRM — Enterprise',won:6,rev:111,pct:59,avg:18.5,win:76,pipeline:220},
+  {name:'EdTech CRM — Business',  won:7,rev:48, pct:26,avg:6.9, win:65,pipeline:197},
+  {name:'EdTech CRM — Starter',   won:4,rev:14, pct:7,  avg:3.5, win:60,pipeline:67},
+  {name:'LMS Add-on',             won:3,rev:14, pct:7,  avg:4.7, win:55,pipeline:42},
+];
+const STAGE_DATA = [
+  {stage:'Prospecting',   val:153,col:'#4e6680'},
+  {stage:'Qualification', val:101,col:'#3d8ef0'},
+  {stage:'Demo Scheduled',val:178,col:'#b57bee'},
+  {stage:'Proposal Sent', val:150,col:'#f5a623'},
+  {stage:'Negotiation',   val:277,col:'#ff7d40'},
+];
+const CLOSING_DEALS = [
+  {name:'ZyntrixEdu Enterprise',company:'ZyntrixEdu Pvt Ltd',owner:'Sanjay Kumar',oi:'SK',col:'#00e5b0',val:185,weighted:157,stage:'Negotiation',prob:85,close:'2025-05-20'},
+  {name:'Apex Schools LMS',    company:'Apex Schools Group', owner:'Priya Nair',  oi:'PN',col:'#3d8ef0',val:92, weighted:60, stage:'Proposal Sent',prob:65,close:'2025-05-30'},
+  {name:'Vidya Network',       company:'Vidya Network',      owner:'Anjali Rao',  oi:'AR',col:'#f5a623',val:38, weighted:21, stage:'Demo Scheduled',prob:55,close:'2025-05-25'},
+  {name:'Pinnacle Schools',    company:'Pinnacle Schools',   owner:'Sanjay Kumar',oi:'SK',col:'#00e5b0',val:140,weighted:84, stage:'Demo Scheduled',prob:60,close:'2025-05-28'},
+];
+
+const TARGETS_DATA = [
+  {name:'Revenue Closed',cur:187,target:240,unit:'₹L',col:'var(--accent)'},
+  {name:'New Deals Created',cur:23,target:30,unit:'',col:'var(--blue)'},
+  {name:'Outbound Calls',cur:312,target:400,unit:'',col:'var(--amber)'},
+  {name:'Proposals Sent',cur:18,target:20,unit:'',col:'var(--purple)'},
+  {name:'Demos Conducted',cur:27,target:35,unit:'',col:'var(--teal)'},
+];
+
+const SAVED_REPORTS = [
+  {title:'Q1 2025 Revenue Report',date:'Apr 5, 2025',type:'PDF',size:'2.1 MB'},
+  {title:'FY24-25 Annual Summary',date:'Mar 31, 2025',type:'XLSX',size:'890 KB'},
+  {title:'Q4 FY24 Performance',  date:'Jan 3, 2025', type:'PDF',size:'1.8 MB'},
+  {title:'H1 2024 Pipeline',      date:'Sep 30, 2024',type:'CSV',size:'320 KB'},
+];
+
+/* ═══ UTILS ═══ */
+const fmtL = n => '₹'+n+'L';
+function toast(msg,type='success'){const tw=document.getElementById('toast-wrap');const t=document.createElement('div');t.className=`toast ${type}`;const ic=type==='success'?'✓':'ℹ';t.innerHTML=`<span style="color:var(--accent);font-size:16px;">${ic}</span>${msg}`;tw.appendChild(t);setTimeout(()=>{t.style.animation='toastOut 0.3s ease forwards';setTimeout(()=>t.remove(),300);},3000);}
+function exportReport(){toast('Report exported as PDF!');}
+function scheduleReport(){toast('Report scheduled — check email settings.');}
+function refreshData(){toast('Data refreshed!');}
+function exportCSV(){toast('CSV exported!');}
+
+/* ═══ TAB SWITCHING ═══ */
+function switchTab(id, el){
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
+  document.getElementById('tab-'+id).style.display='';
+  document.querySelectorAll('.snav-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(id==='monthly')     buildMonthlyTab();
+  if(id==='quarterly')   buildQuarterlyTab();
+  if(id==='byrep')       buildByRepTab();
+  if(id==='byproduct')   buildByProductTab();
+  if(id==='pipeline')    buildPipelineTab();
+}
+function switchPeriod(v){ toast('Period updated to '+document.getElementById('period-sel').options[document.getElementById('period-sel').selectedIndex].text); }
+
+/* ═══ CHART CONFIG ═══ */
+const TT={backgroundColor:'#0d1624',titleColor:'#e8f0fe',bodyColor:'#8ba3bf',borderColor:'#1c2e42',borderWidth:1,padding:10};
+const GL={color:'rgba(255,255,255,0.04)'};
+const TK={color:'#4e6680',font:{size:10.5}};
+let revChartInst=null;
+
+/* ═══ OVERVIEW RENDERS ═══ */
+function buildOverview(){
+  buildRevChart('monthly');
+  buildRevSplitChart();
+  buildWinLossChart();
+  buildSourceChart();
+  buildFunnelChart();
+  buildTargetsList();
+  buildSavedReports();
+  buildRevTable();
+}
+
+function buildRevChart(mode){
+  const ctx=document.getElementById('rev-trend-chart');if(!ctx)return;
+  const labels=mode==='quarterly'?['Q1 FY24','Q2 FY24','Q3 FY24','Q4 FY24','Q1 2025','Q2 2025']:MONTHLY.map(m=>m.m);
+  const actual=mode==='quarterly'?[68,82,95,112,164,187]:MONTHLY.map(m=>m.rev);
+  const target=mode==='quarterly'?[75,85,100,115,180,240]:MONTHLY.map(m=>m.target);
+  if(revChartInst)revChartInst.destroy();
+  revChartInst=new Chart(ctx,{type:'bar',data:{labels,datasets:[
+    {label:'Actual (₹L)',data:actual,backgroundColor:'rgba(0,229,176,0.7)',borderRadius:5,order:2},
+    {label:'Target (₹L)',data:target,type:'line',borderColor:'#f5a623',backgroundColor:'rgba(245,166,35,0.06)',fill:true,tension:0.4,pointRadius:4,pointBackgroundColor:'#f5a623',order:1}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:10}},tooltip:TT},scales:{x:{grid:GL,ticks:TK},y:{grid:GL,ticks:{...TK,callback:v=>'₹'+v+'L'},beginAtZero:true}}}});
+}
+function updateRevChart(v){buildRevChart(v);}
+
+function buildRevSplitChart(){
+  const ctx=document.getElementById('rev-split-chart');if(!ctx)return;
+  new Chart(ctx,{type:'doughnut',data:{labels:['New Business','Expansion','Renewal'],datasets:[{data:[68,20,12],backgroundColor:['#00e5b0','#3d8ef0','#b57bee'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:8}},tooltip:TT}}});
+}
+function buildWinLossChart(){
+  const ctx=document.getElementById('winloss-chart');if(!ctx)return;
+  new Chart(ctx,{type:'doughnut',data:{labels:['Won','Lost','Stalled'],datasets:[{data:[68,24,8],backgroundColor:['#00e5b0','#ff4d6d','#4e6680'],borderWidth:0,hoverOffset:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:TT}}});
+}
+function buildSourceChart(){
+  const ctx=document.getElementById('source-chart');if(!ctx)return;
+  new Chart(ctx,{type:'bar',data:{labels:['Referral','Website','LinkedIn','Campaign','Cold Call','Event'],datasets:[{data:[52,28,22,18,14,8],backgroundColor:['#00e5b0','#3d8ef0','#b57bee','#f5a623','#22d3ee','#ff7d40'],borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>`${ctx.parsed.y}L`}}},scales:{x:{grid:{display:false},ticks:TK},y:{grid:GL,ticks:{...TK,callback:v=>'₹'+v+'L'},beginAtZero:true}}}});
+}
+function buildFunnelChart(){
+  const ctx=document.getElementById('funnel-chart');if(!ctx)return;
+  new Chart(ctx,{type:'bar',data:{labels:['Leads','Contacted','Qualified','Demo','Proposal','Won'],datasets:[{data:[420,280,145,88,46,34],backgroundColor:'rgba(61,142,240,0.65)',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.parsed.y} (${(c.parsed.y/420*100).toFixed(0)}%)`}}},scales:{x:{grid:{display:false},ticks:TK},y:{grid:GL,ticks:TK,beginAtZero:true}}}});
+}
+function buildTargetsList(){
+  const el=document.getElementById('targets-list');if(!el)return;
+  el.innerHTML=TARGETS_DATA.map(t=>{
+    const pct=Math.round(t.cur/t.target*100);
+    const remaining=t.target-t.cur;
+    return `<div class="target-row">
+      <div class="target-hd"><span class="target-name">${t.name}</span><span class="target-vals" style="color:${t.col};">${t.unit}${t.cur} / ${t.unit}${t.target}</span></div>
+      <div class="prog"><div class="prog-fill" style="width:${Math.min(pct,100)}%;background:${t.col};"></div></div>
+      <div class="target-meta">${pct}% complete · ${t.unit}${remaining} remaining</div>
+    </div>`;
+  }).join('');
+}
+function buildSavedReports(){
+  const el=document.getElementById('saved-reports');if(!el)return;
+  const typeColor={'PDF':'var(--rose)','XLSX':'var(--accent)','CSV':'var(--blue)'};
+  el.innerHTML=SAVED_REPORTS.map(r=>`<div class="rep-card" onclick="toast('Downloading ${r.title}...')">
+    <div class="rep-icon" style="background:${typeColor[r.type]+'22'};color:${typeColor[r.type]};">📄</div>
+    <div><div class="rep-title">${r.title}</div><div class="rep-sub">${r.date} · ${r.type} · ${r.size}</div></div>
+    <div class="rep-arrow">↓</div>
+  </div>`).join('');
+}
+function buildRevTable(){
+  const el=document.getElementById('rev-table-body');if(!el)return;
+  el.innerHTML=MONTHLY.map(m=>{
+    const pct=Math.round(m.rev/m.target*100);
+    const momSign=m.mom===null?'—':m.mom>0?`<span class="trend up">▲ ${m.mom}%</span>`:`<span class="trend neu">0%</span>`;
+    const color=pct>=90?'var(--accent)':pct>=70?'var(--amber)':'var(--rose)';
+    return `<tr>
+      <td class="td-main">${m.m}</td>
+      <td style="font-family:var(--mono);color:var(--text2);">${m.won}</td>
+      <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">₹${m.rev}L</td>
+      <td style="font-family:var(--mono);color:var(--text3);">₹${m.target}L</td>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="prog" style="width:60px;"><div class="prog-fill" style="width:${Math.min(pct,100)}%;background:${color};"></div></div><span style="font-size:12px;font-weight:600;color:${color};">${pct}%</span></div></td>
+      <td>${momSign}</td>
+      <td style="font-family:var(--mono);color:var(--blue);">${m.won>0?Math.round(68+Math.random()*6):0}%</td>
+      <td style="font-family:var(--mono);color:var(--text2);">₹${m.avg}L</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══ MONTHLY TAB ═══ */
+function buildMonthlyTab(){
+  const ctx=document.getElementById('monthly-bar-chart');
+  if(!ctx||ctx.chart)return;
+  ctx.chart=true;
+  new Chart(ctx,{type:'bar',data:{labels:MONTHLY.map(m=>m.m),datasets:[
+    {label:'Revenue (₹L)',data:MONTHLY.map(m=>m.rev),backgroundColor:'rgba(0,229,176,0.7)',borderRadius:5},
+    {label:'Target (₹L)', data:MONTHLY.map(m=>m.target),type:'line',borderColor:'#f5a623',backgroundColor:'transparent',tension:0.4,pointRadius:4,pointBackgroundColor:'#f5a623'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8ba3bf',font:{size:10},boxWidth:10}},tooltip:TT},scales:{x:{grid:{display:false},ticks:TK},y:{grid:GL,ticks:{...TK,callback:v=>'₹'+v+'L'},beginAtZero:true}}}});
+  const el=document.getElementById('monthly-table-body');if(!el)return;
+  el.innerHTML=MONTHLY.map(m=>{
+    const pct=Math.round(m.rev/m.target*100);
+    const col=pct>=90?'var(--accent)':pct>=70?'var(--amber)':'var(--rose)';
+    return `<tr>
+      <td class="td-main">${m.m}</td>
+      <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">₹${m.rev}L</td>
+      <td style="font-family:var(--mono);color:var(--text3);">₹${m.target}L</td>
+      <td><span style="font-weight:600;color:${col};">${pct}%</span></td>
+      <td style="font-family:var(--mono);color:var(--text2);">${m.won}</td>
+      <td style="font-family:var(--mono);color:var(--text2);">₹${m.avg}L</td>
+      <td>${m.mom===null?'—':`<span style="color:var(--accent);font-weight:600;">▲ ${m.mom}%</span>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══ QUARTERLY TAB ═══ */
+function buildQuarterlyTab(){
+  const ctx=document.getElementById('quarterly-chart');
+  if(!ctx||ctx.chart)return;
+  ctx.chart=true;
+  new Chart(ctx,{type:'bar',data:{labels:QUARTERLY.map(q=>q.q),datasets:[
+    {label:'Revenue (₹L)',data:QUARTERLY.map(q=>q.rev),backgroundColor:'rgba(0,229,176,0.7)',borderRadius:5},
+    {label:'Target (₹L)', data:QUARTERLY.map(q=>q.target),type:'line',borderColor:'#f5a623',backgroundColor:'transparent',tension:0.4,pointRadius:4,pointBackgroundColor:'#f5a623'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8ba3bf',font:{size:10},boxWidth:10}},tooltip:TT},scales:{x:{grid:{display:false},ticks:TK},y:{grid:GL,ticks:{...TK,callback:v=>'₹'+v+'L'},beginAtZero:true}}}});
+  // comparison
+  const el=document.getElementById('qtr-comparison');if(el){
+    const metrics=[
+      {label:'Revenue',q2:'₹187L',q1:'₹164L',delta:'+14%',up:true},
+      {label:'Deals Won',q2:'18',q1:'22',delta:'-18%',up:false},
+      {label:'Win Rate',q2:'68%',q1:'63%',delta:'+5pp',up:true},
+      {label:'Avg Deal',q2:'₹10.4L',q1:'₹7.5L',delta:'+39%',up:true},
+      {label:'Pipeline Coverage',q2:'7.9×',q1:'5.2×',delta:'+52%',up:true},
+    ];
+    el.innerHTML=metrics.map(m=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border-radius:9px;">
+      <span style="font-size:12px;color:var(--text2);">${m.label}</span>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <span style="font-size:12px;color:var(--text3);">Q1: ${m.q1}</span>
+        <span style="font-family:var(--mono);font-weight:600;color:var(--text);">${m.q2}</span>
+        <span class="trend ${m.up?'up':'dn'}">${m.up?'▲':'▼'} ${m.delta}</span>
+      </div>
+    </div>`).join('');
+  }
+  const tb=document.getElementById('qtr-table-body');if(!tb)return;
+  tb.innerHTML=QUARTERLY.map(q=>{
+    const pct=Math.round(q.rev/q.target*100);
+    const col=pct>=90?'var(--accent)':pct>=70?'var(--amber)':'var(--rose)';
+    return `<tr>
+      <td class="td-main">${q.q}</td>
+      <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">₹${q.rev}L</td>
+      <td style="font-family:var(--mono);color:var(--text3);">₹${q.target}L</td>
+      <td><span style="font-weight:600;color:${col};">${pct}%</span></td>
+      <td style="font-family:var(--mono);color:var(--text2);">${q.won}</td>
+      <td style="font-family:var(--mono);color:var(--blue);">${q.win}%</td>
+      <td style="font-family:var(--mono);color:var(--text2);">₹${q.avg}L</td>
+      <td>${q.qoq===null?'—':`<span style="color:var(--accent);font-weight:600;">▲ ${q.qoq}%</span>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══ BY REP TAB ═══ */
+function buildByRepTab(){
+  const ctx=document.getElementById('rep-chart');
+  if(!ctx||ctx.chart)return;
+  ctx.chart=true;
+  new Chart(ctx,{type:'bar',data:{labels:REPS.map(r=>r.name.split(' ')[0]),datasets:[
+    {label:'Revenue (₹L)',data:REPS.map(r=>r.rev),backgroundColor:REPS.map(r=>r.col+'aa'),borderRadius:5,borderSkipped:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:TT},scales:{x:{grid:{display:false},ticks:TK},y:{grid:GL,ticks:{...TK,callback:v=>'₹'+v+'L'},beginAtZero:true}}}});
+  const tb=document.getElementById('rep-table-body');if(!tb)return;
+  tb.innerHTML=REPS.map(r=>{
+    const att=Math.round(r.rev/r.quota*100);
+    const col=att>=90?'var(--accent)':att>=70?'var(--amber)':'var(--rose)';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;border-radius:50%;background:${r.col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${r.oi}</div><span style="font-size:13px;font-weight:600;color:var(--text);">${r.name}</span></div></td>
+      <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">₹${r.rev}L</td>
+      <td style="font-family:var(--mono);color:var(--text3);">₹${r.quota}L</td>
+      <td><div style="display:flex;align-items:center;gap:6px;"><div class="prog" style="width:60px;"><div class="prog-fill" style="width:${Math.min(att,100)}%;background:${col};"></div></div><span style="font-size:12px;font-weight:600;color:${col};">${att}%</span></div></td>
+      <td style="font-family:var(--mono);color:var(--text2);">${r.won}</td>
+      <td style="font-family:var(--mono);color:${r.win>=70?'var(--accent)':r.win>=55?'var(--amber)':'var(--rose)'};">${r.win}%</td>
+      <td style="font-family:var(--mono);color:var(--text2);">₹${r.avg}L</td>
+      <td style="font-family:var(--mono);color:var(--text3);">${r.cycle}d</td>
+      <td style="font-family:var(--mono);color:var(--blue);">₹${r.pipeline}L</td>
+    </tr>`;
+  }).join('');
+  const barsEl=document.getElementById('rep-quota-bars');if(!barsEl)return;
+  barsEl.innerHTML=REPS.map(r=>{
+    const att=Math.round(r.rev/r.quota*100);
+    const col=att>=90?'var(--accent)':att>=70?'var(--amber)':'var(--rose)';
+    return `<div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+        <div style="display:flex;align-items:center;gap:7px;"><div style="width:20px;height:20px;border-radius:50%;background:${r.col};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${r.oi}</div><span style="color:var(--text2);">${r.name.split(' ')[0]}</span></div>
+        <span style="font-family:var(--mono);color:${col};font-weight:600;">${att}%</span>
+      </div>
+      <div class="prog"><div class="prog-fill" style="width:${Math.min(att,100)}%;background:${col};"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══ BY PRODUCT TAB ═══ */
+function buildByProductTab(){
+  const ctx=document.getElementById('product-chart');
+  if(!ctx||ctx.chart)return;
+  ctx.chart=true;
+  const PCOLS=['#00e5b0','#3d8ef0','#b57bee','#f5a623'];
+  new Chart(ctx,{type:'doughnut',data:{labels:PRODUCTS.map(p=>p.name.replace('EdTech CRM — ','')),datasets:[{data:PRODUCTS.map(p=>p.rev),backgroundColor:PCOLS,borderWidth:0,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:8}},tooltip:{...TT,callbacks:{label:c=>`₹${c.parsed}L`}}}}});
+  const bd=document.getElementById('product-breakdown');if(!bd)return;
+  bd.innerHTML=PRODUCTS.map((p,i)=>`<div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${PCOLS[i]};display:inline-block;"></span><span style="color:var(--text2);">${p.name.replace('EdTech CRM — ','')}</span></span>
+      <span style="font-family:var(--mono);color:${PCOLS[i]};font-weight:600;">${p.pct}%</span>
+    </div>
+    <div class="prog"><div class="prog-fill" style="width:${p.pct}%;background:${PCOLS[i]};"></div></div>
+  </div>`).join('');
+  const tb=document.getElementById('product-table-body');if(!tb)return;
+  tb.innerHTML=PRODUCTS.map((p,i)=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:${PCOLS[i]};display:inline-block;"></span><span class="td-main">${p.name}</span></div></td>
+    <td style="font-family:var(--mono);color:var(--text2);">${p.won}</td>
+    <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">₹${p.rev}L</td>
+    <td style="font-family:var(--mono);color:${PCOLS[i]};">${p.pct}%</td>
+    <td style="font-family:var(--mono);color:var(--text2);">₹${p.avg}L</td>
+    <td style="font-family:var(--mono);color:${p.win>=70?'var(--accent)':p.win>=55?'var(--amber)':'var(--rose)'};">${p.win}%</td>
+    <td style="font-family:var(--mono);color:var(--blue);">₹${p.pipeline}L</td>
+  </tr>`).join('');
+}
+
+/* ═══ PIPELINE HEALTH TAB ═══ */
+function buildPipelineTab(){
+  const ctx=document.getElementById('pipeline-stage-chart');
+  if(!ctx||ctx.chart)return;
+  ctx.chart=true;
+  new Chart(ctx,{type:'bar',data:{labels:STAGE_DATA.map(s=>s.stage),datasets:[{data:STAGE_DATA.map(s=>s.val),backgroundColor:STAGE_DATA.map(s=>s.col+'cc'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`₹${c.parsed.y}L`}}},scales:{x:{grid:{display:false},ticks:TK},y:{grid:GL,ticks:{...TK,callback:v=>'₹'+v+'L'},beginAtZero:true}}}});
+  const tb=document.getElementById('closing-tbody');if(!tb)return;
+  const STAGE_CLS={'Negotiation':'b-orange','Proposal Sent':'b-amber','Demo Scheduled':'b-purple','Qualification':'b-blue'};
+  tb.innerHTML=CLOSING_DEALS.map(d=>`<tr>
+    <td><div class="td-main">${d.name}</div></td>
+    <td style="font-size:12px;color:var(--text3);">${d.company}</td>
+    <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;border-radius:50%;background:${d.col};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:12px;">${d.owner.split(' ')[0]}</span></div></td>
+    <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">₹${d.val}L</td>
+    <td style="font-family:var(--mono);color:var(--blue);">₹${d.weighted}L</td>
+    <td><span class="badge ${STAGE_CLS[d.stage]||'b-gray'}">${d.stage}</span></td>
+    <td><div class="prog" style="width:60px;display:inline-block;"><div class="prog-fill" style="width:${d.prob}%;background:${d.prob>=70?'var(--accent)':'var(--amber)'}"></div></div> <span style="font-size:11px;font-weight:600;color:${d.prob>=70?'var(--accent)':'var(--amber)'};">${d.prob}%</span></td>
+    <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${d.close}</td>
+  </tr>`).join('');
+}
+
+/* ═══ INIT ═══ */
+buildOverview();
+</script>
+<script src="../../assets/js/auth.js"></script>
+</body>
+</html>

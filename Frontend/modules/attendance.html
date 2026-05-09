@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance</title>
+<link rel="stylesheet" href="../assets/css/attendance.css">
+</head>
+
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="brand-mark">Z</div>
+        <div>
+          <strong>Zyntrix</strong>
+          <span>EdTech CRM</span>
+        </div>
+      </div>
+
+      <nav class="side-nav" aria-label="Primary">
+        <a class="active" href="attendance.html"><span class="nav-icon">▣</span>Schedule</a>
+        <a href="timecard.html"><span class="nav-icon">◷</span>Timecard</a>
+        <a href="find-shifts.html"><span class="nav-icon">⌕</span>Find Shifts</a>
+        <a href="payroll.html"><span class="nav-icon">$</span>Payroll</a>
+        <a href="#" data-action="profile"><span class="nav-icon">♙</span>Profile</a>
+        <a href="#" data-action="settings"><span class="nav-icon">⚙</span>Settings</a>
+      </nav>
+    </div>
+
+    <div class="sidebar-user">
+      <img src="https://i.pravatar.cc/80?img=12" alt="">
+      <div>
+        <strong id="sideUserName">Zyntrix Employee</strong>
+        <span id="sideUserEmail">employee@zyntrix.com</span>
+      </div>
+      <button class="icon-button small" type="button" aria-label="Open profile menu">⌄</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1>Schedule</h1>
+
+      <div class="topbar-actions">
+        <label class="search-box">
+          <span>⌕</span>
+          <input id="searchInput" placeholder="Search anything..." aria-label="Search anything">
+          <kbd>⌘ K</kbd>
+        </label>
+
+        <div id="topClock" class="top-clock">--:--</div>
+
+        <button id="notificationButton" class="notification-button" type="button" aria-label="Notifications">
+          ♧
+          <span id="notificationCount">0</span>
+        </button>
+
+        <div class="top-profile">
+          <img src="https://i.pravatar.cc/80?img=12" alt="">
+          <div>
+            <strong id="userName">Zyntrix Employee</strong>
+            <span id="userRole">Employee</span>
+          </div>
+          <button onclick="logout()" type="button" aria-label="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;font-family:inherit;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="content-grid">
+      <div class="primary-column">
+        <section class="panel calendar-panel">
+          <div class="calendar-header">
+            <div class="month-switcher">
+              <button id="prev" class="icon-button" type="button" aria-label="Previous month">‹</button>
+              <h2 id="monthYear"></h2>
+              <button id="next" class="icon-button" type="button" aria-label="Next month">›</button>
+            </div>
+
+            <button class="today-button" onclick="goToday()" type="button">Today</button>
+          </div>
+
+          <div class="weekdays">
+            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+          </div>
+
+          <div id="grid" class="calendar-grid"></div>
+
+          <div class="legend">
+            <span><i class="legend-blue"></i>Punches</span>
+            <span><i class="legend-red"></i>Attention</span>
+            <span><i class="legend-shift"></i>Scheduled shifts</span>
+            <span><i class="legend-dot"></i>Payday</span>
+          </div>
+        </section>
+
+        <div class="lower-grid">
+          <section class="panel punch-panel">
+            <div class="panel-title-row">
+              <h3>Punch Times (<span id="punchCount">0</span>)</h3>
+              <a id="missedPunchLink" href="#">Missed a punch?</a>
+            </div>
+            <p class="panel-copy">Please note that it may take up to 5 minutes for any changes to appear on this page.</p>
+
+            <div class="clock-graphic" aria-hidden="true">
+              <span class="speed-line one"></span>
+              <span class="speed-line two"></span>
+              <span class="speed-line three"></span>
+              <div class="clock-face">
+                <span class="hand minute"></span>
+                <span class="hand hour"></span>
+              </div>
+            </div>
+
+            <p id="punchInfo" class="empty-state">No punch recorded for this day.</p>
+            <button id="punchBtn" class="primary-action" onclick="handlePunch()" type="button">+ Add Punch</button>
+          </section>
+
+          <section class="panel shift-panel">
+            <h3>Shift Details</h3>
+
+            <div class="detail-list">
+              <div class="detail-row">
+                <span class="detail-icon">□</span>
+                <span>Date</span>
+                <strong id="shiftDate">Today</strong>
+              </div>
+              <div class="detail-row">
+                <span class="status-dot"></span>
+                <span>Status</span>
+                <strong><em id="status">Scheduled</em></strong>
+              </div>
+              <div class="detail-row">
+                <span class="detail-icon">◷</span>
+                <span>Start Time</span>
+                <strong id="startTime">09:00 AM</strong>
+              </div>
+              <div class="detail-row">
+                <span class="detail-icon">◷</span>
+                <span>End Time</span>
+                <strong id="endTime">06:00 PM</strong>
+              </div>
+              <div class="detail-row">
+                <span class="detail-icon">⌘</span>
+                <span>Break</span>
+                <strong>1 hour</strong>
+              </div>
+              <div class="detail-row">
+                <span class="detail-icon">◷</span>
+                <span>Total Hours</span>
+                <strong id="summary">8 hours</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <aside class="right-column">
+        <section class="panel summary-panel">
+          <h3>Today's Summary</h3>
+
+          <div class="summary-item">
+            <div class="summary-icon green">◷</div>
+            <div>
+              <span>Working Hours</span>
+              <strong id="todayHours">00:00</strong>
+              <small>/ 8:00 hrs</small>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <div class="summary-icon blue">▣</div>
+            <div>
+              <span>Attendance Status</span>
+              <strong id="todayStatus">Scheduled</strong>
+              <small id="todayDate">Today</small>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <div class="summary-icon yellow">◷</div>
+            <div>
+              <strong>On Time</strong>
+              <small id="expectedTime">Expected in 09:00 AM</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel notifications-panel">
+          <div class="panel-title-row">
+            <h3>Notifications <span id="notificationBadge" class="badge">0</span></h3>
+            <a id="viewAllNotifications" href="#">View all</a>
+          </div>
+
+          <div id="notificationsList"></div>
+        </section>
+
+        <section class="panel quick-panel">
+          <h3>Quick Actions</h3>
+          <div class="quick-actions">
+            <button onclick="handlePunch()" type="button"><span class="teal">+</span>Add Punch<i>›</i></button>
+            <button id="requestLeaveBtn" type="button"><span class="purple">▣</span>Request Leave<i>›</i></button>
+            <button id="swapShiftBtn" type="button"><span class="orange">↔</span>Swap Shift<i>›</i></button>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/attendance.js"></script>
+<script>
+requireAuth();
+requireModuleAccess("attendance");
+
+const user = JSON.parse(localStorage.getItem("user"));
+if (user) {
+  userName.innerText = user.name || "Zyntrix Employee";
+  sideUserName.innerText = user.name || "Zyntrix Employee";
+  sideUserEmail.innerText = user.email || "employee@zyntrix.com";
+  userRole.innerText = user.role ? user.role.replace("_", " ") : "Employee";
+}
+
+</script>
+</body>
+</html>

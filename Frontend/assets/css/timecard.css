@@ -1,0 +1,131 @@
+/* ================= IMPORT DESIGN SYSTEM ================= */
+@import url("attendance.css");
+
+/* ================= PAGE TITLE ================= */
+.page-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* ================= FILTER BAR ================= */
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filters input,
+.filters select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+/* ================= TABLE CONTAINER ================= */
+.table-card {
+  overflow: hidden;
+}
+
+/* SCROLL AREA */
+.table-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ================= TABLE ================= */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+/* ROW HOVER */
+.table tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* ================= STATUS BADGES ================= */
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* STATUS COLORS */
+.badge.present {
+  background: rgba(34,197,94,0.2);
+  color: var(--green);
+}
+
+.badge.late {
+  background: rgba(250,204,21,0.2);
+  color: #facc15;
+}
+
+.badge.absent {
+  background: rgba(239,68,68,0.2);
+  color: var(--red);
+}
+
+/* ================= HOURS ================= */
+.hours {
+  font-weight: 600;
+  color: var(--teal);
+}
+
+/* ================= SUMMARY CARDS ================= */
+.time-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.summary-box {
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.summary-box h2 {
+  margin-top: 6px;
+}
+
+/* ================= SMALL ANIMATIONS ================= */
+.table tr {
+  animation: fadeUp 0.4s ease;
+}
+
+.summary-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

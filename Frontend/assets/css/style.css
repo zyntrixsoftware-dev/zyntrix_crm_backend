@@ -1,0 +1,505 @@
+
+body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ===============================
+   LOGIN PAGE STYLE
+=============================== */
+
+body.centered {
+
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: radial-gradient(circle at top left,
+  #0f172a,
+  #020617);
+
+  color: white;
+}
+
+.login-box {
+
+  width: 340px;
+
+  padding: 30px;
+
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.05);
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+  0 20px 60px rgba(0,0,0,0.6);
+
+  text-align: center;
+}
+
+.login-box h2 {
+
+  margin-bottom: 20px;
+
+  font-size: 24px;
+}
+
+.login-box input {
+
+  width: 100%;
+
+  padding: 12px;
+
+  margin: 10px 0;
+
+  border-radius: 8px;
+
+  border: none;
+
+  background: rgba(255,255,255,0.12);
+
+  color: white;
+}
+
+.login-box input::placeholder {
+
+  color: #bbb;
+}
+
+.login-box button {
+
+  width: 100%;
+
+  padding: 12px;
+
+  margin-top: 10px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: linear-gradient(
+  90deg,
+  #10b981,
+  #06b6d4
+  );
+
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.login-box button:hover {
+
+  opacity: 0.9;
+}
+
+.demo-info {
+
+  margin-top: 18px;
+
+  font-size: 12px;
+
+  color: #aaa;
+
+  line-height: 1.6;
+}
+
+/* ===============================
+   DASHBOARD LAYOUT STYLE
+=============================== */
+
+.layout {
+
+  display: flex;
+
+  height: 100vh;
+}
+
+.sidebar {
+  width: 230px;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 20px;
+  border-right: 1px solid #1e293b;
+}
+
+.sidebar h3 {
+  margin-bottom: 25px;
+  font-size: 18px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  color: #cbd5f5;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.sidebar a:hover {
+  background: #1e293b;
+  color: white;
+}
+.main {
+
+  flex: 1;
+
+  padding: 30px;
+
+  background: #020617;
+  
+  color: #e2e8f0;
+}
+
+.password-wrapper {
+
+position: relative;
+
+}
+
+.password-wrapper span {
+
+position: absolute;
+
+right: 12px;
+top: 12px;
+
+cursor: pointer;
+
+}
+
+.login-options {
+
+display: flex;
+
+justify-content: space-between;
+
+font-size: 13px;
+
+margin: 10px 0;
+
+color: #bbb;
+
+}
+
+.login-options a {
+
+color: #06b6d4;
+
+text-decoration: none;
+
+}
+
+.demo-users {
+
+margin-top: 15px;
+
+}
+
+.demo-users button {
+
+margin: 5px;
+
+padding: 6px 10px;
+
+border: none;
+
+border-radius: 6px;
+
+background: #1e293b;
+
+color: white;
+
+cursor: pointer;
+
+}
+
+/* PASSWORD FIELD */
+
+.password-wrapper {
+position: relative;
+}
+
+.password-wrapper input {
+padding-right: 40px;
+}
+
+.toggle-eye {
+position: absolute;
+right: 10px;
+top: 50%;
+transform: translateY(-50%);
+background: none;
+border: none;
+color: #ccc;
+cursor: pointer;
+font-size: 14px;
+}
+
+/* LOGIN OPTIONS */
+
+.login-options {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin: 10px 0 15px;
+font-size: 13px;
+}
+
+.remember {
+display: flex;
+align-items: center;
+gap: 6px;
+color: #aaa;
+}
+
+.forgot {
+color: #06b6d4;
+text-decoration: none;
+}
+
+/* BUTTON SPACING */
+
+.login-box button {
+margin-top: 10px;
+}
+
+/* QUICK LOGIN */
+
+.demo-users {
+margin-top: 20px;
+text-align: center;
+}
+
+.demo-users p {
+margin-bottom: 10px;
+color: #aaa;
+}
+
+.demo-buttons {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.demo-buttons button {
+padding: 8px;
+border-radius: 8px;
+border: none;
+background: #1e293b;
+color: white;
+cursor: pointer;
+}
+
+.demo-buttons button:hover {
+background: #334155;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #ffffff;
+}
+
+/* Container */
+.dashboard-container {
+    padding: 40px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header h2 {
+    font-weight: 500;
+}
+
+.logout-btn {
+    padding: 6px 12px;
+    border: none;
+    background: #38bdf8;
+    color: #000;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Card style */
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    width: 300px;
+}
+
+/* Menu Items */
+.menu-item {
+    padding: 12px;
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.menu-item:hover {
+    background: linear-gradient(90deg, #22c55e, #06b6d4);
+    color: #000;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.topbar button {
+  background: #1e293b;
+  border: none;
+  padding: 8px 12px;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.topbar button:hover {
+  background: #10b981;
+}
+
+.module-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  color: #e2e8f0;
+  transition: 0.2s;
+}
+
+.module-card:hover {
+  border-color: #10b981;
+  transform: translateY(-3px);
+}
+/* FORCE DARK DASHBOARD FIX */
+
+.main {
+  background: #020617 !important;
+  color: #e2e8f0 !important;
+  min-height: 100vh;
+}
+
+/* ===== FORCE DARK THEME FIX ===== */
+
+body {
+  background: #020617 !important;
+  color: #e2e8f0 !important;
+}
+
+.layout {
+  display: flex;
+}
+
+.main {
+  flex: 1;
+  padding: 30px;
+  background: #020617 !important;
+  color: #e2e8f0 !important;
+  min-height: 100vh;
+}
+
+/* FIX MODULE GRID (IMPORTANT) */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  background: transparent !important;
+}
+
+/* FIX ANY WHITE BLOCKS */
+.modules-grid *,
+.main * {
+  background-color: transparent !important;
+}
+
+.module-card {
+  background: #0f172a !important;
+  border: 1px solid #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  color: #e2e8f0;
+}
+
+.attendance-container {
+padding: 30px;
+color: #e2e8f0;
+}
+
+#calendar {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 20px;
+}
+
+.month {
+background: #1e293b;
+padding: 10px;
+border-radius: 10px;
+}
+
+.days {
+display: flex;
+flex-wrap: wrap;
+}
+
+.days span {
+width: 30px;
+margin: 2px;
+text-align: center;
+padding: 5px;
+border-radius: 5px;
+}
+
+.today {
+background: #22c55e;
+color: black;
+}
+
+.actions button {
+margin: 10px;
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+background: linear-gradient(90deg, #22c55e, #06b6d4);
+color: black;
+cursor: pointer;
+}
+
+table {
+width: 100%;
+margin-top: 20px;
+border-collapse: collapse;
+}
+
+th, td {
+padding: 10px;
+border-bottom: 1px solid #334155;
+}
