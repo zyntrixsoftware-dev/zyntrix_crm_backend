@@ -244,6 +244,12 @@ textarea { resize: vertical; min-height: 80px; }
       <span class="nav-icon">🏠</span> Dashboard
     </a>
   </div>
+  <div class="nav-section">
+    <div class="nav-label">Employees</div>
+    <a class="nav-item" href="../employees/employees.html">
+      <span class="nav-icon">👥</span> All Employees
+    </a>
+  </div>
 
   <div class="nav-section">
     <div class="nav-label">Talent Acquisition</div>
@@ -341,20 +347,20 @@ textarea { resize: vertical; min-height: 80px; }
     <!-- KPI STRIP -->
     <div class="kpi-strip" style="margin-bottom:20px;">
       <div class="kpi-cell">
-        <div class="kpi-val" style="color:var(--accent);">247</div>
+        <div class="kpi-val" style="color:var(--accent);" id="dash-total">—</div>
         <div class="kpi-lbl">Total Employees</div>
       </div>
       <div class="kpi-cell">
-        <div class="kpi-val" style="color:var(--green);">94.2%</div>
-        <div class="kpi-lbl">Attendance Rate</div>
+        <div class="kpi-val" style="color:var(--green);" id="dash-present">—</div>
+        <div class="kpi-lbl">Present Today</div>
       </div>
       <div class="kpi-cell">
-        <div class="kpi-val" style="color:var(--amber);">54</div>
-        <div class="kpi-lbl">Active Interviews</div>
+        <div class="kpi-val" style="color:var(--amber);" id="dash-absent">—</div>
+        <div class="kpi-lbl">Absent Today</div>
       </div>
       <div class="kpi-cell">
-        <div class="kpi-val" style="color:var(--rose);">3</div>
-        <div class="kpi-lbl">Open Escalations</div>
+        <div class="kpi-val" style="color:var(--rose);" id="dash-pending">—</div>
+        <div class="kpi-lbl">Pending Requests</div>
       </div>
     </div>
 
@@ -436,47 +442,15 @@ textarea { resize: vertical; min-height: 80px; }
         </div>
         <table>
           <thead><tr>
-            <th>Name</th><th>Role</th><th>Dept</th><th>Status</th>
+            <th>Name</th><th>Designation</th><th>Dept</th><th>Status</th>
           </tr></thead>
-          <tbody>
-            <tr>
-              <td>
-                <div style="display:flex;align-items:center;gap:9px;">
-                  <div class="avatar" style="width:28px;height:28px;font-size:10px;">PS</div>
-                  <div class="td-main">Priya Sharma</div>
-                </div>
-              </td>
-              <td>Sr. Engineer</td><td>Engineering</td><td><span class="badge b-green">Active</span></td>
-            </tr>
-            <tr>
-              <td>
-                <div style="display:flex;align-items:center;gap:9px;">
-                  <div class="avatar" style="width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,#a78bfa,#7c3aed);">RM</div>
-                  <div class="td-main">Rohit Mehra</div>
-                </div>
-              </td>
-              <td>Product Manager</td><td>Product</td><td><span class="badge b-amber">Onboarding</span></td>
-            </tr>
-            <tr>
-              <td>
-                <div style="display:flex;align-items:center;gap:9px;">
-                  <div class="avatar" style="width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,#2dd4bf,#0d9488);">AD</div>
-                  <div class="td-main">Ananya Das</div>
-                </div>
-              </td>
-              <td>Sales Lead</td><td>Sales</td><td><span class="badge b-green">Active</span></td>
-            </tr>
-            <tr>
-              <td>
-                <div style="display:flex;align-items:center;gap:9px;">
-                  <div class="avatar" style="width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,#f59e0b,#d97706);">VN</div>
-                  <div class="td-main">Vikram Nair</div>
-                </div>
-              </td>
-              <td>DevOps Eng.</td><td>Engineering</td><td><span class="badge b-amber">Onboarding</span></td>
-            </tr>
+          <tbody id="recent-hires-tbody">
+            <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Loading…</td></tr>
           </tbody>
         </table>
+        <div style="margin-top:12px;text-align:right">
+          <a href="../employees/employees.html" style="font-size:12px;color:var(--accent);text-decoration:none">View all employees →</a>
+        </div>
       </div>
 
       <div class="card">
@@ -790,5 +764,52 @@ new Chart(document.getElementById('funnelChart'),{
   });
 })();
 </script>
+
+<script>
+(async function loadHrmsDash() {
+  const user = getUser();
+  if (user) {
+    const n = user.name || "HR";
+    const av = document.querySelector(".avatar");
+    if (av) av.textContent = n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+    const un = document.querySelector(".user-name");
+    if (un) un.textContent = n;
+  }
+
+  const res = await apiRequest("/hr/hrms/dashboard");
+  if (res.error) return;
+
+  const s = res.stats || {};
+  const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setEl("dash-total",   s.totalEmployees  ?? "—");
+  setEl("dash-present", s.presentToday    ?? "—");
+  setEl("dash-absent",  s.absentToday     ?? "—");
+  setEl("dash-pending", s.pendingRequests ?? "—");
+
+  // Recent hires
+  const tbody = document.getElementById("recent-hires-tbody");
+  if (tbody) {
+    const hires = res.recentHires || [];
+    if (!hires.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">No employees yet — <a href="../employees/employees.html" style="color:var(--accent)">add one</a></td></tr>';
+    } else {
+      const statusClass = s => ({Active:"b-green","On Leave":"b-amber",Terminated:"b-rose",Resigned:"b-gray"}[s]||"b-gray");
+      tbody.innerHTML = hires.map(e => {
+        const init = (e.name||"?").split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+        return `<tr>
+          <td><div style="display:flex;align-items:center;gap:9px">
+            <div class="avatar" style="width:28px;height:28px;font-size:10px">${init}</div>
+            <div class="td-main">${e.name}</div>
+          </div></td>
+          <td>${e.designation||"—"}</td>
+          <td>${e.department||"—"}</td>
+          <td><span class="badge ${statusClass(e.employeeStatus)}">${e.employeeStatus||"Active"}</span></td>
+        </tr>`;
+      }).join("");
+    }
+  }
+})();
+</script>
+
 </body>
 </html>

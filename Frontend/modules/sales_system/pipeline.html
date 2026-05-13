@@ -476,7 +476,7 @@ textarea { resize: vertical; min-height: 80px; }
   </div>
 
   <!-- ─── CONTENT ─── -->
-  <div class="content">
+  <div class="content" id="content">
 
     <!-- ════════ BOARD VIEW ════════ -->
     <div id="view-board">
@@ -901,37 +901,11 @@ textarea { resize: vertical; min-height: 80px; }
 
 <script>
 /* ══════════════════════════════════════════════
-   DATA STORE
+   DATA STORE — populated dynamically from Excel
 ══════════════════════════════════════════════ */
-let DEALS = [
-  {id:1,  name:'ZyntrixEdu Enterprise',       company:'ZyntrixEdu Pvt Ltd',    owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:1850000, stage:'Negotiation',     prob:85, close:'2025-05-20', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'High',   notes:'CFO involved. Legal review complete.', created:'2025-04-10', lastContact:'2025-05-06'},
-  {id:2,  name:'Apex Schools — LMS Bundle',   company:'Apex Schools Group',    owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:920000,  stage:'Proposal Sent',   prob:65, close:'2025-05-30', source:'LinkedIn',  product:'LMS Add-on',              priority:'High',   notes:'3-campus implementation requested.',  created:'2025-04-18', lastContact:'2025-05-06'},
-  {id:3,  name:'Global EdTech Corp',          company:'Global EdTech Corp',    owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', value:2200000, stage:'Negotiation',     prob:75, close:'2025-06-05', source:'Website',   product:'EdTech CRM — Enterprise', priority:'High',   notes:'Volume discount requested.',          created:'2025-03-28', lastContact:'2025-05-05'},
-  {id:4,  name:'BrightPath Academy',          company:'BrightPath Academy',    owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', value:720000,  stage:'Qualification',   prob:40, close:'2025-06-15', source:'Campaign',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Budget pending board approval.',       created:'2025-04-25', lastContact:'2025-04-14'},
-  {id:5,  name:'Vidya Network — Starter',     company:'Vidya Network',         owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:380000,  stage:'Demo Scheduled',  prob:55, close:'2025-05-25', source:'Cold Call', product:'EdTech CRM — Starter',    priority:'Medium', notes:'Demo confirmed May 7.',               created:'2025-05-01', lastContact:'2025-05-03'},
-  {id:6,  name:'KnowledgeFirst Institute',    company:'KnowledgeFirst',        owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', value:1100000, stage:'Prospecting',     prob:25, close:'2025-07-01', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'Low',    notes:'Initial outreach done. No reply.',    created:'2025-05-02', lastContact:'2025-05-02'},
-  {id:7,  name:'EduSmart Solutions',          company:'EduSmart Solutions',    owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:560000,  stage:'Closed Won',      prob:100,close:'2025-04-30', source:'Website',   product:'EdTech CRM — Business',   priority:'Medium', notes:'Signed & implementation started.',    created:'2025-04-01', lastContact:'2025-04-30'},
-  {id:8,  name:'LearnFirst Academy',          company:'LearnFirst Academy',    owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:430000,  stage:'Prospecting',     prob:20, close:'2025-07-15', source:'LinkedIn',  product:'EdTech CRM — Starter',    priority:'Low',    notes:'Scheduled intro call for May 12.',    created:'2025-05-03', lastContact:'2025-04-20'},
-  {id:9,  name:'EduFirst Network',            company:'EduFirst Network',      owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:580000,  stage:'Proposal Sent',   prob:50, close:'2025-06-10', source:'Campaign',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Sent revised proposal. Awaiting.',    created:'2025-04-20', lastContact:'2025-04-18'},
-  {id:10, name:'Pinnacle Schools Group',      company:'Pinnacle Schools',      owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:1400000, stage:'Demo Scheduled',  prob:60, close:'2025-05-28', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'High',   notes:'VP of IT is champion.',               created:'2025-04-28', lastContact:'2025-05-04'},
-  {id:11, name:'Sunrise Edu Foundation',      company:'Sunrise Edu',           owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', value:290000,  stage:'Qualification',   prob:35, close:'2025-07-20', source:'Event',     product:'EdTech CRM — Starter',    priority:'Low',    notes:'Met at EdTech Summit.',               created:'2025-05-05', lastContact:'2025-05-05'},
-  {id:12, name:'NorthStar Academy',           company:'NorthStar Academy',     owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:850000,  stage:'Closed Lost',     prob:0,  close:'2025-05-01', source:'LinkedIn',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Lost to competitor on price.',        created:'2025-04-05', lastContact:'2025-05-01'},
-];
-
-let ACTIVITIES = [
-  {id:1, type:'Call',    icon:'📞', dealId:1, outcome:'Positive', dur:'45 min', notes:'CFO joining next call. Pricing discussed.',       date:'2025-05-06T11:00', rep:'Sanjay Kumar'},
-  {id:2, type:'Demo',    icon:'🎥', dealId:2, outcome:'Positive', dur:'60 min', notes:'3-campus proposal requested.',                    date:'2025-05-06T09:00', rep:'Priya Nair'},
-  {id:3, type:'Email',   icon:'✉️', dealId:3, outcome:'Neutral',  dur:'—',     notes:'Revised proposal with volume discount sent.',     date:'2025-05-05T16:00', rep:'Rahul Mehta'},
-  {id:4, type:'Meeting', icon:'🤝', dealId:4, outcome:'Neutral',  dur:'30 min', notes:'Board approval still pending.',                   date:'2025-05-04T14:00', rep:'Rahul Mehta'},
-  {id:5, type:'Call',    icon:'📞', dealId:5, outcome:'Positive', dur:'20 min', notes:'Demo confirmed for May 7.',                       date:'2025-05-03T15:30', rep:'Anjali Rao'},
-];
-
-let NOTIFICATIONS = [
-  {id:1, icon:'🎉', type:'success', title:'ZyntrixEdu Enterprise moved to Negotiation!', body:'₹18.5L · Sanjay Kumar · 1 hour ago', read:false},
-  {id:2, icon:'⚠️', type:'danger',  title:'BrightPath Academy stalled for 21 days',      body:'₹7.2L · Rahul Mehta · Needs follow-up', read:false},
-  {id:3, icon:'📞', type:'info',    title:'Apex Schools demo reminder — Today at 3 PM',  body:'Priya Nair · Zoom link sent', read:false},
-  {id:4, icon:'📊', type:'info',    title:'Q2 quota check — 22 days remaining',           body:'₹53L still needed to hit ₹2.4Cr target', read:false},
-];
+let DEALS = [];
+let ACTIVITIES = [];
+let NOTIFICATIONS = [];
 
 const STAGE_CONFIG = {
   'Prospecting':   {col:'#4e6680', bg:'rgba(78,102,128,0.15)', badgeCls:'b-gray',   order:0},
@@ -943,13 +917,7 @@ const STAGE_CONFIG = {
   'Closed Lost':   {col:'#ff4d6d', bg:'rgba(255,77,109,0.12)', badgeCls:'b-rose',   order:6},
 };
 
-const OWNER_CONFIG = {
-  'Sanjay Kumar': '#00e5b0',
-  'Priya Nair':   '#3d8ef0',
-  'Rahul Mehta':  '#b57bee',
-  'Anjali Rao':   '#f5a623',
-  'Vikram Singh': '#22d3ee',
-};
+const OWNER_CONFIG = {};  // populated dynamically
 
 // State
 let currentView = 'board';
@@ -1859,28 +1827,33 @@ function importDeals() {
 }
 
 /* ══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════ */
-function init() {
-  // Populate activity deal select
-  const aSelect = document.getElementById('a-deal');
-  if (aSelect) {
-    aSelect.innerHTML = DEALS.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
-  }
+async function init() {
+  await loadPageData('sales', 'deals', mapDeal,
+    (mapped) => {
+      DEALS = mapped;
 
-  // Set current datetime for activity
-  const aDate = document.getElementById('a-date');
-  if (aDate) aDate.value = new Date().toISOString().slice(0,16);
+      // Populate deal select in activity modal
+      const aSelect = document.getElementById('a-deal');
+      if (aSelect) {
+        aSelect.innerHTML = DEALS.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+      }
 
-  // Render notifications
-  renderNotifications();
+      const aDate = document.getElementById('a-date');
+      if (aDate) aDate.value = new Date().toISOString().slice(0,16);
 
-  // Render initial view
-  renderBoard();
+      renderNotifications();
+      renderBoard();
+    }, 'content'
+  );
 }
 
 init();
 </script>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/data-loader.js"></script>
 <script src="../../assets/js/auth.js"></script>
 </body>
 </html>

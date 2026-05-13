@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Import Data — ZyntrixCRM</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <style>
+    /* ── Layout ─────────────────────────────────── */
+    body { background: var(--bg1); color: var(--text1); font-family: var(--font); margin: 0; padding: 0; }
+    .import-page { max-width: 860px; margin: 40px auto; padding: 0 20px 60px; }
+    h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { color: var(--text3); font-size: 0.9rem; margin-bottom: 32px; }
+
+    /* ── Stepper ─────────────────────────────────── */
+    .stepper { display: flex; gap: 0; margin-bottom: 36px; }
+    .step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+    .step:not(:last-child)::after {
+      content: ""; position: absolute; top: 16px; left: 50%; width: 100%;
+      height: 2px; background: var(--border); z-index: 0;
+    }
+    .step.done::after  { background: var(--accent); }
+    .step-dot {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--bg2);
+      border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; position: relative; z-index: 1; color: var(--text3);
+    }
+    .step.active .step-dot  { border-color: var(--accent); color: var(--accent); background: var(--bg1); }
+    .step.done .step-dot    { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .step-label { font-size: 0.75rem; margin-top: 6px; color: var(--text3); text-align: center; }
+    .step.active .step-label { color: var(--accent); font-weight: 600; }
+
+    /* ── Cards ───────────────────────────────────── */
+    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Screen A – file drop ─────────────────────── */
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: 10px;
+      padding: 56px 24px; text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(99,102,241,0.05); }
+    .drop-zone svg { width: 48px; height: 48px; stroke: var(--text3); margin-bottom: 12px; }
+    .drop-zone p   { margin: 0; color: var(--text2); }
+    .drop-zone small { color: var(--text3); font-size: 0.82rem; }
+    #file-input { display: none; }
+    .file-chosen { margin-top: 14px; padding: 10px 16px; background: var(--bg1); border-radius: 8px; font-size: 0.9rem; display: none; }
+    .file-chosen span { color: var(--accent); font-weight: 600; }
+
+    /* ── System + Type selectors ─────────────────── */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+    label { display: block; font-size: 0.82rem; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
+    select, input[type="text"] {
+      width: 100%; padding: 9px 12px; background: var(--bg1);
+      border: 1px solid var(--border); border-radius: 8px; color: var(--text1);
+      font-size: 0.9rem; box-sizing: border-box;
+    }
+    select:focus, input:focus { outline: none; border-color: var(--accent); }
+
+    /* ── Screen B – mapping table ────────────────── */
+    .mapping-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .mapping-table th { font-size: 0.78rem; text-align: left; color: var(--text3); padding: 6px 10px; border-bottom: 1px solid var(--border); }
+    .mapping-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); font-size: 0.88rem; vertical-align: middle; }
+    .mapping-table td:first-child { color: var(--text2); font-family: monospace; font-size: 0.82rem; }
+    .mapping-table select { padding: 5px 8px; font-size: 0.85rem; }
+    .badge-sample { background: var(--bg1); border-radius: 4px; padding: 2px 7px; font-size: 0.78rem; color: var(--text3); font-family: monospace; }
+
+    /* ── Screen C – confirm ──────────────────────── */
+    .confirm-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 20px 0; }
+    .confirm-stat { background: var(--bg1); border-radius: 8px; padding: 16px; text-align: center; }
+    .confirm-stat .num  { font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+    .confirm-stat .lbl  { font-size: 0.8rem; color: var(--text3); margin-top: 4px; }
+    .mapped-preview { max-height: 220px; overflow-y: auto; margin-top: 16px; }
+    .mapped-preview table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .mapped-preview th { padding: 5px 10px; background: var(--bg1); color: var(--text3); font-size: 0.78rem; text-align: left; }
+    .mapped-preview td { padding: 5px 10px; border-bottom: 1px solid var(--border); color: var(--text2); }
+
+    /* ── Buttons ─────────────────────────────────── */
+    .btn-row { display: flex; gap: 12px; margin-top: 28px; justify-content: flex-end; }
+    .btn { padding: 10px 22px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost   { background: var(--bg1); color: var(--text2); border: 1px solid var(--border); }
+    .btn-success { background: #16a34a; color: #fff; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── Toast ───────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; padding: 13px 20px;
+      border-radius: 10px; font-size: 0.9rem; font-weight: 500; z-index: 9999;
+      background: #1e293b; color: #f8fafc; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transform: translateY(60px); opacity: 0; transition: all 0.25s ease;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: #15803d; }
+    .toast.error   { background: #b91c1c; }
+
+    /* ── Success screen ──────────────────────────── */
+    .success-screen { text-align: center; padding: 20px 0; }
+    .success-screen .checkmark { font-size: 4rem; }
+    .success-screen h2 { margin: 12px 0 8px; }
+    .success-screen p  { color: var(--text3); }
+    .success-links { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+    .success-links a { padding: 10px 18px; background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; color: var(--text1); text-decoration: none; font-size: 0.88rem; }
+    .success-links a:hover { border-color: var(--accent); color: var(--accent); }
+
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="import-page">
+  <h1>Import Data from Excel</h1>
+  <p class="subtitle">Upload your spreadsheet, map columns to system fields, and confirm — your data is live instantly.</p>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    <div class="step active" id="s1"><div class="step-dot">1</div><div class="step-label">Choose File</div></div>
+    <div class="step"        id="s2"><div class="step-dot">2</div><div class="step-label">Map Columns</div></div>
+    <div class="step"        id="s3"><div class="step-dot">3</div><div class="step-label">Confirm</div></div>
+  </div>
+
+  <div class="card">
+    <!-- ── Screen A ── -->
+    <div class="screen active" id="screenA">
+      <div class="drop-zone" id="dropZone">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <p>Drag &amp; drop your Excel file here</p>
+        <small>or click to browse — .xlsx / .xls up to 10 MB</small>
+        <input type="file" id="file-input" accept=".xlsx,.xls" />
+      </div>
+      <div class="file-chosen" id="fileChosen">Selected: <span id="fileName"></span></div>
+
+      <div class="field-row">
+        <div>
+          <label for="selSystem">System</label>
+          <select id="selSystem">
+            <option value="hrms">HRMS</option>
+            <option value="sales">Sales</option>
+            <option value="employee">Employee</option>
+          </select>
+        </div>
+        <div>
+          <label for="selType">Data Type</label>
+          <select id="selType">
+            <option value="candidates">Candidates</option>
+            <option value="interviews">Interviews</option>
+            <option value="onboarding">Onboarding</option>
+            <option value="careers">Careers / Job Posts</option>
+            <option value="employees">Employees</option>
+            <option value="leads">Leads</option>
+            <option value="deals">Deals</option>
+            <option value="activities">Activities</option>
+            <option value="meetings">Meetings</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnNextA" disabled>Next: Map Columns →</button>
+      </div>
+    </div>
+
+    <!-- ── Screen B ── -->
+    <div class="screen" id="screenB">
+      <h3 style="margin:0 0 6px;">Map Your Columns</h3>
+      <p style="color:var(--text3);font-size:0.88rem;margin-top:0">
+        Each row is an Excel column header. Select what it means in the system.<br>
+        Skip any column you don't want to import.
+      </p>
+      <div style="overflow-x:auto;">
+        <table class="mapping-table">
+          <thead><tr><th>Excel Column</th><th>Sample Value</th><th>Maps To</th><th>Label (editable)</th></tr></thead>
+          <tbody id="mappingBody"></tbody>
+        </table>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnBackB">← Back</button>
+        <button class="btn btn-primary" id="btnNextB">Next: Confirm →</button>
+      </div>
+    </div>
+
+    <!-- ── Screen C ── -->
+    <div class="screen" id="screenC">
+      <h3 style="margin:0 0 6px;">Confirm Import</h3>
+      <p style="color:var(--text3);font-size:0.88rem;margin-top:0">Review your import settings before uploading.</p>
+      <div class="confirm-grid">
+        <div class="confirm-stat"><div class="num" id="cntRows">0</div><div class="lbl">Rows</div></div>
+        <div class="confirm-stat"><div class="num" id="cntCols">0</div><div class="lbl">Mapped Columns</div></div>
+        <div class="confirm-stat"><div class="num" id="cntSystem">—</div><div class="lbl">System / Type</div></div>
+      </div>
+      <div class="mapped-preview">
+        <table><thead><tr><th>Excel Header</th><th>System Key</th><th>Label</th></tr></thead><tbody id="confirmBody"></tbody></table>
+      </div>
+      <div style="margin-top:16px;padding:12px 16px;background:var(--bg1);border-radius:8px;font-size:0.85rem;color:var(--text3);">
+        ⚠️ Importing will <strong>replace</strong> any previously imported data for this system / type combination.
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnBackC">← Back</button>
+        <button class="btn btn-success" id="btnConfirm">🚀 Confirm Import</button>
+      </div>
+    </div>
+
+    <!-- ── Screen D – Success ── -->
+    <div class="screen" id="screenD">
+      <div class="success-screen">
+        <div class="checkmark">✅</div>
+        <h2>Import Complete!</h2>
+        <p id="successMsg">Your data has been imported successfully.</p>
+        <div class="success-links" id="successLinks">
+          <a href="../modules/HRMS/talent_acquisition/candidates/candidates.html">View Candidates</a>
+          <a href="../modules/sales_system/leads.html">View Leads</a>
+          <a href="../modules/sales_system/deals.html">View Deals</a>
+          <a href="javascript:location.reload()">Import More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/api.js"></script>
+<script>
+// ── State ──────────────────────────────────────────────────────────
+let selectedFile = null;
+let excelRows    = [];   // parsed rows from SheetJS
+let excelHeaders = [];   // column names from first row
+let finalMapping = [];   // [{excelHeader, systemKey, label, dataType}]
+
+// ── Predefined field menus per system ─────────────────────────────
+const FIELD_OPTIONS = {
+  hrms: [
+    { key: "name",       label: "Full Name",       type: "string" },
+    { key: "email",      label: "Email",            type: "email"  },
+    { key: "phone",      label: "Phone",            type: "phone"  },
+    { key: "position",   label: "Position / Role",  type: "string" },
+    { key: "department", label: "Department",       type: "string" },
+    { key: "status",     label: "Status",           type: "string" },
+    { key: "stage",      label: "Stage",            type: "string" },
+    { key: "score",      label: "Score",            type: "number" },
+    { key: "date",       label: "Date",             type: "date"   },
+    { key: "notes",      label: "Notes",            type: "string" },
+    { key: "salary",     label: "Salary",           type: "number" },
+    { key: "location",   label: "Location",         type: "string" },
+    { key: "manager",    label: "Manager",          type: "string" },
+    { key: "source",     label: "Source",           type: "string" },
+  ],
+  sales: [
+    { key: "name",       label: "Name / Company",   type: "string" },
+    { key: "email",      label: "Email",            type: "email"  },
+    { key: "phone",      label: "Phone",            type: "phone"  },
+    { key: "stage",      label: "Stage",            type: "string" },
+    { key: "value",      label: "Deal Value",       type: "number" },
+    { key: "owner",      label: "Owner / Rep",      type: "string" },
+    { key: "source",     label: "Source",           type: "string" },
+    { key: "industry",   label: "Industry",         type: "string" },
+    { key: "close_date", label: "Close Date",       type: "date"   },
+    { key: "probability",label: "Probability %",    type: "number" },
+    { key: "notes",      label: "Notes",            type: "string" },
+    { key: "status",     label: "Status",           type: "string" },
+    { key: "country",    label: "Country",          type: "string" },
+  ],
+  employee: [
+    { key: "name",       label: "Full Name",        type: "string" },
+    { key: "email",      label: "Email",            type: "email"  },
+    { key: "phone",      label: "Phone",            type: "phone"  },
+    { key: "emp_id",     label: "Employee ID",      type: "string" },
+    { key: "department", label: "Department",       type: "string" },
+    { key: "position",   label: "Position",         type: "string" },
+    { key: "join_date",  label: "Joining Date",     type: "date"   },
+    { key: "salary",     label: "Salary",           type: "number" },
+    { key: "manager",    label: "Manager",          type: "string" },
+    { key: "status",     label: "Status",           type: "string" },
+    { key: "location",   label: "Location",         type: "string" },
+  ]
+};
+
+// ── Helpers ────────────────────────────────────────────────────────
+function showToast(msg, type = "") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show " + type;
+  setTimeout(() => { t.className = "toast"; }, 3200);
+}
+
+function setStep(n) {
+  ["s1","s2","s3"].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = "step" + (i + 1 < n ? " done" : i + 1 === n ? " active" : "");
+  });
+  ["screenA","screenB","screenC","screenD"].forEach((id, i) => {
+    document.getElementById(id).className = "screen" + (i + 1 === n || (n === 4 && i === 3) ? " active" : "");
+  });
+}
+
+// ── Read Excel client-side via SheetJS CDN ─────────────────────────
+function readExcel(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb   = XLSX.read(e.target.result, { type: "binary" });
+        const ws   = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
+        resolve(rows);
+      } catch (err) { reject(err); }
+    };
+    reader.onerror = reject;
+    reader.readAsBinaryString(file);
+  });
+}
+
+// ── Screen A logic ─────────────────────────────────────────────────
+const dropZone  = document.getElementById("dropZone");
+const fileInput = document.getElementById("file-input");
+const btnNextA  = document.getElementById("btnNextA");
+
+dropZone.addEventListener("click", () => fileInput.click());
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("dragover"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  const f = e.dataTransfer.files[0];
+  if (f) setFile(f);
+});
+fileInput.addEventListener("change", () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
+
+function setFile(f) {
+  if (!f.name.match(/\.(xlsx|xls)$/i)) { showToast("Please upload a .xlsx or .xls file", "error"); return; }
+  selectedFile = f;
+  document.getElementById("fileName").textContent = f.name + " (" + (f.size / 1024).toFixed(1) + " KB)";
+  document.getElementById("fileChosen").style.display = "block";
+  btnNextA.disabled = false;
+}
+
+btnNextA.addEventListener("click", async () => {
+  btnNextA.disabled = true;
+  btnNextA.innerHTML = '<span class="spinner"></span>Reading…';
+  try {
+    excelRows    = await readExcel(selectedFile);
+    excelHeaders = excelRows.length ? Object.keys(excelRows[0]) : [];
+    if (excelHeaders.length === 0) throw new Error("No columns found in the file");
+    buildMappingTable();
+    setStep(2);
+  } catch (err) {
+    showToast("Could not read file: " + err.message, "error");
+  } finally {
+    btnNextA.disabled = false;
+    btnNextA.innerHTML = "Next: Map Columns →";
+  }
+});
+
+// ── Screen B logic ─────────────────────────────────────────────────
+function buildMappingTable() {
+  const system  = document.getElementById("selSystem").value;
+  const options = FIELD_OPTIONS[system] || FIELD_OPTIONS.hrms;
+  const optHtml = `<option value="_skip">— Skip —</option>` +
+    options.map(o => `<option value="${o.key}" data-type="${o.type}">${o.label}</option>`).join("");
+
+  const sample = excelRows[0] || {};
+  const tbody  = document.getElementById("mappingBody");
+
+  tbody.innerHTML = excelHeaders.map((h, i) => {
+    // Try to auto-guess a match
+    const guess = options.find(o =>
+      o.key.toLowerCase() === h.toLowerCase() ||
+      o.label.toLowerCase() === h.toLowerCase() ||
+      h.toLowerCase().includes(o.key.toLowerCase())
+    );
+    const selected = guess ? guess.key : "_skip";
+    return `<tr>
+      <td>${h}</td>
+      <td><span class="badge-sample">${String(sample[h]).substring(0,30)}</span></td>
+      <td>
+        <select class="map-select" data-header="${h}" id="map_${i}">
+          ${optHtml.replace(`value="${selected}"`, `value="${selected}" selected`)}
+        </select>
+      </td>
+      <td><input type="text" class="map-label" data-idx="${i}" value="${guess ? guess.label : h}" /></td>
+    </tr>`;
+  }).join("");
+}
+
+document.getElementById("btnBackB").addEventListener("click", () => setStep(1));
+
+document.getElementById("btnNextB").addEventListener("click", () => {
+  const system  = document.getElementById("selSystem").value;
+  const options = FIELD_OPTIONS[system] || FIELD_OPTIONS.hrms;
+  finalMapping  = [];
+
+  document.querySelectorAll(".map-select").forEach((sel, i) => {
+    if (sel.value === "_skip") return;
+    const label = document.querySelectorAll(".map-label")[i]?.value || sel.value;
+    const opt   = options.find(o => o.key === sel.value);
+    finalMapping.push({
+      excelHeader: sel.dataset.header,
+      systemKey:   sel.value,
+      label:       label,
+      dataType:    opt ? opt.type : "string"
+    });
+  });
+
+  if (finalMapping.length === 0) {
+    showToast("Map at least one column before continuing", "error");
+    return;
+  }
+  buildConfirmScreen();
+  setStep(3);
+});
+
+// ── Screen C logic ─────────────────────────────────────────────────
+function buildConfirmScreen() {
+  const system = document.getElementById("selSystem").value;
+  const type   = document.getElementById("selType").value;
+  document.getElementById("cntRows").textContent   = excelRows.length.toLocaleString();
+  document.getElementById("cntCols").textContent   = finalMapping.length;
+  document.getElementById("cntSystem").textContent = system.toUpperCase() + " / " + type;
+  document.getElementById("confirmBody").innerHTML = finalMapping
+    .map(f => `<tr><td>${f.excelHeader}</td><td><code>${f.systemKey}</code></td><td>${f.label}</td></tr>`)
+    .join("");
+}
+
+document.getElementById("btnBackC").addEventListener("click", () => setStep(2));
+
+document.getElementById("btnConfirm").addEventListener("click", async () => {
+  const btn    = document.getElementById("btnConfirm");
+  const system = document.getElementById("selSystem").value;
+  const type   = document.getElementById("selType").value;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Uploading…';
+
+  const result = await importExcel(selectedFile, system, type, finalMapping);
+
+  if (result.error) {
+    showToast(result.msg, "error");
+    btn.disabled = false;
+    btn.innerHTML = "🚀 Confirm Import";
+    return;
+  }
+
+  document.getElementById("successMsg").textContent =
+    `${result.count.toLocaleString()} records imported into ${system.toUpperCase()} / ${type}.`;
+  setStep(4);
+});
+
+// ── Update type options when system changes ────────────────────────
+document.getElementById("selSystem").addEventListener("change", () => {
+  const system  = document.getElementById("selSystem").value;
+  const typeMap = {
+    hrms:     [["candidates","Candidates"],["interviews","Interviews"],["onboarding","Onboarding"],["careers","Careers / Job Posts"],["employees","Employees"]],
+    sales:    [["leads","Leads"],["deals","Deals"],["activities","Activities"],["meetings","Meetings"]],
+    employee: [["employees","Employees"],["onboarding","Onboarding"]]
+  };
+  const sel = document.getElementById("selType");
+  sel.innerHTML = (typeMap[system] || []).map(([v,l]) => `<option value="${v}">${l}</option>`).join("");
+});
+</script>
+
+<!-- SheetJS for client-side Excel parsing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>

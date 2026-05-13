@@ -255,17 +255,15 @@ textarea{resize:vertical;min-height:80px;}
     <div class="snav-right">
       <select id="owner-filter" onchange="applyFilters()">
         <option value="">All Owners</option>
-        <option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option><option>Vikram Singh</option>
       </select>
       <select id="source-filter" onchange="applyFilters()">
         <option value="">All Sources</option>
-        <option>Website</option><option>LinkedIn</option><option>Referral</option><option>Cold Call</option><option>Campaign</option><option>Event</option>
       </select>
       <button class="tbtn btn-sm" onclick="exportCSV()">↓ Export</button>
     </div>
   </div>
 
-  <div class="content">
+  <div class="content" id="content">
     <div class="section" style="padding-bottom:0;">
       <div class="kpi-row">
         <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);">
@@ -478,21 +476,8 @@ textarea{resize:vertical;min-height:80px;}
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-/* ─── DATA ─── */
-let LEADS = [
-  {id:1,  name:'Aditya Sharma',    company:'EduSphere Technologies', email:'aditya@edusphere.in',   phone:'+91 98100 11001', title:'CTO',           size:'201-500', source:'LinkedIn',  status:'Qualified',    score:88, owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', product:'EdTech CRM — Enterprise', budget:1500000, notes:'Looking for Enterprise solution. RFP expected next week.', created:'2025-04-28', lastActivity:'2025-05-06', converted:false},
-  {id:2,  name:'Rekha Pillai',     company:'MindTree Edu',           email:'rekha@mindtree.edu',    phone:'+91 98200 22002', title:'VP Operations', size:'51-200',  source:'Referral',  status:'Contacted',    score:74, owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', product:'EdTech CRM — Business',   budget:800000,  notes:'Referred by ZyntrixEdu team. Budget approved for Q2.',     created:'2025-05-01', lastActivity:'2025-05-05', converted:false},
-  {id:3,  name:'Suresh Iyer',      company:'Brilliant Academy',      email:'suresh@brilliant.co',   phone:'+91 90000 33003', title:'Director IT',   size:'51-200',  source:'Website',   status:'New',          score:61, owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', product:'EdTech CRM — Business',   budget:600000,  notes:'Downloaded whitepaper. Requested demo.',                  created:'2025-05-03', lastActivity:'2025-05-03', converted:false},
-  {id:4,  name:'Deepa Krishnan',   company:'LearnSpark Solutions',   email:'deepa@learnspark.io',   phone:'+91 80000 44004', title:'CEO',           size:'11-50',   source:'Campaign',  status:'Nurturing',    score:55, owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', product:'EdTech CRM — Starter',    budget:350000,  notes:'Interested but not ready. Follow up in June.',            created:'2025-04-20', lastActivity:'2025-04-28', converted:false},
-  {id:5,  name:'Manish Gupta',     company:'National Edu Trust',     email:'manish@nationaledu.org', phone:'+91 99000 55005', title:'Exec Director', size:'501-1000',source:'Event',     status:'Qualified',    score:82, owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', product:'EdTech CRM — Enterprise', budget:2000000, notes:'Met at EdTech Summit. Large-scale deployment needed.',   created:'2025-05-05', lastActivity:'2025-05-06', converted:false},
-  {id:6,  name:'Sneha Verma',      company:'FutureSkills Institute',  email:'sneha@futureskills.in', phone:'+91 70000 66006', title:'Head of Ops',   size:'11-50',   source:'LinkedIn',  status:'New',          score:48, owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', product:'EdTech CRM — Starter',    budget:280000,  notes:'Early stage interest. Needs nurturing.',                  created:'2025-05-06', lastActivity:'2025-05-06', converted:false},
-  {id:7,  name:'Arjun Nair',       company:'GradeUp Academy',        email:'arjun@gradeup.co',      phone:'+91 91000 77007', title:'Product Lead',  size:'201-500', source:'Cold Call', status:'Contacted',    score:67, owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', product:'EdTech CRM — Business',   budget:900000,  notes:'Interested in migration from old CRM.',                   created:'2025-04-30', lastActivity:'2025-05-04', converted:false},
-  {id:8,  name:'Priti Joshi',      company:'Schoolnet India',        email:'priti@schoolnet.in',    phone:'+91 82000 88008', title:'IT Manager',    size:'1000+',   source:'Referral',  status:'Qualified',    score:79, owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', product:'EdTech CRM — Enterprise', budget:2500000, notes:'Large school network. Decision maker involved.',          created:'2025-04-25', lastActivity:'2025-05-05', converted:false},
-  {id:9,  name:'Vijay Rao',        company:'CampusBridge Corp',      email:'vijay@campusbridge.in', phone:'+91 93000 99009', title:'CIO',           size:'201-500', source:'Website',   status:'Disqualified', score:20, owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', product:'EdTech CRM — Business',   budget:0,       notes:'Budget completely frozen. No timeline.',                  created:'2025-04-10', lastActivity:'2025-04-18', converted:false},
-  {id:10, name:'Kavitha Menon',    company:'EduWise Foundation',     email:'kavitha@eduwise.org',   phone:'+91 85000 10010', title:'Programme Dir', size:'51-200',  source:'Campaign',  status:'Converted',    score:91, owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', product:'EdTech CRM — Enterprise', budget:1800000, notes:'Converted — ZyntrixEdu Enterprise deal opened.',         created:'2025-04-05', lastActivity:'2025-04-30', converted:true, dealName:'ZyntrixEdu Enterprise', dealValue:1850000, convDate:'2025-04-30'},
-  {id:11, name:'Rajan Pillai',     company:'TalentEd India',         email:'rajan@talented.in',     phone:'+91 97000 11011', title:'Co-Founder',    size:'11-50',   source:'LinkedIn',  status:'New',          score:53, owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', product:'EdTech CRM — Starter',    budget:300000,  notes:'Recently funded startup. Looking for scalable CRM.',      created:'2025-05-07', lastActivity:'2025-05-07', converted:false},
-  {id:12, name:'Aarti Singh',      company:'KidsBright Schools',     email:'aarti@kidsbright.edu',  phone:'+91 96000 12012', title:'Principal',     size:'51-200',  source:'Event',     status:'Nurturing',    score:44, owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', product:'EdTech CRM — Starter',    budget:200000,  notes:'Small school chain. Long decision cycle expected.',       created:'2025-04-22', lastActivity:'2025-05-01', converted:false},
-];
+/* ─── DATA — populated dynamically from imported Excel ─── */
+let LEADS = [];
 
 const STATUS_CFG = {
   'New':          {col:'#3d8ef0', bg:'rgba(61,142,240,0.12)',  cls:'b-blue'},
@@ -766,10 +751,25 @@ function bulkConvert(){LEADS.forEach(l=>{if(selectedLeads.has(l.id))convertLead(
 function bulkDisqualify(){LEADS.forEach(l=>{if(selectedLeads.has(l.id))l.status='Disqualified';});selectedLeads.clear();renderCurrentView();toast('Leads disqualified.','error');}
 function convertToDetail(){closeModal('detail-modal');convertLead(editingId);}
 function exportCSV(){const h=['Name','Company','Email','Status','Score','Source','Owner'];const rows=LEADS.map(l=>[l.name,l.company,l.email,l.status,l.score,l.source,l.owner]);const csv=[h,...rows].map(r=>r.join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='leads.csv';a.click();toast('CSV exported!');}
-function toggleDD(e,id){e.stopPropagation();document.querySelectorAll('.dropdown-menu.open').forEach(m=>{if(m.id!==id)m.classList.remove('open');});document.getElementById(id)?.classList.toggle('open');}
-document.addEventListener('click',()=>document.querySelectorAll('.dropdown-menu.open').forEach(m=>m.classList.remove('open')));
-renderCurrentView();
-</script>
+function logout(){localStorage.removeItem('token');window.location.href='../../index.html';}
+
+/* ═══ DYNAMIC INIT ══════════════════════════════════════════ */
+async function initPage() {
+  const ok = await loadPageData('sales', 'leads', mapLead,
+    (mapped) => {
+      LEADS = mapped;
+      // Populate dynamic filters
+      populateFilter('owner-filter',  LEADS.map(l => l.owner),  'All Owners');
+      populateFilter('source-filter', LEADS.map(l => l.source), 'All Sources');
+      renderCurrentView();
+    },
+    'content'
+  );
+}
+initPage();
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/data-loader.js"></script>
 <script src="../../assets/js/auth.js"></script>
 </body>
 </html>

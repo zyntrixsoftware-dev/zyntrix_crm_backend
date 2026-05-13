@@ -239,7 +239,7 @@ textarea{resize:vertical;min-height:80px}
     <button class="topbar-btn primary" onclick="openModal('add-modal')">＋ Add Candidate</button>
   </div>
 
-  <div class="content">
+  <div class="content" id="content">
 
     <!-- KPI ROW -->
     <div class="grid g4" style="margin-bottom:20px;">
@@ -444,170 +444,7 @@ textarea{resize:vertical;min-height:80px}
 const STAGES=['Applied','Shortlisted','Interviewing','Offered','Rejected'];
 const STAGE_COLORS={Applied:'b-gray',Shortlisted:'b-purple',Interviewing:'b-amber',Offered:'b-blue',Rejected:'b-rose','Hired':'b-green'};
 
-let CANDIDATES=[
-  {id:1,name:'Visrutha US',init:'VU',col:'#3b82f6',email:'visrutha33@gmail.com',phone:'8825803385',role:'Full Stack Developer',qual:'Mca',loc:'Dharmapuri',exp:'2+ yrs',source:'Direct Apply',date:'Apr 28',stage:'Applied',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
-  {id:2,name:'Poosala Chandana Priya',init:'PP',col:'#a78bfa',email:'chandana5115@gmail.com',phone:'6303127946',role:'Software Engineer',qual:'BTech',loc:'Bangalore',exp:'2.4+ yrs',source:'Direct Apply',date:'Apr 27',stage:'Applied',score:82,
-   competencies:{Technical:84,Communication:77,'Problem Solving':83,'Culture Fit':79,Leadership:74},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:3,name:'SKANDA S',init:'SS',col:'#2dd4bf',email:'skandasubramanya23@gmail.com',phone:'7975910936',role:'Mobile App Development Intern',qual:'B.E',loc:'Bangalore',exp:'3 mo',source:'Direct Apply',date:'Apr 26',stage:'Shortlisted',score:74,
-   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
-   skills:["Flutter", "Dart", "Android", "Firebase"]},
-  {id:4,name:'Samyak Thool',init:'ST',col:'#f59e0b',email:'samthool@outlook.com',phone:'9370048698',role:'Software Engineer',qual:'B.SC CS',loc:'Wardha',exp:'2.3+ yrs',source:'Direct Apply',date:'Apr 25',stage:'Interviewing',score:74,
-   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:5,name:'varun',init:'VA',col:'#f43f5e',email:'sbvc.varun@gmail.com',phone:'9036469849',role:'Software Engineer',qual:'MTech, CSE',loc:'Bangalore',exp:'N/A',source:'Direct Apply',date:'Apr 24',stage:'Applied',score:62,
-   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:6,name:'Ayush Kumar',init:'AK',col:'#22c55e',email:'ayushsinha4343@gmail.com',phone:'7352186124',role:'Full Stack Developer',qual:'BTech, CSE',loc:'Gaya',exp:'2.5+ yrs',source:'Direct Apply',date:'Apr 23',stage:'Applied',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
-  {id:7,name:'Sarthak Arora',init:'SA',col:'#6366f1',email:'sarthakarora.9634@gmail.com',phone:'9760288282',role:'Associate Software Engineer',qual:'BTech,CSE',loc:'Gurugram',exp:'3.5+ yrs',source:'Direct Apply',date:'Apr 22',stage:'Shortlisted',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["Python", "JavaScript", "SQL", "Git"]},
-  {id:8,name:'Abhishek Kumar Singh',init:'AS',col:'#ec4899',email:'abhicse108@gmail.com',phone:'8429400626',role:'Back End Engineer',qual:'BTech,CSE',loc:'Bengaluru',exp:'3.5+ yrs',source:'Direct Apply',date:'Apr 21',stage:'Applied',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["Node.js", "PostgreSQL", "Docker", "REST APIs", "Redis"]},
-  {id:9,name:'Manthan Kailash Pelne',init:'MP',col:'#14b8a6',email:'manthanpelneoo7@gmail.com',phone:'7028037166',role:'Full Stack Developer',qual:'BE',loc:'Wardha, Maharashtra',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 20',stage:'Applied',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
-  {id:10,name:'Bheemavva',init:'BH',col:'#f97316',email:'bheemu343@gmail.com',phone:'8150041026',role:'Software Engineer',qual:'BE',loc:'Bengaluru',exp:'2+ yrs',source:'Direct Apply',date:'Apr 19',stage:'Interviewing',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:11,name:'M.S Swaroop',init:'MS',col:'#8b5cf6',email:'swaroopms658@gmail.com',phone:'8431950132',role:'Software Engineer',qual:'MTech CSE',loc:'Bangalore',exp:'1+ yrs',source:'Direct Apply',date:'Apr 18',stage:'Applied',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:12,name:'Sannidhi C Shenava',init:'SS',col:'#06b6d4',email:'scshenava@gmail.com',phone:'7338209150',role:'Software Engineer',qual:'MCA',loc:'Mangaluru',exp:'1+ yrs',source:'Direct Apply',date:'Apr 17',stage:'Shortlisted',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:13,name:'Balla Gayathri',init:'BG',col:'#10b981',email:'gayathriballa2001@gmail.com',phone:'9398549344',role:'Software Engineer',qual:'BTech',loc:'Andhra Pradesh',exp:'2+ yrs',source:'Direct Apply',date:'Apr 16',stage:'Applied',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:14,name:'Sahil Choudhary',init:'SC',col:'#ef4444',email:'sahil844101@gmail.com',phone:'9931004934',role:'Software Engineer',qual:'BTech CSE',loc:'Hyderabad',exp:'1+ yrs',source:'Direct Apply',date:'Apr 15',stage:'Interviewing',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:15,name:'alwin jaison',init:'AJ',col:'#3b82f6',email:'alwinjaison1@gmail.com',phone:'6364083131',role:'Software Engineer',qual:'MCA',loc:'Bangalore',exp:'N/A',source:'Direct Apply',date:'Apr 14',stage:'Applied',score:62,
-   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:16,name:'smyla lucia',init:'SL',col:'#a78bfa',email:'jsmylalucia14@gmail.com',phone:'6379297582',role:'Software Engineer',qual:'BTech',loc:'Bangalore',exp:'1+ yrs',source:'Direct Apply',date:'Apr 13',stage:'Applied',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:17,name:'Cheekati Rinku',init:'CR',col:'#2dd4bf',email:'rinkucheekati9@gmail.com',phone:'9686120042',role:'Software Developer',qual:'Bachelors of Engineering',loc:'Hubballi karnataka',exp:'9 mo',source:'Direct Apply',date:'Apr 12',stage:'Applied',score:80,
-   competencies:{Technical:82,Communication:75,'Problem Solving':81,'Culture Fit':77,Leadership:72},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:18,name:'Sahithi Ambati',init:'SA',col:'#f59e0b',email:'sahithiambati14@gmail.com',phone:'8978864465',role:'Front End Developer',qual:'BTech',loc:'Hyderabad',exp:'3+ yrs',source:'Direct Apply',date:'Apr 11',stage:'Shortlisted',score:74,
-   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
-   skills:["React", "HTML/CSS", "JavaScript", "Figma", "TypeScript"]},
-  {id:19,name:'Bhupender Bhamla',init:'BB',col:'#f43f5e',email:'bhupenderbhamla777@gmail.com',phone:'9350851551',role:'Data Anaylst',qual:'BTech',loc:'Gurugram',exp:'2 mo',source:'Direct Apply',date:'Apr 10',stage:'Applied',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["Python", "SQL", "Power BI", "Excel", "Tableau"]},
-  {id:20,name:'RAJAN C',init:'RC',col:'#22c55e',email:'rajanprabha050@gmail.com',phone:'7397635954',role:'Software Engineer',qual:'BTech',loc:'Chennai',exp:'2 mo',source:'Direct Apply',date:'Apr 9',stage:'Applied',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:21,name:'Kumar Gourav',init:'KG',col:'#6366f1',email:'kumargourav.gudu@gmail.com',phone:'8117866490',role:'Full Stack Developer',qual:'BTech',loc:'Bhubaneswar',exp:'3+ yrs',source:'Direct Apply',date:'Apr 8',stage:'Interviewing',score:74,
-   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
-   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
-  {id:22,name:'Vivek Sarvaiya',init:'VS',col:'#ec4899',email:'viveksarvaiya1873@gmail.com',phone:'9322962633',role:'AI Software Engineer',qual:'BTech',loc:'Benguluru',exp:'1+ yrs',source:'Direct Apply',date:'Apr 7',stage:'Applied',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Python", "TensorFlow", "PyTorch", "ML", "LLMs"]},
-  {id:23,name:'Darshan BK',init:'DB',col:'#14b8a6',email:'darshan.bk92@gmail.com',phone:'9916227924',role:'Data Anaylst',qual:'BE (ISE)',loc:'Bangalore',exp:'8+ yrs',source:'Direct Apply',date:'Apr 6',stage:'Shortlisted',score:82,
-   competencies:{Technical:84,Communication:77,'Problem Solving':83,'Culture Fit':79,Leadership:74},
-   skills:["Python", "SQL", "Power BI", "Excel", "Tableau"]},
-  {id:24,name:'Saad Aslam',init:'SA',col:'#f97316',email:'saadaslamdev037@gmail.com',phone:'3099084294',role:'Senior Full Stack Engineer',qual:'BTech',loc:'PAKISTAN',exp:'5+ yrs',source:'Direct Apply',date:'Apr 5',stage:'Applied',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["React", "Node.js", "AWS", "PostgreSQL", "Docker"]},
-  {id:25,name:'Aditya Pawar',init:'AP',col:'#8b5cf6',email:'adityapawar826@gmail.com',phone:'7066336757',role:'Software Engineer',qual:'BTech',loc:'Hyderabad',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 4',stage:'Applied',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:26,name:'Seema Gupta',init:'SG',col:'#06b6d4',email:'seemag7738@gmail.com',phone:'9819959176',role:'Software Engineer',qual:'B.SC',loc:'Mumbai',exp:'3 mo',source:'Direct Apply',date:'Apr 3',stage:'Applied',score:74,
-   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:27,name:'Prateek Mander',init:'PM',col:'#10b981',email:'choudharyprateek131@gmail.com',phone:'9258151068',role:'Software Engineer',qual:'B.Tech CSE AIML',loc:'Bengaluru',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 2',stage:'Shortlisted',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:28,name:'Prakhar Pandey',init:'PP',col:'#ef4444',email:'prakharp684@gmail.com',phone:'6388065025',role:'Java Developer',qual:'B.tech(CSE)',loc:'Bengaluru',exp:'2+ yrs',source:'Direct Apply',date:'Apr 1',stage:'Applied',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["Java", "Spring Boot", "MySQL", "REST APIs", "Maven"]},
-  {id:29,name:'Vishnu Teja Kilaparthi',init:'VK',col:'#3b82f6',email:'kilaparthivishnuteja@gmail.com',phone:'6304208875',role:'Software Engineer',qual:'B.Tech',loc:'Chennai',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 28',stage:'Applied',score:65,
-   competencies:{Technical:67,Communication:60,'Problem Solving':66,'Culture Fit':62,Leadership:57},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:30,name:'Avantika Dinkar Lad',init:'AL',col:'#a78bfa',email:'connectavani@gmail.com',phone:'8767938125',role:'Full Stack Developer',qual:'Arts, Commerce and Science',loc:'pune',exp:'3+ yrs',source:'Direct Apply',date:'Apr 27',stage:'Applied',score:74,
-   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
-   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
-  {id:31,name:'Aishwarya Ganeshan',init:'AG',col:'#2dd4bf',email:'ashganesh74@gmail.com',phone:'8129838593',role:'Software Engineer',qual:'BTech',loc:'Bangalore',exp:'2 mo',source:'Direct Apply',date:'Apr 26',stage:'Applied',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:32,name:'Mohammed Ammaar Hussain',init:'MH',col:'#f59e0b',email:'ammaarhussain2002@gmail.com',phone:'9849946391',role:'Software Developer',qual:'BTech',loc:'Warangal',exp:'2+ yrs',source:'Direct Apply',date:'Apr 25',stage:'Shortlisted',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:33,name:'Manav Soni',init:'MS',col:'#f43f5e',email:'soni.manav040905@gmail.com',phone:'9811012371',role:'Software Developer',qual:'B.Sc',loc:'New Delhi',exp:'N/A',source:'Direct Apply',date:'Apr 24',stage:'Applied',score:62,
-   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:34,name:'Parth Kandharkar',init:'PK',col:'#22c55e',email:'parthkandharkar@gmail.com',phone:'7875263564',role:'Software Developer',qual:'MTech',loc:'Pune',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 23',stage:'Applied',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:35,name:'ABHISHEK GANGULA',init:'AG',col:'#6366f1',email:'abhishekgangula2004@gmail.com',phone:'9515791180',role:'Software Engineer',qual:'BTech',loc:'HYDERABAD',exp:'N/A',source:'Direct Apply',date:'Apr 22',stage:'Applied',score:62,
-   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:36,name:'Abhesh M',init:'AM',col:'#ec4899',email:'abheshm@gmail.com',phone:'9074212887',role:'Software Developer',qual:'B.Com',loc:'Kochi',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 21',stage:'Applied',score:65,
-   competencies:{Technical:67,Communication:60,'Problem Solving':66,'Culture Fit':62,Leadership:57},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:37,name:'TARUN KULKARNI',init:'TK',col:'#14b8a6',email:'tarunkulkarni4@gmail.com',phone:'9632915734',role:'Full Stack Developer',qual:'MCA',loc:'Bangalore',exp:'9 mo',source:'Direct Apply',date:'Apr 20',stage:'Applied',score:80,
-   competencies:{Technical:82,Communication:75,'Problem Solving':81,'Culture Fit':77,Leadership:72},
-   skills:["React", "Node.js", "MongoDB", "Express", "REST APIs"]},
-  {id:38,name:'Muppulakunta Keerthi',init:'MK',col:'#f97316',email:'keerthimuppulakunta@gmail.com',phone:'9014790213',role:'Data Anaylst',qual:'BTech',loc:'BENGALURU',exp:'6 mo',source:'Direct Apply',date:'Apr 19',stage:'Applied',score:80,
-   competencies:{Technical:82,Communication:75,'Problem Solving':81,'Culture Fit':77,Leadership:72},
-   skills:["Python", "SQL", "Power BI", "Excel", "Tableau"]},
-  {id:39,name:'Sahil Bhuwalka',init:'SB',col:'#8b5cf6',email:'sahilbhuwalka574@gmail.com',phone:'6363216206',role:'Software Engineer',qual:'B.E',loc:'Asansol',exp:'2.5+ yrs',source:'Direct Apply',date:'Apr 18',stage:'Applied',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:40,name:'Prateek Mander',init:'PM',col:'#06b6d4',email:'choudharyprateek131@gmail.com',phone:'9258151068',role:'Software Engineer',qual:'BTech',loc:'Bengaluru',exp:'1+ yrs',source:'Direct Apply',date:'Apr 17',stage:'Applied',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:41,name:'Mohamed Ibrahim',init:'MI',col:'#10b981',email:'mdibrahim3057@gmail.com',phone:'9500920916',role:'Software Engineer',qual:'B.E',loc:'Chennai',exp:'3+ yrs',source:'Direct Apply',date:'Apr 16',stage:'Applied',score:74,
-   competencies:{Technical:76,Communication:69,'Problem Solving':75,'Culture Fit':71,Leadership:66},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:42,name:'Rohan Chitodkar',init:'RC',col:'#ef4444',email:'rohanchitodkar27@gmail.com',phone:'7249019265',role:'Software Engineer',qual:'B.E',loc:'Pune',exp:'1 mo',source:'Direct Apply',date:'Apr 15',stage:'Applied',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:43,name:'Kumar Ram krishna',init:'KK',col:'#3b82f6',email:'ram89100@gmail.com',phone:'8073612896',role:'Software Engineer',qual:'B.E',loc:'Bengaluru',exp:'1.5+ yrs',source:'Direct Apply',date:'Apr 14',stage:'Shortlisted',score:65,
-   competencies:{Technical:67,Communication:60,'Problem Solving':66,'Culture Fit':62,Leadership:57},
-   skills:["Python", "JavaScript", "REST APIs", "Git", "SQL"]},
-  {id:44,name:'Harshitha',init:'HA',col:'#a78bfa',email:'harshithaach0@gmail.com',phone:'8867397082',role:'BackEnd',qual:'B.E',loc:'Bengaluru',exp:'1+ yrs',source:'Direct Apply',date:'Apr 13',stage:'Applied',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Node.js", "PostgreSQL", "Docker", "REST APIs"]},
-  {id:45,name:'dinesh',init:'DI',col:'#2dd4bf',email:'dinesh.kolasani@zyntrixsoftware.com',phone:'9949887725',role:'Software Developer',qual:'b.tech',loc:'bapatla',exp:'1+ yrs',source:'LinkedIn',date:'May 1',stage:'Applied',score:63,
-   competencies:{Technical:65,Communication:58,'Problem Solving':64,'Culture Fit':60,Leadership:55},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:46,name:'Ravi',init:'RA',col:'#f59e0b',email:'ravi@gmail.com',phone:'9654782125',role:'Business Development Executive',qual:'BTech',loc:'Delhi',exp:'2+ yrs',source:'LinkedIn',date:'May 1',stage:'Applied',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["CRM", "B2B Sales", "LinkedIn", "Cold Outreach", "Negotiation"]},
-  {id:47,name:'Swapna Gajula',init:'SG',col:'#f43f5e',email:'swapnagajula683@gmail.com',phone:'918074436444',role:'Software Developer',qual:'B Tech, Artificial Intelligence and Machine Learning',loc:'G.p.Nagar',exp:'N/A',source:'Other',date:'May 1',stage:'Applied',score:62,
-   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:48,name:'Ajim Sanadi',init:'AS',col:'#22c55e',email:'ajimsanadi11@gmail.com',phone:'8983938786',role:'Software Developer',qual:'PG- DIPLOMA CDAC (PG-DAC), B.E Electrical',loc:'Maharashtra',exp:'Fresher',source:'Other',date:'May 1',stage:'Applied',score:55,
-   competencies:{Technical:57,Communication:50,'Problem Solving':56,'Culture Fit':52,Leadership:47},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:49,name:'Ajim Sanadi',init:'AS',col:'#6366f1',email:'ajimsanadi11@gmail.com',phone:'8983938786',role:'Software Developer',qual:'PG Diploma (CDAC) PG_DAC ,B.E Electrical',loc:'Maharashtra',exp:'< 1 yr',source:'Other',date:'May 1',stage:'Shortlisted',score:58,
-   competencies:{Technical:60,Communication:53,'Problem Solving':59,'Culture Fit':55,Leadership:50},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:50,name:'Navya Dhawde',init:'ND',col:'#ec4899',email:'dhawde.navya24@gmail.com',phone:'919755077877',role:'Graphic Designer',qual:'B.Tech in Computer Science Engineering (CSE)',loc:'Paras Tierea, Sector 137',exp:'N/A',source:'LinkedIn',date:'May 1',stage:'Shortlisted',score:62,
-   competencies:{Technical:64,Communication:57,'Problem Solving':63,'Culture Fit':59,Leadership:54},
-   skills:["Figma", "Photoshop", "Illustrator", "UI/UX", "Canva"]},
-  {id:51,name:'Puspita  Akther Priya',init:'PP',col:'#14b8a6',email:'priyapuspita75@gmail.com',phone:'8801572909307',role:'Graphic Designer',qual:'Graphics design and freelancing',loc:'Bagha Jatin Road',exp:'2+ yrs',source:'LinkedIn',date:'May 1',stage:'Applied',score:68,
-   competencies:{Technical:70,Communication:63,'Problem Solving':69,'Culture Fit':65,Leadership:60},
-   skills:["Figma", "Photoshop", "Illustrator", "UI/UX", "Canva"]},
-  {id:52,name:'Harsh Rai',init:'HR',col:'#f97316',email:'sanjaykumarr627@gmail.com',phone:'917990244768',role:'Software Developer',qual:'BTech Computer Science and Engineering',loc:'Ahmedabad, Gujarat',exp:'< 1 yr',source:'Other',date:'May 1',stage:'Applied',score:58,
-   competencies:{Technical:60,Communication:53,'Problem Solving':59,'Culture Fit':55,Leadership:50},
-   skills:["Java", "JavaScript", "HTML/CSS", "Git", "MySQL"]},
-  {id:53,name:'Meghana Naveen',init:'MN',col:'#8b5cf6',email:'meghnanaveen19@gmail.com',phone:'9551903103',role:'Content Writer',qual:'MBA in Business Analytics and Btech in Computer Science',loc:'Bengaluru, Karnataka',exp:'4+ yrs',source:'Naukri',date:'May 1',stage:'Applied',score:82,
-   competencies:{Technical:84,Communication:77,'Problem Solving':83,'Culture Fit':79,Leadership:74},
-   skills:["SEO", "Copywriting", "Content Strategy", "WordPress", "Analytics"]},
-  {id:54,name:'Pavan',init:'PA',col:'#06b6d4',email:'ikuttipavan5@gmail.com',phone:'9347485093',role:'Marketing Executive',qual:'Graduation',loc:'Bengaluru',exp:'1 mo',source:'LinkedIn',date:'May 2',stage:'Shortlisted',score:85,
-   competencies:{Technical:87,Communication:80,'Problem Solving':86,'Culture Fit':82,Leadership:77},
-   skills:["SEO", "Google Ads", "Meta Ads", "Power BI", "Analytics"]}
-];
+let CANDIDATES = [];  // populated dynamically from imported Excel
 
 let stageFilter='All';
 let currentView='list';
@@ -803,8 +640,19 @@ new Chart(document.getElementById('scoreChart'),{
   options:{...ctd,responsive:true,maintainAspectRatio:false}
 });
 
-/* INIT */
-renderAll();
+/* ═══ DYNAMIC INIT ═══════════════════════════════════════════ */
+async function initPage() {
+  await loadPageData('hrms', 'candidates', mapCandidate,
+    (mapped) => {
+      CANDIDATES = mapped;
+      renderAll();
+    }, 'content'
+  );
+}
+initPage();
 </script>
+<script src="../../../../assets/js/api.js"></script>
+<script src="../../../../assets/js/data-loader.js"></script>
+<script src="../../../../assets/js/auth.js"></script>
 </body>
 </html>

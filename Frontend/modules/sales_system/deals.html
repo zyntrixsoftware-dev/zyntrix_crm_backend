@@ -279,7 +279,7 @@ textarea{resize:vertical;min-height:80px;}
     </div>
   </div>
 
-  <div class="content">
+  <div class="content" id="content">
     <!-- ALL DEALS VIEW -->
     <div id="view-all">
       <div class="section" style="padding-bottom:0;">
@@ -605,30 +605,10 @@ textarea{resize:vertical;min-height:80px;}
 
 <script>
 /* ═══ DATA ═══ */
-let DEALS = [
-  {id:1,  name:'ZyntrixEdu Enterprise',     company:'ZyntrixEdu Pvt Ltd',   owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:1850000, acv:1850000, stage:'Negotiation',     prob:85, close:'2025-05-20', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'High',   notes:'CFO involved. Legal review complete.', created:'2025-04-10', lastContact:'2025-05-06', lossReason:''},
-  {id:2,  name:'Apex Schools — LMS Bundle', company:'Apex Schools Group',   owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:920000,  acv:920000,  stage:'Proposal Sent',   prob:65, close:'2025-05-30', source:'LinkedIn',  product:'LMS Add-on',              priority:'High',   notes:'3-campus implementation requested.',  created:'2025-04-18', lastContact:'2025-05-06', lossReason:''},
-  {id:3,  name:'Global EdTech Corp',        company:'Global EdTech Corp',   owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', value:2200000, acv:2200000, stage:'Negotiation',     prob:75, close:'2025-06-05', source:'Website',   product:'EdTech CRM — Enterprise', priority:'High',   notes:'Volume discount requested.',          created:'2025-03-28', lastContact:'2025-05-05', lossReason:''},
-  {id:4,  name:'BrightPath Academy',        company:'BrightPath Academy',   owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', value:720000,  acv:720000,  stage:'Qualification',   prob:40, close:'2025-06-15', source:'Campaign',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Budget pending board approval.',       created:'2025-04-25', lastContact:'2025-04-14', lossReason:''},
-  {id:5,  name:'Vidya Network — Starter',   company:'Vidya Network',        owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:380000,  acv:380000,  stage:'Demo Scheduled',  prob:55, close:'2025-05-25', source:'Cold Call', product:'EdTech CRM — Starter',    priority:'Medium', notes:'Demo confirmed May 7.',               created:'2025-05-01', lastContact:'2025-05-03', lossReason:''},
-  {id:6,  name:'KnowledgeFirst Institute',  company:'KnowledgeFirst',       owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', value:1100000, acv:1100000, stage:'Prospecting',     prob:25, close:'2025-07-01', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'Low',    notes:'Initial outreach done. No reply.',    created:'2025-05-02', lastContact:'2025-05-02', lossReason:''},
-  {id:7,  name:'EduSmart Solutions',        company:'EduSmart Solutions',   owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:560000,  acv:560000,  stage:'Closed Won',      prob:100,close:'2025-04-30', source:'Website',   product:'EdTech CRM — Business',   priority:'Medium', notes:'Signed & implementation started.',    created:'2025-04-01', lastContact:'2025-04-30', lossReason:''},
-  {id:8,  name:'LearnFirst Academy',        company:'LearnFirst Academy',   owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:430000,  acv:430000,  stage:'Prospecting',     prob:20, close:'2025-07-15', source:'LinkedIn',  product:'EdTech CRM — Starter',    priority:'Low',    notes:'Scheduled intro call for May 12.',    created:'2025-05-03', lastContact:'2025-04-20', lossReason:''},
-  {id:9,  name:'EduFirst Network',          company:'EduFirst Network',     owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:580000,  acv:580000,  stage:'Proposal Sent',   prob:50, close:'2025-06-10', source:'Campaign',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Sent revised proposal. Awaiting.',    created:'2025-04-20', lastContact:'2025-04-18', lossReason:''},
-  {id:10, name:'Pinnacle Schools Group',    company:'Pinnacle Schools',     owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:1400000, acv:1400000, stage:'Demo Scheduled',  prob:60, close:'2025-05-28', source:'Referral',  product:'EdTech CRM — Enterprise', priority:'High',   notes:'VP of IT is champion.',               created:'2025-04-28', lastContact:'2025-05-04', lossReason:''},
-  {id:11, name:'Sunrise Edu Foundation',    company:'Sunrise Edu',          owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', value:290000,  acv:290000,  stage:'Qualification',   prob:35, close:'2025-07-20', source:'Event',     product:'EdTech CRM — Starter',    priority:'Low',    notes:'Met at EdTech Summit.',               created:'2025-05-05', lastContact:'2025-05-05', lossReason:''},
-  {id:12, name:'NorthStar Academy',         company:'NorthStar Academy',    owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:850000,  acv:850000,  stage:'Closed Lost',     prob:0,  close:'2025-05-01', source:'LinkedIn',  product:'EdTech CRM — Business',   priority:'Medium', notes:'Lost to competitor on price.',        created:'2025-04-05', lastContact:'2025-05-01', lossReason:'Price'},
-  {id:13, name:'MindBridge Edu',            company:'MindBridge Edu',       owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:425000,  acv:425000,  stage:'Closed Won',      prob:100,close:'2025-04-15', source:'Event',     product:'EdTech CRM — Starter',    priority:'Low',    notes:'Quick close. Happy customer.',        created:'2025-03-20', lastContact:'2025-04-15', lossReason:''},
-  {id:14, name:'Sigma Learning Solutions',  company:'Sigma Learning',       owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:670000,  acv:670000,  stage:'Closed Lost',     prob:0,  close:'2025-04-20', source:'Cold Call', product:'EdTech CRM — Business',   priority:'Medium', notes:'Budget frozen until next FY.',        created:'2025-03-15', lastContact:'2025-04-20', lossReason:'Budget frozen'},
-];
-
+/* ─── DATA — populated dynamically from imported Excel ─── */
+let DEALS = [];
 let ACTIVITIES = [];
-let NOTIFICATIONS = [
-  {id:1, icon:'🎉', type:'success', title:'ZyntrixEdu moved to Negotiation!', body:'₹18.5L · Sanjay Kumar', read:false},
-  {id:2, icon:'⚠️', type:'danger',  title:'BrightPath stalled for 21 days',  body:'₹7.2L · Rahul Mehta', read:false},
-  {id:3, icon:'📞', type:'info',    title:'Apex Schools demo — Today 3 PM',  body:'Priya Nair · Zoom link sent', read:false},
-  {id:4, icon:'📊', type:'info',    title:'Q2 quota — 22 days left',         body:'₹53L needed for ₹2.4Cr target', read:false},
-];
+let NOTIFICATIONS = [];
 
 const STAGE_CFG = {
   'Prospecting':   {col:'#4e6680', bg:'rgba(78,102,128,0.15)',  badgeCls:'b-gray',   order:0},
@@ -639,7 +619,7 @@ const STAGE_CFG = {
   'Closed Won':    {col:'#00e5b0', bg:'rgba(0,229,176,0.12)',   badgeCls:'b-accent', order:5},
   'Closed Lost':   {col:'#ff4d6d', bg:'rgba(255,77,109,0.12)',  badgeCls:'b-rose',   order:6},
 };
-const OWNER_COL = {'Sanjay Kumar':'#00e5b0','Priya Nair':'#3d8ef0','Rahul Mehta':'#b57bee','Anjali Rao':'#f5a623','Vikram Singh':'#22d3ee'};
+const OWNER_COL = {};   // populated dynamically
 
 let curView='all', stageFilter='', sortKey='value', sortDir='desc', dealViewMode='table';
 let page=1; const PAGE=8;
@@ -1098,8 +1078,22 @@ document.addEventListener('click',()=>document.querySelectorAll('.dropdown-menu.
 
 document.getElementById('a-date').value=new Date().toISOString().slice(0,16);
 renderNotifications();
-renderCurrentView();
+
+/* ═══ DYNAMIC INIT ═══════════════════════════════════════════ */
+async function initPage() {
+  await loadPageData('sales', 'deals', mapDeal,
+    (mapped) => {
+      DEALS = mapped;
+      populateFilter('owner-filter',  DEALS.map(d => d.owner),  'All Owners');
+      populateFilter('source-filter', DEALS.map(d => d.source), 'All Sources');
+      renderCurrentView();
+    }, 'content'
+  );
+}
+initPage();
 </script>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/data-loader.js"></script>
 <script src="../../assets/js/auth.js"></script>
 </body>
 </html>

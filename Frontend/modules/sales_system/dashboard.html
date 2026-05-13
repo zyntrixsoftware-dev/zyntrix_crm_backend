@@ -320,7 +320,7 @@ select option{background:var(--bg2);}
   </div>
 
   <!-- CONTENT -->
-  <div class="content">
+  <div class="content" id="content">
 
     <!-- HERO BANNER -->
     <div class="hero">
@@ -612,32 +612,9 @@ select option{background:var(--bg2);}
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-/* ══ DATA ══ */
-const DEALS = [
-  {id:1,  name:'ZyntrixEdu Enterprise',     company:'ZyntrixEdu Pvt Ltd',   owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:1850000, stage:'Negotiation',   prob:85, close:'2025-05-20'},
-  {id:2,  name:'Apex Schools — LMS Bundle', company:'Apex Schools Group',   owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:920000,  stage:'Proposal Sent', prob:65, close:'2025-05-30'},
-  {id:3,  name:'Global EdTech Corp',        company:'Global EdTech Corp',   owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', value:2200000, stage:'Negotiation',   prob:75, close:'2025-06-05'},
-  {id:4,  name:'BrightPath Academy',        company:'BrightPath Academy',   owner:'Rahul Mehta',  oi:'RM', oCol:'#b57bee', value:720000,  stage:'Qualification', prob:40, close:'2025-06-15'},
-  {id:5,  name:'Vidya Network — Starter',   company:'Vidya Network',        owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:380000,  stage:'Demo Scheduled',prob:55, close:'2025-05-25'},
-  {id:6,  name:'KnowledgeFirst Institute',  company:'KnowledgeFirst',       owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', value:1100000, stage:'Prospecting',   prob:25, close:'2025-07-01'},
-  {id:7,  name:'EduSmart Solutions',        company:'EduSmart Solutions',   owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:560000,  stage:'Closed Won',    prob:100,close:'2025-04-30'},
-  {id:8,  name:'LearnFirst Academy',        company:'LearnFirst Academy',   owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:430000,  stage:'Prospecting',   prob:20, close:'2025-07-15'},
-  {id:9,  name:'EduFirst Network',          company:'EduFirst Network',     owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:580000,  stage:'Proposal Sent', prob:50, close:'2025-06-10'},
-  {id:10, name:'Pinnacle Schools Group',    company:'Pinnacle Schools',     owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:1400000, stage:'Demo Scheduled',prob:60, close:'2025-05-28'},
-  {id:11, name:'Sunrise Edu Foundation',    company:'Sunrise Edu',          owner:'Vikram Singh', oi:'VS', oCol:'#22d3ee', value:290000,  stage:'Qualification', prob:35, close:'2025-07-20'},
-  {id:12, name:'NorthStar Academy',         company:'NorthStar Academy',    owner:'Priya Nair',   oi:'PN', oCol:'#3d8ef0', value:850000,  stage:'Closed Lost',   prob:0,  close:'2025-05-01'},
-  {id:13, name:'MindBridge Edu',            company:'MindBridge Edu',       owner:'Sanjay Kumar', oi:'SK', oCol:'#00e5b0', value:425000,  stage:'Closed Won',    prob:100,close:'2025-04-15'},
-  {id:14, name:'Sigma Learning Solutions',  company:'Sigma Learning',       owner:'Anjali Rao',   oi:'AR', oCol:'#f5a623', value:670000,  stage:'Closed Lost',   prob:0,  close:'2025-04-20'},
-];
-
-const ACTIVITIES = [
-  {icon:'📞', color:'var(--accent-dim)',  title:'Call logged with ZyntrixEdu CFO',   meta:'Sanjay Kumar · Positive outcome', time:'10 min ago'},
-  {icon:'🎥', color:'var(--blue-dim)',    title:'Demo completed — Apex Schools',      meta:'Priya Nair · 3-campus deal confirmed', time:'1 hr ago'},
-  {icon:'✉️', color:'var(--purple-dim)', title:'Proposal sent to Global EdTech Corp',meta:'Rahul Mehta · Volume discount added', time:'2 hrs ago'},
-  {icon:'🎉', color:'var(--accent-dim)', title:'MindBridge Edu — Deal Won! ₹4.25L',  meta:'Sanjay Kumar · Signed & onboarding', time:'Yesterday'},
-  {icon:'⚠',  color:'var(--rose-dim)',   title:'BrightPath Academy stalled 21 days', meta:'Rahul Mehta · Follow-up required',   time:'Yesterday'},
-  {icon:'📅', color:'var(--amber-dim)',  title:'Pinnacle Schools demo scheduled',     meta:'Sanjay Kumar · Tomorrow 10:00 AM',  time:'2 days ago'},
-];
+/* ══ DATA — populated dynamically from imported Excel ══ */
+let DEALS = [];
+let ACTIVITIES = [];
 
 const STAGE_CFG = {
   'Prospecting':   {col:'#4e6680', badgeCls:'b-gray'},
@@ -898,20 +875,27 @@ function handlePeriodChange(period) {
 }
 
 /* ══ INIT ══ */
-function init() {
-  renderHotDeals();
-  renderActivityFeed();
-  renderLeaderboard();
-  renderGoals();
-  renderTasks();
-  renderKeyMetrics();
-  buildRevChart('monthly');
-  buildPipelineDonut();
-  buildFunnelChart();
+async function init() {
+  await loadPageData('sales', 'deals', mapDeal,
+    (mapped) => {
+      DEALS = mapped;
+      renderHotDeals();
+      renderActivityFeed();
+      renderLeaderboard();
+      renderGoals();
+      renderTasks();
+      renderKeyMetrics();
+      buildRevChart('monthly');
+      buildPipelineDonut();
+      buildFunnelChart();
+    }, 'content'
+  );
 }
 
 init();
 </script>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/data-loader.js"></script>
 <script src="../../assets/js/auth.js"></script>
 </body>
 </html>

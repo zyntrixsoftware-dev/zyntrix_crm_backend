@@ -33,40 +33,34 @@ function isTokenExpired(token) {
 }
 
 // ── LOGOUT ────────────────────────────────────────────────────────────────────
-// FIX: use window.location.origin so the redirect always goes to the site root
-// regardless of how deeply nested the current page is.
-// e.g. /modules/HRMS/dashboard/hr.html → https://zyntrixsoftware.com/index.html ✓
-// e.g. /modules/attendance.html        → https://zyntrixsoftware.com/index.html ✓
-// e.g. localhost:5500/modules/...      → http://localhost:5500/index.html       ✓
 window.logout = function () {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  window.location.href = window.location.origin + "/Frontend/index.html";
+  window.location.href = window.location.origin + "/crm/index.html";
 };
 
 // ── ROLE REDIRECT AFTER LOGIN ─────────────────────────────────────────────────
-// FIX: use absolute paths (origin + path) so this works from any page depth
 function redirectByRole(role) {
   const base = window.location.origin;
   switch (role) {
     case "super_admin":
-      window.location.href = base + "/modules/admin.html";
+      window.location.href = base + "/crm/modules/admin.html";
       break;
     case "hr":
-      window.location.href = base + "/modules/HRMS/dashboard/hr.html";
+      window.location.href = base + "/crm/modules/HRMS/dashboard/hr.html";
       break;
     case "sales":
-      window.location.href = base + "/modules/sales_system/dashboard.html";
+      window.location.href = base + "/crm/modules/sales_system/dashboard.html";
       break;
     case "marketing":
-      window.location.href = base + "/modules/marketing.html";
+      window.location.href = base + "/crm/modules/marketing.html";
       break;
     case "lms":
-      window.location.href = base + "/modules/lms.html";
+      window.location.href = base + "/crm/modules/lms.html";
       break;
     case "employee":
     default:
-      window.location.href = base + "Frontend/modules/attendance.html";
+      window.location.href = base + "/crm/modules/attendance.html";
       break;
   }
 }
@@ -80,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
 
     const email    = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value; // no trim on password
+    const password = document.getElementById("password").value;
 
     if (!email || !password) {
       alert("Please enter your email and password.");
@@ -99,14 +93,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ── AUTH GUARD ────────────────────────────────────────────────────────────────
-// FIX: redirect always uses origin — works at any directory depth
 function requireAuth() {
   const token = localStorage.getItem("token");
 
   if (!token || isTokenExpired(token)) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = window.location.origin + "/Frontend/index.html";
+    window.location.href = window.location.origin + "/crm/index.html";
   }
 }
 
@@ -129,5 +122,5 @@ function togglePassword() {
 }
 
 function forgotPassword() {
-  window.location.href = window.location.origin + "/pages/forgot-password.html";
+  window.location.href = window.location.origin + "/crm/pages/forgot-password.html";
 }

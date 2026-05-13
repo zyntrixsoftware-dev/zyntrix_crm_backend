@@ -142,3 +142,231 @@ exports.getEmployeeAttendance = async (req, res) => {
     return res.status(500).json({ msg: "Server error" });
   }
 };
+
+// ── LIST ALL EMPLOYEES (with login accounts) ──────────────────────────────────
+exports.getEmployees = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const { search, department, status, type } = req.query;
+    const query = { role: "employee" };
+
+    if (department) query.department = department;
+    if (status)     query.employeeStatus = status;
+    if (type)       query.employeeType   = type;
+    if (search) {
+      query.$or = [
+        { name:  { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { designation: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    const employees = await User.find(query)
+      .select("-password -otpCode -otpExpiry -otpResetToken")
+      .populate("reportingTo", "name designation")
+      .sort({ createdAt: -1 });
+
+    return res.json({ employees, total: employees.length });
+  } catch (err) {
+    console.error("GET EMPLOYEES ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── GET SINGLE EMPLOYEE PROFILE ───────────────────────────────────────────────
+exports.getEmployee = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const emp = await User.findOne({ _id: req.params.id, role: "employee" })
+      .select("-password -otpCode -otpExpiry -otpResetToken")
+      .populate("reportingTo", "name designation department");
+
+    if (!emp) return res.status(404).json({ msg: "Employee not found" });
+
+    // also get their attendance summary for current month
+    const month = new Date().toISOString().slice(0, 7);
+    const [year, monthNum] = month.split("-").map(Number);
+    const start = new Date(year, monthNum - 1, 1).toISOString().slice(0, 10);
+    const end   = new Date(year, monthNum,     1).toISOString().slice(0, 10);
+
+    const attendance = await require("../models/attendance").find({
+      userId: emp._id,
+      date: { $gte: start, $lt: end }
+    }).sort({ date: 1 });
+
+    return res.json({ employee: emp, attendance });
+  } catch (err) {
+    console.error("GET EMPLOYEE ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── UPDATE EMPLOYEE PROFILE (HR edits) ───────────────────────────────────────
+exports.updateEmployee = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    // Fields HR is allowed to update (NOT password, NOT role to admin)
+    const allowed = [
+      "name","phone","department","designation","employeeType",
+      "dateOfJoining","salary","reportingTo","employeeStatus",
+      "address","emergencyContact","profileNote"
+    ];
+
+    const update = {};
+    allowed.forEach(f => { if (req.body[f] !== undefined) update[f] = req.body[f]; });
+
+    const emp = await User.findOneAndUpdate(
+      { _id: req.params.id, role: "employee" },
+      update,
+      { new: true, runValidators: true }
+    ).select("-password -otpCode -otpExpiry -otpResetToken");
+
+    if (!emp) return res.status(404).json({ msg: "Employee not found" });
+    return res.json({ msg: "Updated", employee: emp });
+  } catch (err) {
+    console.error("UPDATE EMPLOYEE ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── CREATE EMPLOYEE ACCOUNT (HR creates login + profile) ─────────────────────
+exports.createEmployee = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const {
+      name, email, password,
+      phone, department, designation, employeeType,
+      dateOfJoining, salary, reportingTo, address,
+      emergencyContact, profileNote
+    } = req.body;
+
+    if (!name || !email || !password)
+      return res.status(400).json({ msg: "name, email and password are required" });
+
+    const exists = await User.findOne({ email: email.toLowerCase() });
+    if (exists) return res.status(409).json({ msg: "An account with this email already exists" });
+
+    const bcrypt = require("bcryptjs");
+    const hashed = await bcrypt.hash(password, 12);
+
+    const emp = await User.create({
+      name, email,
+      password: hashed,
+      role: "employee",
+      phone, department, designation,
+      employeeType: employeeType || "Full-time",
+      dateOfJoining, salary,
+      reportingTo: reportingTo || null,
+      address, emergencyContact, profileNote,
+      employeeStatus: "Active"
+    });
+
+    const safe = emp.toObject();
+    delete safe.password;
+    delete safe.otpCode;
+    delete safe.otpExpiry;
+    delete safe.otpResetToken;
+
+    return res.status(201).json({ msg: "Employee created", employee: safe });
+  } catch (err) {
+    console.error("CREATE EMPLOYEE ERROR:", err);
+    return res.status(500).json({ msg: "Server error: " + err.message });
+  }
+};
+
+// ── DELETE / TERMINATE EMPLOYEE ───────────────────────────────────────────────
+exports.terminateEmployee = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const { action } = req.body; // "terminate" | "delete"
+
+    if (action === "delete") {
+      // Hard delete — only super_admin
+      if (req.user.role !== "super_admin")
+        return res.status(403).json({ msg: "Only super_admin can permanently delete employees" });
+
+      await User.findOneAndDelete({ _id: req.params.id, role: "employee" });
+      return res.json({ msg: "Employee permanently deleted" });
+    }
+
+    // Default: soft-terminate (keep account, mark as Terminated)
+    const emp = await User.findOneAndUpdate(
+      { _id: req.params.id, role: "employee" },
+      { employeeStatus: "Terminated" },
+      { new: true }
+    ).select("-password -otpCode -otpExpiry -otpResetToken");
+
+    if (!emp) return res.status(404).json({ msg: "Employee not found" });
+    return res.json({ msg: "Employee terminated", employee: emp });
+  } catch (err) {
+    console.error("TERMINATE EMPLOYEE ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── LIST DEPARTMENTS (derived from employees) ─────────────────────────────────
+exports.getDepartments = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+    const depts = await User.distinct("department", { role: "employee", department: { $ne: "" } });
+    return res.json({ departments: depts.filter(Boolean).sort() });
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── HRMS DASHBOARD (real data) ────────────────────────────────────────────────
+exports.getHrmsDashboard = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const today = getUTCDate();
+
+    const [
+      totalEmployees,
+      activeEmployees,
+      todayAttendance,
+      pendingRequests,
+      deptBreakdown,
+      recentHires
+    ] = await Promise.all([
+      User.countDocuments({ role: "employee" }),
+      User.countDocuments({ role: "employee", employeeStatus: "Active" }),
+      require("../models/attendance").find({ date: today }).select("userId punchIn"),
+      ShiftRequest.countDocuments({ status: "pending" }),
+      User.aggregate([
+        { $match: { role: "employee", department: { $ne: "" } } },
+        { $group: { _id: "$department", count: { $sum: 1 } } },
+        { $sort: { count: -1 } }
+      ]),
+      User.find({ role: "employee" })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select("name designation department employeeStatus createdAt")
+    ]);
+
+    const presentSet = new Set(
+      todayAttendance.filter(r => r.punchIn).map(r => String(r.userId))
+    );
+
+    return res.json({
+      stats: {
+        totalEmployees,
+        activeEmployees,
+        presentToday:  presentSet.size,
+        absentToday:   Math.max(0, activeEmployees - presentSet.size),
+        pendingRequests
+      },
+      deptBreakdown,
+      recentHires
+    });
+  } catch (err) {
+    console.error("HRMS DASHBOARD ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};

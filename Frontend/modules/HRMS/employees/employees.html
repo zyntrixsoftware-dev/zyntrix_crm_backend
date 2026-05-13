@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employees — HRMS Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d1b2a;--navy2:#132236;--navy3:#1a2d42;--navy4:#203350;--navy5:#263d5e;
+  --accent:#4f9cf9;--accent2:#3b82f6;--accent-dim:rgba(59,130,246,0.12);
+  --teal:#2dd4bf;--amber:#f59e0b;--rose:#f43f5e;--green:#22c55e;--purple:#a78bfa;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --card:#132236;--radius:12px;--sidebar:248px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
+.content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
+
+/* SIDEBAR */
+.brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:15px;font-weight:600}
+.brand-ver{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.nav-section{padding:14px 10px 6px}
+.nav-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-item:hover{background:var(--accent-dim);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent2);border-radius:0 3px 3px 0}
+.nav-icon{width:18px;text-align:center;font-size:15px}
+.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
+.nav-divider{height:1px;background:var(--border);margin:8px 10px}
+.sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500}
+.user-role{font-size:11px;color:var(--text3)}
+
+/* TOPBAR */
+.page-title{font-size:16px;font-weight:600;flex:1}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3)}
+.breadcrumb span{color:var(--text2)}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;font-size:13px;min-width:240px;transition:border .15s}
+.search-box:focus-within{border-color:var(--accent2)}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%}
+.search-box input::placeholder{color:var(--text3)}
+.topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.topbar-btn:hover{background:var(--navy3)}
+.topbar-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.topbar-btn.primary:hover{background:var(--accent)}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:16px}
+.kpi-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.kpi-val{font-size:26px;font-weight:600;line-height:1;letter-spacing:-1px}
+.kpi-lbl{font-size:12px;color:var(--text3);margin-top:3px}
+
+/* FILTERS BAR */
+.filters{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.filter-select{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;cursor:pointer}
+.filter-select:focus{border-color:var(--accent2)}
+.filter-select option{background:var(--navy2)}
+.filter-count{margin-left:auto;font-size:12px;color:var(--text3);font-family:var(--mono)}
+
+/* TABLE */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-title{font-size:14px;font-weight:600}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 16px 12px;white-space:nowrap}
+thead tr{border-bottom:1px solid var(--border)}
+thead th{padding-top:14px}
+td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.td-main{font-weight:500;color:var(--text)}
+.td-sub{font-size:11px;color:var(--text3);margin-top:1px;font-family:var(--mono)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-green{background:rgba(34,197,94,0.13);color:var(--green)}
+.b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
+.b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}
+.b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
+.b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
+.b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
+
+/* ACTION BUTTONS */
+.btn-row-inline{display:flex;gap:6px;align-items:center}
+.btn-sm{padding:4px 11px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-size:11px;font-family:var(--font);transition:all .15s;white-space:nowrap}
+.btn-sm:hover{background:var(--navy3);color:var(--text)}
+.btn-sm.primary{background:var(--accent-dim);border-color:var(--accent2);color:var(--accent)}
+.btn-sm.danger{background:rgba(244,63,94,0.08);border-color:rgba(244,63,94,0.25);color:var(--rose)}
+.btn-sm.danger:hover{background:rgba(244,63,94,0.18)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:44px;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:13px}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:520px;max-width:92vw;max-height:90vh;overflow-y:auto}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--navy2);z-index:1}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1;transition:color .15s}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:22px 24px}
+.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--navy2)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.frow.single{grid-template-columns:1fr}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:12px;font-weight:500;color:var(--text2)}
+.fg input,.fg select,.fg textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;transition:border .15s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent2)}
+.fg select option{background:var(--navy2)}
+.fg textarea{resize:vertical;min-height:70px}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:18px 0 10px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.btn{padding:9px 20px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;transition:all .15s}
+.btn:hover{background:var(--navy3)}
+.btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn.primary:hover{background:var(--accent)}
+.btn.danger{background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.3);color:var(--rose)}
+.btn.danger:hover{background:rgba(244,63,94,0.22)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* PROFILE PANEL (slide-in) */
+.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .2s}
+.panel-overlay.open{opacity:1;pointer-events:all}
+.panel{position:fixed;right:0;top:0;bottom:0;width:420px;max-width:95vw;background:var(--navy2);border-left:1px solid var(--border2);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);z-index:91;overflow-y:auto}
+.panel.open{transform:translateX(0)}
+.panel-hd{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--navy2);z-index:1}
+.panel-close{margin-left:auto;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;padding:4px}
+.panel-close:hover{color:var(--text)}
+.panel-body{padding:20px;flex:1}
+.panel-section{margin-bottom:20px}
+.panel-section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.field-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.field-row:last-child{border-bottom:none}
+.field-key{font-size:12px;color:var(--text3)}
+.field-val{font-size:13px;color:var(--text);font-weight:500;text-align:right;max-width:220px}
+.att-mini{display:flex;gap:3px;flex-wrap:wrap;margin-top:6px}
+.att-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy3);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;z-index:200;transform:translateY(20px);opacity:0;transition:all .25s;pointer-events:none;display:flex;align-items:center;gap:10px;max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(34,197,94,.3);color:var(--green)}
+.toast.err{border-color:rgba(244,63,94,.3);color:var(--rose)}
+</style>
+<script src="../../../assets/js/api.js"></script>
+<script src="../../../assets/js/auth.js?v=4"></script>
+</head>
+<body>
+<script>requireAuth(); requireModuleAccess("hr");</script>
+
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">👥</div>
+    <div style="display:flex;flex-direction:column">
+      <div class="brand-name">HRMS Pro</div>
+      <div class="brand-ver">v2.5 · 2025</div>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Employees</div>
+    <a class="nav-item active" href="employees.html"><span class="nav-icon">👥</span> All Employees</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Talent Acquisition</div>
+    <a class="nav-item" href="../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Jobs</a>
+    <a class="nav-item" href="../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates</a>
+    <a class="nav-item" href="../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Employee Lifecycle</div>
+    <a class="nav-item" href="../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
+    <a class="nav-item" href="../employee_lifecycle/offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item" href="../employee_lifecycle/orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
+    <a class="nav-item" href="../employee_lifecycle/deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Operations</div>
+    <a class="nav-item" href="../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
+    <a class="nav-item" href="../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations</a>
+    <a class="nav-item" href="../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar" id="sb-avatar">HR</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name" id="sb-name">Loading…</div>
+        <div class="user-role" id="sb-role">HR</div>
+      </div>
+      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Employees</div>
+      <div class="breadcrumb">HRMS Pro <span>›</span> All Employees</div>
+    </div>
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="search-input" placeholder="Search by name, email, role…" oninput="debounceSearch()">
+    </div>
+    <button class="topbar-btn primary" onclick="openCreateModal()">＋ Add Employee</button>
+  </div>
+
+  <div class="content">
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-icon" style="background:rgba(59,130,246,0.12)">👥</div>
+        <div><div class="kpi-val" id="kpi-total">—</div><div class="kpi-lbl">Total Employees</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon" style="background:rgba(34,197,94,0.12)">✅</div>
+        <div><div class="kpi-val" id="kpi-active">—</div><div class="kpi-lbl">Active</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon" style="background:rgba(245,158,11,0.12)">🕐</div>
+        <div><div class="kpi-val" id="kpi-present">—</div><div class="kpi-lbl">Present Today</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon" style="background:rgba(167,139,250,0.12)">🏢</div>
+        <div><div class="kpi-val" id="kpi-depts">—</div><div class="kpi-lbl">Departments</div></div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters">
+      <select class="filter-select" id="filter-dept" onchange="applyFilters()">
+        <option value="">All Departments</option>
+      </select>
+      <select class="filter-select" id="filter-status" onchange="applyFilters()">
+        <option value="">All Statuses</option>
+        <option value="Active">Active</option>
+        <option value="On Leave">On Leave</option>
+        <option value="Terminated">Terminated</option>
+        <option value="Resigned">Resigned</option>
+      </select>
+      <select class="filter-select" id="filter-type" onchange="applyFilters()">
+        <option value="">All Types</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+        <option value="Contract">Contract</option>
+        <option value="Intern">Intern</option>
+      </select>
+      <span class="filter-count" id="filter-count"></span>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Employee Directory</div>
+        <button class="topbar-btn" onclick="loadEmployees()" style="font-size:12px;padding:5px 12px">↻ Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Department</th>
+              <th>Designation</th>
+              <th>Type</th>
+              <th>Joined</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="emp-tbody">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EMPLOYEE PROFILE PANEL -->
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
+<div class="panel" id="profile-panel">
+  <div class="panel-hd">
+    <div class="avatar" id="panel-avatar" style="width:42px;height:42px;font-size:15px;border-radius:10px">?</div>
+    <div>
+      <div style="font-size:15px;font-weight:600" id="panel-name">—</div>
+      <div style="font-size:12px;color:var(--text3)" id="panel-role">—</div>
+    </div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="panel-body">Loading…</div>
+</div>
+
+<!-- ADD / EDIT EMPLOYEE MODAL -->
+<div class="overlay" id="emp-modal" onclick="closeModal('emp-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <span class="modal-title" id="modal-title">Add Employee</span>
+      <button class="modal-close" onclick="closeModal('emp-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+
+      <div class="section-label">Account &amp; Login</div>
+      <div class="frow">
+        <div class="fg"><label>Full Name *</label><input id="f-name" placeholder="e.g. Arjun Rao"></div>
+        <div class="fg"><label>Email *</label><input type="email" id="f-email" placeholder="arjun@company.com"></div>
+      </div>
+      <div class="frow" id="password-row">
+        <div class="fg"><label>Password *</label><input type="password" id="f-password" placeholder="Min 8 characters"></div>
+        <div class="fg"><label>Phone</label><input id="f-phone" placeholder="+91 98765 43210"></div>
+      </div>
+
+      <div class="section-label">Job Details</div>
+      <div class="frow">
+        <div class="fg"><label>Department</label><input id="f-dept" placeholder="e.g. Engineering"></div>
+        <div class="fg"><label>Designation</label><input id="f-designation" placeholder="e.g. Software Engineer"></div>
+      </div>
+      <div class="frow">
+        <div class="fg">
+          <label>Employee Type</label>
+          <select id="f-type">
+            <option>Full-time</option><option>Part-time</option><option>Contract</option><option>Intern</option>
+          </select>
+        </div>
+        <div class="fg"><label>Date of Joining</label><input type="date" id="f-doj"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Salary (₹)</label><input type="number" id="f-salary" placeholder="e.g. 50000"></div>
+        <div class="fg">
+          <label>Status</label>
+          <select id="f-status">
+            <option>Active</option><option>On Leave</option><option>Terminated</option><option>Resigned</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-label">Additional Info</div>
+      <div class="frow single">
+        <div class="fg"><label>Address</label><input id="f-address" placeholder="e.g. 42 MG Road, Bangalore"></div>
+      </div>
+      <div class="frow single">
+        <div class="fg"><label>Emergency Contact</label><input id="f-emergency" placeholder="Name / Phone"></div>
+      </div>
+      <div class="frow single">
+        <div class="fg"><label>Notes</label><textarea id="f-notes" placeholder="Any HR notes…"></textarea></div>
+      </div>
+
+      <div id="modal-err" style="color:var(--rose);font-size:12px;margin-top:8px;display:none"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('emp-modal')">Cancel</button>
+      <button class="btn primary" id="modal-save-btn" onclick="saveEmployee()">Add Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM TERMINATE MODAL -->
+<div class="overlay" id="term-modal" onclick="closeModal('term-modal')">
+  <div class="modal" style="width:400px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <span class="modal-title">Confirm Action</span>
+      <button class="modal-close" onclick="closeModal('term-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text2);font-size:13px;margin-bottom:16px" id="term-msg">Are you sure?</p>
+      <div class="frow">
+        <div class="fg">
+          <label>Action</label>
+          <select id="term-action">
+            <option value="terminate">Terminate (keeps account)</option>
+            <option value="delete">Permanently Delete (super_admin only)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('term-modal')">Cancel</button>
+      <button class="btn danger" id="term-confirm-btn" onclick="confirmTerminate()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────
+let allEmployees  = [];
+let filteredEmps  = [];
+let pendingTermId = null;
+let searchTimer   = null;
+let isEditMode    = false;
+
+// ── BOOT ──────────────────────────────────────────────────────────
+(async function init() {
+  // sidebar user
+  const u = getUser();
+  if (u) {
+    document.getElementById("sb-name").textContent  = u.name  || "HR";
+    document.getElementById("sb-role").textContent  = u.role  || "hr";
+    document.getElementById("sb-avatar").textContent = (u.name || "HR").slice(0,2).toUpperCase();
+  }
+
+  await Promise.all([loadDashboardKPIs(), loadEmployees(), loadDepartments()]);
+})();
+
+// ── KPIs ──────────────────────────────────────────────────────────
+async function loadDashboardKPIs() {
+  const res = await apiRequest("/hr/hrms/dashboard");
+  if (res.error) return;
+  document.getElementById("kpi-total").textContent   = res.stats.totalEmployees  ?? "—";
+  document.getElementById("kpi-active").textContent  = res.stats.activeEmployees ?? "—";
+  document.getElementById("kpi-present").textContent = res.stats.presentToday    ?? "—";
+  document.getElementById("kpi-depts").textContent   = (res.deptBreakdown || []).length || "—";
+}
+
+// ── LOAD DEPARTMENTS INTO FILTER ──────────────────────────────────
+async function loadDepartments() {
+  const res = await apiRequest("/hr/employees/departments");
+  if (res.error || !res.departments) return;
+  const sel = document.getElementById("filter-dept");
+  res.departments.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = d;
+    sel.appendChild(opt);
+  });
+}
+
+// ── LOAD EMPLOYEES ────────────────────────────────────────────────
+async function loadEmployees() {
+  const dept   = document.getElementById("filter-dept").value;
+  const status = document.getElementById("filter-status").value;
+  const type   = document.getElementById("filter-type").value;
+  const search = document.getElementById("search-input").value.trim();
+
+  let url = "/hr/employees?";
+  if (dept)   url += `department=${encodeURIComponent(dept)}&`;
+  if (status) url += `status=${encodeURIComponent(status)}&`;
+  if (type)   url += `type=${encodeURIComponent(type)}&`;
+  if (search) url += `search=${encodeURIComponent(search)}&`;
+
+  document.getElementById("emp-tbody").innerHTML =
+    `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Loading…</td></tr>`;
+
+  const res = await apiRequest(url);
+  if (res.error) {
+    document.getElementById("emp-tbody").innerHTML =
+      `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--rose)">${res.msg}</td></tr>`;
+    return;
+  }
+
+  allEmployees = res.employees || [];
+  document.getElementById("filter-count").textContent =
+    `${allEmployees.length} employee${allEmployees.length !== 1 ? "s" : ""}`;
+
+  renderTable(allEmployees);
+}
+
+// ── RENDER TABLE ──────────────────────────────────────────────────
+function renderTable(employees) {
+  const tbody = document.getElementById("emp-tbody");
+  if (!employees.length) {
+    tbody.innerHTML = `<tr><td colspan="7">
+      <div class="empty">
+        <div class="empty-icon">👤</div>
+        <div class="empty-title">No employees found</div>
+        <div class="empty-sub">Add an employee using the "+ Add Employee" button above</div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = employees.map(emp => {
+    const initials = (emp.name || "?").split(" ").map(w => w[0]).slice(0,2).join("").toUpperCase();
+    const colors   = ["#3b82f6,#6366f1","#2dd4bf,#0d9488","#a78bfa,#7c3aed","#f59e0b,#d97706","#f43f5e,#dc2626"];
+    const ci       = Math.abs(hashStr(emp._id)) % colors.length;
+    const joined   = emp.dateOfJoining ? new Date(emp.dateOfJoining + "T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "—";
+
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:linear-gradient(135deg,${colors[ci]});font-size:11px;flex-shrink:0">${initials}</div>
+          <div>
+            <div class="td-main">${esc(emp.name)}</div>
+            <div class="td-sub">${esc(emp.email)}</div>
+          </div>
+        </div>
+      </td>
+      <td>${esc(emp.department) || '<span style="color:var(--text3)">—</span>'}</td>
+      <td>${esc(emp.designation) || '<span style="color:var(--text3)">—</span>'}</td>
+      <td><span class="badge ${typeClass(emp.employeeType)}">${esc(emp.employeeType) || "Full-time"}</span></td>
+      <td style="color:var(--text2);font-size:12px">${joined}</td>
+      <td><span class="badge ${statusClass(emp.employeeStatus)}">${esc(emp.employeeStatus) || "Active"}</span></td>
+      <td>
+        <div class="btn-row-inline">
+          <button class="btn-sm primary" onclick="viewProfile('${emp._id}')">View</button>
+          <button class="btn-sm" onclick="openEditModal('${emp._id}')">Edit</button>
+          <button class="btn-sm danger" onclick="openTermModal('${emp._id}','${esc(emp.name)}')">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+// ── VIEW PROFILE PANEL ────────────────────────────────────────────
+async function viewProfile(id) {
+  document.getElementById("panel-name").textContent = "Loading…";
+  document.getElementById("panel-role").textContent = "";
+  document.getElementById("panel-body").innerHTML   = "<div style='text-align:center;padding:40px;color:var(--text3)'>Loading…</div>";
+  openPanel();
+
+  const res = await apiRequest(`/hr/employees/${id}`);
+  if (res.error) {
+    document.getElementById("panel-body").innerHTML = `<div style="color:var(--rose)">${res.msg}</div>`;
+    return;
+  }
+
+  const emp = res.employee;
+  const att = res.attendance || [];
+
+  // header
+  const initials = (emp.name || "?").split(" ").map(w => w[0]).slice(0,2).join("").toUpperCase();
+  document.getElementById("panel-avatar").textContent = initials;
+  document.getElementById("panel-name").textContent   = emp.name;
+  document.getElementById("panel-role").textContent   = emp.designation || emp.role;
+
+  // attendance mini calendar
+  const attMap = {};
+  att.forEach(a => { attMap[a.date] = a.punchIn ? "present" : "absent"; });
+  const today  = new Date();
+  const days   = [];
+  for (let d = 1; d <= today.getDate(); d++) {
+    const key = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    days.push({ key, s: attMap[key] || "none" });
+  }
+  const attDots = days.map(d => {
+    const col = d.s === "present" ? "var(--green)" : d.s === "absent" ? "var(--rose)" : "var(--border2)";
+    return `<div class="att-dot" style="background:${col}" title="${d.key}"></div>`;
+  }).join("");
+
+  const fields = [
+    ["Email",          emp.email],
+    ["Phone",          emp.phone || "—"],
+    ["Department",     emp.department || "—"],
+    ["Designation",    emp.designation || "—"],
+    ["Employee Type",  emp.employeeType || "Full-time"],
+    ["Date of Joining",emp.dateOfJoining ? new Date(emp.dateOfJoining+"T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "—"],
+    ["Salary",         emp.salary ? "₹" + Number(emp.salary).toLocaleString("en-IN") : "—"],
+    ["Status",         emp.employeeStatus || "Active"],
+    ["Address",        emp.address || "—"],
+    ["Emergency",      emp.emergencyContact || "—"],
+  ];
+
+  document.getElementById("panel-body").innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-title">Profile</div>
+      ${fields.map(([k,v]) => `<div class="field-row"><span class="field-key">${k}</span><span class="field-val">${esc(String(v))}</span></div>`).join("")}
+    </div>
+    ${emp.profileNote ? `<div class="panel-section"><div class="panel-section-title">Notes</div><div style="font-size:13px;color:var(--text2);line-height:1.6">${esc(emp.profileNote)}</div></div>` : ""}
+    <div class="panel-section">
+      <div class="panel-section-title">Attendance — this month (${att.filter(a=>a.punchIn).length} present / ${days.length} days)</div>
+      <div class="att-mini">${attDots}</div>
+      <div style="display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--text3)">
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:2px;margin-right:4px"></span>Present</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--rose);border-radius:2px;margin-right:4px"></span>Absent</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--border2);border-radius:2px;margin-right:4px"></span>No data</span>
+      </div>
+    </div>
+    <div style="padding-top:12px;display:flex;gap:10px">
+      <button class="btn" style="flex:1" onclick="openEditModal('${emp._id}')">✏️ Edit Profile</button>
+      <a href="/crm/modules/HRMS/employee-attendance.html?userId=${emp._id}" class="btn" style="flex:1;text-decoration:none;text-align:center">📅 Full Attendance</a>
+    </div>
+  `;
+}
+
+// ── CREATE MODAL ──────────────────────────────────────────────────
+function openCreateModal() {
+  isEditMode = false;
+  document.getElementById("modal-title").textContent        = "Add Employee";
+  document.getElementById("modal-save-btn").textContent     = "Add Employee";
+  document.getElementById("password-row").style.display     = "grid";
+  document.getElementById("edit-id").value = "";
+  clearForm();
+  openModal("emp-modal");
+}
+
+// ── EDIT MODAL ────────────────────────────────────────────────────
+async function openEditModal(id) {
+  isEditMode = true;
+  document.getElementById("modal-title").textContent    = "Edit Employee";
+  document.getElementById("modal-save-btn").textContent = "Save Changes";
+  document.getElementById("password-row").style.display = "none"; // don't change password here
+  document.getElementById("edit-id").value = id;
+  clearForm();
+
+  const res = await apiRequest(`/hr/employees/${id}`);
+  if (res.error) { showToast(res.msg, "err"); return; }
+
+  const e = res.employee;
+  document.getElementById("f-name").value       = e.name        || "";
+  document.getElementById("f-email").value      = e.email       || "";
+  document.getElementById("f-phone").value      = e.phone       || "";
+  document.getElementById("f-dept").value       = e.department  || "";
+  document.getElementById("f-designation").value= e.designation || "";
+  document.getElementById("f-type").value       = e.employeeType|| "Full-time";
+  document.getElementById("f-doj").value        = e.dateOfJoining || "";
+  document.getElementById("f-salary").value     = e.salary      || "";
+  document.getElementById("f-status").value     = e.employeeStatus || "Active";
+  document.getElementById("f-address").value    = e.address     || "";
+  document.getElementById("f-emergency").value  = e.emergencyContact || "";
+  document.getElementById("f-notes").value      = e.profileNote || "";
+
+  closePanel();
+  openModal("emp-modal");
+}
+
+// ── SAVE EMPLOYEE ─────────────────────────────────────────────────
+async function saveEmployee() {
+  const btn = document.getElementById("modal-save-btn");
+  const err = document.getElementById("modal-err");
+  err.style.display = "none";
+
+  const payload = {
+    name:             document.getElementById("f-name").value.trim(),
+    email:            document.getElementById("f-email").value.trim(),
+    phone:            document.getElementById("f-phone").value.trim(),
+    department:       document.getElementById("f-dept").value.trim(),
+    designation:      document.getElementById("f-designation").value.trim(),
+    employeeType:     document.getElementById("f-type").value,
+    dateOfJoining:    document.getElementById("f-doj").value,
+    salary:           document.getElementById("f-salary").value || 0,
+    employeeStatus:   document.getElementById("f-status").value,
+    address:          document.getElementById("f-address").value.trim(),
+    emergencyContact: document.getElementById("f-emergency").value.trim(),
+    profileNote:      document.getElementById("f-notes").value.trim(),
+  };
+
+  if (!payload.name) { showErr("Full name is required"); return; }
+  if (!payload.email) { showErr("Email is required"); return; }
+
+  if (!isEditMode) {
+    payload.password = document.getElementById("f-password").value;
+    if (!payload.password || payload.password.length < 8)
+      { showErr("Password must be at least 8 characters"); return; }
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+
+  const id  = document.getElementById("edit-id").value;
+  const url = isEditMode ? `/hr/employees/${id}` : "/hr/employees";
+  const method = isEditMode ? "PUT" : "POST";
+
+  const res = await apiRequest(url, method, payload);
+
+  btn.disabled = false;
+  btn.textContent = isEditMode ? "Save Changes" : "Add Employee";
+
+  if (res.error) { showErr(res.msg); return; }
+
+  closeModal("emp-modal");
+  showToast(isEditMode ? "Employee updated ✓" : "Employee created ✓", "ok");
+  await loadEmployees();
+  await loadDashboardKPIs();
+}
+
+// ── TERMINATE / DELETE ────────────────────────────────────────────
+function openTermModal(id, name) {
+  pendingTermId = id;
+  document.getElementById("term-msg").textContent =
+    `This action applies to: ${name}. Choose what to do:`;
+  openModal("term-modal");
+}
+
+async function confirmTerminate() {
+  if (!pendingTermId) return;
+  const action = document.getElementById("term-action").value;
+  const btn    = document.getElementById("term-confirm-btn");
+  btn.disabled = true;
+
+  const res = await apiRequest(`/hr/employees/${pendingTermId}/terminate`, "PATCH", { action });
+
+  btn.disabled = false;
+  if (res.error) { showToast(res.msg, "err"); return; }
+
+  closeModal("term-modal");
+  showToast(action === "delete" ? "Employee deleted" : "Employee terminated", "ok");
+  pendingTermId = null;
+  await loadEmployees();
+  await loadDashboardKPIs();
+}
+
+// ── SEARCH + FILTERS ──────────────────────────────────────────────
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(loadEmployees, 350);
+}
+
+function applyFilters() { loadEmployees(); }
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+function openPanel()  {
+  document.getElementById("profile-panel").classList.add("open");
+  document.getElementById("panel-overlay").classList.add("open");
+}
+function closePanel() {
+  document.getElementById("profile-panel").classList.remove("open");
+  document.getElementById("panel-overlay").classList.remove("open");
+}
+
+function clearForm() {
+  ["f-name","f-email","f-phone","f-dept","f-designation","f-doj","f-salary","f-address","f-emergency","f-notes","f-password"]
+    .forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+  document.getElementById("f-type").value   = "Full-time";
+  document.getElementById("f-status").value = "Active";
+  document.getElementById("modal-err").style.display = "none";
+}
+function showErr(msg) {
+  const el = document.getElementById("modal-err");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+function statusClass(s) {
+  return {Active:"b-green","On Leave":"b-amber",Terminated:"b-rose",Resigned:"b-gray"}[s] || "b-gray";
+}
+function typeClass(t) {
+  return {"Full-time":"b-blue","Part-time":"b-teal",Contract:"b-amber",Intern:"b-purple"}[t] || "b-gray";
+}
+function esc(s) {
+  if (!s) return "";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function hashStr(s) {
+  let h = 0;
+  for(let i=0;i<s.length;i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  return h;
+}
+
+let toastTimer;
+function showToast(msg, type = "ok") {
+  const t = document.getElementById("toast");
+  t.textContent = (type === "ok" ? "✓ " : "✕ ") + msg;
+  t.className   = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    document.querySelectorAll(".overlay.open").forEach(m => m.classList.remove("open"));
+    closePanel();
+  }
+});
+</script>
+</body>
+</html>

@@ -25,11 +25,24 @@ const userSchema = new mongoose.Schema({
     default: "employee"
   },
 
+  // ── HRMS EMPLOYEE PROFILE ────────────────────────────────────────
+  phone:          { type: String, default: "" },
+  department:     { type: String, default: "" },
+  designation:    { type: String, default: "" },
+  employeeType:   { type: String, enum: ["Full-time","Part-time","Contract","Intern"], default: "Full-time" },
+  dateOfJoining:  { type: String, default: "" },   // "YYYY-MM-DD"
+  salary:         { type: Number, default: 0 },
+  reportingTo:    { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+  employeeStatus: { type: String, enum: ["Active","On Leave","Terminated","Resigned"], default: "Active" },
+  address:        { type: String, default: "" },
+  emergencyContact: { type: String, default: "" },
+  profileNote:    { type: String, default: "" },
+
   // OTP-based password reset
-  otpCode:       { type: String },   // hashed OTP stored in DB
-  otpExpiry:     { type: Date },     // expires in 10 minutes
-  otpVerified:   { type: Boolean, default: false }, // true after OTP verified
-  otpResetToken: { type: String },   // short-lived token to allow password reset
+  otpCode:       { type: String },
+  otpExpiry:     { type: Date },
+  otpVerified:   { type: Boolean, default: false },
+  otpResetToken: { type: String },
 
 }, {
   timestamps: true

@@ -12,6 +12,7 @@ const attendanceRoutes = require("./routes/attendanceRoutes");
 const hrRoutes         = require("./routes/hrRoutes");
 const shiftRoutes      = require("./routes/shiftRoutes");
 const payrollRoutes    = require("./routes/payrollRoutes");
+const importRoutes     = require("./routes/importRoutes");
 
 const app = express();
 
@@ -83,6 +84,7 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/hr",         hrRoutes);
 app.use("/api/shifts",     shiftRoutes);
 app.use("/api/payroll",    payrollRoutes);
+app.use("/api/import",     importRoutes);
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────
 app.get("/", (req, res) => {
