@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shift Requests — HRMS Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d1b2a;--navy2:#132236;--navy3:#1a2d42;--navy4:#203350;
+  --accent:#4f9cf9;--accent2:#3b82f6;--accent-dim:rgba(59,130,246,0.12);
+  --teal:#2dd4bf;--amber:#f59e0b;--rose:#f43f5e;--green:#22c55e;--purple:#a78bfa;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --card:#132236;--radius:12px;--sidebar:248px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
+.content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
+
+/* SIDEBAR */
+.brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:15px;font-weight:600}.brand-ver{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.nav-section{padding:14px 10px 6px}
+.nav-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-item:hover{background:var(--accent-dim);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent2);border-radius:0 3px 3px 0}
+.nav-icon{width:18px;text-align:center;font-size:15px}
+.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
+.nav-divider{height:1px;background:var(--border);margin:8px 10px}
+.sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500}.user-role{font-size:11px;color:var(--text3)}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:14px}
+.kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.kpi-val{font-size:26px;font-weight:600;line-height:1;letter-spacing:-1px}
+.kpi-lbl{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content}
+.tab{padding:8px 20px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;display:flex;align-items:center;gap:7px;border:none;background:none;font-family:var(--font)}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--navy3);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.tab-count{background:var(--navy4);color:var(--text2);font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;font-family:var(--mono)}
+.tab.active .tab-count{background:var(--accent-dim);color:var(--accent)}
+
+/* TABLE */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);gap:10px}
+.card-title{font-size:14px;font-weight:600}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:12px 16px;border-bottom:1px solid var(--border)}
+td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.td-name{font-weight:500}
+.td-sub{font-size:11px;color:var(--text3);margin-top:1px;font-family:var(--mono)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.b-green{background:rgba(34,197,94,0.13);color:var(--green)}
+.b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
+.b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}
+.b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
+.b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
+
+/* ACTION BUTTONS */
+.act-row{display:flex;gap:6px}
+.btn-approve{padding:5px 14px;border-radius:6px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:var(--green);cursor:pointer;font-size:12px;font-family:var(--font);font-weight:500;transition:all .15s}
+.btn-approve:hover{background:rgba(34,197,94,.2)}
+.btn-approve:disabled{opacity:.4;cursor:not-allowed}
+.btn-reject{padding:5px 14px;border-radius:6px;border:1px solid rgba(244,63,94,.3);background:rgba(244,63,94,.1);color:var(--rose);cursor:pointer;font-size:12px;font-family:var(--font);font-weight:500;transition:all .15s}
+.btn-reject:hover{background:rgba(244,63,94,.2)}
+.btn-reject:disabled{opacity:.4;cursor:not-allowed}
+.btn-view{padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s}
+.btn-view:hover{background:var(--navy3);color:var(--text)}
+
+/* SEARCH + FILTER */
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;font-size:13px;min-width:200px;transition:border .15s}
+.search-box:focus-within{border-color:var(--accent2)}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%}
+.search-box input::placeholder{color:var(--text3)}
+.filter-select{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none}
+.filter-select:focus{border-color:var(--accent2)}
+.filter-select option{background:var(--navy2)}
+.topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.topbar-btn:hover{background:var(--navy3)}
+.result-count{font-size:12px;color:var(--text3);margin-left:auto;font-family:var(--mono)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:480px;max-width:94vw;max-height:90vh;overflow-y:auto}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--navy2);z-index:1}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:22px 24px}
+.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--navy2)}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-key{color:var(--text3);font-size:12px}
+.info-val{font-weight:500;color:var(--text);text-align:right}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 10px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fg label{font-size:12px;font-weight:500;color:var(--text2)}
+.fg textarea,.fg input{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;width:100%;transition:border .15s}
+.fg textarea:focus,.fg input:focus{border-color:var(--accent2)}
+.fg textarea{resize:vertical;min-height:70px}
+.btn{padding:9px 20px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;transition:all .15s}
+.btn:hover{background:var(--navy3)}
+.btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn.primary:hover{background:var(--accent)}
+.btn.approve{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:var(--green)}
+.btn.approve:hover{background:rgba(34,197,94,.25)}
+.btn.reject-btn{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.3);color:var(--rose)}
+.btn.reject-btn:hover{background:rgba(244,63,94,.22)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:44px;margin-bottom:12px}
+.empty-title{font-size:16px;color:var(--text2);font-weight:500;margin-bottom:6px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy3);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;z-index:200;transform:translateY(12px);opacity:0;transition:all .2s;pointer-events:none;display:flex;align-items:center;gap:8px;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(34,197,94,.3);color:var(--green)}
+.toast.err{border-color:rgba(244,63,94,.3);color:var(--rose)}
+</style>
+<script src="../../../assets/js/api.js"></script>
+<script src="../../../assets/js/auth.js?v=4"></script>
+</head>
+<body>
+<script>requireAuth(); requireModuleAccess("hr");</script>
+
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">👥</div>
+    <div><div class="brand-name">HRMS Pro</div><div class="brand-ver">v2.5 · 2025</div></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Employees</div>
+    <a class="nav-item" href="employees.html"><span class="nav-icon">👥</span> All Employees</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Talent Acquisition</div>
+    <a class="nav-item" href="../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Jobs</a>
+    <a class="nav-item" href="../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates</a>
+    <a class="nav-item" href="../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Employee Lifecycle</div>
+    <a class="nav-item" href="../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
+    <a class="nav-item" href="../employee_lifecycle/offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item" href="../employee_lifecycle/orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
+    <a class="nav-item" href="../employee_lifecycle/deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Operations</div>
+    <a class="nav-item" href="../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
+    <a class="nav-item active" href="shift-requests.html"><span class="nav-icon">🔄</span> Shift Requests <span class="nav-badge" id="pending-badge" style="display:none">0</span></a>
+    <a class="nav-item" href="../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations</a>
+    <a class="nav-item" href="../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar" id="sb-avatar">HR</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name" id="sb-name">Loading…</div>
+        <div class="user-role" id="sb-role">hr</div>
+      </div>
+      <button onclick="logout()" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Shift Requests</div>
+      <div style="font-size:12px;color:var(--text3)">Review and approve employee shift change requests</div>
+    </div>
+    <button class="topbar-btn" onclick="loadAll()">↻ Refresh</button>
+  </div>
+
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-icon" style="background:rgba(245,158,11,.12)">⏳</div>
+        <div><div class="kpi-val" id="k-pending" style="color:var(--amber)">—</div><div class="kpi-lbl">Pending</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon" style="background:rgba(34,197,94,.12)">✅</div>
+        <div><div class="kpi-val" id="k-approved" style="color:var(--green)">—</div><div class="kpi-lbl">Approved</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon" style="background:rgba(244,63,94,.12)">❌</div>
+        <div><div class="kpi-val" id="k-rejected" style="color:var(--rose)">—</div><div class="kpi-lbl">Rejected</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon" style="background:rgba(79,156,249,.12)">📋</div>
+        <div><div class="kpi-val" id="k-total" style="color:var(--accent)">—</div><div class="kpi-lbl">Total</div></div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" id="tab-pending"  onclick="switchTab('pending')">⏳ Pending  <span class="tab-count" id="tc-pending">0</span></button>
+      <button class="tab"        id="tab-approved" onclick="switchTab('approved')">✅ Approved <span class="tab-count" id="tc-approved">0</span></button>
+      <button class="tab"        id="tab-rejected" onclick="switchTab('rejected')">❌ Rejected <span class="tab-count" id="tc-rejected">0</span></button>
+      <button class="tab"        id="tab-all"      onclick="switchTab('all')">📋 All       <span class="tab-count" id="tc-all">0</span></button>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar" style="margin-bottom:16px">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" id="search-input" placeholder="Search employee name…" oninput="renderTable()">
+      </div>
+      <select class="filter-select" id="date-filter" onchange="renderTable()">
+        <option value="">All dates</option>
+        <option value="today">Today</option>
+        <option value="week">This week</option>
+        <option value="month">This month</option>
+      </select>
+      <span class="result-count" id="result-count"></span>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title" id="table-title">Pending Requests</div>
+        <div id="bulk-actions" style="display:none;gap:8px;align-items:center" class="act-row">
+          <span style="font-size:12px;color:var(--text3)" id="selected-count">0 selected</span>
+          <button class="btn-approve" id="bulk-approve-btn" onclick="bulkAction('approved')">✓ Approve All</button>
+          <button class="btn-reject"  id="bulk-reject-btn"  onclick="bulkAction('rejected')">✕ Reject All</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th id="check-col" style="width:40px"><input type="checkbox" id="select-all" onchange="toggleSelectAll()" style="cursor:pointer;accent-color:var(--accent2)"></th>
+              <th>Employee</th>
+              <th>Requested Date</th>
+              <th>Shift Time</th>
+              <th>Note</th>
+              <th>Requested On</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="req-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detail-modal" onclick="closeModal('detail-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <span class="modal-title">Shift Request Detail</span>
+      <button class="modal-close" onclick="closeModal('detail-modal')">×</button>
+    </div>
+    <div class="modal-body" id="detail-body">Loading…</div>
+    <div class="modal-ft" id="detail-ft"></div>
+  </div>
+</div>
+
+<!-- REMARKS MODAL (for approve / reject with remarks) -->
+<div class="overlay" id="remarks-modal" onclick="closeModal('remarks-modal')">
+  <div class="modal" style="width:420px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <span class="modal-title" id="remarks-title">Add Remarks</span>
+      <button class="modal-close" onclick="closeModal('remarks-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px" id="remarks-desc">Optionally add a note for the employee.</p>
+      <div class="fg">
+        <label>Remarks (optional)</label>
+        <textarea id="remarks-input" placeholder="e.g. Approved, please coordinate with your team lead…" rows="4"></textarea>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('remarks-modal')">Cancel</button>
+      <button class="btn primary" id="remarks-confirm-btn" onclick="submitReview()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────
+let allRequests  = [];
+let currentTab   = "pending";
+let pendingAction= null;  // { id, status }
+
+// ── BOOT ──────────────────────────────────────────────────────────
+(async function init() {
+  const u = getUser();
+  if (u) {
+    document.getElementById("sb-name").textContent   = u.name || "HR";
+    document.getElementById("sb-role").textContent   = u.role || "hr";
+    document.getElementById("sb-avatar").textContent = (u.name||"HR").slice(0,2).toUpperCase();
+  }
+  // hide checkbox col for non-pending tabs
+  await loadAll();
+})();
+
+// ── LOAD ALL ──────────────────────────────────────────────────────
+async function loadAll() {
+  const res = await apiRequest("/hr/shift-requests");
+  if (res.error) { showToast(res.msg, "err"); return; }
+
+  allRequests = Array.isArray(res) ? res : [];
+  updateKPIs();
+  updateTabCounts();
+  renderTable();
+}
+
+// ── KPIs ──────────────────────────────────────────────────────────
+function updateKPIs() {
+  const pending  = allRequests.filter(r => r.status === "pending").length;
+  const approved = allRequests.filter(r => r.status === "approved").length;
+  const rejected = allRequests.filter(r => r.status === "rejected").length;
+  document.getElementById("k-pending").textContent  = pending;
+  document.getElementById("k-approved").textContent = approved;
+  document.getElementById("k-rejected").textContent = rejected;
+  document.getElementById("k-total").textContent    = allRequests.length;
+
+  // sidebar badge
+  const badge = document.getElementById("pending-badge");
+  badge.textContent    = pending;
+  badge.style.display  = pending > 0 ? "inline" : "none";
+}
+
+// ── TAB COUNTS ────────────────────────────────────────────────────
+function updateTabCounts() {
+  ["pending","approved","rejected"].forEach(s => {
+    document.getElementById("tc-"+s).textContent = allRequests.filter(r => r.status === s).length;
+  });
+  document.getElementById("tc-all").textContent = allRequests.length;
+}
+
+// ── SWITCH TAB ────────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("tab-"+tab).classList.add("active");
+  const titles = { pending:"Pending Requests", approved:"Approved Requests", rejected:"Rejected Requests", all:"All Requests" };
+  document.getElementById("table-title").textContent = titles[tab];
+
+  // checkbox col only for pending
+  const chkCol = document.getElementById("check-col");
+  chkCol.style.display = (tab === "pending") ? "" : "none";
+  document.getElementById("select-all").checked = false;
+  document.getElementById("bulk-actions").style.display = "none";
+
+  document.getElementById("search-input").value = "";
+  document.getElementById("date-filter").value  = "";
+  renderTable();
+}
+
+// ── RENDER TABLE ──────────────────────────────────────────────────
+function renderTable() {
+  const search    = document.getElementById("search-input").value.toLowerCase();
+  const dateFilter= document.getElementById("date-filter").value;
+  const tbody     = document.getElementById("req-tbody");
+
+  let rows = currentTab === "all"
+    ? allRequests
+    : allRequests.filter(r => r.status === currentTab);
+
+  // search
+  if (search) rows = rows.filter(r => (r.userId?.name||"").toLowerCase().includes(search) || (r.userId?.email||"").toLowerCase().includes(search));
+
+  // date filter
+  if (dateFilter) {
+    const now  = new Date();
+    const today = now.toISOString().slice(0,10);
+    const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
+    const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
+
+    rows = rows.filter(r => {
+      if (dateFilter === "today")  return r.date === today;
+      if (dateFilter === "week")   return r.date >= weekStart.toISOString().slice(0,10);
+      if (dateFilter === "month")  return r.date >= monthStart;
+      return true;
+    });
+  }
+
+  document.getElementById("result-count").textContent = `${rows.length} result${rows.length !== 1 ? "s" : ""}`;
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="8">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">${currentTab === "pending" ? "No pending requests" : "No requests found"}</div>
+        <div style="font-size:13px">
+          ${currentTab === "pending" ? "All caught up! Employees haven't submitted any new shift requests." : "Try changing the filter or search."}
+        </div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => {
+    const name    = r.userId?.name  || "Unknown";
+    const email   = r.userId?.email || "";
+    const initials= name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+    const isPending = r.status === "pending";
+    const requestedOn = r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "—";
+    const shiftDate   = r.date      ? new Date(r.date+"T00:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"2-digit",month:"short"}) : "—";
+
+    const checkboxCell = (currentTab === "pending")
+      ? `<td><input type="checkbox" class="row-check" data-id="${r._id}" onchange="updateBulkBar()" style="cursor:pointer;accent-color:var(--accent2)"></td>`
+      : `<td></td>`;
+
+    const actionsCell = isPending
+      ? `<div class="act-row">
+           <button class="btn-approve" onclick="quickAction('${r._id}','approved')">✓ Approve</button>
+           <button class="btn-reject"  onclick="quickAction('${r._id}','rejected')">✕ Reject</button>
+           <button class="btn-view"    onclick="openDetail('${r._id}')">Detail</button>
+         </div>`
+      : `<button class="btn-view" onclick="openDetail('${r._id}')">View</button>`;
+
+    return `<tr>
+      ${checkboxCell}
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:linear-gradient(135deg,#3b82f6,#6366f1);font-size:11px;flex-shrink:0">${initials}</div>
+          <div><div class="td-name">${esc(name)}</div><div class="td-sub">${esc(email)}</div></div>
+        </div>
+      </td>
+      <td style="font-family:var(--mono);font-size:12px">${shiftDate}</td>
+      <td><span style="font-family:var(--mono);font-size:12px;background:var(--navy3);padding:3px 8px;border-radius:5px">${esc(r.slotStart)} – ${esc(r.slotEnd)}</span></td>
+      <td style="color:var(--text2);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.note)}">${r.note ? esc(r.note) : '<span style="color:var(--text3)">—</span>'}</td>
+      <td style="color:var(--text3);font-size:12px">${requestedOn}</td>
+      <td><span class="badge ${statusClass(r.status)}">${r.status}</span></td>
+      <td>${actionsCell}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── QUICK APPROVE / REJECT (no modal, instant) ────────────────────
+function quickAction(id, status) {
+  pendingAction = { id, status };
+  const action  = status === "approved" ? "Approve" : "Reject";
+  document.getElementById("remarks-title").textContent = `${action} Request`;
+  document.getElementById("remarks-desc").textContent  =
+    `Add an optional remark for the employee before ${action.toLowerCase()}ing.`;
+  document.getElementById("remarks-confirm-btn").textContent = action;
+  document.getElementById("remarks-confirm-btn").className =
+    `btn ${status === "approved" ? "approve" : "reject-btn"}`;
+  document.getElementById("remarks-input").value = "";
+  closeModal("detail-modal");
+  openModal("remarks-modal");
+}
+
+// ── SUBMIT REVIEW ─────────────────────────────────────────────────
+async function submitReview() {
+  if (!pendingAction) return;
+  const { id, status } = pendingAction;
+  const remarks = document.getElementById("remarks-input").value.trim();
+  const btn     = document.getElementById("remarks-confirm-btn");
+
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+
+  const res = await apiRequest(`/hr/shift-requests/${id}/status`, "PATCH", {
+    status, reviewRemarks: remarks
+  });
+
+  btn.disabled = false;
+  btn.textContent = status === "approved" ? "Approve" : "Reject";
+
+  if (res.error) { showToast(res.msg, "err"); return; }
+
+  closeModal("remarks-modal");
+  pendingAction = null;
+  showToast(status === "approved" ? "Request approved ✓" : "Request rejected", status === "approved" ? "ok" : "err");
+  await loadAll();
+}
+
+// ── BULK ACTIONS ──────────────────────────────────────────────────
+function updateBulkBar() {
+  const checked = document.querySelectorAll(".row-check:checked");
+  const bar     = document.getElementById("bulk-actions");
+  const cnt     = document.getElementById("selected-count");
+  if (checked.length > 0) {
+    bar.style.display = "flex";
+    cnt.textContent   = `${checked.length} selected`;
+  } else {
+    bar.style.display = "none";
+  }
+}
+
+function toggleSelectAll() {
+  const all = document.getElementById("select-all").checked;
+  document.querySelectorAll(".row-check").forEach(c => c.checked = all);
+  updateBulkBar();
+}
+
+async function bulkAction(status) {
+  const checked = [...document.querySelectorAll(".row-check:checked")];
+  if (!checked.length) return;
+  if (!confirm(`${status === "approved" ? "Approve" : "Reject"} ${checked.length} request(s)?`)) return;
+
+  document.getElementById("bulk-approve-btn").disabled = true;
+  document.getElementById("bulk-reject-btn").disabled  = true;
+
+  let success = 0;
+  for (const cb of checked) {
+    const res = await apiRequest(`/hr/shift-requests/${cb.dataset.id}/status`, "PATCH", { status, reviewRemarks: "" });
+    if (!res.error) success++;
+  }
+
+  document.getElementById("bulk-approve-btn").disabled = false;
+  document.getElementById("bulk-reject-btn").disabled  = false;
+  document.getElementById("select-all").checked        = false;
+  document.getElementById("bulk-actions").style.display = "none";
+
+  showToast(`${success} request(s) ${status} ✓`, "ok");
+  await loadAll();
+}
+
+// ── DETAIL MODAL ──────────────────────────────────────────────────
+function openDetail(id) {
+  const r = allRequests.find(x => x._id === id);
+  if (!r) return;
+
+  const name     = r.userId?.name  || "Unknown";
+  const email    = r.userId?.email || "";
+  const isPending= r.status === "pending";
+  const reviewedBy = r.reviewedBy?.name || "—";
+  const reviewedAt = r.reviewedAt ? new Date(r.reviewedAt).toLocaleString() : "—";
+
+  document.getElementById("detail-body").innerHTML = `
+    <div class="section-label">Employee</div>
+    <div class="info-row"><span class="info-key">Name</span><span class="info-val">${esc(name)}</span></div>
+    <div class="info-row"><span class="info-key">Email</span><span class="info-val" style="font-family:var(--mono);font-size:12px">${esc(email)}</span></div>
+
+    <div class="section-label">Shift Request</div>
+    <div class="info-row"><span class="info-key">Date</span><span class="info-val">${r.date ? new Date(r.date+"T00:00:00").toLocaleDateString("en-GB",{weekday:"long",day:"2-digit",month:"long",year:"numeric"}) : "—"}</span></div>
+    <div class="info-row"><span class="info-key">Shift slot</span><span class="info-val" style="font-family:var(--mono)">${esc(r.slotStart)} – ${esc(r.slotEnd)}</span></div>
+    <div class="info-row"><span class="info-key">Employee note</span><span class="info-val" style="max-width:240px;text-align:right;color:var(--text2)">${r.note ? esc(r.note) : "None"}</span></div>
+    <div class="info-row"><span class="info-key">Submitted</span><span class="info-val" style="font-size:12px;color:var(--text2)">${r.createdAt ? new Date(r.createdAt).toLocaleString() : "—"}</span></div>
+
+    <div class="section-label">Review</div>
+    <div class="info-row"><span class="info-key">Status</span><span class="info-val"><span class="badge ${statusClass(r.status)}">${r.status}</span></span></div>
+    ${!isPending ? `
+    <div class="info-row"><span class="info-key">Reviewed by</span><span class="info-val">${esc(reviewedBy)}</span></div>
+    <div class="info-row"><span class="info-key">Reviewed at</span><span class="info-val" style="font-size:12px;color:var(--text2)">${reviewedAt}</span></div>
+    <div class="info-row"><span class="info-key">Remarks</span><span class="info-val" style="max-width:240px;text-align:right;color:var(--text2)">${r.reviewRemarks ? esc(r.reviewRemarks) : "None"}</span></div>
+    ` : ""}
+  `;
+
+  const ft = document.getElementById("detail-ft");
+  if (isPending) {
+    ft.innerHTML = `
+      <button class="btn" onclick="closeModal('detail-modal')">Close</button>
+      <button class="btn reject-btn" onclick="quickAction('${r._id}','rejected')">✕ Reject</button>
+      <button class="btn approve"    onclick="quickAction('${r._id}','approved')">✓ Approve</button>
+    `;
+  } else {
+    ft.innerHTML = `<button class="btn primary" onclick="closeModal('detail-modal')">Close</button>`;
+  }
+
+  openModal("detail-modal");
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function statusClass(s) {
+  return { pending:"b-amber", approved:"b-green", rejected:"b-rose" }[s] || "b-gray";
+}
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function openModal(id)  { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") document.querySelectorAll(".overlay.open").forEach(m => m.classList.remove("open"));
+});
+
+let toastTimer;
+function showToast(msg, type = "ok") {
+  const t = document.getElementById("toast");
+  t.textContent = (type === "ok" ? "✓ " : "✕ ") + msg;
+  t.className   = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 3500);
+}
+</script>
+</body>
+</html>

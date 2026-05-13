@@ -290,9 +290,12 @@ textarea { resize: vertical; min-height: 80px; }
     <a class="nav-item" href="../operations/payroll.html">
       <span class="nav-icon">💰</span> Payroll
     </a>
+    <a class="nav-item" href="../employees/shift-requests.html">
+      <span class="nav-icon">🔄</span> Shift Requests
+      <span class="nav-badge" id="shift-badge" style="display:none">0</span>
+    </a>
     <a class="nav-item" href="../operations/escalations.html">
       <span class="nav-icon">⚠️</span> Escalations
-      <span class="nav-badge">3</span>
     </a>
     <a class="nav-item" href="../operations/performance.html">
       <span class="nav-icon">📊</span> Performance
@@ -785,6 +788,13 @@ new Chart(document.getElementById('funnelChart'),{
   setEl("dash-present", s.presentToday    ?? "—");
   setEl("dash-absent",  s.absentToday     ?? "—");
   setEl("dash-pending", s.pendingRequests ?? "—");
+  // update shift badge in sidebar
+  const sb = document.getElementById("shift-badge");
+  if (sb) {
+    const p = s.pendingRequests || 0;
+    sb.textContent = p;
+    sb.style.display = p > 0 ? "inline" : "none";
+  }
 
   // Recent hires
   const tbody = document.getElementById("recent-hires-tbody");
