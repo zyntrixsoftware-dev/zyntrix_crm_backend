@@ -114,8 +114,26 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .hours-low{color:var(--amber);font-weight:500}
 .empty{text-align:center;padding:48px;color:var(--text3)}
 
-/* NO EMPLOYEE STATE */
-.no-id{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;height:60vh;color:var(--text3);text-align:center}
+/* NO EMPLOYEE STATE / EMPLOYEE PICKER */
+.no-id{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;padding-top:40px;color:var(--text3);text-align:center}
+.picker-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:540px;overflow:hidden}
+.picker-hd{padding:20px 24px 16px;border-bottom:1px solid var(--border)}
+.picker-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px}
+.picker-sub{font-size:13px;color:var(--text3)}
+.picker-search-wrap{padding:14px 20px;border-bottom:1px solid var(--border);position:relative}
+.picker-input{width:100%;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:10px 14px 10px 36px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;transition:border .15s}
+.picker-input:focus{border-color:var(--accent2)}
+.picker-icon{position:absolute;left:32px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.picker-list{max-height:320px;overflow-y:auto}
+.picker-item{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s}
+.picker-item:last-child{border-bottom:none}
+.picker-item:hover{background:var(--accent-dim)}
+.picker-avatar{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.picker-name{font-size:13px;font-weight:500;color:var(--text)}
+.picker-detail{font-size:11px;color:var(--text3);margin-top:1px}
+.picker-role{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin-left:auto;flex-shrink:0}
+.picker-empty{padding:32px;text-align:center;color:var(--text3);font-size:13px}
+.picker-loading{padding:24px;text-align:center;color:var(--text3);font-size:13px}
 
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -229,14 +247,23 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
   <div class="content">
 
-    <!-- NO EMPLOYEE SELECTED -->
+    <!-- NO EMPLOYEE SELECTED → EMPLOYEE PICKER -->
     <div class="no-id" id="no-id-state">
-      <div style="font-size:48px">👤</div>
-      <div style="font-size:18px;font-weight:500;color:var(--text2)">No employee selected</div>
-      <div style="font-size:13px">Open this page from an employee's profile</div>
-      <a href="employees.html" class="topbar-btn" style="background:var(--accent2);border-color:var(--accent2);color:#fff;margin-top:6px">
-        Go to Employees
-      </a>
+      <div class="picker-card">
+        <div class="picker-hd">
+          <div class="picker-title">📅 Attendance Viewer</div>
+          <div class="picker-sub">Search and select an employee to view their attendance</div>
+        </div>
+        <div class="picker-search-wrap">
+          <span class="picker-icon">🔍</span>
+          <input class="picker-input" id="picker-input" type="text"
+            placeholder="Search by name, email or department…"
+            oninput="onPickerSearch(this.value)" autocomplete="off">
+        </div>
+        <div class="picker-list" id="picker-list">
+          <div class="picker-loading">Loading employees…</div>
+        </div>
+      </div>
     </div>
 
     <!-- LOADED STATE -->
@@ -397,6 +424,7 @@ let empData  = null; // User object returned by API
   if (!userId) {
     document.getElementById("no-id-state").style.display  = "flex";
     document.getElementById("loaded-state").style.display = "none";
+    loadPickerEmployees(); // populate the search picker
     return;
   }
 
@@ -725,6 +753,79 @@ function showToast(msg, type = "ok") {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeResetModal();
 });
+
+// ══════════════════════════════════════════════════════════════════
+//  EMPLOYEE PICKER  (shown when no userId in URL)
+// ══════════════════════════════════════════════════════════════════
+let _pickerAll = [];   // full list from API
+let _pickerTimer = null;
+
+async function loadPickerEmployees() {
+  const res = await apiRequest("/hr/employees");
+  if (res.error || !res.employees) {
+    document.getElementById("picker-list").innerHTML =
+      '<div class="picker-empty">Could not load employees. Please try again.</div>';
+    return;
+  }
+  _pickerAll = res.employees || [];
+  renderPickerList(_pickerAll);
+}
+
+function onPickerSearch(q) {
+  clearTimeout(_pickerTimer);
+  _pickerTimer = setTimeout(() => {
+    const lq = q.trim().toLowerCase();
+    const filtered = lq
+      ? _pickerAll.filter(e =>
+          (e.name        || "").toLowerCase().includes(lq) ||
+          (e.email       || "").toLowerCase().includes(lq) ||
+          (e.department  || "").toLowerCase().includes(lq) ||
+          (e.designation || "").toLowerCase().includes(lq)
+        )
+      : _pickerAll;
+    renderPickerList(filtered, lq);
+  }, 180);
+}
+
+const ROLE_COLORS = {
+  employee:"#3b82f6,#6366f1", hr:"#2dd4bf,#0d9488",
+  sales:"#f59e0b,#d97706", marketing:"#a78bfa,#7c3aed",
+  lms:"#22c55e,#16a34a", super_admin:"#f43f5e,#dc2626"
+};
+const ROLE_BADGE = {
+  employee:"rgba(59,130,246,.15);color:#4f9cf9",
+  hr:"rgba(45,212,191,.15);color:#2dd4bf",
+  sales:"rgba(245,158,11,.15);color:#f59e0b",
+  marketing:"rgba(167,139,250,.15);color:#a78bfa",
+  lms:"rgba(34,197,94,.15);color:#22c55e",
+  super_admin:"rgba(244,63,94,.15);color:#f43f5e"
+};
+
+function renderPickerList(list, query) {
+  const el = document.getElementById("picker-list");
+  if (!list.length) {
+    el.innerHTML = `<div class="picker-empty">${query ? "No employees match <b>" + esc(query) + "</b>" : "No employees found"}</div>`;
+    return;
+  }
+  el.innerHTML = list.map(e => {
+    const init  = mkInitials(e.name || "?");
+    const grad  = `linear-gradient(135deg,${ROLE_COLORS[e.role] || "#3b82f6,#6366f1"})`;
+    const badge = ROLE_BADGE[e.role] || "rgba(100,116,139,.15);color:#64748b";
+    const dept  = [e.designation, e.department].filter(Boolean).join(" · ") || "No department";
+    return `<div class="picker-item" onclick="goToAttendance('${e._id}')">
+      <div class="picker-avatar" style="background:${grad}">${init}</div>
+      <div style="flex:1;min-width:0">
+        <div class="picker-name">${esc(e.name)}</div>
+        <div class="picker-detail">${esc(e.email)} · ${esc(dept)}</div>
+      </div>
+      <span class="picker-role" style="background:${badge.split(";")[0]};${badge.split(";")[1]}">${esc(e.role||"employee")}</span>
+    </div>`;
+  }).join("");
+}
+
+function goToAttendance(id) {
+  window.location.href = "attendance.html?userId=" + encodeURIComponent(id);
+}
 </script>
 </body>
 </html>
