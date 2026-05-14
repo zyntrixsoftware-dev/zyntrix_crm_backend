@@ -510,6 +510,7 @@ function renderTable(employees) {
           <div>
             <div class="td-main">${esc(emp.name)}</div>
             <div class="td-sub">${esc(emp.email)}</div>
+            <div style="margin-top:3px"><span class="badge ${roleClass(emp.role)}" style="font-size:10px">${esc(emp.role||'employee')}</span></div>
           </div>
         </div>
       </td>
@@ -755,6 +756,9 @@ function statusClass(s) {
 }
 function typeClass(t) {
   return {"Full-time":"b-blue","Part-time":"b-teal",Contract:"b-amber",Intern:"b-purple"}[t] || "b-gray";
+}
+function roleClass(r) {
+  return {employee:"b-blue",hr:"b-teal",sales:"b-amber",marketing:"b-purple",lms:"b-green",super_admin:"b-rose"}[r] || "b-gray";
 }
 function esc(s) {
   if (!s) return "";
