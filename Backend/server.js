@@ -27,12 +27,16 @@ app.use(helmet());
 
 // ── CORS ─────────────────────────────────────────────────────────
 const allowedOrigins = [
-  process.env.FRONTEND_URL,               // https://zyntrixsoftware.com
-  "https://zyntrixsoftware.com",          // hard fallback
-  "https://www.zyntrixsoftware.com",      // www variant
-  "http://localhost:5500",                // VS Code Live Server
-  "http://127.0.0.1:5500",               // alternate localhost
-  "http://localhost:3000",               // other local dev
+  process.env.FRONTEND_URL,               // set in Railway env vars
+  "https://zyntrixsoftware.com",
+  "https://www.zyntrixsoftware.com",
+  // Railway backend talking to itself (health checks etc)
+  "https://zyntrixcrmbackend-production.up.railway.app",
+  "https://zyntrixbackend-production-d32c.up.railway.app",
+  "http://localhost:5500",               // VS Code Live Server
+  "http://127.0.0.1:5500",
+  "http://localhost:3000",
+  "http://localhost:5000",
 ].filter(Boolean);
 
 const corsOptions = {

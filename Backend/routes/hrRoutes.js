@@ -26,10 +26,12 @@ router.get("/employee/:userId/attendance",   auth, getEmployeeAttendance);
 router.get("/hrms/dashboard",                auth, getHrmsDashboard);
 
 // ── EMPLOYEE MANAGEMENT ───────────────────────────────────────────
+// IMPORTANT: /employees/departments MUST be before /employees/:id
+// otherwise Express treats "departments" as the :id param
 router.get("/employees",                     auth, getEmployees);
-router.get("/employees/departments",         auth, getDepartments);
-router.get("/employees/:id",                 auth, getEmployee);
+router.get("/employees/departments",         auth, getDepartments);  // ← must be before /:id
 router.post("/employees",                    auth, createEmployee);
+router.get("/employees/:id",                 auth, getEmployee);     // ← after named routes
 router.put("/employees/:id",                 auth, updateEmployee);
 router.patch("/employees/:id/terminate",     auth, terminateEmployee);
 
