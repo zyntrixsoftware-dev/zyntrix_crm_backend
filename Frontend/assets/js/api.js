@@ -1,7 +1,8 @@
 // ══════════════════════════════════════════════════════════════════
 //  DEPLOYMENT CONFIG
 // ══════════════════════════════════════════════════════════════════
-const RAILWAY_BACKEND_URL = "https://zyntrixbackend-production-d32c.up.railway.app";
+// ⚠ UPDATE THIS to your actual Railway backend URL if it changes
+const RAILWAY_BACKEND_URL = "https://zyntrixcrmbackend-production.up.railway.app";
 
 const API_BASE = (
   window.location.hostname === "localhost" ||
@@ -28,7 +29,17 @@ async function apiRequest(url, method = "GET", body = null) {
     try {
       data = await res.json();
     } catch {
-      return { error: true, msg: "Invalid server response (not JSON)" };
+      // Backend returned HTML instead of JSON — usually means:
+      // 1. Wrong Railway URL in RAILWAY_BACKEND_URL above
+      // 2. Backend is down / deploying
+      // 3. CORS blocked the request
+      console.error("Non-JSON response from:", API_BASE, "Status:", res.status, "URL:", res.url);
+      return {
+        error: true,
+        msg: res.status === 0 || res.status >= 500
+          ? "Backend unreachable — check Railway deployment or RAILWAY_BACKEND_URL in api.js"
+          : `Server error (${res.status}) — check backend logs`
+      };
     }
 
     // Auto-logout on 401 (expired / invalid token)

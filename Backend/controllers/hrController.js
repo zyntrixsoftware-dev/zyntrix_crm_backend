@@ -120,17 +120,20 @@ exports.getEmployeeAttendance = async (req, res) => {
     }
 
     const [year, monthNumber] = month.split("-").map(Number);
-    const start = new Date(year, monthNumber - 1, 1);
-    const end   = new Date(year, monthNumber,     1);
+
+    // ── Use pure string arithmetic to avoid local-timezone / UTC offset bugs ──
+    // e.g. on IST server: new Date(2026,4,1).toISOString() = "2026-04-30…"
+    const pad2      = n => String(n).padStart(2, "0");
+    const startStr  = `${year}-${pad2(monthNumber)}-01`;
+    const nextYear  = monthNumber === 12 ? year + 1 : year;
+    const nextMonth = monthNumber === 12 ? 1 : monthNumber + 1;
+    const endStr    = `${nextYear}-${pad2(nextMonth)}-01`;
 
     const [user, data] = await Promise.all([
       User.findById(userId).select("name email role"),
       Attendance.find({
         userId,
-        date: {
-          $gte: start.toISOString().slice(0, 10),
-          $lt:  end.toISOString().slice(0, 10)
-        }
+        date: { $gte: startStr, $lt: endStr }
       }).sort({ date: 1 })
     ]);
 
@@ -185,15 +188,18 @@ exports.getEmployee = async (req, res) => {
 
     if (!emp) return res.status(404).json({ msg: "Employee not found" });
 
-    // also get their attendance summary for current month
-    const month = new Date().toISOString().slice(0, 7);
+    // also get their attendance summary for current month (string arithmetic — no TZ offset bugs)
+    const month    = new Date().toISOString().slice(0, 7);
     const [year, monthNum] = month.split("-").map(Number);
-    const start = new Date(year, monthNum - 1, 1).toISOString().slice(0, 10);
-    const end   = new Date(year, monthNum,     1).toISOString().slice(0, 10);
+    const _pad      = n => String(n).padStart(2, "0");
+    const startStr  = `${year}-${_pad(monthNum)}-01`;
+    const _nextYear  = monthNum === 12 ? year + 1 : year;
+    const _nextMonth = monthNum === 12 ? 1 : monthNum + 1;
+    const endStr    = `${_nextYear}-${_pad(_nextMonth)}-01`;
 
     const attendance = await require("../models/attendance").find({
       userId: emp._id,
-      date: { $gte: start, $lt: end }
+      date: { $gte: startStr, $lt: endStr }
     }).sort({ date: 1 });
 
     return res.json({ employee: emp, attendance });
