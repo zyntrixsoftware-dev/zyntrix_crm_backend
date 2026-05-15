@@ -12,7 +12,8 @@ const attendanceRoutes = require("./routes/attendanceRoutes");
 const hrRoutes         = require("./routes/hrRoutes");
 const shiftRoutes      = require("./routes/shiftRoutes");
 const payrollRoutes    = require("./routes/payrollRoutes");
-const importRoutes     = require("./routes/importRoutes");
+const importRoutes          = require("./routes/importRoutes");
+const interviewOfferRoutes  = require("./routes/interviewOfferRoutes");
 
 const app = express();
 
@@ -89,6 +90,7 @@ app.use("/api/hr",         hrRoutes);
 app.use("/api/shifts",     shiftRoutes);
 app.use("/api/payroll",    payrollRoutes);
 app.use("/api/import",     importRoutes);
+app.use("/api/hr",         interviewOfferRoutes);   // interview + offer letter panel
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────
 app.get("/", (req, res) => {
