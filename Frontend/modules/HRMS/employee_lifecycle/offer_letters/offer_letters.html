@@ -5,28 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HRMS — Offer Letters</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy:#0d1b2a;--navy2:#132236;--navy3:#1a2d42;--navy4:#203350;--navy5:#263d5e;
+  --navy:#0d1b2a;--navy2:#132236;--navy3:#1a2d42;--navy4:#203350;
   --accent:#4f9cf9;--accent2:#3b82f6;--accent-dim:rgba(59,130,246,0.12);
   --teal:#2dd4bf;--amber:#f59e0b;--rose:#f43f5e;--green:#22c55e;--purple:#a78bfa;
   --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --card:#132236;--radius:12px;--sidebar:248px;
+  --card:#132236;--radius:12px;
   --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
 }
-html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden}
-.shell{display:flex;height:100vh}
-.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
-.content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
+html,body{min-height:100%;background:var(--navy);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6}
+.shell{display:flex;min-height:100vh}
+.sidebar{width:240px;min-width:240px;background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:10}
+.content{flex:1;padding:24px;background:var(--navy)}
 .brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
 .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.brand-name{font-size:15px;font-weight:600;color:var(--text)}
-.brand-ver{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.brand-name{font-size:15px;font-weight:600}.brand-ver{font-size:10px;color:var(--text3);font-family:var(--mono)}
 .nav-section{padding:14px 10px 6px}
 .nav-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
 .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
@@ -34,96 +32,67 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
 .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent2);border-radius:0 3px 3px 0}
 .nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
-.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
 .nav-divider{height:1px;background:var(--border);margin:8px 10px}
 .sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
-.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
-.user-pill:hover{background:var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
 .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
-.page-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
-.breadcrumb{font-size:12px;color:var(--text3)}
-.breadcrumb span{color:var(--text2)}
-.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;min-width:200px}
+.page-title{font-size:16px;font-weight:600;flex:1}
+.breadcrumb{font-size:12px;color:var(--text3)}.breadcrumb span{color:var(--text2)}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;min-width:220px}
 .search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%}
 .search-box input::placeholder{color:var(--text3)}
 .topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
 .topbar-btn:hover{background:var(--navy3)}
 .topbar-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
 .topbar-btn.primary:hover{background:var(--accent);border-color:var(--accent)}
-.notif-wrap{position:relative}
-.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--navy2)}
-.grid{display:grid;gap:16px}
-.g4{grid-template-columns:repeat(4,1fr)}
-.g2{grid-template-columns:repeat(2,1fr)}
-.g21{grid-template-columns:2fr 1fr}
-.g12{grid-template-columns:1fr 2fr}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(4,1fr)}.g12{grid-template-columns:1fr 2fr}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;animation:fadeUp .3s ease both}
 .card-sm{padding:16px}
 .card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
-.card-title{font-size:14px;font-weight:600;color:var(--text)}
-.card-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.card-title{font-size:14px;font-weight:600}.card-sub{font-size:12px;color:var(--text3);margin-top:2px}
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
-.b-green{background:rgba(34,197,94,0.13);color:var(--green)}
-.b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
-.b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}
-.b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
-.b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
-.b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px}
-td{padding:12px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
-tr:first-child td{border-top:none}
-tr:hover td{background:rgba(255,255,255,.02)}
-.td-main{font-weight:500;color:var(--text)}
-.td-sub{font-size:11px;color:var(--text3);margin-top:1px}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.b-green{background:rgba(34,197,94,0.13);color:var(--green)}.b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}.b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}.b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}.b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}.b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:flex-start;justify-content:center;backdrop-filter:blur(2px);padding:32px 16px;overflow-y:auto}
 .overlay.open{display:flex}
-.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:600px;max-width:94vw;max-height:90vh;overflow-y:auto}
-.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:760px;max-width:96vw;margin:auto}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--navy2);z-index:2;border-radius:16px 16px 0 0}
 .modal-title{font-size:15px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
-.modal-close:hover{color:var(--text)}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:24px;line-height:1;padding:0 4px}
 .modal-body{padding:22px 24px}
-.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--navy2);border-radius:0 0 16px 16px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:0}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 label{font-size:12px;font-weight:500;color:var(--text2)}
 input,select,textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
-select option{background:var(--navy2)}
+select option{background:var(--navy2)}textarea{resize:vertical;min-height:80px}
 .btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.btn:hover{background:var(--navy3)}
-.btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
-.btn.danger{background:var(--rose);border-color:var(--rose);color:#fff}
+.btn:hover{background:var(--navy3)}.btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}.btn.primary:hover{background:var(--accent)}
+.btn.success{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.35);color:var(--green)}
 .btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
-/* LETTER PREVIEW */
 .letter-wrap{background:#fff;border-radius:10px;padding:32px 36px;color:#1e293b;font-family:Georgia,serif;font-size:13px;line-height:1.8}
-.letter-wrap .co-header{border-bottom:2px solid #3b82f6;padding-bottom:14px;margin-bottom:20px}
 .letter-wrap .co-name{font-size:18px;font-weight:700;color:#1e40af;font-family:'DM Sans',sans-serif}
 .letter-wrap .co-tagline{font-size:11px;color:#64748b;font-family:'DM Sans',sans-serif}
-.letter-wrap h3{font-size:14px;font-weight:700;color:#1e293b;margin:16px 0 8px;text-decoration:underline;font-family:'DM Sans',sans-serif}
-.letter-wrap p{color:#334155;margin-bottom:10px}
+.letter-wrap h3{font-size:13px;font-weight:700;color:#1e293b;margin:16px 0 8px;text-decoration:underline;font-family:'DM Sans',sans-serif}
+.letter-wrap p{color:#334155;margin-bottom:10px;font-size:13px}
 .letter-wrap table{border-collapse:collapse;width:100%;margin:12px 0}
 .letter-wrap td,.letter-wrap th{padding:7px 12px;border:1px solid #e2e8f0;font-size:12px;color:#334155}
-.letter-wrap th{background:#f8fafc;font-weight:600;text-transform:none;letter-spacing:0;font-size:12px}
-.letter-wrap .sig-block{margin-top:24px}
+.letter-wrap th{background:#f8fafc;font-weight:600}
 .letter-wrap .sig-name{font-weight:700;font-size:14px;font-family:'DM Sans',sans-serif}
 .letter-wrap .sig-role{font-size:12px;color:#64748b;font-family:'DM Sans',sans-serif}
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.card{animation:fadeUp .3s ease both}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.edit-field{background:rgba(59,130,246,0.08);border:1px dashed rgba(59,130,246,0.3);border-radius:4px;padding:2px 6px;min-width:60px;display:inline-block;color:inherit;font-family:inherit;font-size:inherit}
+.edit-field:focus{outline:1px solid var(--accent2);background:rgba(59,130,246,0.15)}
+.section-divider{display:flex;align-items:center;gap:10px;margin:16px 0 12px;color:var(--text3);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1px}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(59,130,246,0.12);color:var(--accent);border:1px solid rgba(59,130,246,0.2)}
 </style>
-<script src="../../../../assets/js/api.js"></script>
-<script src="../../../../assets/js/auth.js?v=3"></script>
 </head>
 <body>
-<script>requireAuth(); requireModuleAccess("hr");</script>
 <div class="shell">
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-icon">👥</div>
@@ -131,311 +100,772 @@ select option{background:var(--navy2)}
   </div>
   <div class="nav-section">
     <div class="nav-label">Overview</div>
-    <a class="nav-item" href="../../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Employees</div>
+    <a class="nav-item" href="#"><span class="nav-icon">👥</span> All Employees</a>
+    <a class="nav-item" href="#"><span class="nav-icon">📅</span> Attendance</a>
   </div>
   <div class="nav-section">
     <div class="nav-label">Talent Acquisition</div>
-    <a class="nav-item" href="../../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
-    <a class="nav-item" href="../../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates <span class="nav-badge">14</span></a>
-    <a class="nav-item" href="../../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
+    <a class="nav-item" href="#"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
+    <a class="nav-item" href="#"><span class="nav-icon">👤</span> Candidates</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🎤</span> Interview Panel</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-label">Employee Lifecycle</div>
+    <a class="nav-item active" href="../offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
     <a class="nav-item" href="../onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
-    <a class="nav-item active" href="offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
     <a class="nav-item" href="../orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
     <a class="nav-item" href="../deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-label">Operations</div>
-    <a class="nav-item" href="../../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
-    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations <span class="nav-badge">3</span></a>
-    <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
+    <a class="nav-item" href="#"><span class="nav-icon">💰</span> Payroll</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🔄</span> Shift Requests</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⚠️</span> Escalations</a>
+    <a class="nav-item" href="#"><span class="nav-icon">📊</span> Performance</a>
   </div>
   <div class="sidebar-footer">
     <div class="user-pill">
-      <div class="avatar">AR</div>
-      <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--text);">Arjun Rao</div><div style="font-size:11px;color:var(--text3);">HR Manager</div></div>
-      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+      <div class="avatar">HR</div>
+      <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">HR Manager</div><div style="font-size:11px;color:var(--text3);">Admin</div></div>
     </div>
   </div>
 </aside>
-<!-- MAIN -->
+
 <div class="main">
   <div class="topbar">
     <div>
       <div class="page-title">Offer Letters</div>
       <div class="breadcrumb">HRMS Pro <span>›</span> Employee Lifecycle <span>›</span> Offer Letters</div>
     </div>
-    <div class="search-box"><span>🔍</span><input type="text" id="of-search" placeholder="Search candidate, role…" oninput="renderOffers()"></div>
-    <div class="notif-wrap"><button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button><span class="notif-dot"></span></div>
-    <button class="topbar-btn primary" onclick="openModal('gen-modal')">＋ Generate Offer</button>
+    <div class="search-box"><span>🔍</span><input type="text" id="of-search" placeholder="Search candidate or role…" oninput="renderList()"></div>
+    <button class="topbar-btn" onclick="loadData()">🔄 Reload</button>
   </div>
 
   <div class="content">
-    <!-- KPI -->
+    <!-- KPIs -->
     <div class="grid g4" style="margin-bottom:20px;">
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--amber);">4</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Awaiting Response</div>
-        <div style="font-size:11px;color:var(--amber);margin-top:3px;">1 deadline today</div>
+        <div id="kpi-total" style="font-size:26px;font-weight:700;color:var(--green);">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Candidates with Offer</div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--green);">11</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Accepted This Month</div>
-        <div style="font-size:11px;color:var(--green);margin-top:3px;">79% acceptance rate</div>
+        <div id="kpi-pending" style="font-size:26px;font-weight:700;color:var(--amber);">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Pending Send</div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--rose);">3</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Declined This Month</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:3px;">21% decline rate</div>
+        <div id="kpi-sent" style="font-size:26px;font-weight:700;color:var(--accent);">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Sent Today</div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--accent);">2.4</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Avg. Response Days</div>
-        <div style="font-size:11px;color:var(--green);margin-top:3px;">▼ faster than avg</div>
+        <div id="kpi-dept" style="font-size:26px;font-weight:700;color:var(--purple);">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Departments</div>
       </div>
     </div>
 
-    <!-- MAIN CONTENT: TABLE + PREVIEW -->
-    <div class="grid g12" style="margin-bottom:16px;">
-      <!-- LEFT: LIST -->
+    <!-- Status banner -->
+    <div id="status-banner" style="display:none;padding:12px 16px;border-radius:10px;margin-bottom:16px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);align-items:center;gap:12px;">
+      <span style="font-size:20px;">🎉</span>
+      <span id="status-banner-msg" style="font-size:13px;color:var(--text);flex:1;"></span>
+    </div>
+
+    <!-- Main layout -->
+    <div class="grid g12">
+      <!-- LEFT: list -->
       <div style="display:flex;flex-direction:column;gap:14px;">
-        <div class="card">
-          <div class="card-hd">
-            <div><div class="card-title">Offer Register</div><div class="card-sub" id="of-count">Showing all offers</div></div>
-            <select onchange="renderOffers()" id="status-filter" style="width:auto;padding:5px 10px;font-size:12px;">
-              <option value="">All Statuses</option>
-              <option>Awaiting</option>
-              <option>Accepted</option>
-              <option>Declined</option>
-              <option>Expired</option>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+            <div>
+              <div class="card-title">Candidate Register</div>
+              <div class="card-sub" id="of-count">Loading…</div>
+            </div>
+            <select id="dept-filter" onchange="renderList()" style="width:auto;padding:5px 10px;font-size:12px;">
+              <option value="">All Departments</option>
             </select>
           </div>
-          <div id="offer-list" style="display:flex;flex-direction:column;gap:0;"></div>
-        </div>
-
-        <!-- CHART -->
-        <div class="card">
-          <div class="card-hd"><div class="card-title">Offer Acceptance Trend</div></div>
-          <div style="height:150px;position:relative;"><canvas id="acceptChart"></canvas></div>
-        </div>
-      </div>
-
-      <!-- RIGHT: LETTER PREVIEW -->
-      <div class="card">
-        <div class="card-hd">
-          <div><div class="card-title" id="preview-title">Offer Preview — Kavya Reddy</div><div class="card-sub">Click an offer to load</div></div>
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-sm" onclick="alert('Downloading PDF…')">📥 PDF</button>
-            <button class="btn btn-sm" onclick="resendOffer()">📧 Resend</button>
+          <div id="cand-list"></div>
+          <div id="empty-list" style="display:none;text-align:center;padding:40px;color:var(--text3);">
+            <div style="font-size:28px;margin-bottom:10px;">📭</div>
+            <div style="font-size:13px;color:var(--text2);">No offer candidates found</div>
+            <div style="font-size:12px;margin-top:4px;">Candidates appear here once they pass all rounds in the Interview Panel.</div>
           </div>
         </div>
-        <div id="letter-preview-wrap" style="max-height:520px;overflow-y:auto;border-radius:8px;"></div>
+      </div>
+
+      <!-- RIGHT: preview -->
+      <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div class="card-title" id="preview-title">Offer Preview</div>
+            <div class="card-sub" id="preview-sub">Select a candidate to preview</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="preview-actions"></div>
+        </div>
+        <div id="preview-area" style="flex:1;overflow-y:auto;padding:16px;min-height:400px;">
+          <div style="text-align:center;padding:60px 20px;color:var(--text3);">
+            <div style="font-size:32px;margin-bottom:12px;">📝</div>
+            <div style="font-size:13px;color:var(--text2);">Select a candidate to preview and customise the offer letter</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 </div>
 
-<!-- GENERATE OFFER MODAL -->
-<div class="overlay" id="gen-modal" onclick="closeModal('gen-modal')">
+<!-- ===================== EDIT OFFER MODAL ===================== -->
+<div class="overlay" id="edit-modal" onclick="closeModal('edit-modal')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Generate Offer Letter</span><button class="modal-close" onclick="closeModal('gen-modal')">×</button></div>
-    <div class="modal-body">
+    <div class="modal-hd">
+      <span class="modal-title" id="edit-modal-title">✏️ Customise Offer Letter</span>
+      <button class="modal-close" onclick="closeModal('edit-modal')">×</button>
+    </div>
+    <div class="modal-body" id="edit-modal-body">
+      <!-- Candidate info banner -->
+      <div id="edit-cand-info" style="padding:12px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;margin-bottom:20px;font-size:13px;"></div>
+
+      <div class="section-divider">Compensation & Role</div>
       <div class="frow">
-        <div class="fg"><label>Candidate Name *</label><input id="go-name" placeholder="Full name"></div>
-        <div class="fg"><label>Applied Role *</label>
-          <select id="go-role"><option>Sr. Backend Engineer</option><option>Product Manager</option><option>DevOps Engineer</option><option>Sales Dev Rep</option><option>UX Designer</option></select>
+        <div class="fg" style="margin-bottom:0;"><label>Annual CTC (₹) *</label><input id="ed-ctc" type="number" placeholder="e.g. 800000"></div>
+        <div class="fg" style="margin-bottom:0;"><label>Date of Joining *</label><input id="ed-doj" type="date"></div>
+      </div>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0;"><label>Employee Type</label>
+          <select id="ed-type"><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Intern</option></select>
         </div>
+        <div class="fg" style="margin-bottom:0;"><label>Offer Expiry Date</label><input id="ed-expiry" type="date"></div>
       </div>
+
+      <div class="section-divider" style="margin-top:20px;">Workplace Details</div>
       <div class="frow">
-        <div class="fg"><label>Department</label>
-          <select id="go-dept"><option>Engineering</option><option>Product</option><option>Sales</option><option>Operations</option></select>
-        </div>
-        <div class="fg"><label>Date of Joining *</label><input id="go-doj" type="date"></div>
+        <div class="fg" style="margin-bottom:0;"><label>Work Location</label><input id="ed-loc" placeholder="e.g. Hyderabad / Remote"></div>
+        <div class="fg" style="margin-bottom:0;"><label>Reporting To</label><input id="ed-mgr" placeholder="Manager name & designation"></div>
       </div>
+
+      <div class="section-divider" style="margin-top:20px;">Letter Content</div>
+      <div class="fg">
+        <label>Opening Paragraph (custom message to candidate)</label>
+        <textarea id="ed-opening" style="min-height:90px;" placeholder="e.g. After a thorough evaluation of your interview rounds, we are delighted to extend this offer…"></textarea>
+      </div>
+      <div class="fg">
+        <label>Special Terms / Additional Clauses</label>
+        <textarea id="ed-terms" style="min-height:80px;" placeholder="e.g. Signing bonus of ₹50,000 payable on joining. Relocation assistance of ₹30,000. Probation period of 3 months…"></textarea>
+      </div>
+
+      <div class="section-divider" style="margin-top:20px;">Signatory</div>
       <div class="frow">
-        <div class="fg"><label>Annual CTC (₹ LPA) *</label><input id="go-ctc" type="number" placeholder="18"></div>
-        <div class="fg"><label>Work Location</label><input id="go-loc" placeholder="Bangalore / Remote"></div>
+        <div class="fg" style="margin-bottom:0;"><label>Signatory Name</label><input id="ed-signame" placeholder="e.g. Priya Sharma" value="HR Department"></div>
+        <div class="fg" style="margin-bottom:0;"><label>Signatory Designation</label><input id="ed-sigdes" placeholder="e.g. HR Manager" value="Zyntrix Software Pvt. Ltd."></div>
       </div>
-      <div class="frow">
-        <div class="fg"><label>Response Deadline *</label><input id="go-deadline" type="date"></div>
-        <div class="fg"><label>Probation Period</label>
-          <select id="go-probation"><option>3 months</option><option>6 months</option><option>No probation</option></select>
-        </div>
+
+      <div style="margin-top:16px;padding:12px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:12px;color:var(--text2);">
+        💡 <strong style="color:var(--amber);">Tip:</strong> After saving, you can also click directly on any field inside the offer preview to edit inline before sending.
       </div>
-      <div class="fg" style="margin-bottom:0;"><label>Special Clauses / Notes</label><textarea id="go-notes" placeholder="Signing bonus, relocation assistance, special terms…" style="min-height:70px;"></textarea></div>
     </div>
     <div class="modal-ft">
-      <button class="btn" onclick="closeModal('gen-modal')">Cancel</button>
-      <button class="btn" onclick="saveDraft()">Save Draft</button>
-      <button class="btn primary" onclick="generateOffer()">Generate &amp; Send</button>
+      <button class="btn" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="btn primary" id="save-edit-btn" onclick="saveEdit()">💾 Save &amp; Preview</button>
     </div>
   </div>
 </div>
 
-<!-- NOTIF -->
-<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
-  <div class="modal" style="width:400px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+<!-- ===================== SEND CONFIRM MODAL ===================== -->
+<div class="overlay" id="send-modal" onclick="closeModal('send-modal')">
+  <div class="modal" style="max-width:520px;" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <span class="modal-title">📧 Send Offer Letter</span>
+      <button class="modal-close" onclick="closeModal('send-modal')">×</button>
+    </div>
     <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="padding:12px;background:rgba(244,63,94,0.08);border-radius:8px;border-left:3px solid var(--rose);font-size:13px;"><strong>Kavya Reddy</strong> — offer deadline TODAY (May 5)</div>
-        <div style="padding:12px;background:var(--navy3);border-radius:8px;font-size:13px;">📝 Rajesh Kumar — offer not yet opened (sent 3 days ago)</div>
+      <div id="send-summary" style="margin-bottom:16px;"></div>
+      <div class="fg">
+        <label>Recipient Email *</label>
+        <input id="send-email" type="email" placeholder="candidate@email.com">
       </div>
+      <div class="fg">
+        <label>CC (optional, comma-separated)</label>
+        <input id="send-cc" type="text" placeholder="manager@company.com, hr@company.com">
+      </div>
+      <div class="fg" style="margin-bottom:0;">
+        <label>Personal Note to Candidate (prepended to email body)</label>
+        <textarea id="send-note" style="min-height:70px;" placeholder="Dear [Name], We are thrilled to welcome you aboard…"></textarea>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('send-modal')">Cancel</button>
+      <button class="btn primary" id="send-btn" onclick="sendOffer()">📧 Send Offer Letter</button>
     </div>
   </div>
 </div>
 
 <script>
-const OFFERS = [
-  {id:1, name:'Kavya Reddy',  init:'KR', col:'#3b82f6', role:'Sr. Backend Engineer', dept:'Engineering', ctc:18, doj:'May 15, 2025', loc:'Bangalore', sent:'Apr 29', deadline:'May 5',  status:'Awaiting',  probation:'3 months'},
-  {id:2, name:'Priya Sharma', init:'PS', col:'#22c55e', role:'Full Stack Developer',  dept:'Engineering', ctc:14, doj:'Apr 28, 2025', loc:'Bangalore', sent:'Apr 22', deadline:'Apr 28', status:'Accepted',  probation:'3 months'},
-  {id:3, name:'Ananya Das',   init:'AD', col:'#2dd4bf', role:'Sales Lead',            dept:'Sales',       ctc:12, doj:'Apr 25, 2025', loc:'Mumbai',    sent:'Apr 20', deadline:'Apr 25', status:'Accepted',  probation:'3 months'},
-  {id:4, name:'Kunal Saxena', init:'KS', col:'#f43f5e', role:'Data Analyst',          dept:'Operations',  ctc:10, doj:'—',           loc:'Hyderabad', sent:'Apr 18', deadline:'Apr 23', status:'Declined',  probation:'—'},
-  {id:5, name:'Rohit Mehra',  init:'RM', col:'#a78bfa', role:'Product Manager',       dept:'Product',     ctc:22, doj:'May 1, 2025',  loc:'Hyderabad', sent:'Apr 15', deadline:'Apr 22', status:'Accepted',  probation:'6 months'},
-  {id:6, name:'Rajesh Kumar', init:'RJ', col:'#f59e0b', role:'DevOps Engineer',       dept:'Engineering', ctc:20, doj:'May 10, 2025', loc:'Remote',    sent:'Apr 28', deadline:'May 6',  status:'Awaiting',  probation:'3 months'},
-];
+// ── BACKEND CONFIG (mirrors assets/js/api.js) ──────────
+const RAILWAY_BACKEND_URL = 'https://zyntrixcrmbackend-production.up.railway.app';
+const API_BASE = (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1'
+) ? 'http://localhost:5000/api' : RAILWAY_BACKEND_URL + '/api';
 
-const STATUS_CLS = {Awaiting:'b-amber',Accepted:'b-green',Declined:'b-rose',Expired:'b-gray'};
-let selectedId = 1;
+async function apiRequest(url, method = 'GET', body = null) {
+  const token = localStorage.getItem('token');
+  try {
+    const res = await fetch(API_BASE + url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: 'Bearer ' + token })
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+    if (res.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = window.location.origin + '/crm/index.html';
+      return { error: true, msg: 'Session expired. Please log in again.' };
+    }
+    let data;
+    try { data = await res.json(); } catch { data = {}; }
+    if (!res.ok) return { error: true, msg: data.msg || 'Request failed (' + res.status + ')' };
+    return data;
+  } catch (err) {
+    return { error: true, msg: 'Cannot reach the server: ' + err.message };
+  }
+}
+const PALETTE = ['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#22c55e','#f43f5e','#6366f1','#ec4899'];
 
-function ctcBreakdown(ctc){
-  const basic  = Math.round(ctc*100000*0.4/12);
-  const hra    = Math.round(ctc*100000*0.2/12);
-  const spl    = Math.round(ctc*100000*0.18/12);
-  const bonus  = Math.round(ctc*100000*0.12/12);
-  const pfComp = Math.round(ctc*100000*0.05/12);
-  const annual = ctc*100000;
-  return {basic,hra,spl,bonus,pfComp,annual};
+let ALL_CANDS = [];
+let selectedCand = null;
+let editData = {};
+let sentToday = 0;
+
+const mkInit = n => (n||'').trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+const mkCol  = s => { let h=0; for(const c of s){h=(h<<5)-h+c.charCodeAt(0);h|=0;} return PALETTE[Math.abs(h)%PALETTE.length]; };
+const fmtDt  = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+const fmtCur = n => Number(n).toLocaleString('en-IN');
+
+/* ── LOAD DATA — DUAL SOURCE: GAS Sheet (stage=Offered) + Node.js backend (passed interviews) ──
+ *
+ * FIX (Bug 2): The offer letter page was calling ONLY the Node.js backend
+ * (/api/hr/interviews/passed), which only knows about candidates that went
+ * through the MongoDB Interview Panel. But HR marks candidates as Offered
+ * in the Candidates CRM page which writes to Google Sheet column O.
+ * Those candidates NEVER appear in MongoDB, so the offer page was always empty.
+ *
+ * Solution: Load from BOTH sources and merge by email (dedup).
+ *   Source A — GAS Sheet: candidates whose stage === Offered
+ *   Source B — MongoDB:   candidates whose overallStatus === passed
+ */
+const SHEET_SCRIPT_URL = (function() {
+  // Re-use the same GAS URL as the candidates page (stored in localStorage after first load)
+  // or fall back to the hardcoded URL
+  try {
+    return localStorage.getItem('hrms_gas_url') ||
+      'https://script.google.com/macros/s/AKfycbyMU26puW-cuUsCu6iUECxGowyMSL4U1enosOxB9VIGp6YJ-5qO0b4MNp_vFNTrgghp/exec';
+  } catch(e) {
+    return 'https://script.google.com/macros/s/AKfycbyMU26puW-cuUsCu6iUECxGowyMSL4U1enosOxB9VIGp6YJ-5qO0b4MNp_vFNTrgghp/exec';
+  }
+})();
+
+async function loadData() {
+  showLoadingState('Loading offered candidates from all sources…');
+
+  // ── Source A: Google Sheet (stage = Offered) ────────────────────────────
+  let gasOffered = [];
+  try {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 15000);
+    const res = await fetch(SHEET_SCRIPT_URL, { method: 'GET', redirect: 'follow', signal: controller.signal });
+    clearTimeout(t);
+    if (res.ok) {
+      const gasData = await res.json();
+      if (gasData.success && Array.isArray(gasData.candidates)) {
+        gasOffered = gasData.candidates
+          .filter(c => (c.stage || '').toLowerCase() === 'offered')
+          .map(normaliseGASCand);
+      }
+    }
+  } catch (err) {
+    console.warn('[Offer Letters] GAS fetch failed:', err.message);
+  }
+
+  // ── Source B: MongoDB backend (overallStatus = passed) ─────────────────
+  let mongoPassedArr = [];
+  try {
+    const data = await apiRequest('/hr/interviews/passed');
+    if (!data.error && Array.isArray(data.candidates)) {
+      mongoPassedArr = data.candidates.map(normaliseMongoInterviewCand);
+    }
+  } catch (err) {
+    console.warn('[Offer Letters] MongoDB fetch failed:', err.message);
+  }
+
+  // ── Merge: deduplicate by email (MongoDB wins if both have same email) ────
+  const merged = new Map();
+  gasOffered.forEach(c    => merged.set((c.email || '').toLowerCase(), c));
+  mongoPassedArr.forEach(c => merged.set((c.email || '').toLowerCase(), c)); // overwrite if same email
+
+  const rows = [...merged.values()];
+
+  hideLoadingState();
+
+  if (!rows.length) {
+    ALL_CANDS = [];
+    updateKPIs(); populateDeptFilter(); renderList(); updateBanner();
+    showToast('ℹ No offered candidates found in Sheet or Interview Panel.');
+    return;
+  }
+
+  ALL_CANDS = rows;
+  updateKPIs(); populateDeptFilter(); renderList(); updateBanner();
+  if (ALL_CANDS.length) selectCand(ALL_CANDS[0]);
+  showToast(`✓ Loaded ${ALL_CANDS.length} candidate${ALL_CANDS.length !== 1 ? 's' : ''} ready for offer letters`);
 }
 
-function renderLetterPreview(o){
-  const b=ctcBreakdown(o.ctc);
-  const fmt=n=>n.toLocaleString('en-IN');
-  document.getElementById('preview-title').textContent=`Offer Preview — ${o.name}`;
-  document.getElementById('letter-preview-wrap').innerHTML=`
-    <div class="letter-wrap">
-      <div class="co-header">
-        <div class="co-name">ZYNTRIX SOFTWARE SOLUTION</div>
-        <div class="co-tagline">CIN: U72200KA2018PTC123456 · Bangalore, Karnataka — 560001</div>
-      </div>
-      <p style="font-size:11px;color:#64748b;">Date: ${o.sent}, 2025 &nbsp;|&nbsp; Ref: ZYNTRIX/HR/OL/${String(o.id).padStart(4,'0')}</p>
-      <p>To,<br><strong>${o.name}</strong></p>
-      <h3>Letter of Offer — ${o.role}</h3>
-      <p>Dear <strong>${o.name.split(' ')[0]}</strong>,</p>
-      <p>We are delighted to offer you the position of <strong>${o.role}</strong> at Zyntrix Software Solution in our <strong>${o.dept}</strong> department, based at <strong>${o.loc}</strong>.</p>
-      <p>Your appointment is effective from <strong>${o.doj}</strong>, subject to successful completion of background verification and submission of all required documents.</p>
-      <h3>Compensation — Annual CTC: ₹${o.ctc} LPA</h3>
-      <table>
-        <thead><tr><th>Salary Component</th><th>Monthly (₹)</th><th>Annual (₹)</th></tr></thead>
-        <tbody>
-          <tr><td>Basic Salary</td><td>${fmt(b.basic)}</td><td>${fmt(b.basic*12)}</td></tr>
-          <tr><td>House Rent Allowance (HRA)</td><td>${fmt(b.hra)}</td><td>${fmt(b.hra*12)}</td></tr>
-          <tr><td>Special Allowance</td><td>${fmt(b.spl)}</td><td>${fmt(b.spl*12)}</td></tr>
-          <tr><td>Performance Bonus (variable)</td><td>${fmt(b.bonus)}</td><td>${fmt(b.bonus*12)}</td></tr>
-          <tr><td>PF (Employer contribution)</td><td>${fmt(b.pfComp)}</td><td>${fmt(b.pfComp*12)}</td></tr>
-          <tr style="font-weight:700;"><td><strong>Total CTC</strong></td><td></td><td><strong>₹${fmt(b.annual)}</strong></td></tr>
-        </tbody>
-      </table>
-      <h3>Terms &amp; Conditions</h3>
-      <p>• Probation Period: <strong>${o.probation}</strong><br>
-      • Notice Period: 2 months (post-probation)<br>
-      • This offer is valid until <strong>${o.deadline}, 2025</strong>. Non-response by this date will be treated as a rejection.<br>
-      • This offer is contingent upon satisfactory background verification.</p>
-      <p>Please sign and return a copy of this letter as your acceptance. We look forward to welcoming you to the Zyntrix family.</p>
-      <div class="sig-block">
-        <div style="margin-top:20px;border-top:1px solid #e2e8f0;padding-top:12px;">
-          <div class="sig-name">Arjun Rao</div>
-          <div class="sig-role">HR Manager · Zyntrix Software Solution</div>
-        </div>
-        <div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:12px;">
-          <div style="font-size:12px;color:#64748b;">I, <strong>${o.name}</strong>, accept the above offer of employment.</div>
-          <div style="margin-top:16px;display:flex;gap:32px;">
-            <div><div style="border-top:1px solid #94a3b8;width:150px;margin-bottom:4px;"></div><div style="font-size:11px;color:#64748b;">Signature</div></div>
-            <div><div style="border-top:1px solid #94a3b8;width:120px;margin-bottom:4px;"></div><div style="font-size:11px;color:#64748b;">Date</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+// ── FIX (Bug 1): Maps a GAS Sheet row (stage=Offered) into the UI shape.
+// GAS now correctly returns { stage, offered, shortlisted } from the fixed doGet().
+// Previously COL.STAGE and COL.HR_NOTES were undefined so stage was always Applied
+// and no candidates ever showed up in the Offered tab.
+function normaliseGASCand(r) {
+  const email = (r.email || '').trim().toLowerCase();
+  const id    = 'gas_' + email; // synthetic id for GAS-sourced candidates
+  return {
+    id,
+    name:        r.fullName   || r.name  || '',
+    email,
+    phone:       r.phone      || '',
+    role:        r.position   || 'Position not specified',
+    department:  r.department || '',
+    salary:      0,
+    status:      'Offered',
+    experience:  r.experience || '',
+    location:    r.location   || '',
+    offerId:     null,         // no MongoDB offer letter yet
+    offerStatus: null,
+    _sent:       false,
+    source:      'sheet',
+    raw:         r,
+  };
 }
 
-function renderOffers(){
-  const q=document.getElementById('of-search').value.toLowerCase();
-  const st=document.getElementById('status-filter').value;
-  const data=OFFERS.filter(o=>{
-    if(st&&o.status!==st) return false;
-    if(q&&!o.name.toLowerCase().includes(q)&&!o.role.toLowerCase().includes(q)) return false;
+// Maps a MongoDB Interview document (overallStatus=passed) into the UI shape.
+// FIX (Bug 3): offerId._id is always returned by populate(), no need for the
+// r.offerId._id || r.offerId fallback that caused confusion.
+function normaliseMongoInterviewCand(r) {
+  const offerStatus = r.offerId ? (r.offerId.status || 'draft') : null;
+  return {
+    id:          r._id,
+    name:        r.candidateName  || '',
+    email:       (r.candidateEmail || '').trim().toLowerCase(),
+    phone:       r.candidatePhone || '',
+    role:        r.appliedFor     || 'Position not specified',
+    department:  r.department     || '',
+    salary:      0,
+    status:      'Passed',
+    experience:  '',
+    location:    '',
+    offerId:     r.offerId ? (r.offerId._id || r.offerId) : null,
+    offerStatus,
+    _sent:       offerStatus === 'sent' || offerStatus === 'accepted',
+    source:      'mongodb',
+    raw:         r,
+  };
+}
+
+// Kept for backward compat — alias of normaliseMongoInterviewCand
+function normaliseCand(r) { return normaliseMongoInterviewCand(r); }
+
+/* ── LOADING / ERROR STATES ────────────────────────── */
+function showLoadingState(msg) {
+  document.getElementById('of-count').textContent = msg || 'Connecting to backend…';
+  document.getElementById('cand-list').innerHTML = `
+    <div style="padding:32px;text-align:center;color:var(--text3);">
+      <div style="display:inline-block;width:22px;height:22px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--accent2);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px;"></div>
+      <div style="font-size:13px;color:var(--text2);">${msg || 'Fetching passed candidates from backend…'}</div>
+    </div>`;
+  document.getElementById('empty-list').style.display = 'none';
+  ['kpi-total','kpi-pending','kpi-sent','kpi-dept'].forEach(id => document.getElementById(id).textContent='—');
+}
+
+function hideLoadingState() {
+  document.getElementById('cand-list').innerHTML = '';
+}
+
+function showErrorState(html) {
+  document.getElementById('of-count').textContent = 'Connection failed';
+  document.getElementById('cand-list').innerHTML = `
+    <div style="padding:28px 24px;">
+      <div style="padding:16px 18px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.25);border-radius:10px;">
+        <div style="font-size:13px;font-weight:600;color:var(--rose);margin-bottom:8px;">⚠ Could not load sheet data</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;">${html}</div>
+      </div>
+      <button class="btn primary" style="margin-top:14px;width:100%;justify-content:center;" onclick="loadData()">🔄 Retry</button>
+    </div>`;
+  document.getElementById('preview-area').innerHTML = `
+    <div style="text-align:center;padding:60px 20px;color:var(--text3);">
+      <div style="font-size:32px;margin-bottom:12px;">⚠️</div>
+      <div style="font-size:13px;color:var(--text2);">Sheet connection failed — check the left panel for details</div>
+    </div>`;
+  document.getElementById('preview-actions').innerHTML = '';
+  document.getElementById('preview-title').textContent = 'Offer Preview';
+  document.getElementById('preview-sub').textContent   = 'No data loaded';
+}
+
+/* ── KPIs ──────────────────────────────────────────── */
+function updateKPIs() {
+  document.getElementById('kpi-total').textContent   = ALL_CANDS.length;
+  document.getElementById('kpi-pending').textContent = ALL_CANDS.filter(c=>!c._sent).length;
+  document.getElementById('kpi-sent').textContent    = sentToday;
+  const depts = new Set(ALL_CANDS.map(c=>c.department).filter(Boolean));
+  document.getElementById('kpi-dept').textContent    = depts.size || '—';
+}
+
+function updateBanner() {
+  const b = document.getElementById('status-banner');
+  const m = document.getElementById('status-banner-msg');
+  if (ALL_CANDS.length > 0) {
+    b.style.display='flex';
+    m.innerHTML = `<strong>${ALL_CANDS.length} candidate${ALL_CANDS.length!==1?'s':''}</strong> have cleared all interview rounds and are ready for offer letters. Select any candidate to preview and customise the letter.`;
+  } else {
+    b.style.display='none';
+  }
+}
+
+function populateDeptFilter() {
+  const sel = document.getElementById('dept-filter');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">All Departments</option>';
+  const depts = [...new Set(ALL_CANDS.map(c=>c.department).filter(Boolean))].sort();
+  depts.forEach(d => {
+    const o = document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o);
+  });
+  sel.value = prev;
+}
+
+/* ── RENDER LIST ───────────────────────────────────── */
+function renderList() {
+  const q  = (document.getElementById('of-search').value||'').toLowerCase();
+  const df = document.getElementById('dept-filter').value;
+
+  const filtered = ALL_CANDS.filter(c => {
+    if (df && c.department !== df) return false;
+    if (q && !(c.name+c.role+c.department).toLowerCase().includes(q)) return false;
     return true;
   });
-  document.getElementById('of-count').textContent=`Showing ${data.length} offer${data.length!==1?'s':''}`;
-  document.getElementById('offer-list').innerHTML=data.map(o=>`
-    <div onclick="selectOffer(${o.id})" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;${selectedId===o.id?'background:var(--accent-dim);border-left:3px solid var(--accent2);margin-left:-1px;':''}" onmouseenter="this.style.background='rgba(255,255,255,0.03)'" onmouseleave="this.style.background='${selectedId===o.id?'var(--accent-dim)':'transparent'}'">
-      <div style="width:34px;height:34px;border-radius:50%;background:${o.col};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;">${o.init}</div>
+
+  document.getElementById('of-count').textContent = `${filtered.length} candidate${filtered.length!==1?'s':''}`;
+
+  const html = filtered.map(c => {
+    const init = mkInit(c.name);
+    const col  = mkCol(c.name+c.id);
+    const isSel = selectedCand && selectedCand.id===c.id;
+    return `<div onclick="selectCand_byId('${c.id}')"
+      style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;${isSel?'background:var(--accent-dim);border-left:3px solid var(--accent2);':''}transition:background .15s;"
+      onmouseenter="this.style.background='${isSel?'var(--accent-dim)':'rgba(255,255,255,0.03)'}'"
+      onmouseleave="this.style.background='${isSel?'var(--accent-dim)':'transparent'}'">
+      <div style="width:36px;height:36px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${init}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:500;color:var(--text);">${o.name}</div>
-        <div style="font-size:11px;color:var(--text3);">${o.role} · ₹${o.ctc} LPA · Sent ${o.sent}</div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.name}</div>
+        <div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.role} · ${c.department||'—'}</div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
-        <span class="badge ${STATUS_CLS[o.status]}">${o.status}</span>
-        <span style="font-size:10px;color:var(--text3);">Due ${o.deadline}</span>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:11px;font-weight:500;color:var(--green);">₹${fmtCur(c.salary)}</div>
+        ${c._sent?'<span class="badge b-green" style="font-size:10px;">✓ Sent</span>':'<span class="badge b-amber" style="font-size:10px;">Pending</span>'}
+      </div>
+    </div>`;
+  }).join('');
+
+  const listEl = document.getElementById('cand-list');
+  listEl.innerHTML = html || '';
+  document.getElementById('empty-list').style.display = filtered.length ? 'none' : 'block';
+}
+
+function selectCand_byId(id) {
+  const c = ALL_CANDS.find(x=>x.id===id);
+  if (c) selectCand(c);
+}
+
+/* ── SELECT CANDIDATE ──────────────────────────────── */
+function selectCand(c) {
+  selectedCand = c;
+  if (!c.editData) {
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+30);
+    const expiry   = new Date(); expiry.setDate(expiry.getDate()+7);
+    c.editData = {
+      ctc:      c.salary || 800000,
+      doj:      tomorrow.toISOString().split('T')[0],
+      expiry:   expiry.toISOString().split('T')[0],
+      type:     'Full-time',
+      location: 'Hyderabad',
+      manager:  '',
+      opening:  '',
+      terms:    '',
+      signame:  'HR Department',
+      sigdes:   'Zyntrix Software Pvt. Ltd.'
+    };
+  }
+  document.getElementById('preview-title').textContent = `Offer Preview — ${c.name}`;
+  document.getElementById('preview-sub').textContent   = `${c.role} · ₹${fmtCur(c.editData.ctc)} p.a.`;
+  document.getElementById('preview-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="openEditModal()">✏️ Customise</button>
+    <button class="btn btn-sm success" onclick="openSendModal()">📧 Send Offer</button>`;
+  renderPreview(c);
+  renderList();
+}
+
+/* ── RENDER PREVIEW ────────────────────────────────── */
+function renderPreview(c) {
+  const ed    = c.editData;
+  const ctc   = Number(ed.ctc) || c.salary || 800000;
+  const basic = Math.round(ctc*0.4/12);
+  const hra   = Math.round(ctc*0.2/12);
+  const spl   = Math.round(ctc*0.18/12);
+  const bonus = Math.round(ctc*0.12/12);
+  const pf    = Math.round(ctc*0.05/12);
+  const fmt   = n => Number(n).toLocaleString('en-IN');
+  const today = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  const refNo = 'ZYN/HR/OL/' + String(c.id).slice(-6).toUpperCase();
+
+  document.getElementById('preview-area').innerHTML = `
+  <div class="letter-wrap" id="live-letter">
+    <div style="border-bottom:2px solid #3b82f6;padding-bottom:14px;margin-bottom:20px;">
+      <div class="co-name">ZYNTRIX SOFTWARE PVT. LTD.</div>
+      <div class="co-tagline">hr@zyntrixsoftware.com &nbsp;·&nbsp; www.zyntrixsoftware.com &nbsp;·&nbsp; Hyderabad, Telangana</div>
+    </div>
+    <p style="font-size:11px;color:#64748b;">Date: ${today} &nbsp;|&nbsp; Ref: ${refNo}</p>
+    <p>To,<br><strong>${c.name}</strong>${c.phone?'<br><span style="font-size:12px;color:#64748b;">'+c.phone+'</span>':''}<br><span style="font-size:12px;color:#64748b;">${c.email}</span></p>
+    <h3>Letter of Offer — ${c.role}</h3>
+    <p>Dear <strong>${c.name.split(' ')[0]}</strong>,</p>
+    <p contenteditable="true" id="opening-para" style="border:1px dashed transparent;border-radius:4px;padding:4px;transition:border .2s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='transparent';selectedCand.editData.opening=this.innerText;">
+      ${ed.opening || `We are pleased to extend this offer of employment following your successful interview process. After evaluating your qualifications, experience, and interview performance, we believe you will be a valuable addition to our team at Zyntrix Software Pvt. Ltd.`}
+    </p>
+    <h3>Employment Details</h3>
+    <table>
+      <tbody>
+        <tr><td><strong>Position</strong></td><td>${c.role}</td></tr>
+        <tr><td><strong>Department</strong></td><td>${c.department||'—'}</td></tr>
+        <tr><td><strong>Employee Type</strong></td><td>${ed.type||'Full-time'}</td></tr>
+        <tr><td><strong>Reporting To</strong></td><td>${ed.manager||'Respective Manager'}</td></tr>
+        <tr><td><strong>Work Location</strong></td><td>${ed.location||'Zyntrix Office, Hyderabad'}</td></tr>
+        <tr><td><strong>Date of Joining</strong></td><td>${ed.doj?fmtDt(ed.doj+'T00:00:00'):'To be confirmed'}</td></tr>
+        ${c.experience?'<tr><td><strong>Experience Recognised</strong></td><td>'+c.experience+'</td></tr>':''}
+      </tbody>
+    </table>
+    <h3>Compensation — Annual CTC: ₹${fmt(ctc)}</h3>
+    <table>
+      <thead><tr><th>Component</th><th>Monthly (₹)</th><th>Annual (₹)</th></tr></thead>
+      <tbody>
+        <tr><td>Basic Salary</td><td>${fmt(basic)}</td><td>${fmt(basic*12)}</td></tr>
+        <tr><td>House Rent Allowance</td><td>${fmt(hra)}</td><td>${fmt(hra*12)}</td></tr>
+        <tr><td>Special Allowance</td><td>${fmt(spl)}</td><td>${fmt(spl*12)}</td></tr>
+        <tr><td>Performance Bonus (variable)</td><td>${fmt(bonus)}</td><td>${fmt(bonus*12)}</td></tr>
+        <tr><td>PF Employer Contribution</td><td>${fmt(pf)}</td><td>${fmt(pf*12)}</td></tr>
+        <tr style="font-weight:700;background:#f8fafc;"><td><strong>Total CTC</strong></td><td></td><td><strong>₹${fmt(ctc)}</strong></td></tr>
+      </tbody>
+    </table>
+    <h3>Terms &amp; Conditions</h3>
+    <p contenteditable="true" id="terms-para" style="border:1px dashed transparent;border-radius:4px;padding:4px;transition:border .2s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='transparent';selectedCand.editData.terms=this.innerText;">
+      ${ed.terms || '• Probation period of 3 months from date of joining.\n• Notice Period: 2 months (post-probation).\n• This offer is contingent upon satisfactory background verification and submission of all required documents.\n• Continuation of employment is subject to company policies and code of conduct.'}
+      ${ed.expiry?'<br>• This offer is valid until <strong>'+fmtDt(ed.expiry+'T00:00:00')+'</strong>. Non-response will be treated as rejection.':''}
+    </p>
+    <p>Please confirm your acceptance by signing and returning this letter or by replying to <strong>hr@zyntrixsoftware.com</strong> within the validity period. We look forward to welcoming you to the Zyntrix family!</p>
+    <div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:14px;">
+      <div class="sig-name">${ed.signame||'HR Department'}</div>
+      <div class="sig-role">${ed.sigdes||'Zyntrix Software Pvt. Ltd.'}</div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:2px;">hr@zyntrixsoftware.com</div>
+    </div>
+    <div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:14px;">
+      <div style="font-size:12px;color:#64748b;">I, <strong>${c.name}</strong>, accept the above offer of employment.</div>
+      <div style="margin-top:16px;display:flex;gap:32px;">
+        <div><div style="border-top:1px solid #94a3b8;width:150px;margin-bottom:4px;"></div><div style="font-size:11px;color:#64748b;">Candidate Signature</div></div>
+        <div><div style="border-top:1px solid #94a3b8;width:120px;margin-bottom:4px;"></div><div style="font-size:11px;color:#64748b;">Date</div></div>
       </div>
     </div>
-  `).join('');
+    <div style="margin-top:12px;padding:8px 10px;background:#f8fafc;border-radius:6px;font-size:10px;color:#94a3b8;text-align:center;">
+      💡 Click on any text in this letter to edit it directly
+    </div>
+  </div>`;
 }
 
-function selectOffer(id){
-  selectedId=id;
-  const o=OFFERS.find(x=>x.id===id);
-  renderLetterPreview(o);
-  renderOffers();
+/* ── EDIT MODAL ────────────────────────────────────── */
+function openEditModal() {
+  if (!selectedCand) return;
+  const c = selectedCand;
+  const ed = c.editData;
+  const col = mkCol(c.name+c.id);
+  document.getElementById('edit-modal-title').textContent = `✏️ Customise Offer — ${c.name}`;
+  document.getElementById('edit-cand-info').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:36px;height:36px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">${mkInit(c.name)}</div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">${c.name}</div>
+        <div style="font-size:12px;color:var(--green);">✅ Interview Cleared · ${c.role} · ${c.department||'—'}</div>
+        <div style="font-size:11px;color:var(--text3);">${c.email}${c.phone?' · '+c.phone:''}</div>
+      </div>
+    </div>`;
+  document.getElementById('ed-ctc').value     = ed.ctc || c.salary || '';
+  document.getElementById('ed-doj').value     = ed.doj || '';
+  document.getElementById('ed-expiry').value  = ed.expiry || '';
+  document.getElementById('ed-type').value    = ed.type || 'Full-time';
+  document.getElementById('ed-loc').value     = ed.location || '';
+  document.getElementById('ed-mgr').value     = ed.manager || '';
+  document.getElementById('ed-opening').value = ed.opening || '';
+  document.getElementById('ed-terms').value   = ed.terms || '';
+  document.getElementById('ed-signame').value = ed.signame || 'HR Department';
+  document.getElementById('ed-sigdes').value  = ed.sigdes || 'Zyntrix Software Pvt. Ltd.';
+  openModal('edit-modal');
 }
-function resendOffer(){
-  const o=OFFERS.find(x=>x.id===selectedId);
-  alert(`Offer letter resent to ${o?.name}!`);
+
+function saveEdit() {
+  if (!selectedCand) return;
+  const ctc = Number(document.getElementById('ed-ctc').value);
+  if (!ctc) { showToast('⚠ Annual CTC is required'); return; }
+
+  selectedCand.editData = {
+    ctc:      ctc,
+    doj:      document.getElementById('ed-doj').value,
+    expiry:   document.getElementById('ed-expiry').value,
+    type:     document.getElementById('ed-type').value,
+    location: document.getElementById('ed-loc').value.trim(),
+    manager:  document.getElementById('ed-mgr').value.trim(),
+    opening:  document.getElementById('ed-opening').value.trim(),
+    terms:    document.getElementById('ed-terms').value.trim(),
+    signame:  document.getElementById('ed-signame').value.trim(),
+    sigdes:   document.getElementById('ed-sigdes').value.trim()
+  };
+  document.getElementById('preview-sub').textContent = `${selectedCand.role} · ₹${fmtCur(ctc)} p.a.`;
+  closeModal('edit-modal');
+  renderPreview(selectedCand);
+  showToast('✓ Offer letter customised. Review the preview before sending.');
 }
 
-function generateOffer(){
-  const name=document.getElementById('go-name').value.trim();
-  if(!name){alert('Please enter candidate name.');return;}
-  const ctc=+document.getElementById('go-ctc').value||0;
-  OFFERS.unshift({
-    id:Date.now(), name, init:name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
-    col:'#3b82f6', role:document.getElementById('go-role').value,
-    dept:document.getElementById('go-dept').value, ctc,
-    doj:document.getElementById('go-doj').value||'TBD',
-    loc:document.getElementById('go-loc').value||'TBD',
-    sent:'Today', deadline:document.getElementById('go-deadline').value||'TBD',
-    status:'Awaiting', probation:document.getElementById('go-probation').value
-  });
-  closeModal('gen-modal');
-  renderOffers();
-  alert(`Offer generated and sent to ${name}!`);
+/* ── SEND MODAL ────────────────────────────────────── */
+function openSendModal() {
+  if (!selectedCand) return;
+  const c = selectedCand;
+  document.getElementById('send-summary').innerHTML = `
+    <div style="padding:12px 14px;background:rgba(79,156,249,0.08);border:1px solid rgba(79,156,249,0.2);border-radius:8px;font-size:13px;">
+      <div style="font-weight:600;color:var(--text);margin-bottom:4px;">📋 ${c.name} — ${c.role}</div>
+      <div style="font-size:12px;color:var(--text3);">CTC: ₹${fmtCur(c.editData.ctc||c.salary)} · ${c.department||'—'}</div>
+    </div>`;
+  document.getElementById('send-email').value = c.email || '';
+  document.getElementById('send-cc').value    = '';
+  document.getElementById('send-note').value  = `Dear ${c.name.split(' ')[0]},\n\nWe are thrilled to welcome you to the Zyntrix Software family. Please find your offer letter attached below. Kindly review and confirm your acceptance at your earliest convenience.\n\nWarm regards,\nHR Team — Zyntrix Software Pvt. Ltd.`;
+  openModal('send-modal');
 }
-function saveDraft(){alert('Draft saved.');closeModal('gen-modal');}
 
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'))});
+async function sendOffer() {
+  const email = document.getElementById('send-email').value.trim();
+  if (!email) { showToast('⚠ Recipient email is required'); return; }
 
-const ctd={plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}},
-  scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}}}};
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Sending…';
 
-new Chart(document.getElementById('acceptChart'),{
-  type:'bar',
-  data:{labels:['Jan','Feb','Mar','Apr','May'],datasets:[
-    {label:'Accepted',data:[8,10,9,11,4],backgroundColor:'rgba(34,197,94,0.7)',borderRadius:4},
-    {label:'Declined',data:[2,3,2,3,1],backgroundColor:'rgba(244,63,94,0.5)',borderRadius:4}
-  ]},
-  options:{...ctd,responsive:true,maintainAspectRatio:false,plugins:{...ctd.plugins,legend:{display:true,labels:{color:'#94a3b8',font:{size:10},boxWidth:8}}}}
+  const c  = selectedCand;
+  const ed = c.editData;
+
+  try {
+    // ── Step 1: Create the offer letter in MongoDB (if not already created) ──
+    // FIX: was POSTing action:'sendOfferLetter' to Google Apps Script which has
+    // NO handler for that action. Email was silently dropped every time.
+    // Correct flow: POST /api/hr/offers → creates offer + generates letter body
+    //               POST /api/hr/offers/:id/send → sends email via nodemailer
+    let offerId = c.offerId;
+
+    if (!offerId) {
+      const ctc = Number(ed.ctc || c.salary || 0);
+      if (!ctc || !ed.doj) {
+        showToast('⚠ Please set Annual CTC and Date of Joining in Customise before sending');
+        btn.disabled = false; btn.innerHTML = '📧 Send Offer Letter';
+        return;
+      }
+
+      // ── FIX: GAS-sourced candidates have no MongoDB Interview record.
+      // Create one first so /api/hr/offers has a valid interviewId to link to.
+      let interviewId = c.id;
+      if (c.source === 'sheet' || String(c.id).startsWith('gas_')) {
+        const intRes = await apiRequest('/hr/interviews', 'POST', {
+          candidateName:  c.name,
+          candidateEmail: c.email,
+          candidatePhone: c.phone  || '',
+          appliedFor:     c.role,
+          department:     c.department || '',
+          notes:          'Auto-created from Candidates CRM (stage=Offered)',
+          rounds: [{ roundName: 'HR Round', status: 'passed', remarks: 'Cleared via Candidates CRM' }],
+        });
+        if (intRes.error) throw new Error('Could not create interview record: ' + intRes.msg);
+        // Mark as passed immediately
+        const statusRes = await apiRequest(`/hr/interviews/${intRes.interview._id}/status`, 'PATCH', { status: 'passed' });
+        if (statusRes.error) throw new Error('Could not mark interview as passed: ' + statusRes.msg);
+        interviewId = intRes.interview._id;
+        c.id = interviewId; // update local cache
+        c.source = 'mongodb'; // no longer sheet-only
+      }
+
+      const createRes = await apiRequest('/hr/offers', 'POST', {
+        interviewId:     interviewId,
+        offeredSalary:   ctc,
+        joiningDate:     ed.doj,
+        offerExpiryDate: ed.expiry  || '',
+        employeeType:    ed.type    || 'Full-time',
+        location:        ed.location|| '',
+        reportingTo:     ed.manager || '',
+        additionalTerms: ed.terms   || ''
+      });
+      if (createRes.error) throw new Error(createRes.msg);
+      offerId         = createRes.offer._id;
+      c.offerId       = offerId;  // cache so re-send skips creation
+      c.offerStatus   = 'draft';
+    }
+
+    // ── Step 2: Send the email ────────────────────────────────────────────────
+    const sendRes = await apiRequest(`/hr/offers/${offerId}/send`, 'POST');
+    if (sendRes.error) throw new Error(sendRes.msg);
+
+    sentToday++;
+    c._sent       = true;
+    c.offerStatus = 'sent';
+    updateKPIs();
+    renderList();
+    closeModal('send-modal');
+    showToast(`📧 Offer letter sent to ${email} successfully!`, 6000);
+
+  } catch (e) {
+    showToast('⚠ ' + e.message, 6000);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📧 Send Offer Letter';
+  }
+}
+
+/* ── MODAL / TOAST ─────────────────────────────────── */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'));
 });
 
-renderOffers();
-renderLetterPreview(OFFERS[0]);
+function showToast(msg, ms=4000) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a2d42;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;padding:12px 20px;border-radius:10px;font-size:13px;z-index:9999;transition:opacity .3s;box-shadow:0 4px 24px rgba(0,0,0,.5);max-width:420px;line-height:1.5;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.style.opacity='0', ms);
+}
+
+/* ── INIT ──────────────────────────────────────────── */
+loadData();
 </script>
 </body>
 </html>

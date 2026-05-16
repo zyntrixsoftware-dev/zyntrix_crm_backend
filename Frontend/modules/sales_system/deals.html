@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deals — Zyntrix CRM</title>
+<title>Enrollments — Zyntrix CRM</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg:#080e18; --bg2:#0d1624; --bg3:#111e30; --bg4:#162436; --bg5:#1c2e42;
-  --surface:#0f1d2e; --surface2:#162336;
+  --surface:#0f1d2e;
   --accent:#00e5b0; --accent2:#00c99a; --accent-dim:rgba(0,229,176,0.10); --accent-glow:rgba(0,229,176,0.22);
   --blue:#3d8ef0; --blue-dim:rgba(61,142,240,0.12);
   --amber:#f5a623; --amber-dim:rgba(245,166,35,0.12);
@@ -30,7 +29,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .brand{padding:22px 20px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
 .brand-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:800;color:var(--bg);flex-shrink:0;box-shadow:0 0 20px rgba(0,229,176,0.3);}
-.brand-text{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.brand-text{font-family:var(--display);font-size:15px;font-weight:700;}
 .brand-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px;letter-spacing:0.5px;}
 .nav-group{padding:16px 12px 6px;}
 .nav-label{font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 8px;font-family:var(--display);}
@@ -40,75 +39,60 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--accent);}
 .nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0;}
 .nav-count{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--mono);background:var(--bg4);color:var(--text2);padding:2px 7px;border-radius:6px;}
-.nav-count.hot{background:var(--rose-dim);color:var(--rose);}
 .nav-count.ok{background:var(--accent-dim);color:var(--accent);}
 .nav-divider{height:1px;background:var(--border);margin:8px 12px;}
 .sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);flex-shrink:0;}
 .user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background 0.15s;}
 .user-card:hover{background:var(--border);}
 .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bg);flex-shrink:0;font-family:var(--display);}
-.user-name{font-size:13px;font-weight:600;color:var(--text);}
-.user-role{font-size:11px;color:var(--text3);}
 .topbar{height:64px;min-height:64px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;position:relative;}
 .topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,176,0.15),transparent);}
 .page-hd{flex:1;}
-.page-title{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
+.page-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-0.3px;}
 .page-crumb{font-size:11px;color:var(--text3);margin-top:1px;}
 .page-crumb span{color:var(--accent);}
-.search-wrap{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;min-width:240px;transition:border 0.2s;}
+.search-wrap{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;min-width:220px;transition:border 0.2s;}
 .search-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
 .search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%;}
 .search-wrap input::placeholder{color:var(--text3);}
 .tbtn{padding:8px 16px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:flex;align-items:center;gap:7px;transition:all 0.18s;white-space:nowrap;}
 .tbtn:hover{background:var(--bg3);}
 .tbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(0,229,176,0.25);}
-.tbtn.primary:hover{background:var(--accent2);box-shadow:0 0 28px rgba(0,229,176,0.35);}
-.notif-wrap{position:relative;}
-.notif-dot{position:absolute;top:5px;right:12px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--bg2);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
-.sub-nav{display:flex;align-items:center;gap:4px;padding:0 28px;background:var(--bg2);border-bottom:1px solid var(--border);height:48px;}
-.snav-tab{padding:0 18px;height:100%;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;white-space:nowrap;font-family:var(--font);display:flex;align-items:center;gap:7px;background:none;border-top:none;border-left:none;border-right:none;}
+.tbtn.primary:hover{background:var(--accent2);}
+.sub-nav{display:flex;align-items:center;gap:4px;padding:16px 28px 0;background:var(--bg2);border-bottom:1px solid var(--border);}
+.snav-tab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;white-space:nowrap;font-family:var(--font);display:flex;align-items:center;gap:7px;background:none;border-top:none;border-left:none;border-right:none;}
 .snav-tab:hover{color:var(--text);}
 .snav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .snav-tab .tab-count{font-size:10px;font-family:var(--mono);background:var(--accent-dim);color:var(--accent);padding:1px 6px;border-radius:5px;}
 .snav-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
 .content{flex:1;overflow-y:auto;background:var(--bg);}
 .content::-webkit-scrollbar{width:5px;}
-.content::-webkit-scrollbar-track{background:transparent;}
 .content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 .section{padding:24px 28px;}
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s;cursor:default;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s;}
 .kpi-card:hover{transform:translateY(-2px);border-color:var(--border2);}
 .kpi-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,var(--glow,rgba(0,229,176,0.06)) 0%,transparent 60%);pointer-events:none;}
 .kpi-icon{font-size:20px;margin-bottom:10px;display:block;}
 .kpi-val{font-family:var(--display);font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px;}
 .kpi-lbl{font-size:11px;color:var(--text3);margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
 .kpi-delta{font-size:11.5px;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:500;}
-.up{color:var(--accent);} .dn{color:var(--rose);} .neu{color:var(--text3);}
+.up{color:var(--accent);}.dn{color:var(--rose);}.neu{color:var(--text3);}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
-.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap;}
-.card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.2px;}
+.card-title{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:-0.2px;}
 .card-sub{font-size:11.5px;color:var(--text3);margin-top:3px;}
-.card-actions{display:flex;gap:8px;flex-shrink:0;align-items:center;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
-.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;font-family:var(--mono);}
 .b-accent{background:var(--accent-dim);color:var(--accent);}
 .b-blue{background:var(--blue-dim);color:var(--blue);}
 .b-amber{background:var(--amber-dim);color:var(--amber);}
 .b-rose{background:var(--rose-dim);color:var(--rose);}
 .b-purple{background:var(--purple-dim);color:var(--purple);}
-.b-orange{background:var(--orange-dim);color:var(--orange);}
 .b-teal{background:var(--teal-dim);color:var(--teal);}
 .b-gray{background:rgba(78,102,128,0.15);color:var(--text3);}
 .btn{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:all 0.18s;}
 .btn:hover{background:var(--bg4);}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 16px rgba(0,229,176,0.2);}
-.btn.primary:hover{background:var(--accent2);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
 .btn.danger{background:var(--rose-dim);border-color:transparent;color:var(--rose);}
-.btn.danger:hover{background:rgba(255,77,109,0.2);}
 .btn-sm{padding:5px 12px;font-size:12px;border-radius:7px;}
 .btn-xs{padding:3px 9px;font-size:11px;border-radius:6px;}
 .btn-icon{width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border2);background:transparent;cursor:pointer;color:var(--text2);font-size:14px;transition:all 0.15s;}
@@ -117,31 +101,42 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .prog-fill{height:100%;border-radius:3px;transition:width 0.8s cubic-bezier(.4,0,.2,1);}
 table{width:100%;border-collapse:collapse;}
 thead tr{border-bottom:1px solid var(--border2);}
-th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 16px 12px;white-space:nowrap;font-family:var(--display);}
-td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
+th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 14px 12px;white-space:nowrap;font-family:var(--display);}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tbody tr{transition:background 0.12s;}
 tbody tr:hover td{background:rgba(255,255,255,0.015);}
 .td-main{font-weight:600;color:var(--text);font-size:13px;}
 .td-sub{font-size:11px;color:var(--text3);margin-top:2px;}
 select{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer;transition:border 0.15s;}
-select:focus{border-color:var(--accent);}
 select option{background:var(--bg2);}
 .filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all 0.15s;font-family:var(--font);white-space:nowrap;}
 .filter-chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 .filter-chip:hover:not(.active){background:var(--bg3);color:var(--text);}
-.tab-group{display:flex;gap:2px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:3px;}
-.tab-btn{padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--text2);transition:all 0.15s;background:none;border:none;font-family:var(--font);font-weight:500;}
-.tab-btn.active{background:var(--bg5);color:var(--text);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.ani{animation:fadeUp 0.35s ease both;}
+/* PIPELINE BOARD */
+.pipeline-board{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;min-height:400px;}
+.pipeline-board::-webkit-scrollbar{height:5px;}
+.pipeline-board::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.pipe-col{flex:0 0 220px;min-width:220px;}
+.pipe-hd{padding:12px 14px;border-radius:10px 10px 0 0;border:1px solid var(--border);border-bottom:none;display:flex;align-items:center;justify-content:space-between;}
+.pipe-body{border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:8px;background:var(--bg3);min-height:80px;display:flex;flex-direction:column;gap:8px;}
+.deal-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px;cursor:pointer;transition:all 0.2s;}
+.deal-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.dc-name{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.dc-value{font-size:13px;font-family:var(--mono);font-weight:700;color:var(--accent);margin-bottom:4px;}
+.dc-sub{font-size:11px;color:var(--text3);}
+/* OVERLAY / MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(4,8,16,0.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .overlay.open{display:flex;animation:overlayIn 0.2s ease;}
 @keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:620px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:modalUp 0.25s cubic-bezier(.34,1.56,.64,1);}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:680px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:modalUp 0.25s cubic-bezier(.34,1.56,.64,1);}
 @keyframes modalUp{from{opacity:0;transform:translateY(20px) scale(0.96);}to{opacity:1;transform:none;}}
 .modal::-webkit-scrollbar{width:4px;}
 .modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 .modal-hd{padding:22px 26px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg2);z-index:1;}
-.modal-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);}
+.modal-title{font-family:var(--display);font-size:16px;font-weight:700;}
 .modal-close{background:var(--bg4);border:none;color:var(--text2);cursor:pointer;font-size:18px;width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
 .modal-close:hover{background:var(--bg5);color:var(--text);}
 .modal-body{padding:24px 26px;}
@@ -154,55 +149,41 @@ input,textarea{background:var(--bg3);border:1px solid var(--border2);border-radi
 input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
 textarea{resize:vertical;min-height:80px;}
 .fg select{padding:10px 13px;}
-.ds-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:12px;font-family:var(--display);padding-bottom:8px;border-bottom:1px solid var(--border);}
-.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.field-lbl{font-size:10.5px;color:var(--text3);margin-bottom:3px;font-weight:500;}
-.field-val{font-size:13px;color:var(--text);font-weight:500;}
-.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(4,8,16,0.7);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
-.confirm-overlay.open{display:flex;}
-.confirm-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;width:380px;max-width:95vw;text-align:center;animation:modalUp 0.2s ease;}
-.confirm-icon{font-size:36px;margin-bottom:12px;}
-.confirm-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;}
-.confirm-msg{font-size:13px;color:var(--text2);margin-bottom:22px;}
-.confirm-btns{display:flex;gap:10px;justify-content:center;}
 .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;}
 .toast{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);max-width:320px;animation:toastIn 0.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
 .toast.success{border-color:rgba(0,229,176,0.3);}
 .toast.error{border-color:rgba(255,77,109,0.3);}
 @keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(0.95);}to{opacity:1;transform:none;}}
 @keyframes toastOut{to{opacity:0;transform:translateY(6px) scale(0.96);}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
-.ani{animation:fadeUp 0.35s ease both;}
-.ani:nth-child(1){animation-delay:.00s}.ani:nth-child(2){animation-delay:.05s}
-.ani:nth-child(3){animation-delay:.10s}.ani:nth-child(4){animation-delay:.15s}
-.ani:nth-child(5){animation-delay:.20s}.ani:nth-child(6){animation-delay:.25s}
-.dropdown{position:relative;}
-.dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--border2);border-radius:10px;min-width:170px;z-index:50;box-shadow:0 8px 32px rgba(0,0,0,0.4);overflow:hidden;}
-.dropdown-menu.open{display:block;animation:fadeUp 0.15s ease;}
-.dd-item{padding:10px 14px;font-size:13px;cursor:pointer;color:var(--text2);display:flex;align-items:center;gap:8px;transition:all 0.12s;}
-.dd-item:hover{background:var(--bg3);color:var(--text);}
-.dd-item.danger:hover{background:var(--rose-dim);color:var(--rose);}
-.dd-sep{height:1px;background:var(--border);margin:3px 0;}
-.qcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:all 0.2s;cursor:pointer;}
-.qcard:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.25);}
-.wf-bar-wrap{display:flex;flex-direction:column;gap:8px;}
-.wf-row{display:flex;align-items:center;gap:10px;}
-.wf-label{font-size:11px;color:var(--text2);width:110px;flex-shrink:0;text-align:right;}
-.wf-track{flex:1;height:22px;background:var(--bg3);border-radius:5px;overflow:hidden;position:relative;}
-.wf-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-family:var(--mono);color:var(--bg);font-weight:600;transition:width 0.9s cubic-bezier(.4,0,.2,1);}
-.wf-val{font-size:11px;font-family:var(--mono);color:var(--text2);width:70px;flex-shrink:0;}
-.health-hot{color:var(--accent);background:var(--accent-dim);}
-.health-warm{color:var(--amber);background:var(--amber-dim);}
-.health-cold{color:var(--rose);background:var(--rose-dim);}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(4,8,16,0.7);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.confirm-overlay.open{display:flex;}
+.confirm-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;width:380px;max-width:95vw;text-align:center;animation:modalUp 0.2s ease;}
+.confirm-icon{font-size:36px;margin-bottom:12px;}
+.confirm-title{font-family:var(--display);font-size:16px;font-weight:700;margin-bottom:8px;}
+.confirm-msg{font-size:13px;color:var(--text2);margin-bottom:22px;}
+.confirm-btns{display:flex;gap:10px;justify-content:center;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;gap:16px;text-align:center;}
+.empty-icon{font-size:48px;opacity:0.4;}
+.empty-title{font-family:var(--display);font-size:18px;font-weight:700;}
+.empty-sub{font-size:13px;color:var(--text3);max-width:380px;line-height:1.7;}
+.bar-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.bar-item:last-child{border-bottom:none;}
+.bar-label{font-size:12px;color:var(--text2);min-width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width 0.6s ease;}
+.bar-count{font-size:11px;font-family:var(--mono);color:var(--text3);min-width:36px;text-align:right;}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 </style>
 </head>
 <body>
 <div class="shell">
-<!-- SIDEBAR -->
+
+<!-- ─── SIDEBAR ─────────────────────────────────────────────────────────── -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-mark">Z</div>
-    <div><div class="brand-text">Zyntrix CRM</div><div class="brand-sub">v2.5 · Sales Suite</div></div>
+    <div><div class="brand-text" style="color:var(--text);">Zyntrix CRM</div><div class="brand-sub">Student Sales Suite</div></div>
   </div>
   <div class="nav-group">
     <div class="nav-label">Overview</div>
@@ -210,391 +191,195 @@ textarea{resize:vertical;min-height:80px;}
   </div>
   <div class="nav-group">
     <div class="nav-label">Pipeline</div>
-    <a class="nav-item" href="pipeline.html"><span class="nav-icon">◈</span> Pipeline Board <span class="nav-count ok">18</span></a>
-    <a class="nav-item active" href="deals.html"><span class="nav-icon">⟐</span> Deals <span class="nav-count">18</span></a>
-    <a class="nav-item" href="leads.html"><span class="nav-icon">◎</span> Leads <span class="nav-count hot">42</span></a>
+    <a class="nav-item" href="pipeline.html"><span class="nav-icon">◈</span> Pipeline Board</a>
+    <a class="nav-item active" href="deals.html"><span class="nav-icon">⟐</span> Enrollments <span class="nav-count ok" id="nav-deal-count">—</span></a>
+    <a class="nav-item" href="leads.html"><span class="nav-icon">◎</span> Student Leads</a>
   </div>
-  <div class="nav-divider"></div>
   <div class="nav-group">
     <div class="nav-label">Engagement</div>
     <a class="nav-item" href="activities.html"><span class="nav-icon">☏</span> Activities</a>
     <a class="nav-item" href="emails.html"><span class="nav-icon">✉</span> Emails &amp; Proposals</a>
-    <a class="nav-item" href="meetings.html"><span class="nav-icon">◷</span> Meetings <span class="nav-count hot">3</span></a>
+    <a class="nav-item" href="meetings.html"><span class="nav-icon">◷</span> Meetings</a>
   </div>
-  <div class="nav-divider"></div>
   <div class="nav-group">
     <div class="nav-label">Insights</div>
     <a class="nav-item" href="reports.html"><span class="nav-icon">↗</span> Revenue Reports</a>
     <a class="nav-item" href="leaderboard.html"><span class="nav-icon">⬡</span> Leaderboard</a>
-    <a class="nav-item" href="playbook.html"><span class="nav-icon">⊞</span> Playbook</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-group">
     <div class="nav-label">Admin</div>
     <a class="nav-item" href="settings.html"><span class="nav-icon">⊙</span> Settings</a>
+    <a class="nav-item" href="../import.html"><span class="nav-icon">↑</span> Import Data</a>
   </div>
   <div class="sidebar-footer">
     <div class="user-card">
-      <div class="avatar">SK</div>
-      <div><div class="user-name">Sanjay Kumar</div><div class="user-role">Sales Manager</div></div>
+      <div class="avatar" id="user-avatar">?</div>
+      <div><div class="user-name" id="user-name" style="font-size:13px;font-weight:600;">Loading…</div><div style="font-size:11px;color:var(--text3);">Sales Executive</div></div>
     </div>
-    <button class="tbtn" type="button" onclick="logout()" style="margin-top:8px;width:100%;justify-content:center;">⏻ Logout</button>
   </div>
 </aside>
 
-<!-- MAIN -->
+<!-- ─── MAIN ──────────────────────────────────────────────────────────────── -->
 <div class="main">
   <div class="topbar">
     <div class="page-hd">
-      <div class="page-title">Deals</div>
-      <div class="page-crumb">Zyntrix CRM › Pipeline › <span>Deals</span></div>
+      <div class="page-title">Enrollments</div>
+      <div class="page-crumb">Sales Suite → <span>Deals / Enrollments</span></div>
     </div>
     <div class="search-wrap">
-      <span style="color:var(--text3);">⌕</span>
-      <input type="text" id="global-search" placeholder="Search deals, companies…" oninput="applyFilters()">
+      <span style="color:var(--text3);font-size:14px;">⌕</span>
+      <input type="text" id="global-search" placeholder="Search enrollments…" oninput="applyFilters()">
     </div>
-    <div class="notif-wrap">
-      <button class="tbtn" onclick="openModal('notif-modal')">🔔 <span id="notif-count" style="background:var(--rose);color:#fff;font-size:10px;padding:1px 5px;border-radius:4px;">4</span></button>
-      <span class="notif-dot"></span>
-    </div>
-    <button class="tbtn primary" onclick="openNewDeal()">＋ New Deal</button>
+    <button class="tbtn" onclick="openModal('import-prompt-overlay')">↑ Import</button>
+    <button class="tbtn primary" id="add-btn" onclick="openAddModal()" style="display:none;">+ Add Deal</button>
+    <button class="tbtn" onclick="loadData()">↺</button>
   </div>
 
-  <!-- SUB-NAV -->
   <div class="sub-nav">
-    <button class="snav-tab active" onclick="switchView('all', this)">⊟ All Deals <span class="tab-count" id="tc-all">18</span></button>
-    <button class="snav-tab" onclick="switchView('won', this)">✓ Won <span class="tab-count" id="tc-won" style="background:var(--accent-dim);color:var(--accent);">0</span></button>
-    <button class="snav-tab" onclick="switchView('lost', this)">✗ Lost <span class="tab-count" id="tc-lost" style="background:var(--rose-dim);color:var(--rose);">0</span></button>
-    <button class="snav-tab" onclick="switchView('active', this)">◎ Active <span class="tab-count" id="tc-active">0</span></button>
-    <button class="snav-tab" onclick="switchView('analytics', this)">⟁ Analytics</button>
+    <button class="snav-tab active" onclick="switchView('all',this)">⊟ All <span class="tab-count" id="tc-all">—</span></button>
+    <button class="snav-tab" onclick="switchView('pipeline',this)">◈ Pipeline</button>
+    <button class="snav-tab" onclick="switchView('won',this)">✓ Enrolled <span class="tab-count" id="tc-won">—</span></button>
+    <button class="snav-tab" onclick="switchView('lost',this)">✗ Dropped <span class="tab-count" style="background:var(--rose-dim);color:var(--rose);" id="tc-lost">—</span></button>
+    <button class="snav-tab" onclick="switchView('analytics',this)">↗ Analytics</button>
     <div class="snav-right">
-      <select id="owner-filter" onchange="applyFilters()">
-        <option value="">All Owners</option>
-        <option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option><option>Vikram Singh</option>
+      <select id="owner-filter" onchange="applyFilters()" style="font-size:12px;padding:5px 10px;">
+        <option value="">All Counsellors</option>
       </select>
-      <select id="period-filter" onchange="applyFilters()">
-        <option value="q2">Q2 2025</option><option value="q1">Q1 2025</option><option value="all">All Time</option>
+      <select id="sort-sel" onchange="applyFilters()" style="font-size:12px;padding:5px 10px;">
+        <option value="value-desc">Highest Value</option>
+        <option value="created-desc">Newest First</option>
+        <option value="name-asc">Name A–Z</option>
       </select>
-      <button class="tbtn btn-sm" onclick="exportCSV()">↓ Export</button>
     </div>
   </div>
 
-  <div class="content" id="content">
-    <!-- ALL DEALS VIEW -->
-    <div id="view-all">
+  <div class="content">
+    <!-- LOADING -->
+    <div id="loading-state" class="section">
+      <div class="kpi-row"><div class="kpi-card skeleton" style="height:90px;"></div><div class="kpi-card skeleton" style="height:90px;"></div><div class="kpi-card skeleton" style="height:90px;"></div><div class="kpi-card skeleton" style="height:90px;"></div><div class="kpi-card skeleton" style="height:90px;"></div></div>
+      <div class="card skeleton" style="height:400px;"></div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="empty-state" style="display:none;">
+      <div class="empty-state">
+        <div class="empty-icon">⟐</div>
+        <div class="empty-title">No Enrollment Data Yet</div>
+        <div class="empty-sub">Import your enrollment Excel sheet. The system reads your column names and configures everything automatically.</div>
+        <button class="btn primary" onclick="openModal('import-prompt-overlay')" style="margin-top:8px;">↑ Import Enrollment Excel</button>
+      </div>
+    </div>
+
+    <!-- DATA AREA -->
+    <div id="data-area" style="display:none;">
       <div class="section" style="padding-bottom:0;">
-        <div class="kpi-row">
-          <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);">
-            <span class="kpi-icon">◎</span>
-            <div class="kpi-val" id="kpi-total" style="color:var(--accent);">₹4.2Cr</div>
-            <div class="kpi-lbl">Total Pipeline Value</div>
-            <div class="kpi-delta up">▲ 23% vs Q1</div>
-          </div>
-          <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.06);">
-            <span class="kpi-icon">✓</span>
-            <div class="kpi-val" id="kpi-won" style="color:var(--accent);">₹98.5L</div>
-            <div class="kpi-lbl">Closed Won</div>
-            <div class="kpi-delta up">▲ 2 deals this month</div>
-          </div>
-          <div class="kpi-card ani" style="--glow:rgba(255,77,109,0.08);">
-            <span class="kpi-icon">✗</span>
-            <div class="kpi-val" id="kpi-lost" style="color:var(--rose);">₹8.5L</div>
-            <div class="kpi-lbl">Closed Lost</div>
-            <div class="kpi-delta dn">▼ 1 deal this month</div>
-          </div>
-          <div class="kpi-card ani" style="--glow:rgba(61,142,240,0.08);">
-            <span class="kpi-icon">⚡</span>
-            <div class="kpi-val" id="kpi-winrate" style="color:var(--blue);">68%</div>
-            <div class="kpi-lbl">Win Rate</div>
-            <div class="kpi-delta up">▲ 5% vs last Q</div>
-          </div>
-          <div class="kpi-card ani" style="--glow:rgba(245,166,35,0.08);">
-            <span class="kpi-icon">⟐</span>
-            <div class="kpi-val" id="kpi-avg" style="color:var(--amber);">₹23.3L</div>
-            <div class="kpi-lbl">Avg Deal Size</div>
-            <div class="kpi-delta up">▲ ₹2.1L vs Q1</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="section" style="padding-top:0;padding-bottom:0;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="stage-chips">
-            <button class="filter-chip active" onclick="setStageFilter('', this)">All Stages</button>
-            <button class="filter-chip" onclick="setStageFilter('Prospecting', this)">Prospecting</button>
-            <button class="filter-chip" onclick="setStageFilter('Qualification', this)">Qualification</button>
-            <button class="filter-chip" onclick="setStageFilter('Demo Scheduled', this)">Demo</button>
-            <button class="filter-chip" onclick="setStageFilter('Proposal Sent', this)">Proposal</button>
-            <button class="filter-chip" onclick="setStageFilter('Negotiation', this)">Negotiation</button>
-          </div>
-          <div style="margin-left:auto;display:flex;gap:8px;">
-            <select id="sort-sel" onchange="applyFilters()" style="font-size:12px;padding:6px 10px;">
-              <option value="value-desc">Value ↓</option>
-              <option value="value-asc">Value ↑</option>
-              <option value="prob-desc">Probability ↓</option>
-              <option value="close-asc">Close Date</option>
-              <option value="created-desc">Newest</option>
-            </select>
-            <div class="tab-group">
-              <button class="tab-btn active" onclick="setDealView('table', this)">⊟ Table</button>
-              <button class="tab-btn" onclick="setDealView('cards', this)">⊞ Cards</button>
+        <!-- KPI ROW -->
+        <div class="kpi-row" id="kpi-row"></div>
+
+        <!-- STAGE CHIPS -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;" id="stage-chips">
+          <button class="filter-chip active" onclick="setStageFilter('',this)">All Stages</button>
+        </div>
+
+        <!-- ALL TABLE -->
+        <div id="view-all">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+              <div><div class="card-title">Enrollment Deals</div><div class="card-sub" id="table-sub"></div></div>
+            </div>
+            <div style="overflow-x:auto;"><table><thead><tr id="deals-thead"></tr></thead><tbody id="deals-tbody"></tbody></table></div>
+            <div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+              <div style="font-size:12px;color:var(--text3);" id="table-footer"></div>
+              <div style="display:flex;gap:6px;" id="pagination"></div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- TABLE VIEW -->
-      <div class="section" style="padding-top:0;" id="deals-table-wrap">
-        <div class="card ani">
-          <div class="card-hd">
-            <div><div class="card-title">All Deals</div><div class="card-sub" id="table-sub">Loading…</div></div>
-            <div class="card-actions">
-              <div id="bulk-actions" style="display:none;gap:8px;flex-wrap:wrap;">
-                <button class="btn btn-sm" onclick="bulkStage()">Move Stage</button>
-                <button class="btn btn-sm" onclick="bulkOwner()">Reassign</button>
-                <button class="btn btn-sm danger" onclick="bulkDelete()">Delete</button>
-              </div>
-            </div>
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead><tr>
-                <th><input type="checkbox" id="sel-all" onchange="toggleAll(this)"></th>
-                <th>Deal / Company</th><th>Owner</th><th>Value</th><th>Stage</th><th>Probability</th><th>Health</th><th>Close Date</th><th>Source</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="deals-tbody"></tbody>
-            </table>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border);margin-top:4px;">
-            <div style="font-size:12px;color:var(--text3);" id="table-footer"></div>
-            <div style="display:flex;gap:6px;" id="pagination"></div>
-          </div>
+        <!-- PIPELINE BOARD -->
+        <div id="view-pipeline" style="display:none;">
+          <div class="pipeline-board" id="pipeline-board"></div>
         </div>
-      </div>
 
-      <!-- CARDS VIEW -->
-      <div class="section" style="padding-top:0;display:none;" id="deals-cards-wrap">
-        <div id="deals-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;"></div>
-      </div>
+        <!-- WON -->
+        <div id="view-won" style="display:none;">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border);"><div class="card-title">✓ Enrolled Students</div><div class="card-sub">Successfully enrolled and fee collected</div></div>
+            <div style="overflow-x:auto;"><table><thead><tr id="won-thead"></tr></thead><tbody id="won-tbody"></tbody></table></div>
+          </div>
+        </div>
 
-      <!-- BOTTOM CHARTS -->
-      <div class="section" style="padding-top:0;">
-        <div class="g21">
-          <div class="card ani">
-            <div class="card-hd"><div><div class="card-title">Deal Value by Stage</div><div class="card-sub">Pipeline ₹ distribution</div></div></div>
-            <div id="stage-waterfall" class="wf-bar-wrap"></div>
-          </div>
-          <div class="card ani">
-            <div class="card-hd"><div><div class="card-title">Owner Summary</div><div class="card-sub">Deals & revenue by rep</div></div></div>
-            <table>
-              <thead><tr><th>Rep</th><th>Deals</th><th>Revenue</th><th>Win%</th></tr></thead>
-              <tbody id="owner-summary-tbody"></tbody>
-            </table>
+        <!-- LOST -->
+        <div id="view-lost" style="display:none;">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border);"><div class="card-title">✗ Dropped Students</div><div class="card-sub">Did not convert or fee not paid</div></div>
+            <div style="overflow-x:auto;"><table><thead><tr id="lost-thead"></tr></thead><tbody id="lost-tbody"></tbody></table></div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- WON VIEW -->
-    <div id="view-won" style="display:none;">
-      <div class="section">
-        <div class="g3" style="margin-bottom:16px;">
-          <div class="card ani" style="border-color:rgba(0,229,176,0.2);">
-            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:8px;">Won This Quarter</div>
-            <div style="font-family:var(--display);font-size:28px;font-weight:700;color:var(--accent);" id="won-rev">₹0</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:4px;" id="won-count">0 deals closed</div>
-          </div>
-          <div class="card ani">
-            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:8px;">Avg Days to Close</div>
-            <div style="font-family:var(--display);font-size:28px;font-weight:700;color:var(--blue);">34</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:4px;">Sales cycle average</div>
-          </div>
-          <div class="card ani">
-            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:8px;">Top Source</div>
-            <div style="font-family:var(--display);font-size:24px;font-weight:700;color:var(--amber);">Referral</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:4px;">43% of won deals</div>
+        <!-- ANALYTICS -->
+        <div id="view-analytics" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="card" id="analytics-stage"></div>
+            <div class="card" id="analytics-counsellor"></div>
+            <div class="card" id="analytics-course"></div>
+            <div class="card" id="analytics-source"></div>
+            <div class="card" style="grid-column:1/-1;" id="analytics-revenue"></div>
           </div>
         </div>
-        <div class="card ani">
-          <div class="card-hd"><div><div class="card-title">Closed Won Deals</div><div class="card-sub">All successfully closed deals</div></div></div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead><tr><th>Deal</th><th>Company</th><th>Owner</th><th>Value</th><th>Closed On</th><th>Source</th><th>Product</th><th>Actions</th></tr></thead>
-              <tbody id="won-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- LOST VIEW -->
-    <div id="view-lost" style="display:none;">
-      <div class="section">
-        <div class="card ani" style="margin-bottom:16px;border-color:rgba(255,77,109,0.15);">
-          <div class="card-hd"><div><div class="card-title">Loss Analysis</div><div class="card-sub">Understand why deals are lost</div></div></div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" id="loss-reasons"></div>
-        </div>
-        <div class="card ani">
-          <div class="card-hd"><div><div class="card-title">Closed Lost Deals</div><div class="card-sub">Review & reopen opportunities</div></div></div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead><tr><th>Deal</th><th>Company</th><th>Owner</th><th>Value</th><th>Lost On</th><th>Reason</th><th>Actions</th></tr></thead>
-              <tbody id="lost-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ACTIVE VIEW -->
-    <div id="view-active" style="display:none;">
-      <div class="section">
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;" id="active-cards"></div>
-      </div>
-    </div>
-
-    <!-- ANALYTICS VIEW -->
-    <div id="view-analytics" style="display:none;">
-      <div class="section">
-        <div class="g21" style="margin-bottom:16px;">
-          <div class="card ani">
-            <div class="card-hd"><div><div class="card-title">Deal Velocity Trend</div><div class="card-sub">Created vs closed — 6 months</div></div></div>
-            <div style="height:230px;position:relative;"><canvas id="velocity-chart"></canvas></div>
-          </div>
-          <div class="card ani">
-            <div class="card-hd"><div><div class="card-title">Stage Funnel</div><div class="card-sub">Deal count by stage</div></div></div>
-            <div style="height:230px;position:relative;"><canvas id="funnel-chart"></canvas></div>
-          </div>
-        </div>
-        <div class="g3" style="margin-bottom:16px;">
-          <div class="card ani">
-            <div class="card-hd"><div><div class="card-title">Win/Loss Trend</div><div class="card-sub">Monthly ratio</div></div></div>
-            <div style="height:180px;position:relative;"><canvas id="winloss-chart"></canvas></div>
-          </div>
-          <div class="card ani">
-            <div class="card-hd"><div><div class="card-title">Revenue by Source</div><div class="card-sub">Which channels deliver</div></div></div>
-            <div style="height:180px;position:relative;"><canvas id="source-chart"></canvas></div>
-          </div>
-          <div class="card ani">
-            <div class="card-hd"><div><div class="card-title">Product Mix</div><div class="card-sub">Revenue by plan</div></div></div>
-            <div style="height:180px;position:relative;"><canvas id="product-chart"></canvas></div>
-          </div>
-        </div>
-        <div class="card ani">
-          <div class="card-hd"><div><div class="card-title">Deal Age Distribution</div><div class="card-sub">Days since created · active deals</div></div></div>
-          <div id="age-dist" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;"></div>
-        </div>
       </div>
     </div>
   </div>
 </div>
 </div>
 
-<!-- NEW/EDIT DEAL MODAL -->
-<div class="overlay" id="deal-modal" onclick="closeModal('deal-modal')">
-  <div class="modal" onclick="event.stopPropagation()">
+<!-- MODALS -->
+<div class="overlay" id="deal-modal-overlay">
+  <div class="modal" style="width:740px;">
     <div class="modal-hd">
-      <span class="modal-title" id="deal-modal-title">New Deal</span>
-      <button class="modal-close" onclick="closeModal('deal-modal')">×</button>
+      <div class="modal-title" id="deal-modal-title">Add Enrollment Deal</div>
+      <button class="modal-close" onclick="closeModal('deal-modal-overlay')">✕</button>
     </div>
-    <div class="modal-body">
-      <input type="hidden" id="d-id">
-      <div class="fgrid">
-        <div class="fg"><label>Deal Name *</label><input id="d-name" placeholder="e.g. ZyntrixEdu Enterprise Plan"></div>
-        <div class="fg"><label>Company *</label><input id="d-company" placeholder="Company name"></div>
-        <div class="fg"><label>Deal Value (₹) *</label><input id="d-value" type="number" placeholder="1800000"></div>
-        <div class="fg"><label>Stage *</label>
-          <select id="d-stage"><option>Prospecting</option><option>Qualification</option><option>Demo Scheduled</option><option>Proposal Sent</option><option>Negotiation</option><option>Closed Won</option><option>Closed Lost</option></select>
-        </div>
-        <div class="fg"><label>Win Probability (%)</label><input id="d-prob" type="number" min="0" max="100" value="50"></div>
-        <div class="fg"><label>Expected Close Date</label><input id="d-close" type="date"></div>
-        <div class="fg"><label>Owner</label>
-          <select id="d-owner"><option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option><option>Vikram Singh</option></select>
-        </div>
-        <div class="fg"><label>Lead Source</label>
-          <select id="d-source"><option>Referral</option><option>Website</option><option>LinkedIn</option><option>Campaign</option><option>Cold Call</option><option>Event</option></select>
-        </div>
-        <div class="fg"><label>Product / Plan</label>
-          <select id="d-product"><option>EdTech CRM — Enterprise</option><option>EdTech CRM — Business</option><option>EdTech CRM — Starter</option><option>LMS Add-on</option><option>Custom Implementation</option></select>
-        </div>
-        <div class="fg"><label>Priority</label>
-          <select id="d-priority"><option>High</option><option>Medium</option><option>Low</option></select>
-        </div>
-        <div class="fg"><label>Loss Reason (if lost)</label>
-          <select id="d-loss"><option value="">— N/A —</option><option>Price</option><option>Competitor</option><option>Budget frozen</option><option>No decision</option><option>Product fit</option></select>
-        </div>
-        <div class="fg"><label>Annual Contract Value (₹)</label><input id="d-acv" type="number" placeholder="Annual contract value"></div>
-        <div class="fg full"><label>Notes / Context</label><textarea id="d-notes" placeholder="Decision makers, blockers, key requirements…"></textarea></div>
-      </div>
-    </div>
+    <div class="modal-body"><div class="fgrid" id="deal-form-fields"></div></div>
     <div class="modal-ft">
-      <button class="btn" onclick="closeModal('deal-modal')">Cancel</button>
+      <button class="btn" onclick="closeModal('deal-modal-overlay')">Cancel</button>
       <button class="btn primary" onclick="saveDeal()">Save Deal</button>
     </div>
   </div>
 </div>
 
-<!-- DEAL DETAIL MODAL -->
-<div class="overlay" id="detail-modal" onclick="closeModal('detail-modal')">
-  <div class="modal" style="width:700px;" onclick="event.stopPropagation()">
+<div class="overlay" id="detail-overlay">
+  <div class="modal" style="width:740px;">
     <div class="modal-hd">
-      <div>
-        <span class="modal-title" id="det-name">Deal</span>
-        <div style="font-size:12px;color:var(--text3);margin-top:3px;" id="det-company"></div>
-      </div>
+      <div><div class="modal-title" id="det-name">Deal Detail</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="det-sub"></div></div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <span class="badge" id="det-stage-badge"></span>
-        <button class="modal-close" onclick="closeModal('detail-modal')">×</button>
+        <button class="btn btn-sm" onclick="openEditFromDetail()">✎ Edit</button>
+        <button class="modal-close" onclick="closeModal('detail-overlay')">✕</button>
       </div>
     </div>
     <div class="modal-body" id="detail-body"></div>
-    <div class="modal-ft">
-      <button class="btn btn-sm danger" onclick="deleteFromDetail()">🗑 Delete</button>
-      <button class="btn btn-sm" onclick="editFromDetail()">Edit Deal</button>
-      <button class="btn btn-sm primary" onclick="logActivityForDeal()">＋ Log Activity</button>
-    </div>
+    <div class="modal-ft" id="detail-footer"></div>
   </div>
 </div>
 
-<!-- LOG ACTIVITY MODAL -->
-<div class="overlay" id="activity-modal" onclick="closeModal('activity-modal')">
-  <div class="modal" style="width:500px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Log Activity</span><button class="modal-close" onclick="closeModal('activity-modal')">×</button></div>
-    <div class="modal-body">
-      <div class="fgrid">
-        <div class="fg"><label>Activity Type</label>
-          <select id="a-type"><option>Call</option><option>Email</option><option>Meeting</option><option>Demo</option><option>Proposal Sent</option><option>Follow-up</option></select>
-        </div>
-        <div class="fg"><label>Outcome</label>
-          <select id="a-outcome"><option>Positive</option><option>Neutral</option><option>Negative</option><option>No answer</option></select>
-        </div>
-        <div class="fg"><label>Date &amp; Time</label><input id="a-date" type="datetime-local"></div>
-        <div class="fg"><label>Duration (mins)</label><input id="a-dur" type="number" value="30"></div>
-        <div class="fg full"><label>Notes</label><textarea id="a-notes" placeholder="What was discussed…"></textarea></div>
-      </div>
+<div class="overlay" id="import-prompt-overlay">
+  <div class="modal" style="width:460px;">
+    <div class="modal-hd"><div class="modal-title">Import Enrollment Data</div><button class="modal-close" onclick="closeModal('import-prompt-overlay')">✕</button></div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+      <div style="background:var(--accent-dim);border:1px solid var(--accent);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--accent);">✦ Import an Excel with enrollment/deal data. Columns are auto-detected and used to configure this page.</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;">Common columns auto-detected: <strong>Student Name, Course, Fees, Stage, Counsellor, Batch, Enrollment Date</strong></div>
     </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('activity-modal')">Cancel</button>
-      <button class="btn primary" onclick="logActivity()">Log Activity</button>
-    </div>
+    <div class="modal-ft"><button class="btn" onclick="closeModal('import-prompt-overlay')">Close</button><a class="btn primary" href="../import.html">Go to Import ↗</a></div>
   </div>
 </div>
 
-<!-- NOTIFICATIONS MODAL -->
-<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
-  <div class="modal" style="width:420px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
-    <div class="modal-body"><div style="display:flex;flex-direction:column;gap:10px;" id="notif-list"></div></div>
-    <div class="modal-ft"><button class="btn btn-sm" onclick="markAllRead()">Mark All Read</button></div>
-  </div>
-</div>
-
-<!-- CONFIRM DIALOG -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
     <div class="confirm-icon" id="ci">⚠️</div>
-    <div class="confirm-title" id="ct">Are you sure?</div>
-    <div class="confirm-msg" id="cm">This cannot be undone.</div>
+    <div class="confirm-title" id="ct">Confirm</div>
+    <div class="confirm-msg" id="cm"></div>
     <div class="confirm-btns">
       <button class="btn" onclick="resolveConfirm(false)">Cancel</button>
       <button class="btn danger" id="c-ok" onclick="resolveConfirm(true)">Confirm</button>
@@ -604,496 +389,422 @@ textarea{resize:vertical;min-height:80px;}
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-/* ═══ DATA ═══ */
-/* ─── DATA — populated dynamically from imported Excel ─── */
-let DEALS = [];
-let ACTIVITIES = [];
-let NOTIFICATIONS = [];
+/* ═══════════════════════════════════════════════════════════════════
+   ENROLLMENTS / DEALS — Dynamic Schema-Driven CRM
+   system=sales, type=deals
+═══════════════════════════════════════════════════════════════════ */
 
-const STAGE_CFG = {
-  'Prospecting':   {col:'#4e6680', bg:'rgba(78,102,128,0.15)',  badgeCls:'b-gray',   order:0},
-  'Qualification': {col:'#3d8ef0', bg:'rgba(61,142,240,0.12)',  badgeCls:'b-blue',   order:1},
-  'Demo Scheduled':{col:'#b57bee', bg:'rgba(181,123,238,0.12)', badgeCls:'b-purple', order:2},
-  'Proposal Sent': {col:'#f5a623', bg:'rgba(245,166,35,0.12)',  badgeCls:'b-amber',  order:3},
-  'Negotiation':   {col:'#ff7d40', bg:'rgba(255,125,64,0.12)',  badgeCls:'b-orange', order:4},
-  'Closed Won':    {col:'#00e5b0', bg:'rgba(0,229,176,0.12)',   badgeCls:'b-accent', order:5},
-  'Closed Lost':   {col:'#ff4d6d', bg:'rgba(255,77,109,0.12)',  badgeCls:'b-rose',   order:6},
-};
-const OWNER_COL = {};   // populated dynamically
+const API_BASE  = window.CRM_CONFIG?.apiBase || 'https://zyntrixbackend-production-d32c.up.railway.app/api';
+const SYSTEM    = 'sales';
+const DATA_TYPE = 'deals';
 
-let curView='all', stageFilter='', sortKey='value', sortDir='desc', dealViewMode='table';
-let page=1; const PAGE=8;
-let selectedDeals=new Set(), editingId=null, activityDealId=null, confirmResolve=null;
-let chartsBuilt=false;
+let SCHEMA   = null;
+let RECORDS  = [];
+let DEALS    = [];
+let curView  = 'all';
+let stageFilter = '';
+let sortKey  = 'value', sortDir = 'desc';
+let page     = 1;
+const PAGE   = 12;
+let editingId = null;
+let confirmResolve = null;
 
-const fmt = n => n>=10000000?'₹'+(n/10000000).toFixed(2)+'Cr':'₹'+(n/100000).toFixed(1)+'L';
-const fmtDate = d => d?new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';
-const daysSince = d => d?Math.floor((Date.now()-new Date(d).getTime())/86400000):0;
-const initials = n => n.split(' ').map(w=>w[0]).join('').toUpperCase();
-const weighted = d => Math.round(d.value*d.prob/100);
+let KEYS = { name:null, stage:null, value:null, counsellor:null, course:null, closeDate:null, source:null, phone:null, email:null, batch:null, notes:null };
 
-function healthScore(d) {
-  if(d.stage==='Closed Won') return {label:'Won',cls:'health-hot',score:100};
-  if(d.stage==='Closed Lost') return {label:'Lost',cls:'health-cold',score:0};
-  let s=d.prob;
-  if(daysSince(d.lastContact)>14) s-=25;
-  if(d.priority==='High') s+=10;
-  s=Math.max(0,Math.min(100,s));
-  if(s>=65) return {label:'Healthy',cls:'health-hot',score:s};
-  if(s>=35) return {label:'Warm',cls:'health-warm',score:s};
-  return {label:'At Risk',cls:'health-cold',score:s};
+const STATUS_COLORS = [
+  {cls:'b-blue',   col:'#3d8ef0', bg:'rgba(61,142,240,0.12)'},
+  {cls:'b-purple', col:'#b57bee', bg:'rgba(181,123,238,0.12)'},
+  {cls:'b-amber',  col:'#f5a623', bg:'rgba(245,166,35,0.12)'},
+  {cls:'b-orange', col:'#ff7d40', bg:'rgba(255,125,64,0.12)'},
+  {cls:'b-accent', col:'#00e5b0', bg:'rgba(0,229,176,0.12)'},
+  {cls:'b-rose',   col:'#ff4d6d', bg:'rgba(255,77,109,0.12)'},
+];
+let stageColorMap = {};
+
+const WON_STAGES  = ['enrolled','closed won','won','paid','admission confirmed','fee paid','fee collected'];
+const LOST_STAGES = ['dropped','closed lost','lost','not interested','no show','cancelled'];
+
+const getToken    = () => localStorage.getItem('crm_token') || localStorage.getItem('token') || '';
+const fmtDate     = d => { if (!d) return '—'; const dt = new Date(d); return isNaN(dt) ? String(d) : dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); };
+const fmtMoney    = n => { const v=parseFloat(n); if(isNaN(v)) return '—'; if(v>=10000000) return '₹'+(v/10000000).toFixed(2)+'Cr'; if(v>=100000) return '₹'+(v/100000).toFixed(1)+'L'; return '₹'+v.toLocaleString(); };
+const initials    = n => n ? n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?';
+
+async function apiFetch(path, opts={}) {
+  const res = await fetch(API_BASE+path, { headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()}, ...opts });
+  if (!res.ok) { const e=await res.json().catch(()=>({msg:res.statusText})); throw new Error(e.msg||res.statusText); }
+  return res.json();
 }
 
-function toast(msg,type='success'){
-  const tw=document.getElementById('toast-wrap');
-  const t=document.createElement('div');
-  t.className=`toast ${type}`;
-  const ic=type==='success'?'✓':type==='error'?'✗':'ℹ';
-  const col=type==='success'?'var(--accent)':type==='error'?'var(--rose)':'var(--blue)';
-  t.innerHTML=`<span style="color:${col};font-size:16px;">${ic}</span>${msg}`;
-  tw.appendChild(t);
-  setTimeout(()=>{t.style.animation='toastOut 0.3s ease forwards';setTimeout(()=>t.remove(),300);},3200);
-}
+function toast(msg,type='success'){const tw=document.getElementById('toast-wrap');const t=document.createElement('div');t.className=`toast ${type}`;const ic=type==='success'?'✓':'✗';t.innerHTML=`<span style="color:${type==='success'?'var(--accent)':'var(--rose)'};font-size:16px;">${ic}</span>${msg}`;tw.appendChild(t);setTimeout(()=>{t.style.animation='toastOut 0.3s ease forwards';setTimeout(()=>t.remove(),300)},3200);}
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'));document.body.style.overflow='';}});
-function confirm2(title,msg,okLabel='Delete',icon='⚠️'){
-  return new Promise(resolve=>{
-    confirmResolve=resolve;
-    document.getElementById('ci').textContent=icon;
-    document.getElementById('ct').textContent=title;
-    document.getElementById('cm').textContent=msg;
-    document.getElementById('c-ok').textContent=okLabel;
-    document.getElementById('confirm-overlay').classList.add('open');
-  });
-}
+function confirm2(title,msg,ok='Delete'){return new Promise(resolve=>{confirmResolve=resolve;document.getElementById('ci').textContent='⚠️';document.getElementById('ct').textContent=title;document.getElementById('cm').textContent=msg;document.getElementById('c-ok').textContent=ok;document.getElementById('confirm-overlay').classList.add('open');});}
 function resolveConfirm(v){document.getElementById('confirm-overlay').classList.remove('open');if(confirmResolve){confirmResolve(v);confirmResolve=null;}}
 
-function switchView(v,el){
-  curView=v;
-  ['all','won','lost','active','analytics'].forEach(id=>{const e=document.getElementById('view-'+id);if(e)e.style.display=v===id?'':'none';});
-  document.querySelectorAll('.snav-tab').forEach(t=>t.classList.remove('active'));
-  if(el)el.classList.add('active');
-  renderCurrentView();
+function stageCfg(s) {
+  if (!stageColorMap[s]) {
+    const idx = Object.keys(stageColorMap).length % STATUS_COLORS.length;
+    stageColorMap[s] = STATUS_COLORS[idx];
+  }
+  return stageColorMap[s];
 }
-function renderCurrentView(){
-  updateTabCounts();
-  if(curView==='all')       renderAll();
-  if(curView==='won')       renderWon();
-  if(curView==='lost')      renderLost();
-  if(curView==='active')    renderActive();
-  if(curView==='analytics') renderAnalytics();
+
+function isWon(d)  { return WON_STAGES.includes((d[KEYS.stage||'stage']||'').toLowerCase()); }
+function isLost(d) { return LOST_STAGES.includes((d[KEYS.stage||'stage']||'').toLowerCase()); }
+function getVal(l,key){ return key ? (l[key]??null) : null; }
+
+const KEY_PATTERNS = {
+  name:       ['student_name','name','full_name','student','candidate_name'],
+  stage:      ['stage','deal_stage','status','lead_status','enrollment_stage','pipeline_stage'],
+  value:      ['value','deal_value','enrollment_fees','fees','budget','amount','total_fees','revenue'],
+  counsellor: ['counsellor','owner','assigned_to','counselor','sales_rep','executive'],
+  course:     ['course','course_enrolled','program','product','subject','programme'],
+  closeDate:  ['close_date','enrollment_date','joining_date','admission_date','date_of_admission'],
+  source:     ['source','lead_source','channel'],
+  phone:      ['phone','mobile','contact'],
+  email:      ['email','email_id'],
+  batch:      ['batch','batch_name','joining_month'],
+  notes:      ['notes','remarks','comments'],
+};
+
+function detectSmartKeys() {
+  if (!SCHEMA?.fields) return;
+  const fieldKeys = SCHEMA.fields.map(f=>f.systemKey);
+  for (const [smartKey,patterns] of Object.entries(KEY_PATTERNS)) {
+    KEYS[smartKey] = patterns.find(p=>fieldKeys.includes(p)) || null;
+  }
 }
-function updateTabCounts(){
-  document.getElementById('tc-all').textContent=DEALS.length;
-  document.getElementById('tc-won').textContent=DEALS.filter(d=>d.stage==='Closed Won').length;
-  document.getElementById('tc-lost').textContent=DEALS.filter(d=>d.stage==='Closed Lost').length;
-  document.getElementById('tc-active').textContent=DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost').length;
+
+window.addEventListener('DOMContentLoaded',()=>{ loadUserInfo(); loadData(); });
+
+function loadUserInfo(){const raw=localStorage.getItem('crm_user')||localStorage.getItem('user');if(!raw)return;try{const u=JSON.parse(raw);const nm=u.name||u.username||'User';document.getElementById('user-name').textContent=nm;document.getElementById('user-avatar').textContent=initials(nm);}catch{}}
+
+async function loadData() {
+  showLoading(true);
+  try {
+    const schemaRes = await apiFetch(`/import/schema?system=${SYSTEM}&type=${DATA_TYPE}`);
+    SCHEMA = schemaRes;
+    if (!SCHEMA.configured||!SCHEMA.fields?.length) { showLoading(false); document.getElementById('empty-state').style.display=''; return; }
+    detectSmartKeys();
+
+    const recRes = await apiFetch(`/import/records?system=${SYSTEM}&type=${DATA_TYPE}&limit=500`);
+    RECORDS = recRes.records||[];
+    DEALS   = RECORDS;
+
+    // Pre-build stage color map
+    if (KEYS.stage) [...new Set(DEALS.map(d=>d[KEYS.stage]).filter(Boolean))].forEach(s=>stageCfg(s));
+
+    buildOwnerFilter();
+    buildStageChips();
+    showLoading(false);
+    document.getElementById('empty-state').style.display='none';
+    document.getElementById('data-area').style.display='';
+    document.getElementById('add-btn').style.display='';
+    buildTableHeaders();
+    renderCurrentView();
+  } catch(err) {
+    showLoading(false);
+    toast('Failed to load: '+err.message,'error');
+    document.getElementById('empty-state').style.display='';
+  }
 }
-function getFiltered(){
-  const owner=document.getElementById('owner-filter')?.value||'';
-  const search=document.getElementById('global-search')?.value.toLowerCase()||'';
-  let data=DEALS.filter(d=>{
-    if(stageFilter&&d.stage!==stageFilter)return false;
-    if(owner&&d.owner!==owner)return false;
-    if(search&&!d.name.toLowerCase().includes(search)&&!d.company.toLowerCase().includes(search))return false;
-    if(curView==='won'&&d.stage!=='Closed Won')return false;
-    if(curView==='lost'&&d.stage!=='Closed Lost')return false;
-    if(curView==='active'&&(d.stage==='Closed Won'||d.stage==='Closed Lost'))return false;
+
+function showLoading(v){
+  document.getElementById('loading-state').style.display=v?'':'none';
+  if(v){document.getElementById('empty-state').style.display='none';document.getElementById('data-area').style.display='none';}
+}
+
+// ── FILTER ────────────────────────────────────────────────────────
+function getFiltered(view) {
+  const search = document.getElementById('global-search')?.value.toLowerCase()||'';
+  const owner  = document.getElementById('owner-filter')?.value||'';
+  const v = view||curView;
+
+  let data = [...DEALS].filter(d=>{
+    if (stageFilter && d[KEYS.stage||'stage']!==stageFilter) return false;
+    if (owner && d[KEYS.counsellor||'counsellor']!==owner) return false;
+    if (search) { const nm=(d[KEYS.name||'name']||'').toLowerCase(); const cr=(d[KEYS.course||'course']||'').toLowerCase(); if(!nm.includes(search)&&!cr.includes(search)) return false; }
+    if (v==='won')  return isWon(d);
+    if (v==='lost') return isLost(d);
+    if (v==='all')  return true;
     return true;
   });
+
   data.sort((a,b)=>{
-    let av=sortKey==='value'?a.value:sortKey==='prob'?a.prob:sortKey==='created'?new Date(a.created).getTime():new Date(a.close).getTime();
-    let bv=sortKey==='value'?b.value:sortKey==='prob'?b.prob:sortKey==='created'?new Date(b.created).getTime():new Date(b.close).getTime();
-    return sortDir==='desc'?bv-av:av-bv;
+    if(sortKey==='value')  { return sortDir==='desc'?(parseFloat(b[KEYS.value])||0)-(parseFloat(a[KEYS.value])||0):(parseFloat(a[KEYS.value])||0)-(parseFloat(b[KEYS.value])||0); }
+    if(sortKey==='created'){ return sortDir==='desc'?new Date(b.createdAt||0)-new Date(a.createdAt||0):new Date(a.createdAt||0)-new Date(b.createdAt||0); }
+    if(sortKey==='name')   { return (a[KEYS.name||'name']||'').localeCompare(b[KEYS.name||'name']||''); }
+    return 0;
   });
   return data;
 }
-function applyFilters(){
-  const sv=document.getElementById('sort-sel')?.value||'value-desc';
-  const[k,d]=sv.split('-');sortKey=k;sortDir=d;
-  renderCurrentView();
+
+function applyFilters(){const sv=document.getElementById('sort-sel')?.value||'value-desc';const[k,d]=sv.split('-');sortKey=k;sortDir=d;page=1;renderCurrentView();}
+function setStageFilter(s,el){stageFilter=s;document.querySelectorAll('#stage-chips .filter-chip').forEach(c=>c.classList.remove('active'));el?.classList.add('active');page=1;renderCurrentView();}
+function switchView(v,el){curView=v;['all','pipeline','won','lost','analytics'].forEach(id=>{const e=document.getElementById('view-'+id);if(e)e.style.display=v===id?'':'none';});document.querySelectorAll('.snav-tab').forEach(t=>t.classList.remove('active'));el?.classList.add('active');renderCurrentView();}
+
+function renderCurrentView(){updateTabCounts();updateKPIs();if(curView==='all')renderTable();if(curView==='pipeline')renderPipeline();if(curView==='won')renderFiltered('won-tbody');if(curView==='lost')renderFiltered('lost-tbody');if(curView==='analytics')renderAnalytics();}
+
+function updateTabCounts(){
+  const total=DEALS.length;
+  const won=DEALS.filter(d=>isWon(d)).length;
+  const lost=DEALS.filter(d=>isLost(d)).length;
+  document.getElementById('tc-all').textContent=total;
+  document.getElementById('tc-won').textContent=won;
+  document.getElementById('tc-lost').textContent=lost;
+  document.getElementById('nav-deal-count').textContent=total;
 }
-function setStageFilter(stage,el){
-  stageFilter=stage;
-  document.querySelectorAll('#stage-chips .filter-chip').forEach(c=>c.classList.remove('active'));
-  if(el)el.classList.add('active');
-  page=1;renderAll();
-}
-function setDealView(v,el){
-  dealViewMode=v;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  if(el)el.classList.add('active');
-  document.getElementById('deals-table-wrap').style.display=v==='table'?'':'none';
-  document.getElementById('deals-cards-wrap').style.display=v==='cards'?'':'none';
-  renderAll();
-}
+
 function updateKPIs(){
-  const wonD=DEALS.filter(d=>d.stage==='Closed Won');
-  const lostD=DEALS.filter(d=>d.stage==='Closed Lost');
-  const active=DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost');
-  const total=wonD.length+lostD.length;
-  const winRate=total>0?Math.round(wonD.length/total*100):0;
-  document.getElementById('kpi-total').textContent=fmt(active.reduce((s,d)=>s+d.value,0));
-  document.getElementById('kpi-won').textContent=fmt(wonD.reduce((s,d)=>s+d.value,0));
-  document.getElementById('kpi-lost').textContent=fmt(lostD.reduce((s,d)=>s+d.value,0));
-  document.getElementById('kpi-winrate').textContent=winRate+'%';
-  document.getElementById('kpi-avg').textContent=fmt(DEALS.length>0?Math.round(DEALS.reduce((s,d)=>s+d.value,0)/DEALS.length):0);
+  const wonD  = DEALS.filter(d=>isWon(d));
+  const lostD = DEALS.filter(d=>isLost(d));
+  const active= DEALS.filter(d=>!isWon(d)&&!isLost(d));
+  const total = wonD.length+lostD.length;
+  const winRate = total>0?Math.round(wonD.length/total*100):0;
+  const totalVal = KEYS.value ? DEALS.reduce((s,d)=>s+(parseFloat(d[KEYS.value])||0),0) : 0;
+  const wonVal   = KEYS.value ? wonD.reduce((s,d)=>s+(parseFloat(d[KEYS.value])||0),0) : 0;
+
+  document.getElementById('kpi-row').innerHTML=`
+    <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);">
+      <span class="kpi-icon">⟐</span>
+      <div class="kpi-val" style="color:var(--accent);">${KEYS.value?fmtMoney(wonVal):wonD.length}</div>
+      <div class="kpi-lbl">${KEYS.value?'Revenue Collected':'Enrolled'}</div>
+    </div>
+    <div class="kpi-card ani">
+      <span class="kpi-icon">◈</span>
+      <div class="kpi-val">${KEYS.value?fmtMoney(active.reduce((s,d)=>s+(parseFloat(d[KEYS.value])||0),0)):active.length}</div>
+      <div class="kpi-lbl">${KEYS.value?'Pipeline Value':'Active Deals'}</div>
+    </div>
+    <div class="kpi-card ani" style="--glow:rgba(255,77,109,0.06);">
+      <span class="kpi-icon">✗</span>
+      <div class="kpi-val" style="color:var(--rose);">${KEYS.value?fmtMoney(lostD.reduce((s,d)=>s+(parseFloat(d[KEYS.value])||0),0)):lostD.length}</div>
+      <div class="kpi-lbl">Lost / Dropped</div>
+    </div>
+    <div class="kpi-card ani" style="--glow:rgba(61,142,240,0.06);">
+      <span class="kpi-icon">⚡</span>
+      <div class="kpi-val" style="color:var(--blue);">${winRate}%</div>
+      <div class="kpi-lbl">Win Rate</div>
+      <div class="kpi-delta ${winRate>=50?'up':winRate>=30?'neu':'dn'}">${wonD.length} of ${total} closed</div>
+    </div>
+    <div class="kpi-card ani">
+      <span class="kpi-icon">⊞</span>
+      <div class="kpi-val">${DEALS.length}</div>
+      <div class="kpi-lbl">Total Deals</div>
+      <div class="kpi-delta neu">${SCHEMA.fields.length} columns</div>
+    </div>`;
 }
-function renderAll(){
-  updateKPIs();
-  const data=getFiltered();
-  if(dealViewMode==='table')renderTable(data);
-  else renderCards(data);
-  renderStageWaterfall();
-  renderOwnerSummary();
+
+// ── TABLE ─────────────────────────────────────────────────────────
+function buildTableHeaders(){
+  const fields=SCHEMA.fields;
+  const priority=['student_name','name','stage','deal_stage','status','value','deal_value','fees','enrollment_fees','counsellor','owner','course','product','close_date','enrollment_date','phone','source'];
+  const shown=[];
+  priority.forEach(pk=>{const f=fields.find(x=>x.systemKey===pk);if(f&&!shown.includes(f))shown.push(f);});
+  fields.forEach(f=>{if(!shown.includes(f)&&shown.length<8)shown.push(f);});
+  window._TABLE_FIELDS=shown;
+
+  const hdr=shown.map(f=>`<th>${f.label}</th>`).join('');
+  ['deals-thead','won-thead','lost-thead'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=hdr+'<th>Actions</th>';});
 }
-function renderTable(data){
+
+function renderTable(){
+  const data=getFiltered('all');
   const total=data.length;
   const pages=Math.max(1,Math.ceil(total/PAGE));
   if(page>pages)page=1;
   const paged=data.slice((page-1)*PAGE,page*PAGE);
-  document.getElementById('table-sub').textContent=`${total} deals · ${fmt(data.reduce((s,d)=>s+d.value,0))} total`;
+  document.getElementById('table-sub').textContent=`${total} deal${total!==1?'s':''}`;
   document.getElementById('table-footer').textContent=`Page ${page} of ${pages} · ${total} deals`;
-  document.getElementById('deals-tbody').innerHTML=paged.map(d=>{
-    const h=healthScore(d);
-    const probColor=d.prob>=70?'var(--accent)':d.prob>=40?'var(--amber)':'var(--rose)';
-    return `<tr>
-      <td><input type="checkbox" class="rck" value="${d.id}" onchange="rowSel(this)" ${selectedDeals.has(d.id)?'checked':''}></td>
-      <td><div class="td-main" style="cursor:pointer;" onclick="showDetail(${d.id})">${d.name}</div><div class="td-sub">${d.company}</div></td>
-      <td><div style="display:flex;align-items:center;gap:7px;"><div style="width:24px;height:24px;border-radius:50%;background:${d.oCol};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:12px;">${d.owner.split(' ')[0]}</span></div></td>
-      <td><span style="font-family:var(--mono);color:var(--accent);font-weight:600;">${fmt(d.value)}</span></td>
-      <td><span class="badge ${STAGE_CFG[d.stage]?.badgeCls||'b-gray'}">${d.stage}</span></td>
-      <td><div style="font-size:12px;font-weight:600;color:${probColor};">${d.prob}%</div><div class="prog" style="width:60px;margin-top:3px;"><div class="prog-fill" style="width:${d.prob}%;background:${probColor};"></div></div></td>
-      <td><span class="badge ${h.cls}" style="font-size:10px;">${h.label}</span></td>
-      <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${d.close}</td>
-      <td><span style="font-size:11px;background:var(--bg4);padding:2px 8px;border-radius:5px;color:var(--text2);">${d.source}</span></td>
-      <td>
-        <div style="display:flex;gap:5px;">
-          <button class="btn btn-xs" onclick="showDetail(${d.id})">View</button>
-          <button class="btn btn-xs" onclick="openEditDeal(${d.id})">Edit</button>
-          <div class="dropdown">
-            <button class="btn-icon" style="width:24px;height:24px;font-size:12px;" onclick="toggleDD(event,'dd-${d.id}')">⋯</button>
-            <div class="dropdown-menu" id="dd-${d.id}">
-              <div class="dd-item" onclick="showDetail(${d.id})">👁 View Detail</div>
-              <div class="dd-item" onclick="openEditDeal(${d.id})">✎ Edit</div>
-              <div class="dd-item" onclick="activityDealId=${d.id};openModal('activity-modal')">📞 Log Activity</div>
-              <div class="dd-sep"></div>
-              <div class="dd-item" onclick="markDeal(${d.id},'Closed Won')">✓ Mark Won</div>
-              <div class="dd-item" onclick="markDeal(${d.id},'Closed Lost')">✗ Mark Lost</div>
-              <div class="dd-sep"></div>
-              <div class="dd-item danger" onclick="deleteDeal(${d.id})">🗑 Delete</div>
-            </div>
-          </div>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
+  document.getElementById('deals-tbody').innerHTML=paged.map(d=>buildRow(d)).join('');
+  renderPagination(pages);
+}
+
+function renderFiltered(tbodyId,view){
+  const v=view||(tbodyId.includes('won')?'won':'lost');
+  const data=getFiltered(v);
+  document.getElementById(tbodyId).innerHTML=data.length?data.map(d=>buildRow(d)).join(''):`<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:40px;">No records</td></tr>`;
+}
+
+function buildRow(d){
+  const fields=window._TABLE_FIELDS||SCHEMA.fields.slice(0,7);
+  const id=d._id;
+  const cells=fields.map(f=>renderCell(d,f)).join('');
+  return `<tr>${cells}<td><div style="display:flex;gap:5px;"><button class="btn btn-xs" onclick="showDetail('${id}')">View</button><button class="btn btn-xs primary" onclick="openEditModal('${id}')">Edit</button><button class="btn btn-xs danger" onclick="deleteDeal('${id}')">✗</button></div></td></tr>`;
+}
+
+function renderCell(d,f){
+  const val=d[f.systemKey];
+  if(val===undefined||val===null||val==='')return`<td style="color:var(--text3);">—</td>`;
+
+  if(['student_name','name','full_name','student'].includes(f.systemKey)){
+    const sub=KEYS.course?`<div class="td-sub">${d[KEYS.course]||''}</div>`:'';
+    return`<td><div class="td-main" style="cursor:pointer;" onclick="showDetail('${d._id}')">${val}</div>${sub}</td>`;
+  }
+  if(['stage','deal_stage','status','enrollment_stage'].includes(f.systemKey)){
+    const cfg=stageCfg(val);
+    return`<td><span class="badge ${cfg.cls}">${val}</span></td>`;
+  }
+  if(['value','deal_value','fees','enrollment_fees','amount','total_fees'].includes(f.systemKey)){
+    const isWonDeal=isWon(d);
+    return`<td style="font-family:var(--mono);font-size:13px;font-weight:700;color:${isWonDeal?'var(--accent)':'var(--text)'};">${fmtMoney(val)}</td>`;
+  }
+  if(['counsellor','owner','assigned_to'].includes(f.systemKey)){
+    return`<td><div style="display:flex;align-items:center;gap:6px;"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-dim);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--blue);">${initials(String(val))}</div><span style="font-size:12px;">${String(val).split(' ')[0]}</span></div></td>`;
+  }
+  if(f.dataType==='date')return`<td style="font-size:12px;color:var(--text3);">${fmtDate(val)}</td>`;
+  if(f.dataType==='number'){const isMoney=['fees','value','amount'].some(k=>f.systemKey.includes(k));return isMoney?`<td style="font-family:var(--mono);font-size:12px;">${fmtMoney(val)}</td>`:`<td style="font-family:var(--mono);font-size:12px;">${val}</td>`;}
+  return`<td style="font-size:12px;">${val}</td>`;
+}
+
+function renderPagination(pages){
   const pg=document.getElementById('pagination');pg.innerHTML='';
-  for(let i=1;i<=pages;i++){const b=document.createElement('button');b.className='btn btn-xs'+(i===page?' primary':'');b.textContent=i;b.onclick=()=>{page=i;renderAll();};pg.appendChild(b);}
+  for(let i=1;i<=pages;i++){const b=document.createElement('button');b.className='btn btn-xs'+(i===page?' primary':'');b.textContent=i;b.onclick=()=>{page=i;renderTable();};pg.appendChild(b);}
 }
-function renderCards(data){
-  document.getElementById('deals-cards-grid').innerHTML=data.map(d=>{
-    const h=healthScore(d);
-    const probColor=d.prob>=70?'var(--accent)':d.prob>=40?'var(--amber)':'var(--rose)';
-    return `<div class="qcard" onclick="showDetail(${d.id})">
-      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-        <div><div style="font-size:13px;font-weight:600;color:var(--text);">${d.name}</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">${d.company}</div></div>
-        <span class="badge ${h.cls}" style="font-size:10px;height:fit-content;">${h.label}</span>
+
+// ── PIPELINE BOARD ─────────────────────────────────────────────────
+function renderPipeline(){
+  const board=document.getElementById('pipeline-board');
+  if(!KEYS.stage){board.innerHTML=`<div style="padding:40px;color:var(--text3);">No Stage/Status column detected in your Excel.</div>`;return;}
+  const stages=[...new Set(DEALS.map(d=>d[KEYS.stage]||'Unknown'))];
+  board.innerHTML=stages.map(s=>{
+    const cfg=stageCfg(s);
+    const deals=DEALS.filter(d=>(d[KEYS.stage]||'Unknown')===s);
+    const stageVal=KEYS.value?deals.reduce((sum,d)=>sum+(parseFloat(d[KEYS.value])||0),0):0;
+    return`<div class="pipe-col">
+      <div class="pipe-hd" style="background:${cfg.bg};">
+        <span style="font-size:12px;font-weight:600;color:${cfg.col};font-family:var(--display);">${s}</span>
+        <span style="font-size:10px;font-family:var(--mono);color:${cfg.col};">${deals.length}</span>
       </div>
-      <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:${STAGE_CFG[d.stage]?.col||'var(--accent)'};margin-bottom:10px;">${fmt(d.value)}</div>
-      <div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px;"><span>Win Probability</span><span style="color:${probColor};">${d.prob}%</span></div><div class="prog"><div class="prog-fill" style="width:${d.prob}%;background:${probColor};"></div></div></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span class="badge ${STAGE_CFG[d.stage]?.badgeCls||'b-gray'}" style="font-size:10px;">${d.stage}</span>
-        <div style="display:flex;align-items:center;gap:6px;"><div style="width:22px;height:22px;border-radius:50%;background:${d.oCol};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:11px;color:var(--text3);">📅 ${d.close.slice(5)}</span></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-function renderStageWaterfall(){
-  const stages=['Prospecting','Qualification','Demo Scheduled','Proposal Sent','Negotiation'];
-  const max=Math.max(...stages.map(s=>DEALS.filter(d=>d.stage===s).reduce((a,d)=>a+d.value,0)),1);
-  document.getElementById('stage-waterfall').innerHTML=stages.map(s=>{
-    const v=DEALS.filter(d=>d.stage===s).reduce((a,d)=>a+d.value,0);
-    const cfg=STAGE_CFG[s];
-    const pct=Math.round(v/max*100);
-    return `<div class="wf-row"><div class="wf-label">${s}</div><div class="wf-track"><div class="wf-fill" style="width:${pct}%;background:${cfg.col};">${DEALS.filter(d=>d.stage===s).length}d</div></div><div class="wf-val">${fmt(v)}</div></div>`;
-  }).join('');
-}
-function renderOwnerSummary(){
-  const owners=['Sanjay Kumar','Priya Nair','Rahul Mehta','Anjali Rao','Vikram Singh'];
-  const oi={'Sanjay Kumar':'SK','Priya Nair':'PN','Rahul Mehta':'RM','Anjali Rao':'AR','Vikram Singh':'VS'};
-  document.getElementById('owner-summary-tbody').innerHTML=owners.map(o=>{
-    const ods=DEALS.filter(d=>d.owner===o);
-    const won=ods.filter(d=>d.stage==='Closed Won');
-    const lost=ods.filter(d=>d.stage==='Closed Lost');
-    const total=won.length+lost.length;
-    const winPct=total>0?Math.round(won.length/total*100):0;
-    return `<tr>
-      <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;border-radius:50%;background:${OWNER_COL[o]};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${oi[o]}</div><span style="font-size:12px;color:var(--text);">${o.split(' ')[0]}</span></div></td>
-      <td style="font-family:var(--mono);color:var(--text2);">${ods.length}</td>
-      <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">${fmt(ods.reduce((s,d)=>s+d.value,0))}</td>
-      <td><span style="font-size:12px;font-weight:600;color:${winPct>=60?'var(--accent)':winPct>=40?'var(--amber)':'var(--rose)'};">${winPct}%</span></td>
-    </tr>`;
-  }).join('');
-}
-function renderWon(){
-  const won=DEALS.filter(d=>d.stage==='Closed Won');
-  document.getElementById('won-rev').textContent=fmt(won.reduce((s,d)=>s+d.value,0));
-  document.getElementById('won-count').textContent=`${won.length} deals closed`;
-  document.getElementById('won-tbody').innerHTML=won.map(d=>`<tr>
-    <td><div class="td-main">${d.name}</div></td>
-    <td style="font-size:12px;color:var(--text3);">${d.company}</td>
-    <td><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:${d.oCol};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:12px;">${d.owner.split(' ')[0]}</span></div></td>
-    <td><span style="font-family:var(--mono);color:var(--accent);font-weight:700;">${fmt(d.value)}</span></td>
-    <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">${fmtDate(d.close)}</td>
-    <td><span style="font-size:11px;background:var(--bg4);padding:2px 8px;border-radius:5px;color:var(--text2);">${d.source}</span></td>
-    <td style="font-size:12px;color:var(--text3);">${d.product}</td>
-    <td><button class="btn btn-xs" onclick="showDetail(${d.id})">View</button></td>
-  </tr>`).join('');
-}
-function renderLost(){
-  const lost=DEALS.filter(d=>d.stage==='Closed Lost');
-  const reasons={};
-  lost.forEach(d=>{const r=d.lossReason||'Unknown';reasons[r]=(reasons[r]||0)+1;});
-  document.getElementById('loss-reasons').innerHTML=Object.entries(reasons).map(([r,c])=>`
-    <div style="padding:14px;background:var(--rose-dim);border-radius:10px;border:1px solid rgba(255,77,109,0.2);text-align:center;">
-      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--rose);">${c}</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px;">${r}</div>
-    </div>`).join('');
-  document.getElementById('lost-tbody').innerHTML=lost.map(d=>`<tr>
-    <td><div class="td-main">${d.name}</div></td>
-    <td style="font-size:12px;color:var(--text3);">${d.company}</td>
-    <td><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:${d.oCol};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${d.oi}</div><span style="font-size:12px;">${d.owner.split(' ')[0]}</span></div></td>
-    <td><span style="font-family:var(--mono);color:var(--rose);font-weight:600;">${fmt(d.value)}</span></td>
-    <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">${fmtDate(d.close)}</td>
-    <td><span class="badge b-rose">${d.lossReason||'Unknown'}</span></td>
-    <td><div style="display:flex;gap:5px;"><button class="btn btn-xs primary" onclick="reopenDeal(${d.id})">Reopen</button><button class="btn btn-xs" onclick="showDetail(${d.id})">View</button></div></td>
-  </tr>`).join('');
-}
-function renderActive(){
-  const active=DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost').sort((a,b)=>b.value-a.value);
-  document.getElementById('active-cards').innerHTML=active.map(d=>{
-    const h=healthScore(d);
-    const probColor=d.prob>=70?'var(--accent)':d.prob>=40?'var(--amber)':'var(--rose)';
-    const stale=daysSince(d.lastContact);
-    return `<div class="qcard" style="border-color:${h.label==='At Risk'?'rgba(255,77,109,0.3)':'var(--border)'};" onclick="showDetail(${d.id})">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-        <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text);">${d.name}</div><div style="font-size:11px;color:var(--text3);">${d.company}</div></div>
-        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
-          <span class="badge ${h.cls}" style="font-size:10px;">${h.label}</span>
-          <span class="badge ${d.priority==='High'?'b-rose':d.priority==='Medium'?'b-amber':'b-gray'}" style="font-size:10px;">${d.priority}</span>
-        </div>
-      </div>
-      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:${STAGE_CFG[d.stage]?.col||'var(--accent)'};margin-bottom:12px;">${fmt(d.value)}</div>
-      <div class="prog" style="margin-bottom:12px;"><div class="prog-fill" style="width:${d.prob}%;background:${probColor};"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:10px;">
-        <span>Prob: <strong style="color:${probColor};">${d.prob}%</strong></span>
-        <span>Close: ${d.close.slice(5)}</span>
-        <span style="color:${stale>14?'var(--rose)':'var(--text3)'};">${stale}d ago</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span class="badge ${STAGE_CFG[d.stage]?.badgeCls||'b-gray'}" style="font-size:10px;">${d.stage}</span>
-        <div style="display:flex;gap:5px;" onclick="event.stopPropagation()">
-          <button class="btn btn-xs primary" onclick="markDeal(${d.id},'Closed Won')">Won</button>
-          <button class="btn btn-xs danger" onclick="markDeal(${d.id},'Closed Lost')">Lost</button>
-        </div>
+      <div class="pipe-body">
+        ${KEYS.value?`<div style="font-size:11px;font-family:var(--mono);color:${cfg.col};padding:4px 6px;background:${cfg.bg};border-radius:6px;margin-bottom:4px;">${fmtMoney(stageVal)}</div>`:''}
+        ${deals.map(d=>`<div class="deal-card" onclick="showDetail('${d._id}')">
+          <div class="dc-name">${d[KEYS.name||'name']||'—'}</div>
+          ${KEYS.value&&d[KEYS.value]?`<div class="dc-value">${fmtMoney(d[KEYS.value])}</div>`:''}
+          <div class="dc-sub">${[d[KEYS.course],d[KEYS.counsellor]].filter(Boolean).join(' · ')||''}</div>
+        </div>`).join('')}
+        ${deals.length===0?`<div style="text-align:center;padding:20px;color:var(--text3);font-size:11px;">Empty</div>`:''}
       </div>
     </div>`;
   }).join('');
 }
+
+// ── ANALYTICS ─────────────────────────────────────────────────────
 function renderAnalytics(){
-  if(!chartsBuilt){buildCharts();chartsBuilt=true;}
-  renderAgeDist();
+  renderBar('analytics-stage',     KEYS.stage,      'By Stage',      'var(--blue)');
+  renderBar('analytics-counsellor',KEYS.counsellor, 'By Counsellor', 'var(--amber)');
+  renderBar('analytics-course',    KEYS.course,     'By Course',     'var(--teal)');
+  renderBar('analytics-source',    KEYS.source,     'By Source',     'var(--purple)');
+
+  // Revenue by counsellor
+  const revEl=document.getElementById('analytics-revenue');
+  if(!KEYS.value||!KEYS.counsellor){revEl.innerHTML=`<div class="card-title">Revenue by Counsellor</div><div style="font-size:12px;color:var(--text3);margin-top:8px;">Requires both a "value/fees" and "counsellor" column.</div>`;return;}
+  const grouped={};
+  DEALS.forEach(d=>{const k=d[KEYS.counsellor]||'Unknown';if(!grouped[k])grouped[k]={total:0,count:0};grouped[k].total+=(parseFloat(d[KEYS.value])||0);grouped[k].count++;});
+  const entries=Object.entries(grouped).sort((a,b)=>b[1].total-a[1].total);
+  const max=entries[0]?.[1].total||1;
+  revEl.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div><div class="card-title">Revenue by Counsellor</div><div class="card-sub">Total collected per sales executive</div></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;">${entries.map(([k,v])=>`<div class="bar-item"><div class="bar-label">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v.total/max*100)}%;background:var(--accent);"></div></div><div class="bar-count" style="min-width:70px;">${fmtMoney(v.total)}</div></div>`).join('')}</div>`;
 }
-const chartTooltip={backgroundColor:'#0d1624',titleColor:'#e8f0fe',bodyColor:'#8ba3bf',borderColor:'#1c2e42',borderWidth:1,padding:10};
-const gridLines={color:'rgba(255,255,255,0.04)'};
-const tickStyle={color:'#4e6680',font:{size:10.5}};
-function buildCharts(){
-  new Chart(document.getElementById('velocity-chart'),{type:'bar',data:{labels:['Nov','Dec','Jan','Feb','Mar','Apr','May'],datasets:[{label:'Created',data:[4,6,5,7,4,6,3],backgroundColor:'rgba(61,142,240,0.6)',borderRadius:4},{label:'Closed',data:[2,3,4,5,3,4,2],backgroundColor:'rgba(0,229,176,0.6)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8ba3bf',font:{size:10},boxWidth:10}},tooltip:chartTooltip},scales:{x:{grid:{display:false},ticks:tickStyle},y:{grid:gridLines,ticks:tickStyle,beginAtZero:true}}}});
-  const stageData=Object.keys(STAGE_CFG).filter(s=>s!=='Closed Won'&&s!=='Closed Lost').map(s=>({label:s,count:DEALS.filter(d=>d.stage===s).length,col:STAGE_CFG[s].col}));
-  new Chart(document.getElementById('funnel-chart'),{type:'bar',data:{labels:stageData.map(s=>s.label),datasets:[{data:stageData.map(s=>s.count),backgroundColor:stageData.map(s=>s.col),borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:chartTooltip},scales:{x:{grid:gridLines,ticks:tickStyle,beginAtZero:true},y:{grid:{display:false},ticks:{color:'#8ba3bf',font:{size:10}}}}}});
-  new Chart(document.getElementById('winloss-chart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May'],datasets:[{label:'Won',data:[3,5,4,6,3],borderColor:'#00e5b0',backgroundColor:'rgba(0,229,176,0.08)',fill:true,tension:0.4,pointRadius:3},{label:'Lost',data:[2,1,3,1,2],borderColor:'#ff4d6d',backgroundColor:'rgba(255,77,109,0.08)',fill:true,tension:0.4,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8ba3bf',font:{size:10},boxWidth:10}},tooltip:chartTooltip},scales:{x:{grid:{display:false},ticks:tickStyle},y:{grid:gridLines,ticks:tickStyle,beginAtZero:true}}}});
-  const sources={};DEALS.forEach(d=>{sources[d.source]=(sources[d.source]||0)+d.value;});
-  new Chart(document.getElementById('source-chart'),{type:'doughnut',data:{labels:Object.keys(sources),datasets:[{data:Object.values(sources),backgroundColor:['#00e5b0','#3d8ef0','#b57bee','#f5a623','#22d3ee','#ff7d40'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:6}},tooltip:chartTooltip}}});
-  const products={};DEALS.forEach(d=>{products[d.product]=(products[d.product]||0)+d.value;});
-  new Chart(document.getElementById('product-chart'),{type:'doughnut',data:{labels:Object.keys(products),datasets:[{data:Object.values(products),backgroundColor:['#3d8ef0','#b57bee','#f5a623','#22d3ee','#ff7d40'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:6}},tooltip:chartTooltip}}});
+
+function renderBar(containerId,fieldKey,title,color){
+  const el=document.getElementById(containerId);if(!el)return;
+  if(!fieldKey||!SCHEMA.fields.find(f=>f.systemKey===fieldKey)){el.innerHTML=`<div class="card-title">${title}</div><div style="font-size:12px;color:var(--text3);margin-top:8px;">Column not in Excel sheet.</div>`;return;}
+  const grouped={};
+  DEALS.forEach(d=>{const v=d[fieldKey]||'Unknown';grouped[v]=(grouped[v]||0)+1;});
+  const entries=Object.entries(grouped).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max=entries[0]?.[1]||1;
+  el.innerHTML=`<div style="margin-bottom:16px;"><div class="card-title">${title}</div><div class="card-sub">${entries.length} categories</div></div>${entries.map(([k,v])=>`<div class="bar-item"><div class="bar-label">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/max*100)}%;background:${color};"></div></div><div class="bar-count">${v}</div></div>`).join('')}`;
 }
-function renderAgeDist(){
-  const buckets=[{label:'0–7 days',min:0,max:7,col:'#00e5b0'},{label:'8–14 days',min:8,max:14,col:'#3d8ef0'},{label:'15–30 days',min:15,max:30,col:'#f5a623'},{label:'31–60 days',min:31,max:60,col:'#ff7d40'},{label:'60+ days',min:61,max:999,col:'#ff4d6d'}];
-  const active=DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost');
-  document.getElementById('age-dist').innerHTML=buckets.map(b=>{
-    const count=active.filter(d=>{const age=daysSince(d.created);return age>=b.min&&age<=b.max;}).length;
-    const pct=active.length>0?Math.round(count/active.length*100):0;
-    return `<div style="flex:1;min-width:120px;padding:14px;background:var(--bg3);border-radius:10px;border-left:3px solid ${b.col};"><div style="font-family:var(--display);font-size:22px;font-weight:700;color:${b.col};">${count}</div><div style="font-size:11px;color:var(--text3);margin-top:3px;">${b.label}</div><div class="prog" style="margin-top:8px;"><div class="prog-fill" style="width:${pct}%;background:${b.col};"></div></div></div>`;
+
+// ── DETAIL ────────────────────────────────────────────────────────
+function showDetail(id){
+  const d=DEALS.find(x=>x._id===id);if(!d)return;
+  editingId=id;
+  const name=KEYS.name?d[KEYS.name]:'Deal';
+  document.getElementById('det-name').textContent=name||'Deal';
+  document.getElementById('det-sub').textContent=[KEYS.course&&d[KEYS.course],KEYS.stage&&d[KEYS.stage]].filter(Boolean).join(' · ')||'';
+  document.getElementById('detail-body').innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+    ${SCHEMA.fields.map(f=>{
+      let val=d[f.systemKey];
+      let display=val??'—';
+      if(f.dataType==='date'&&val)display=fmtDate(val);
+      if(f.systemKey===KEYS.stage&&val){const cfg=stageCfg(val);display=`<span class="badge ${cfg.cls}">${val}</span>`;}
+      if(['deal_value','fees','enrollment_fees','amount'].includes(f.systemKey)&&val)display=`<span style="color:var(--accent);font-family:var(--mono);font-size:16px;font-weight:700;">${fmtMoney(val)}</span>`;
+      return`<div style="padding:12px;background:var(--bg3);border-radius:9px;"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px;font-family:var(--display);">${f.label}</div><div style="font-size:13px;font-weight:500;">${display}</div></div>`;
+    }).join('')}
+    <div style="grid-column:1/-1;padding:10px 12px;background:var(--bg3);border-radius:9px;font-size:11px;color:var(--text3);">Created: ${fmtDate(d.createdAt)} · ID: ${id}</div>
+  </div>`;
+  document.getElementById('detail-footer').innerHTML=`<button class="btn" onclick="closeModal('detail-overlay')">Close</button><button class="btn" onclick="closeModal('detail-overlay');openEditModal('${id}')">✎ Edit</button><button class="btn danger" onclick="deleteDeal('${id}');closeModal('detail-overlay')">✗ Delete</button>`;
+  openModal('detail-overlay');
+}
+
+function openEditFromDetail(){closeModal('detail-overlay');if(editingId)openEditModal(editingId);}
+
+// ── ADD / EDIT ─────────────────────────────────────────────────────
+function openAddModal(){editingId=null;document.getElementById('deal-modal-title').textContent='Add Enrollment Deal';buildDealForm({});openModal('deal-modal-overlay');}
+function openEditModal(id){const d=DEALS.find(x=>x._id===id);if(!d)return;editingId=id;document.getElementById('deal-modal-title').textContent='Edit Enrollment Deal';buildDealForm(d);openModal('deal-modal-overlay');}
+
+function buildDealForm(d){
+  const fields=SCHEMA.fields;
+  const stageOpts=KEYS.stage?[...new Set(DEALS.map(x=>x[KEYS.stage]).filter(Boolean))]:[];
+  const ownerOpts=KEYS.counsellor?[...new Set(DEALS.map(x=>x[KEYS.counsellor]).filter(Boolean))]:[];
+  const courseOpts=KEYS.course?[...new Set(DEALS.map(x=>x[KEYS.course]).filter(Boolean))]:[];
+
+  document.getElementById('deal-form-fields').innerHTML=fields.map(f=>{
+    const val=d[f.systemKey]??'';
+    const isStage=['stage','deal_stage','status','enrollment_stage'].includes(f.systemKey);
+    const isOwner=['counsellor','owner','assigned_to','counselor'].includes(f.systemKey);
+    const isCourse=['course','course_enrolled','program','product'].includes(f.systemKey);
+    let input;
+    if(isStage&&stageOpts.length)input=`<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${stageOpts.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
+    else if(isOwner&&ownerOpts.length)input=`<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${ownerOpts.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
+    else if(isCourse&&courseOpts.length>2)input=`<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${courseOpts.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
+    else if(f.dataType==='date'){const dv=val?new Date(val).toISOString().slice(0,10):'';input=`<input type="date" name="${f.systemKey}" value="${dv}">`;}
+    else if(f.dataType==='number')input=`<input type="number" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
+    else if(f.dataType==='email')input=`<input type="email" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
+    else if(f.dataType==='phone')input=`<input type="tel" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
+    else if(['notes','remarks','comments'].includes(f.systemKey))input=`<textarea name="${f.systemKey}" placeholder="${f.label}">${val}</textarea>`;
+    else input=`<input type="text" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
+    return`<div class="fg${['notes','remarks','comments'].includes(f.systemKey)?' full':''}"><label>${f.label}</label>${input}</div>`;
   }).join('');
 }
 
-/* DEAL DETAIL */
-function showDetail(id){
-  const d=DEALS.find(x=>x.id===id);if(!d)return;
-  editingId=id;
-  document.getElementById('det-name').textContent=d.name;
-  document.getElementById('det-company').textContent=d.company;
-  const sb=document.getElementById('det-stage-badge');sb.textContent=d.stage;sb.className=`badge ${STAGE_CFG[d.stage]?.badgeCls||'b-gray'}`;
-  const h=healthScore(d);
-  const probColor=d.prob>=70?'var(--accent)':d.prob>=40?'var(--amber)':'var(--rose)';
-  const acts=ACTIVITIES.filter(a=>a.dealId===id);
-  document.getElementById('detail-body').innerHTML=`
-    <div style="margin-bottom:20px;">
-      <div class="ds-title">Deal Overview</div>
-      <div class="field-grid">
-        <div><div class="field-lbl">Deal Value</div><div class="field-val" style="color:var(--accent);font-family:var(--mono);font-size:18px;font-weight:700;">${fmt(d.value)}</div></div>
-        <div><div class="field-lbl">Weighted Value</div><div class="field-val" style="color:var(--blue);font-family:var(--mono);">${fmt(weighted(d))}</div></div>
-        <div><div class="field-lbl">Win Probability</div><div class="field-val"><span style="color:${probColor};font-family:var(--mono);font-size:16px;font-weight:700;">${d.prob}%</span></div></div>
-        <div><div class="field-lbl">Deal Health</div><div class="field-val"><span class="badge ${h.cls}">${h.label}</span></div></div>
-        <div><div class="field-lbl">Close Date</div><div class="field-val">${fmtDate(d.close)}</div></div>
-        <div><div class="field-lbl">Owner</div><div class="field-val" style="display:flex;align-items:center;gap:8px;"><span style="width:26px;height:26px;border-radius:50%;background:${d.oCol};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${d.oi}</span>${d.owner}</div></div>
-        <div><div class="field-lbl">Product</div><div class="field-val">${d.product}</div></div>
-        <div><div class="field-lbl">Source</div><div class="field-val">${d.source}</div></div>
-        <div><div class="field-lbl">Priority</div><div class="field-val"><span class="badge ${d.priority==='High'?'b-rose':d.priority==='Medium'?'b-amber':'b-gray'}">${d.priority}</span></div></div>
-        <div><div class="field-lbl">Last Contact</div><div class="field-val" style="color:${daysSince(d.lastContact)>14?'var(--rose)':'var(--text)'};">${fmtDate(d.lastContact)} (${daysSince(d.lastContact)}d ago)</div></div>
-        <div><div class="field-lbl">Created</div><div class="field-val">${fmtDate(d.created)}</div></div>
-        <div><div class="field-lbl">ACV</div><div class="field-val" style="font-family:var(--mono);">${d.acv?fmt(d.acv):'—'}</div></div>
-      </div>
-      ${d.notes?`<div style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:9px;font-size:13px;color:var(--text2);">${d.notes}</div>`:''}
-    </div>
-    <div style="margin-bottom:20px;">
-      <div class="ds-title">Stage Progress</div>
-      <div style="display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
-        ${Object.keys(STAGE_CFG).filter(s=>s!=='Closed Lost').map(s=>{const cfg=STAGE_CFG[s];const isActive=s===d.stage;const isPast=cfg.order<(STAGE_CFG[d.stage]?.order||0);return `<div style="flex:1;padding:8px 4px;text-align:center;font-size:9px;font-weight:600;background:${isActive?cfg.bg:isPast?'rgba(0,229,176,0.05)':'transparent'};color:${isActive?cfg.col:isPast?'var(--accent)':'var(--text3)'};border-right:1px solid var(--border);font-family:var(--display);">${s.replace(' ','<br>')}</div>`;}).join('')}
-      </div>
-    </div>
-    <div style="margin-bottom:20px;">
-      <div class="ds-title">Activity Log (${acts.length})</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${acts.length?acts.map(a=>`<div style="display:flex;gap:10px;padding:10px;background:var(--bg3);border-radius:9px;"><div style="width:28px;height:28px;border-radius:8px;background:${a.outcome==='Positive'?'var(--accent-dim)':a.outcome==='Negative'?'var(--rose-dim)':'var(--amber-dim)'};display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">${a.icon}</div><div><div style="font-size:12px;font-weight:500;color:var(--text);">${a.type} · <span style="color:${a.outcome==='Positive'?'var(--accent)':a.outcome==='Negative'?'var(--rose)':'var(--amber)'};">${a.outcome}</span></div><div style="font-size:11px;color:var(--text3);">${a.notes} · ${fmtDate(a.date)}</div></div></div>`).join(''):`<div style="font-size:12px;color:var(--text3);">No activities logged yet.</div>`}
-      </div>
-    </div>
-    <div>
-      <div class="ds-title">Quick Actions</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-sm primary" onclick="markDeal(${d.id},'Closed Won');closeModal('detail-modal')">✓ Mark as Won</button>
-        <button class="btn btn-sm danger" onclick="markDeal(${d.id},'Closed Lost');closeModal('detail-modal')">✗ Mark as Lost</button>
-        <button class="btn btn-sm" onclick="closeModal('detail-modal');activityDealId=${d.id};openModal('activity-modal')">📞 Log Activity</button>
-      </div>
-    </div>`;
-  openModal('detail-modal');
+async function saveDeal(){
+  const data={};
+  document.querySelectorAll('#deal-form-fields [name]').forEach(el=>{if(el.value!=='')data[el.name]=el.value;});
+  try{
+    if(editingId)await apiFetch(`/import/record/${editingId}`,{method:'PUT',body:JSON.stringify(data)});
+    else await apiFetch('/import/record',{method:'POST',body:JSON.stringify({system:SYSTEM,type:DATA_TYPE,data})});
+    toast(editingId?'Deal updated':'Deal added');
+    closeModal('deal-modal-overlay');
+    await loadData();
+  }catch(err){toast('Save failed: '+err.message,'error');}
 }
-function editFromDetail(){closeModal('detail-modal');openEditDeal(editingId);}
-async function deleteFromDetail(){
-  const d=DEALS.find(x=>x.id===editingId);
-  const ok=await confirm2('Delete Deal?',`"${d?.name}" will be permanently removed.`,'Delete','🗑️');
-  if(ok){DEALS=DEALS.filter(x=>x.id!==editingId);closeModal('detail-modal');renderCurrentView();toast('Deal deleted.','error');}
-}
-function logActivityForDeal(){closeModal('detail-modal');activityDealId=editingId;openModal('activity-modal');}
 
-/* CRUD */
-function openNewDeal(){
-  editingId=null;
-  document.getElementById('deal-modal-title').textContent='New Deal';
-  ['d-name','d-company','d-value','d-notes','d-acv'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('d-id').value='';
-  document.getElementById('d-prob').value=50;
-  document.getElementById('d-stage').value='Prospecting';
-  document.getElementById('d-close').value='';
-  document.getElementById('d-loss').value='';
-  openModal('deal-modal');
-}
-function openEditDeal(id){
-  editingId=id;const d=DEALS.find(x=>x.id===id);if(!d)return;
-  document.getElementById('deal-modal-title').textContent='Edit Deal';
-  document.getElementById('d-id').value=id;
-  document.getElementById('d-name').value=d.name;
-  document.getElementById('d-company').value=d.company;
-  document.getElementById('d-value').value=d.value;
-  document.getElementById('d-stage').value=d.stage;
-  document.getElementById('d-prob').value=d.prob;
-  document.getElementById('d-close').value=d.close;
-  document.getElementById('d-owner').value=d.owner;
-  document.getElementById('d-source').value=d.source;
-  document.getElementById('d-priority').value=d.priority;
-  document.getElementById('d-product').value=d.product;
-  document.getElementById('d-notes').value=d.notes;
-  document.getElementById('d-acv').value=d.acv||'';
-  document.getElementById('d-loss').value=d.lossReason||'';
-  openModal('deal-modal');
-}
-function saveDeal(){
-  const name=document.getElementById('d-name').value.trim();
-  const company=document.getElementById('d-company').value.trim();
-  const value=+document.getElementById('d-value').value;
-  if(!name){toast('Deal name required.','error');return;}
-  if(!company){toast('Company required.','error');return;}
-  if(!value||value<=0){toast('Valid value required.','error');return;}
-  const owner=document.getElementById('d-owner').value;
-  const id=document.getElementById('d-id').value;
-  const data={name,company,value,stage:document.getElementById('d-stage').value,prob:+document.getElementById('d-prob').value,close:document.getElementById('d-close').value||'2025-12-31',owner,oi:initials(owner),oCol:OWNER_COL[owner]||'#00e5b0',source:document.getElementById('d-source').value,product:document.getElementById('d-product').value,priority:document.getElementById('d-priority').value,notes:document.getElementById('d-notes').value,acv:+document.getElementById('d-acv').value||value,lossReason:document.getElementById('d-loss').value};
-  if(id){Object.assign(DEALS.find(x=>x.id===+id),data);toast(`"${name}" updated!`);}
-  else{DEALS.unshift({id:Date.now(),...data,created:new Date().toISOString().slice(0,10),lastContact:new Date().toISOString().slice(0,10)});toast(`"${name}" created!`);}
-  closeModal('deal-modal');renderCurrentView();
-}
 async function deleteDeal(id){
-  const d=DEALS.find(x=>x.id===id);
-  const ok=await confirm2('Delete Deal?',`"${d?.name}" will be removed.`,'Delete','🗑️');
-  if(ok){DEALS=DEALS.filter(x=>x.id!==id);renderCurrentView();toast('Deal deleted.','error');}
+  const d=DEALS.find(x=>x._id===id);
+  const name=KEYS.name&&d?d[KEYS.name]:id;
+  const ok=await confirm2('Delete Deal',`Delete "${name}"? This cannot be undone.`);
+  if(!ok)return;
+  try{await apiFetch(`/import/record/${id}`,{method:'DELETE'});toast('Deal deleted');await loadData();}
+  catch(err){toast('Delete failed: '+err.message,'error');}
 }
-function markDeal(id,stage){
-  const d=DEALS.find(x=>x.id===id);if(!d)return;
-  d.stage=stage;
-  if(stage==='Closed Won'){d.prob=100;d.close=new Date().toISOString().slice(0,10);}
-  if(stage==='Closed Lost'){d.prob=0;}
-  renderCurrentView();toast(`${d.name} marked as ${stage}!`);
-}
-function reopenDeal(id){
-  const d=DEALS.find(x=>x.id===id);if(!d)return;
-  d.stage='Prospecting';d.prob=30;
-  renderCurrentView();toast(`${d.name} reopened.`);
-}
-function rowSel(cb){if(cb.checked)selectedDeals.add(+cb.value);else selectedDeals.delete(+cb.value);document.getElementById('bulk-actions').style.display=selectedDeals.size>0?'flex':'none';}
-function toggleAll(cb){document.querySelectorAll('.rck').forEach(c=>{c.checked=cb.checked;if(cb.checked)selectedDeals.add(+c.value);else selectedDeals.delete(+c.value);});document.getElementById('bulk-actions').style.display=selectedDeals.size>0?'flex':'none';}
-async function bulkDelete(){const ok=await confirm2('Delete Selected?',`${selectedDeals.size} deal(s) will be removed.`,'Delete All','🗑️');if(ok){DEALS=DEALS.filter(d=>!selectedDeals.has(d.id));selectedDeals.clear();renderCurrentView();toast('Deals deleted.','error');}}
-function bulkStage(){const stage=prompt('Enter new stage:\nProspecting, Qualification, Demo Scheduled, Proposal Sent, Negotiation, Closed Won, Closed Lost');if(stage&&STAGE_CFG[stage]){DEALS.forEach(d=>{if(selectedDeals.has(d.id))d.stage=stage;});selectedDeals.clear();renderCurrentView();toast(`Deals moved to ${stage}.`);}}
-function bulkOwner(){const o=prompt('Reassign to:\nSanjay Kumar, Priya Nair, Rahul Mehta, Anjali Rao, Vikram Singh');if(o&&OWNER_COL[o]){DEALS.forEach(d=>{if(selectedDeals.has(d.id)){d.owner=o;d.oi=initials(o);d.oCol=OWNER_COL[o];}});selectedDeals.clear();renderCurrentView();toast(`Reassigned to ${o}.`);}}
-function logActivity(){
-  const icons={Call:'📞',Email:'✉️',Meeting:'🤝',Demo:'🎥','Proposal Sent':'📄','Follow-up':'🔄'};
-  const type=document.getElementById('a-type').value;
-  ACTIVITIES.unshift({id:Date.now(),type,icon:icons[type]||'📋',dealId:activityDealId,outcome:document.getElementById('a-outcome').value,dur:document.getElementById('a-dur').value+' min',notes:document.getElementById('a-notes').value||'Activity logged.',date:document.getElementById('a-date').value||new Date().toISOString(),rep:'Sanjay Kumar'});
-  const d=DEALS.find(x=>x.id===activityDealId);
-  if(d)d.lastContact=new Date().toISOString().slice(0,10);
-  closeModal('activity-modal');toast(`${type} logged!`);
-}
-function exportCSV(){const h=['Deal Name','Company','Owner','Value','Stage','Probability','Close Date','Source','Priority'];const rows=DEALS.map(d=>[d.name,d.company,d.owner,d.value,d.stage,d.prob+'%',d.close,d.source,d.priority]);const csv=[h,...rows].map(r=>r.join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='deals.csv';a.click();toast('CSV exported!');}
 
-/* NOTIFICATIONS */
-function renderNotifications(){
-  const ts={success:'rgba(0,229,176,0.08);border-left:3px solid var(--accent)',danger:'rgba(255,77,109,0.08);border-left:3px solid var(--rose)',info:'var(--bg3);border-left:3px solid var(--blue)'};
-  document.getElementById('notif-list').innerHTML=NOTIFICATIONS.map(n=>`<div style="display:flex;gap:12px;padding:13px 14px;background:${ts[n.type]||'var(--bg3)'};border-radius:9px;opacity:${n.read?0.5:1};"><span style="font-size:18px;">${n.icon}</span><div style="flex:1;"><div style="font-weight:600;font-size:13px;color:var(--text);">${n.title}</div><div style="font-size:11px;color:var(--text3);margin-top:3px;">${n.body}</div></div>${!n.read?`<button class="btn btn-xs" onclick="markRead(${n.id})">✓</button>`:''}</div>`).join('');
+// ── FILTER BUILDERS ───────────────────────────────────────────────
+function buildOwnerFilter(){
+  const sel=document.getElementById('owner-filter');
+  if(!sel||!KEYS.counsellor)return;
+  const owners=[...new Set(DEALS.map(d=>d[KEYS.counsellor]).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">All Counsellors</option>'+owners.map(o=>`<option>${o}</option>`).join('');
 }
-function markRead(id){const n=NOTIFICATIONS.find(x=>x.id===id);if(n)n.read=true;renderNotifications();document.getElementById('notif-count').textContent=NOTIFICATIONS.filter(n=>!n.read).length;}
-function markAllRead(){NOTIFICATIONS.forEach(n=>n.read=true);renderNotifications();document.getElementById('notif-count').textContent=0;}
-
-function toggleDD(e,id){e.stopPropagation();document.querySelectorAll('.dropdown-menu.open').forEach(m=>{if(m.id!==id)m.classList.remove('open');});document.getElementById(id)?.classList.toggle('open');}
-document.addEventListener('click',()=>document.querySelectorAll('.dropdown-menu.open').forEach(m=>m.classList.remove('open')));
-
-document.getElementById('a-date').value=new Date().toISOString().slice(0,16);
-renderNotifications();
-
-/* ═══ DYNAMIC INIT ═══════════════════════════════════════════ */
-async function initPage() {
-  await loadPageData('sales', 'deals', mapDeal,
-    (mapped) => {
-      DEALS = mapped;
-      populateFilter('owner-filter',  DEALS.map(d => d.owner),  'All Owners');
-      populateFilter('source-filter', DEALS.map(d => d.source), 'All Sources');
-      renderCurrentView();
-    }, 'content'
-  );
+function buildStageChips(){
+  const c=document.getElementById('stage-chips');
+  if(!c||!KEYS.stage)return;
+  const stages=[...new Set(DEALS.map(d=>d[KEYS.stage]).filter(Boolean))];
+  c.innerHTML=`<button class="filter-chip active" onclick="setStageFilter('',this)">All</button>`+
+    stages.map(s=>{const cfg=stageCfg(s);return`<button class="filter-chip" onclick="setStageFilter('${s}',this)">${s}</button>`;}).join('');
 }
-initPage();
 </script>
-<script src="../../assets/js/api.js"></script>
-<script src="../../assets/js/data-loader.js"></script>
-<script src="../../assets/js/auth.js"></script>
 </body>
 </html>

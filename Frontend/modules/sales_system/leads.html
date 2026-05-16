@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leads — Zyntrix CRM</title>
+<title>Student Leads — Zyntrix CRM</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,7 +54,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .page-title{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
 .page-crumb{font-size:11px;color:var(--text3);margin-top:1px;}
 .page-crumb span{color:var(--accent);}
-.search-wrap{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;min-width:240px;transition:border 0.2s;}
+.search-wrap{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;min-width:220px;transition:border 0.2s;}
 .search-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
 .search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%;}
 .search-wrap input::placeholder{color:var(--text3);}
@@ -62,8 +62,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .tbtn:hover{background:var(--bg3);}
 .tbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(0,229,176,0.25);}
 .tbtn.primary:hover{background:var(--accent2);}
-.notif-dot{position:absolute;top:5px;right:12px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--bg2);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
 .sub-nav{display:flex;align-items:center;gap:4px;padding:16px 28px 0;background:var(--bg2);border-bottom:1px solid var(--border);}
 .snav-tab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;white-space:nowrap;font-family:var(--font);display:flex;align-items:center;gap:7px;background:none;border-top:none;border-left:none;border-right:none;}
 .snav-tab:hover{color:var(--text);}
@@ -83,7 +81,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .kpi-val{font-family:var(--display);font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px;}
 .kpi-lbl{font-size:11px;color:var(--text3);margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
 .kpi-delta{font-size:11.5px;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:500;}
-.up{color:var(--accent);} .dn{color:var(--rose);} .neu{color:var(--text3);}
+.up{color:var(--accent);}.dn{color:var(--rose);}.neu{color:var(--text3);}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
 .card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap;}
 .card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.2px;}
@@ -109,8 +107,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .prog-fill{height:100%;border-radius:3px;transition:width 0.8s cubic-bezier(.4,0,.2,1);}
 table{width:100%;border-collapse:collapse;}
 thead tr{border-bottom:1px solid var(--border2);}
-th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 16px 12px;white-space:nowrap;font-family:var(--display);}
-td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
+th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 14px 12px;white-space:nowrap;font-family:var(--display);}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tbody tr{transition:background 0.12s;}
 tbody tr:hover td{background:rgba(255,255,255,0.015);}
@@ -124,28 +122,23 @@ select option{background:var(--bg2);}
 .filter-chip:hover:not(.active){background:var(--bg3);color:var(--text);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 .ani{animation:fadeUp 0.35s ease both;}
-.ani:nth-child(1){animation-delay:.00s}.ani:nth-child(2){animation-delay:.05s}
-.ani:nth-child(3){animation-delay:.10s}.ani:nth-child(4){animation-delay:.15s}
-.ani:nth-child(5){animation-delay:.20s}
-/* LEAD SCORE */
-.score-pill{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px;}
 /* KANBAN */
 .leads-kanban{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;min-height:400px;}
 .leads-kanban::-webkit-scrollbar{height:5px;}
 .leads-kanban::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
-.lk-col{flex:0 0 220px;min-width:220px;}
+.lk-col{flex:0 0 210px;min-width:210px;}
 .lk-hd{padding:10px 12px;border-radius:10px 10px 0 0;border:1px solid var(--border);border-bottom:none;display:flex;align-items:center;justify-content:space-between;}
-.lk-body{border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:8px;background:var(--bg3);min-height:100px;display:flex;flex-direction:column;gap:8px;}
+.lk-body{border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:8px;background:var(--bg3);min-height:80px;display:flex;flex-direction:column;gap:8px;}
 .lead-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px;cursor:pointer;transition:all 0.2s;}
 .lead-card:hover{border-color:var(--border2);transform:translateY(-2px);}
 .lc-name{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:3px;}
 .lc-co{font-size:11px;color:var(--text3);margin-bottom:8px;}
 .lc-foot{display:flex;justify-content:space-between;align-items:center;}
-/* OVERLAY */
+/* OVERLAY / MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(4,8,16,0.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .overlay.open{display:flex;animation:overlayIn 0.2s ease;}
 @keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:620px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:modalUp 0.25s cubic-bezier(.34,1.56,.64,1);}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:680px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:modalUp 0.25s cubic-bezier(.34,1.56,.64,1);}
 @keyframes modalUp{from{opacity:0;transform:translateY(20px) scale(0.96);}to{opacity:1;transform:none;}}
 .modal::-webkit-scrollbar{width:4px;}
 .modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
@@ -183,14 +176,42 @@ textarea{resize:vertical;min-height:80px;}
 .confirm-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;}
 .confirm-msg{font-size:13px;color:var(--text2);margin-bottom:22px;}
 .confirm-btns{display:flex;gap:10px;justify-content:center;}
+/* EMPTY STATE */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;gap:16px;text-align:center;}
+.empty-icon{font-size:48px;opacity:0.4;}
+.empty-title{font-family:var(--display);font-size:18px;font-weight:700;color:var(--text);}
+.empty-sub{font-size:13px;color:var(--text3);max-width:380px;line-height:1.7;}
+/* ANALYTICS GRID */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.bar-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.bar-item:last-child{border-bottom:none;}
+.bar-label{font-size:12px;color:var(--text2);min-width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;background:var(--accent);transition:width 0.6s ease;}
+.bar-count{font-size:11px;font-family:var(--mono);color:var(--text3);min-width:28px;text-align:right;}
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+/* SCORE PILL */
+.score-pill{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px;}
+/* BULK BAR */
+.bulk-bar{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--accent);border-radius:12px;padding:12px 20px;gap:14px;align-items:center;z-index:100;box-shadow:0 8px 32px rgba(0,229,176,0.15);}
+.bulk-bar.open{display:flex;}
+/* FOLLOWUP BADGE */
+.followup-badge{font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:5px;display:inline-block;}
+.followup-today{background:var(--rose-dim);color:var(--rose);}
+.followup-soon{background:var(--amber-dim);color:var(--amber);}
+.followup-ok{background:var(--accent-dim);color:var(--accent);}
 </style>
 </head>
 <body>
 <div class="shell">
+
+<!-- ─── SIDEBAR ─────────────────────────────────────────────────────────── -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-mark">Z</div>
-    <div><div class="brand-text">Zyntrix CRM</div><div class="brand-sub">v2.5 · Sales Suite</div></div>
+    <div><div class="brand-text">Zyntrix CRM</div><div class="brand-sub">Student Sales Suite</div></div>
   </div>
   <div class="nav-group">
     <div class="nav-label">Overview</div>
@@ -198,265 +219,279 @@ textarea{resize:vertical;min-height:80px;}
   </div>
   <div class="nav-group">
     <div class="nav-label">Pipeline</div>
-    <a class="nav-item" href="pipeline.html"><span class="nav-icon">◈</span> Pipeline Board <span class="nav-count ok">18</span></a>
-    <a class="nav-item" href="deals.html"><span class="nav-icon">⟐</span> Deals <span class="nav-count">18</span></a>
-    <a class="nav-item active" href="leads.html"><span class="nav-icon">◎</span> Leads <span class="nav-count hot">42</span></a>
+    <a class="nav-item" href="pipeline.html"><span class="nav-icon">◈</span> Pipeline Board</a>
+    <a class="nav-item" href="deals.html"><span class="nav-icon">⟐</span> Enrollments</a>
+    <a class="nav-item active" href="leads.html"><span class="nav-icon">◎</span> Student Leads <span class="nav-count hot" id="nav-hot-count">—</span></a>
   </div>
-  <div class="nav-divider"></div>
   <div class="nav-group">
     <div class="nav-label">Engagement</div>
     <a class="nav-item" href="activities.html"><span class="nav-icon">☏</span> Activities</a>
     <a class="nav-item" href="emails.html"><span class="nav-icon">✉</span> Emails &amp; Proposals</a>
-    <a class="nav-item" href="meetings.html"><span class="nav-icon">◷</span> Meetings <span class="nav-count hot">3</span></a>
+    <a class="nav-item" href="meetings.html"><span class="nav-icon">◷</span> Meetings</a>
   </div>
-  <div class="nav-divider"></div>
   <div class="nav-group">
     <div class="nav-label">Insights</div>
     <a class="nav-item" href="reports.html"><span class="nav-icon">↗</span> Revenue Reports</a>
     <a class="nav-item" href="leaderboard.html"><span class="nav-icon">⬡</span> Leaderboard</a>
-    <a class="nav-item" href="#"><span class="nav-icon">⊞</span> Playbook</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-group">
     <div class="nav-label">Admin</div>
     <a class="nav-item" href="settings.html"><span class="nav-icon">⊙</span> Settings</a>
+    <a class="nav-item" href="../import.html"><span class="nav-icon">↑</span> Import Data</a>
   </div>
   <div class="sidebar-footer">
     <div class="user-card">
-      <div class="avatar">SK</div>
-      <div><div class="user-name">Sanjay Kumar</div><div class="user-role">Sales Manager</div></div>
+      <div class="avatar" id="user-avatar">?</div>
+      <div><div class="user-name" id="user-name">Loading…</div><div class="user-role">Sales Executive</div></div>
     </div>
-    <button class="tbtn" type="button" onclick="logout()" style="margin-top:8px;width:100%;justify-content:center;">⏻ Logout</button>
   </div>
 </aside>
 
+<!-- ─── MAIN ──────────────────────────────────────────────────────────────── -->
 <div class="main">
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="page-hd">
-      <div class="page-title">Leads</div>
-      <div class="page-crumb">Zyntrix CRM › Pipeline › <span>Leads</span></div>
+      <div class="page-title">Student Leads</div>
+      <div class="page-crumb">Sales Suite → <span>Leads</span></div>
     </div>
     <div class="search-wrap">
-      <span style="color:var(--text3);">⌕</span>
-      <input type="text" id="global-search" placeholder="Search leads, companies…" oninput="applyFilters()">
+      <span style="color:var(--text3);font-size:14px;">⌕</span>
+      <input type="text" id="global-search" placeholder="Search students…" oninput="applyFilters()">
     </div>
-    <div style="position:relative;">
-      <button class="tbtn" onclick="openModal('notif-modal')">🔔 <span style="background:var(--rose);color:#fff;font-size:10px;padding:1px 5px;border-radius:4px;">4</span></button>
-      <span class="notif-dot"></span>
-    </div>
-    <button class="tbtn primary" onclick="openNewLead()">＋ New Lead</button>
+    <button class="tbtn" onclick="openModal('import-prompt-overlay')" title="Import student Excel">↑ Import</button>
+    <button class="tbtn primary" id="add-btn" onclick="openAddModal()" style="display:none;">+ Add Student</button>
+    <button class="tbtn" onclick="loadData()" title="Refresh">↺</button>
   </div>
 
+  <!-- SUB-NAV TABS -->
   <div class="sub-nav">
-    <button class="snav-tab active" onclick="switchView('table',this)">⊟ All Leads <span class="tab-count" id="tc-all">42</span></button>
+    <button class="snav-tab active" onclick="switchView('table',this)">⊟ All Leads <span class="tab-count" id="tc-all">—</span></button>
     <button class="snav-tab" onclick="switchView('kanban',this)">◈ Kanban</button>
-    <button class="snav-tab" onclick="switchView('hot',this)">🔥 Hot Leads <span class="tab-count" style="background:var(--rose-dim);color:var(--rose);" id="tc-hot">0</span></button>
-    <button class="snav-tab" onclick="switchView('converted',this)">✓ Converted <span class="tab-count" id="tc-conv">0</span></button>
+    <button class="snav-tab" onclick="switchView('hot',this)">🔥 Hot Leads <span class="tab-count" style="background:var(--rose-dim);color:var(--rose);" id="tc-hot">—</span></button>
+    <button class="snav-tab" onclick="switchView('followup',this)">📅 Follow-ups <span class="tab-count" style="background:var(--amber-dim);color:var(--amber);" id="tc-followup">—</span></button>
+    <button class="snav-tab" onclick="switchView('analytics',this)">↗ Analytics</button>
     <div class="snav-right">
-      <select id="owner-filter" onchange="applyFilters()">
-        <option value="">All Owners</option>
+      <select id="owner-filter" onchange="applyFilters()" style="font-size:12px;padding:5px 10px;">
+        <option value="">All Counsellors</option>
       </select>
-      <select id="source-filter" onchange="applyFilters()">
-        <option value="">All Sources</option>
+      <select id="sort-sel" onchange="applyFilters()" style="font-size:12px;padding:5px 10px;">
+        <option value="created-desc">Newest First</option>
+        <option value="created-asc">Oldest First</option>
+        <option value="score-desc">Highest Score</option>
+        <option value="name-asc">Name A–Z</option>
       </select>
-      <button class="tbtn btn-sm" onclick="exportCSV()">↓ Export</button>
     </div>
   </div>
 
-  <div class="content" id="content">
-    <div class="section" style="padding-bottom:0;">
-      <div class="kpi-row">
-        <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);">
-          <span class="kpi-icon">◎</span>
-          <div class="kpi-val" id="kpi-total" style="color:var(--accent);">42</div>
-          <div class="kpi-lbl">Total Leads</div>
-          <div class="kpi-delta up">▲ 12 this week</div>
-        </div>
-        <div class="kpi-card ani" style="--glow:rgba(255,77,109,0.08);">
-          <span class="kpi-icon">🔥</span>
-          <div class="kpi-val" id="kpi-hot" style="color:var(--rose);">0</div>
-          <div class="kpi-lbl">Hot Leads</div>
-          <div class="kpi-delta up">Score 70+</div>
-        </div>
-        <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.06);">
-          <span class="kpi-icon">✓</span>
-          <div class="kpi-val" id="kpi-conv" style="color:var(--accent);">0</div>
-          <div class="kpi-lbl">Converted</div>
-          <div class="kpi-delta neu">This quarter</div>
-        </div>
-        <div class="kpi-card ani" style="--glow:rgba(61,142,240,0.08);">
-          <span class="kpi-icon">%</span>
-          <div class="kpi-val" id="kpi-rate" style="color:var(--blue);">0%</div>
-          <div class="kpi-lbl">Conversion Rate</div>
-          <div class="kpi-delta up">▲ 3% vs Q1</div>
-        </div>
-        <div class="kpi-card ani" style="--glow:rgba(245,166,35,0.08);">
-          <span class="kpi-icon">⟐</span>
-          <div class="kpi-val" id="kpi-new" style="color:var(--amber);">12</div>
-          <div class="kpi-lbl">New This Week</div>
-          <div class="kpi-delta up">▲ 4 vs last week</div>
-        </div>
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- LOADING SKELETON -->
+    <div id="loading-state" class="section">
+      <div class="kpi-row" style="margin-bottom:22px;">
+        <div class="kpi-card skeleton" style="height:90px;"></div>
+        <div class="kpi-card skeleton" style="height:90px;"></div>
+        <div class="kpi-card skeleton" style="height:90px;"></div>
+        <div class="kpi-card skeleton" style="height:90px;"></div>
+        <div class="kpi-card skeleton" style="height:90px;"></div>
+      </div>
+      <div class="card skeleton" style="height:400px;"></div>
+    </div>
+
+    <!-- NO SCHEMA STATE -->
+    <div id="empty-state" style="display:none;">
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">No Student Data Yet</div>
+        <div class="empty-sub">Import your student Excel sheet to get started. The system will automatically map your columns and display everything here.</div>
+        <button class="btn primary" onclick="openModal('import-prompt-overlay')" style="margin-top:8px;">↑ Import Student Excel</button>
       </div>
     </div>
 
-    <!-- TABLE VIEW -->
-    <div id="view-table" class="section" style="padding-top:0;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="status-chips">
-          <button class="filter-chip active" onclick="setStatusFilter('',this)">All Status</button>
-          <button class="filter-chip" onclick="setStatusFilter('New',this)">New</button>
-          <button class="filter-chip" onclick="setStatusFilter('Contacted',this)">Contacted</button>
-          <button class="filter-chip" onclick="setStatusFilter('Qualified',this)">Qualified</button>
-          <button class="filter-chip" onclick="setStatusFilter('Nurturing',this)">Nurturing</button>
-          <button class="filter-chip" onclick="setStatusFilter('Disqualified',this)">Disqualified</button>
+    <!-- MAIN DATA AREA (shown after schema loads) -->
+    <div id="data-area" style="display:none;">
+      <!-- KPI CARDS -->
+      <div class="section" style="padding-bottom:0;">
+        <div class="kpi-row" id="kpi-row"></div>
+
+        <!-- STATUS FILTER CHIPS -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;" id="status-chips">
+          <button class="filter-chip active" onclick="setStatusFilter('',this)">All</button>
         </div>
-        <div style="margin-left:auto;">
-          <select id="sort-sel" onchange="applyFilters()" style="font-size:12px;padding:6px 10px;">
-            <option value="score-desc">Score ↓</option>
-            <option value="score-asc">Score ↑</option>
-            <option value="created-desc">Newest</option>
-            <option value="name-asc">Name A-Z</option>
-          </select>
-        </div>
-      </div>
-      <div class="card ani">
-        <div class="card-hd">
-          <div><div class="card-title">All Leads</div><div class="card-sub" id="table-sub">Loading…</div></div>
-          <div style="display:flex;gap:8px;" id="bulk-actions" style="display:none;">
-            <button class="btn btn-sm" onclick="bulkAssign()">Reassign</button>
-            <button class="btn btn-sm primary" onclick="bulkConvert()">Convert to Deal</button>
-            <button class="btn btn-sm danger" onclick="bulkDisqualify()">Disqualify</button>
+
+        <!-- ── ALL LEADS TABLE VIEW ── -->
+        <div id="view-table">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+              <div>
+                <div class="card-title" id="table-title">Student Leads</div>
+                <div class="card-sub" id="table-sub"></div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-sm" id="bulk-status-btn" style="display:none;" onclick="openBulkStatus()">⚡ Bulk Update Status</button>
+                <button class="btn btn-sm danger" id="bulk-del-btn" style="display:none;" onclick="bulkDelete()">✗ Delete Selected</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr id="leads-thead"></tr></thead>
+                <tbody id="leads-tbody"></tbody>
+              </table>
+            </div>
+            <div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+              <div style="font-size:12px;color:var(--text3);" id="table-footer"></div>
+              <div style="display:flex;gap:6px;" id="pagination"></div>
+            </div>
           </div>
         </div>
-        <div style="overflow-x:auto;">
-          <table>
-            <thead>
-              <tr>
-                <th><input type="checkbox" id="sel-all" onchange="toggleAll(this)"></th>
-                <th>Lead / Company</th><th>Contact</th><th>Source</th><th>Status</th><th>Score</th><th>Assigned To</th><th>Created</th><th>Last Activity</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="leads-tbody"></tbody>
-          </table>
+
+        <!-- ── KANBAN VIEW ── -->
+        <div id="view-kanban" style="display:none;">
+          <div class="leads-kanban" id="leads-kanban"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border);margin-top:4px;">
-          <div style="font-size:12px;color:var(--text3);" id="table-footer"></div>
-          <div style="display:flex;gap:6px;" id="pagination"></div>
+
+        <!-- ── HOT LEADS VIEW ── -->
+        <div id="view-hot" style="display:none;">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+              <div class="card-title">🔥 Hot Leads</div>
+              <div class="card-sub">Students with highest interest scores</div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr id="hot-thead"></tr></thead>
+                <tbody id="hot-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── FOLLOW-UPS VIEW ── -->
+        <div id="view-followup" style="display:none;">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+              <div class="card-title">📅 Pending Follow-Ups</div>
+              <div class="card-sub">Students due for follow-up today and this week</div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr id="fu-thead"></tr></thead>
+                <tbody id="fu-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ANALYTICS VIEW ── -->
+        <div id="view-analytics" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="card" id="analytics-status"></div>
+            <div class="card" id="analytics-source"></div>
+            <div class="card" id="analytics-counsellor"></div>
+            <div class="card" id="analytics-course"></div>
+            <div class="card" id="analytics-city" style="grid-column:1/-1;"></div>
+          </div>
         </div>
       </div>
     </div>
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
 
-    <!-- KANBAN VIEW -->
-    <div id="view-kanban" class="section" style="display:none;padding-top:0;">
-      <div class="leads-kanban" id="leads-kanban"></div>
-    </div>
+<!-- ═══ MODALS ═══════════════════════════════════════════════════════════════ -->
 
-    <!-- HOT LEADS VIEW -->
-    <div id="view-hot" class="section" style="display:none;padding-top:0;">
-      <div class="card ani">
-        <div class="card-hd"><div><div class="card-title">🔥 Hot Leads</div><div class="card-sub">Score 70+ · priority outreach needed</div></div></div>
-        <div style="overflow-x:auto;">
-          <table>
-            <thead><tr><th>Lead</th><th>Company</th><th>Contact</th><th>Score</th><th>Source</th><th>Assigned To</th><th>Actions</th></tr></thead>
-            <tbody id="hot-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONVERTED VIEW -->
-    <div id="view-converted" class="section" style="display:none;padding-top:0;">
-      <div class="card ani">
-        <div class="card-hd"><div><div class="card-title">✓ Converted Leads</div><div class="card-sub">Successfully converted to deals this quarter</div></div></div>
-        <div style="overflow-x:auto;">
-          <table>
-            <thead><tr><th>Lead</th><th>Company</th><th>Converted Deal</th><th>Value</th><th>Converted On</th><th>By</th></tr></thead>
-            <tbody id="conv-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- NEW/EDIT LEAD MODAL -->
-<div class="overlay" id="lead-modal" onclick="closeModal('lead-modal')">
-  <div class="modal" onclick="event.stopPropagation()">
+<!-- ADD / EDIT LEAD -->
+<div class="overlay" id="lead-modal-overlay">
+  <div class="modal" style="width:740px;">
     <div class="modal-hd">
-      <span class="modal-title" id="lead-modal-title">New Lead</span>
-      <button class="modal-close" onclick="closeModal('lead-modal')">×</button>
+      <div class="modal-title" id="lead-modal-title">Add Student Lead</div>
+      <button class="modal-close" onclick="closeModal('lead-modal-overlay')">✕</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="l-id">
-      <div class="fgrid">
-        <div class="fg"><label>Full Name *</label><input id="l-name" placeholder="Lead's full name"></div>
-        <div class="fg"><label>Company *</label><input id="l-company" placeholder="Company name"></div>
-        <div class="fg"><label>Email</label><input id="l-email" type="email" placeholder="email@company.com"></div>
-        <div class="fg"><label>Phone</label><input id="l-phone" placeholder="+91 98000 00000"></div>
-        <div class="fg"><label>Job Title</label><input id="l-title" placeholder="e.g. Director of IT"></div>
-        <div class="fg"><label>Company Size</label>
-          <select id="l-size"><option>1-10</option><option>11-50</option><option>51-200</option><option>201-500</option><option>501-1000</option><option>1000+</option></select>
-        </div>
-        <div class="fg"><label>Lead Source</label>
-          <select id="l-source"><option>Website</option><option>LinkedIn</option><option>Referral</option><option>Cold Call</option><option>Campaign</option><option>Event</option></select>
-        </div>
-        <div class="fg"><label>Status</label>
-          <select id="l-status"><option>New</option><option>Contacted</option><option>Qualified</option><option>Nurturing</option><option>Disqualified</option></select>
-        </div>
-        <div class="fg"><label>Lead Score (0-100)</label><input id="l-score" type="number" min="0" max="100" placeholder="50"></div>
-        <div class="fg"><label>Assigned To</label>
-          <select id="l-owner"><option>Sanjay Kumar</option><option>Priya Nair</option><option>Rahul Mehta</option><option>Anjali Rao</option><option>Vikram Singh</option></select>
-        </div>
-        <div class="fg"><label>Product Interest</label>
-          <select id="l-product"><option>EdTech CRM — Enterprise</option><option>EdTech CRM — Business</option><option>EdTech CRM — Starter</option><option>LMS Add-on</option></select>
-        </div>
-        <div class="fg"><label>Est. Budget (₹)</label><input id="l-budget" type="number" placeholder="500000"></div>
-        <div class="fg full"><label>Notes</label><textarea id="l-notes" placeholder="Pain points, requirements, next steps…"></textarea></div>
-      </div>
+      <div class="fgrid" id="lead-form-fields"></div>
     </div>
     <div class="modal-ft">
-      <button class="btn" onclick="closeModal('lead-modal')">Cancel</button>
+      <button class="btn" onclick="closeModal('lead-modal-overlay')">Cancel</button>
       <button class="btn primary" onclick="saveLead()">Save Lead</button>
     </div>
   </div>
 </div>
 
-<!-- LEAD DETAIL MODAL -->
-<div class="overlay" id="detail-modal" onclick="closeModal('detail-modal')">
-  <div class="modal" style="width:680px;" onclick="event.stopPropagation()">
+<!-- DETAIL VIEW -->
+<div class="overlay" id="detail-overlay">
+  <div class="modal" style="width:760px;">
     <div class="modal-hd">
       <div>
-        <span class="modal-title" id="det-name">Lead</span>
-        <div style="font-size:12px;color:var(--text3);margin-top:3px;" id="det-company"></div>
+        <div class="modal-title" id="det-name">Student Detail</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px;" id="det-sub"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <span class="badge" id="det-status-badge"></span>
-        <button class="modal-close" onclick="closeModal('detail-modal')">×</button>
+        <button class="btn btn-sm" id="det-edit-btn" onclick="openEditFromDetail()">✎ Edit</button>
+        <button class="modal-close" onclick="closeModal('detail-overlay')">✕</button>
       </div>
     </div>
     <div class="modal-body" id="detail-body"></div>
+    <div class="modal-ft" id="detail-footer"></div>
+  </div>
+</div>
+
+<!-- IMPORT PROMPT -->
+<div class="overlay" id="import-prompt-overlay">
+  <div class="modal" style="width:480px;">
+    <div class="modal-hd">
+      <div class="modal-title">Import Student Data</div>
+      <button class="modal-close" onclick="closeModal('import-prompt-overlay')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+      <div style="background:var(--accent-dim);border:1px solid var(--accent);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--accent);">
+        ✦ The system auto-detects your column names and maps them to student fields (Name, Course, Phone, Status, etc.)
+      </div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+        Head to the <strong style="color:var(--text);">Import page</strong>, upload your Excel (.xlsx) with student data, and it will auto-configure all columns for the Leads and Deals sections.
+      </div>
+      <div style="background:var(--bg3);border-radius:10px;padding:14px 16px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Common columns auto-detected:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Student Name</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Email</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Phone</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Course</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">College</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">City</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Counsellor</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Status</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Lead Score</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Follow-up Date</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Source</span>
+          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Budget</span>
+        </div>
+      </div>
+    </div>
     <div class="modal-ft">
-      <button class="btn btn-sm danger" onclick="disqualifyFromDetail()">✗ Disqualify</button>
-      <button class="btn btn-sm" onclick="editFromDetail()">Edit Lead</button>
-      <button class="btn btn-sm primary" onclick="convertToDeal()">⟐ Convert to Deal</button>
+      <button class="btn" onclick="closeModal('import-prompt-overlay')">Close</button>
+      <a class="btn primary" href="../import.html">Go to Import ↗</a>
     </div>
   </div>
 </div>
 
-<!-- NOTIFICATIONS -->
-<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
-  <div class="modal" style="width:420px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+<!-- BULK STATUS MODAL -->
+<div class="overlay" id="bulk-status-overlay">
+  <div class="modal" style="width:380px;">
+    <div class="modal-hd">
+      <div class="modal-title">Update Status</div>
+      <button class="modal-close" onclick="closeModal('bulk-status-overlay')">✕</button>
+    </div>
     <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="padding:13px 14px;background:rgba(0,229,176,0.08);border-left:3px solid var(--accent);border-radius:9px;"><div style="font-weight:600;font-size:13px;color:var(--text);">🎉 ZyntrixEdu moved to Negotiation!</div><div style="font-size:11px;color:var(--text3);">₹18.5L · Sanjay Kumar</div></div>
-        <div style="padding:13px 14px;background:rgba(255,77,109,0.08);border-left:3px solid var(--rose);border-radius:9px;"><div style="font-weight:600;font-size:13px;color:var(--text);">⚠️ BrightPath stalled for 21 days</div><div style="font-size:11px;color:var(--text3);">₹7.2L · Rahul Mehta</div></div>
-        <div style="padding:13px 14px;background:var(--bg3);border-left:3px solid var(--blue);border-radius:9px;"><div style="font-weight:600;font-size:13px;color:var(--text);">📞 Apex Schools demo — Today 3 PM</div><div style="font-size:11px;color:var(--text3);">Priya Nair · Zoom link sent</div></div>
-        <div style="padding:13px 14px;background:var(--bg3);border-left:3px solid var(--blue);border-radius:9px;"><div style="font-weight:600;font-size:13px;color:var(--text);">📊 Q2 quota — 22 days left</div><div style="font-size:11px;color:var(--text3);">₹53L needed to hit ₹2.4Cr target</div></div>
+      <div class="fg">
+        <label>Set status for selected leads</label>
+        <select id="bulk-status-val"></select>
       </div>
     </div>
-    <div class="modal-ft"><button class="btn btn-sm" onclick="closeModal('notif-modal')">Dismiss All</button></div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('bulk-status-overlay')">Cancel</button>
+      <button class="btn primary" onclick="applyBulkStatus()">Apply</button>
+    </div>
   </div>
 </div>
 
@@ -464,8 +499,8 @@ textarea{resize:vertical;min-height:80px;}
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
     <div class="confirm-icon" id="ci">⚠️</div>
-    <div class="confirm-title" id="ct">Are you sure?</div>
-    <div class="confirm-msg" id="cm">This cannot be undone.</div>
+    <div class="confirm-title" id="ct">Confirm</div>
+    <div class="confirm-msg" id="cm"></div>
     <div class="confirm-btns">
       <button class="btn" onclick="resolveConfirm(false)">Cancel</button>
       <button class="btn danger" id="c-ok" onclick="resolveConfirm(true)">Confirm</button>
@@ -476,300 +511,793 @@ textarea{resize:vertical;min-height:80px;}
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-/* ─── DATA — populated dynamically from imported Excel ─── */
-let LEADS = [];
+/* ═══════════════════════════════════════════════════════════════════
+   STUDENT LEADS — DYNAMIC SCHEMA-DRIVEN CRM PAGE
+   Reads column definitions from the backend SchemaConfig,
+   then adapts the entire UI (table, kanban, forms, KPIs, analytics)
+   to match exactly what was imported in the Excel sheet.
+═══════════════════════════════════════════════════════════════════ */
 
-const STATUS_CFG = {
-  'New':          {col:'#3d8ef0', bg:'rgba(61,142,240,0.12)',  cls:'b-blue'},
-  'Contacted':    {col:'#b57bee', bg:'rgba(181,123,238,0.12)', cls:'b-purple'},
-  'Qualified':    {col:'#00e5b0', bg:'rgba(0,229,176,0.12)',   cls:'b-accent'},
-  'Nurturing':    {col:'#f5a623', bg:'rgba(245,166,35,0.12)',  cls:'b-amber'},
-  'Disqualified': {col:'#ff4d6d', bg:'rgba(255,77,109,0.12)', cls:'b-rose'},
-  'Converted':    {col:'#22d3ee', bg:'rgba(34,211,238,0.12)', cls:'b-teal'},
+// ── CONFIG ────────────────────────────────────────────────────────
+const API_BASE  = window.CRM_CONFIG?.apiBase || 'https://zyntrixbackend-production-d32c.up.railway.app/api';
+const SYSTEM    = 'sales';
+const DATA_TYPE = 'leads';
+
+// ── STATE ─────────────────────────────────────────────────────────
+let SCHEMA    = null;   // { fields: [{excelHeader, systemKey, label, dataType}], configured }
+let RECORDS   = [];     // raw records from API
+let LEADS     = [];     // normalized (with _smart fields)
+let curView   = 'table';
+let statusFilter = '';
+let sortKey   = 'created', sortDir = 'desc';
+let page      = 1;
+const PAGE    = 12;
+let selectedIds = new Set();
+let editingId   = null;
+let confirmResolve = null;
+
+// Smart field keys detected from schema
+let KEYS = {
+  name: null, email: null, phone: null, status: null, score: null,
+  source: null, counsellor: null, followup: null, course: null,
+  college: null, city: null, budget: null, notes: null,
 };
-const OWNER_COL={'Sanjay Kumar':'#00e5b0','Priya Nair':'#3d8ef0','Rahul Mehta':'#b57bee','Anjali Rao':'#f5a623','Vikram Singh':'#22d3ee'};
 
-let curView='table', statusFilter='', sortKey='score', sortDir='desc';
-let page=1; const PAGE=10;
-let selectedLeads=new Set(), editingId=null, confirmResolve=null;
-const fmt=n=>n>=10000000?'₹'+(n/10000000).toFixed(2)+'Cr':'₹'+(n/100000).toFixed(1)+'L';
-const fmtDate=d=>d?new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';
-const initials=n=>n.split(' ').map(w=>w[0]).join('').toUpperCase();
+// Status color cycling
+const STATUS_COLORS = [
+  {cls:'b-blue',    col:'#3d8ef0', bg:'rgba(61,142,240,0.12)'},
+  {cls:'b-purple',  col:'#b57bee', bg:'rgba(181,123,238,0.12)'},
+  {cls:'b-accent',  col:'#00e5b0', bg:'rgba(0,229,176,0.12)'},
+  {cls:'b-amber',   col:'#f5a623', bg:'rgba(245,166,35,0.12)'},
+  {cls:'b-rose',    col:'#ff4d6d', bg:'rgba(255,77,109,0.12)'},
+  {cls:'b-teal',    col:'#22d3ee', bg:'rgba(34,211,238,0.12)'},
+];
+let statusColorMap = {};
 
-function toast(msg,type='success'){const tw=document.getElementById('toast-wrap');const t=document.createElement('div');t.className=`toast ${type}`;const ic=type==='success'?'✓':'✗';t.innerHTML=`<span style="color:${type==='success'?'var(--accent)':'var(--rose)'};font-size:16px;">${ic}</span>${msg}`;tw.appendChild(t);setTimeout(()=>{t.style.animation='toastOut 0.3s ease forwards';setTimeout(()=>t.remove(),300);},3200);}
-function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
-function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'));document.body.style.overflow='';}});
-function confirm2(title,msg,ok='Confirm',icon='⚠️'){return new Promise(resolve=>{confirmResolve=resolve;document.getElementById('ci').textContent=icon;document.getElementById('ct').textContent=title;document.getElementById('cm').textContent=msg;document.getElementById('c-ok').textContent=ok;document.getElementById('confirm-overlay').classList.add('open');});}
-function resolveConfirm(v){document.getElementById('confirm-overlay').classList.remove('open');if(confirmResolve){confirmResolve(v);confirmResolve=null;}}
+// ── AUTH HELPERS ──────────────────────────────────────────────────
+const getToken = () => localStorage.getItem('crm_token') || localStorage.getItem('token') || '';
 
-function scoreColor(s){return s>=70?'var(--accent)':s>=45?'var(--amber)':'var(--rose)';}
-function scoreBg(s){return s>=70?'var(--accent-dim)':s>=45?'var(--amber-dim)':'var(--rose-dim)';}
-
-function updateKPIs(){
-  const hot=LEADS.filter(l=>l.score>=70&&!l.converted).length;
-  const conv=LEADS.filter(l=>l.converted).length;
-  const total=LEADS.length;
-  document.getElementById('kpi-total').textContent=total;
-  document.getElementById('kpi-hot').textContent=hot;
-  document.getElementById('kpi-conv').textContent=conv;
-  document.getElementById('kpi-rate').textContent=total>0?Math.round(conv/total*100)+'%':'0%';
-  document.getElementById('tc-all').textContent=total;
-  document.getElementById('tc-hot').textContent=hot;
-  document.getElementById('tc-conv').textContent=conv;
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API_BASE + path, {
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+    ...opts,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ msg: res.statusText }));
+    throw new Error(err.msg || res.statusText);
+  }
+  return res.json();
 }
 
-function getFiltered(){
-  const search=document.getElementById('global-search')?.value.toLowerCase()||'';
-  const owner=document.getElementById('owner-filter')?.value||'';
-  const source=document.getElementById('source-filter')?.value||'';
-  let data=[...LEADS].filter(l=>{
-    if(statusFilter&&l.status!==statusFilter)return false;
-    if(owner&&l.owner!==owner)return false;
-    if(source&&l.source!==source)return false;
-    if(search&&!l.name.toLowerCase().includes(search)&&!l.company.toLowerCase().includes(search))return false;
-    if(curView==='hot'&&(l.score<70||l.converted))return false;
-    if(curView==='converted'&&!l.converted)return false;
+// ── UTILITIES ─────────────────────────────────────────────────────
+const fmtDate = d => {
+  if (!d) return '—';
+  const dt = new Date(d);
+  if (isNaN(dt)) return String(d);
+  return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+};
+const fmtMoney = n => {
+  const v = parseFloat(n);
+  if (isNaN(v)) return '—';
+  if (v >= 10000000) return '₹' + (v/10000000).toFixed(2) + 'Cr';
+  if (v >= 100000)   return '₹' + (v/100000).toFixed(1) + 'L';
+  return '₹' + v.toLocaleString();
+};
+const initials = n => n ? n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?';
+const daysSince = d => {
+  if (!d) return 999;
+  return Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
+};
+const daysUntil = d => {
+  if (!d) return 999;
+  return Math.floor((new Date(d).getTime() - Date.now()) / 86400000);
+};
+const scoreColor = s => s >= 70 ? 'var(--accent)' : s >= 40 ? 'var(--amber)' : 'var(--rose)';
+const scoreBg    = s => s >= 70 ? 'var(--accent-dim)' : s >= 40 ? 'var(--amber-dim)' : 'var(--rose-dim)';
+
+function statusCfg(statusVal) {
+  if (!statusColorMap[statusVal]) {
+    const idx = Object.keys(statusColorMap).length % STATUS_COLORS.length;
+    statusColorMap[statusVal] = STATUS_COLORS[idx];
+  }
+  return statusColorMap[statusVal];
+}
+
+function getVal(lead, key) {
+  if (!key) return null;
+  return lead[key] ?? null;
+}
+
+function toast(msg, type = 'success') {
+  const tw = document.getElementById('toast-wrap');
+  const t  = document.createElement('div');
+  t.className = `toast ${type}`;
+  const ic  = type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ';
+  const col = type === 'success' ? 'var(--accent)' : type === 'error' ? 'var(--rose)' : 'var(--blue)';
+  t.innerHTML = `<span style="color:${col};font-size:16px;">${ic}</span>${msg}`;
+  tw.appendChild(t);
+  setTimeout(() => { t.style.animation = 'toastOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3200);
+}
+function openModal(id)  { document.getElementById(id).classList.add('open');    document.body.style.overflow = 'hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { document.querySelectorAll('.overlay.open').forEach(m => m.classList.remove('open')); document.body.style.overflow = ''; }
+});
+function confirm2(title, msg, okLabel = 'Delete', icon = '⚠️') {
+  return new Promise(resolve => {
+    confirmResolve = resolve;
+    document.getElementById('ci').textContent = icon;
+    document.getElementById('ct').textContent = title;
+    document.getElementById('cm').textContent = msg;
+    document.getElementById('c-ok').textContent = okLabel;
+    document.getElementById('confirm-overlay').classList.add('open');
+  });
+}
+function resolveConfirm(v) { document.getElementById('confirm-overlay').classList.remove('open'); if (confirmResolve) { confirmResolve(v); confirmResolve = null; } }
+
+// ── BOOT ──────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  loadUserInfo();
+  loadData();
+});
+
+function loadUserInfo() {
+  const raw = localStorage.getItem('crm_user') || localStorage.getItem('user');
+  if (!raw) return;
+  try {
+    const u = JSON.parse(raw);
+    const nm = u.name || u.username || 'User';
+    document.getElementById('user-name').textContent = nm;
+    document.getElementById('user-avatar').textContent = initials(nm);
+  } catch {}
+}
+
+async function loadData() {
+  showLoading(true);
+  try {
+    // 1. Load schema
+    const schemaRes = await apiFetch(`/import/schema?system=${SYSTEM}&type=${DATA_TYPE}`);
+    SCHEMA = schemaRes;
+
+    if (!SCHEMA.configured || !SCHEMA.fields?.length) {
+      showLoading(false);
+      document.getElementById('empty-state').style.display = '';
+      document.getElementById('data-area').style.display = 'none';
+      return;
+    }
+
+    // 2. Detect smart field keys
+    detectSmartKeys();
+
+    // 3. Load records
+    const recRes = await apiFetch(`/import/records?system=${SYSTEM}&type=${DATA_TYPE}&limit=500`);
+    RECORDS = recRes.records || [];
+    LEADS = RECORDS;
+
+    // 4. Build status color map
+    if (KEYS.status) {
+      const statuses = [...new Set(LEADS.map(l => l[KEYS.status]).filter(Boolean))];
+      statuses.forEach(s => statusCfg(s));
+    }
+
+    // 5. Build filter dropdowns
+    buildOwnerFilter();
+    buildStatusChips();
+    buildBulkStatusOptions();
+
+    // 6. Show data area
+    showLoading(false);
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('data-area').style.display = '';
+    document.getElementById('add-btn').style.display = '';
+
+    // 7. Build dynamic table headers
+    buildTableHeaders();
+
+    // 8. Render
+    renderCurrentView();
+
+  } catch (err) {
+    showLoading(false);
+    if (err.message?.includes('401') || err.message?.includes('unauthorized')) {
+      toast('Session expired. Please log in again.', 'error');
+    } else {
+      toast('Failed to load data: ' + err.message, 'error');
+      document.getElementById('empty-state').style.display = '';
+    }
+  }
+}
+
+function showLoading(v) {
+  document.getElementById('loading-state').style.display = v ? '' : 'none';
+  if (v) {
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('data-area').style.display = 'none';
+  }
+}
+
+// ── SMART KEY DETECTION ───────────────────────────────────────────
+const KEY_PATTERNS = {
+  name:       ['student_name','name','full_name','student','candidate_name','applicant'],
+  email:      ['email','email_id','email_address','mail'],
+  phone:      ['phone','mobile','contact','phone_number','mobile_no','contact_no'],
+  status:     ['status','lead_status','stage','lead_stage','current_status'],
+  score:      ['score','lead_score','priority','priority_score','rating','interest_level'],
+  source:     ['source','lead_source','channel','medium','platform','campaign'],
+  counsellor: ['counsellor','owner','assigned_to','sales_rep','executive','counselor','advisor'],
+  followup:   ['followup_date','followup','follow_up_date','callback','next_contact','follow_up'],
+  course:     ['course','course_interested','program','subject','stream','programme','product'],
+  college:    ['college','institution','university','school','institute'],
+  city:       ['city','location','district','place'],
+  budget:     ['value','budget','fees','course_fees','amount','fee','deal_value'],
+  notes:      ['notes','remarks','comments','observation'],
+};
+
+function detectSmartKeys() {
+  if (!SCHEMA?.fields) return;
+  const fieldKeys = SCHEMA.fields.map(f => f.systemKey);
+  for (const [smartKey, patterns] of Object.entries(KEY_PATTERNS)) {
+    KEYS[smartKey] = patterns.find(p => fieldKeys.includes(p)) || null;
+  }
+}
+
+// ── FILTER & SORT ─────────────────────────────────────────────────
+function getFiltered() {
+  const search  = document.getElementById('global-search')?.value.toLowerCase() || '';
+  const owner   = document.getElementById('owner-filter')?.value || '';
+
+  let data = [...LEADS].filter(l => {
+    if (statusFilter && getVal(l, KEYS.status) !== statusFilter) return false;
+    if (owner && getVal(l, KEYS.counsellor) !== owner) return false;
+    if (search) {
+      const nm  = (getVal(l, KEYS.name)    || '').toLowerCase();
+      const co  = (getVal(l, KEYS.college) || '').toLowerCase();
+      const cr  = (getVal(l, KEYS.course)  || '').toLowerCase();
+      const ph  = (getVal(l, KEYS.phone)   || '').toLowerCase();
+      if (!nm.includes(search) && !co.includes(search) && !cr.includes(search) && !ph.includes(search)) return false;
+    }
+    if (curView === 'hot') {
+      if (KEYS.score) { if ((parseFloat(getVal(l, KEYS.score)) || 0) < 70) return false; }
+      else { return false; }
+    }
+    if (curView === 'followup') {
+      if (!KEYS.followup) return false;
+      const d = daysUntil(getVal(l, KEYS.followup));
+      return d <= 7 && d >= -1;
+    }
     return true;
   });
-  data.sort((a,b)=>{
-    if(sortKey==='score')return sortDir==='desc'?b.score-a.score:a.score-b.score;
-    if(sortKey==='created')return sortDir==='desc'?new Date(b.created)-new Date(a.created):new Date(a.created)-new Date(b.created);
-    if(sortKey==='name')return a.name.localeCompare(b.name);
+
+  data.sort((a, b) => {
+    if (sortKey === 'score')   { const av = parseFloat(getVal(a, KEYS.score)) || 0; const bv = parseFloat(getVal(b, KEYS.score)) || 0; return sortDir === 'desc' ? bv - av : av - bv; }
+    if (sortKey === 'name')    { return (getVal(a, KEYS.name) || '').localeCompare(getVal(b, KEYS.name) || ''); }
+    if (sortKey === 'created') { return sortDir === 'desc' ? new Date(b.createdAt||0) - new Date(a.createdAt||0) : new Date(a.createdAt||0) - new Date(b.createdAt||0); }
     return 0;
   });
   return data;
 }
 
-function applyFilters(){
-  const sv=document.getElementById('sort-sel')?.value||'score-desc';
-  const[k,d]=sv.split('-');sortKey=k;sortDir=d;
+function applyFilters() {
+  const sv = document.getElementById('sort-sel')?.value || 'created-desc';
+  const [k, d] = sv.split('-'); sortKey = k; sortDir = d;
+  page = 1;
   renderCurrentView();
 }
 
-function setStatusFilter(s,el){statusFilter=s;document.querySelectorAll('#status-chips .filter-chip').forEach(c=>c.classList.remove('active'));el?.classList.add('active');page=1;renderCurrentView();}
+function setStatusFilter(s, el) {
+  statusFilter = s;
+  document.querySelectorAll('#status-chips .filter-chip').forEach(c => c.classList.remove('active'));
+  el?.classList.add('active');
+  page = 1;
+  renderCurrentView();
+}
 
-function switchView(v,el){
-  curView=v;
-  ['table','kanban','hot','converted'].forEach(id=>{const e=document.getElementById('view-'+id);if(e)e.style.display=v===id?'':'none';});
-  document.querySelectorAll('.snav-tab').forEach(t=>t.classList.remove('active'));
+// ── VIEWS ─────────────────────────────────────────────────────────
+function switchView(v, el) {
+  curView = v;
+  ['table','kanban','hot','followup','analytics'].forEach(id => {
+    const e = document.getElementById('view-' + id);
+    if (e) e.style.display = v === id ? '' : 'none';
+  });
+  document.querySelectorAll('.snav-tab').forEach(t => t.classList.remove('active'));
   el?.classList.add('active');
   renderCurrentView();
 }
 
-function renderCurrentView(){
+function renderCurrentView() {
+  updateTabCounts();
   updateKPIs();
-  if(curView==='table')renderTable();
-  if(curView==='kanban')renderKanban();
-  if(curView==='hot')renderHot();
-  if(curView==='converted')renderConverted();
+  if (curView === 'table')     renderTable();
+  if (curView === 'kanban')    renderKanban();
+  if (curView === 'hot')       renderHot();
+  if (curView === 'followup')  renderFollowup();
+  if (curView === 'analytics') renderAnalytics();
 }
 
-function renderTable(){
-  const data=getFiltered();
-  const total=data.length;
-  const pages=Math.max(1,Math.ceil(total/PAGE));
-  if(page>pages)page=1;
-  const paged=data.slice((page-1)*PAGE,page*PAGE);
-  document.getElementById('table-sub').textContent=`${total} leads`;
-  document.getElementById('table-footer').textContent=`Page ${page} of ${pages} · ${total} leads`;
-  document.getElementById('leads-tbody').innerHTML=paged.map(l=>`<tr>
-    <td><input type="checkbox" class="rck" value="${l.id}" onchange="rowSel(this)" ${selectedLeads.has(l.id)?'checked':''}></td>
-    <td>
-      <div class="td-main" style="cursor:pointer;" onclick="showDetail(${l.id})">${l.name}</div>
-      <div class="td-sub">${l.title} · ${l.company}</div>
-    </td>
-    <td>
-      <div style="font-size:12px;color:var(--text2);">${l.email}</div>
-      <div style="font-size:11px;color:var(--text3);">${l.phone}</div>
-    </td>
-    <td><span style="font-size:11px;background:var(--bg4);padding:2px 8px;border-radius:5px;color:var(--text2);">${l.source}</span></td>
-    <td><span class="badge ${STATUS_CFG[l.status]?.cls||'b-gray'}">${l.status}</span></td>
-    <td>
-      <div style="display:flex;align-items:center;gap:7px;">
-        <div style="width:34px;height:34px;border-radius:50%;background:${scoreBg(l.score)};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;color:${scoreColor(l.score)};">${l.score}</div>
-        <div class="prog" style="width:50px;"><div class="prog-fill" style="width:${l.score}%;background:${scoreColor(l.score)};"></div></div>
-      </div>
-    </td>
-    <td>
-      <div style="display:flex;align-items:center;gap:7px;">
-        <div style="width:24px;height:24px;border-radius:50%;background:${l.oCol};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--bg);">${l.oi}</div>
-        <span style="font-size:12px;">${l.owner.split(' ')[0]}</span>
-      </div>
-    </td>
-    <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${l.created}</td>
-    <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${fmtDate(l.lastActivity)}</td>
+// ── KPIs ──────────────────────────────────────────────────────────
+function updateKPIs() {
+  const total      = LEADS.length;
+  const hotCount   = KEYS.score ? LEADS.filter(l => (parseFloat(getVal(l, KEYS.score)) || 0) >= 70).length : 0;
+  const followupCount = KEYS.followup ? LEADS.filter(l => { const d = daysUntil(getVal(l, KEYS.followup)); return d <= 1 && d >= -1; }).length : 0;
+  const wonStatuses = ['converted','enrolled','admitted','closed won','paid','admission confirmed'];
+  const convertedCount = KEYS.status ? LEADS.filter(l => wonStatuses.includes((getVal(l, KEYS.status) || '').toLowerCase())).length : 0;
+  const convRate = total > 0 ? Math.round(convertedCount / total * 100) : 0;
+
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi-card ani">
+      <span class="kpi-icon">◎</span>
+      <div class="kpi-val">${total}</div>
+      <div class="kpi-lbl">Total Leads</div>
+    </div>
+    <div class="kpi-card ani" style="--glow:rgba(255,77,109,0.08);">
+      <span class="kpi-icon">🔥</span>
+      <div class="kpi-val" style="color:var(--rose);">${hotCount}</div>
+      <div class="kpi-lbl">Hot Leads</div>
+    </div>
+    <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);">
+      <span class="kpi-icon">✓</span>
+      <div class="kpi-val" style="color:var(--accent);">${convertedCount}</div>
+      <div class="kpi-lbl">${KEYS.status ? 'Converted' : 'Records'}</div>
+      <div class="kpi-delta ${convRate > 0 ? 'up' : 'neu'}">${convRate}% rate</div>
+    </div>
+    <div class="kpi-card ani" style="--glow:rgba(245,166,35,0.08);">
+      <span class="kpi-icon">📅</span>
+      <div class="kpi-val" style="color:var(--amber);">${followupCount}</div>
+      <div class="kpi-lbl">Follow-ups Today</div>
+    </div>
+    <div class="kpi-card ani" style="--glow:rgba(61,142,240,0.08);">
+      <span class="kpi-icon">⊞</span>
+      <div class="kpi-val" style="color:var(--blue);">${SCHEMA.fields.length}</div>
+      <div class="kpi-lbl">Data Columns</div>
+      <div class="kpi-delta neu">From Excel</div>
+    </div>`;
+}
+
+function updateTabCounts() {
+  const total = LEADS.length;
+  const hot   = KEYS.score ? LEADS.filter(l => (parseFloat(getVal(l, KEYS.score)) || 0) >= 70).length : 0;
+  const fu    = KEYS.followup ? LEADS.filter(l => { const d = daysUntil(getVal(l, KEYS.followup)); return d <= 7 && d >= -1; }).length : 0;
+  document.getElementById('tc-all').textContent    = total;
+  document.getElementById('tc-hot').textContent    = hot;
+  document.getElementById('tc-followup').textContent = fu;
+  document.getElementById('nav-hot-count').textContent = hot;
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────
+function buildTableHeaders() {
+  const fields = SCHEMA.fields;
+  // Decide which columns to show (limit to ~7 for readability; always show name, status, score, counsellor, followup)
+  const priority = ['student_name','name','full_name','status','lead_status','score','lead_score','counsellor','owner','followup_date','followup','source','course','phone','email'];
+  
+  // Pick up to 7 fields; prioritised ones first
+  const shown = [];
+  priority.forEach(pk => {
+    const f = fields.find(x => x.systemKey === pk);
+    if (f && !shown.includes(f)) shown.push(f);
+  });
+  fields.forEach(f => { if (!shown.includes(f) && shown.length < 8) shown.push(f); });
+
+  // Store visible field list globally
+  window._TABLE_FIELDS = shown;
+  
+  const buildTH = (list, extra = '') =>
+    `<th style="width:36px;"><input type="checkbox" id="sel-all" onchange="toggleAllSel(this)"></th>` +
+    list.map(f => `<th>${f.label}</th>`).join('') +
+    `<th>Actions</th>`;
+
+  ['leads-thead','hot-thead','fu-thead'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = buildTH(shown);
+  });
+}
+
+function renderTable() {
+  const data   = getFiltered();
+  const total  = data.length;
+  const pages  = Math.max(1, Math.ceil(total / PAGE));
+  if (page > pages) page = 1;
+  const paged  = data.slice((page - 1) * PAGE, page * PAGE);
+  document.getElementById('table-sub').textContent = `${total} student${total !== 1 ? 's' : ''}`;
+  document.getElementById('table-footer').textContent = `Page ${page} of ${pages} · ${total} leads`;
+
+  document.getElementById('leads-tbody').innerHTML = paged.map(l => buildRow(l)).join('');
+  renderPagination(pages);
+  updateBulkBar();
+}
+
+function buildRow(l) {
+  const fields = window._TABLE_FIELDS || SCHEMA.fields.slice(0, 7);
+  const cells = fields.map(f => renderCell(l, f)).join('');
+  const id = l._id;
+  return `<tr>
+    <td><input type="checkbox" class="rck" value="${id}" ${selectedIds.has(id) ? 'checked' : ''} onchange="rowSel(this)"></td>
+    ${cells}
     <td>
       <div style="display:flex;gap:5px;">
-        <button class="btn btn-xs" onclick="showDetail(${l.id})">View</button>
-        ${!l.converted?`<button class="btn btn-xs primary" onclick="convertLead(${l.id})">Convert</button>`:''}
-        <div class="dropdown">
-          <button class="btn-icon" style="width:24px;height:24px;font-size:12px;" onclick="toggleDD(event,'dd-${l.id}')">⋯</button>
-          <div class="dropdown-menu" id="dd-${l.id}">
-            <div class="dd-item" onclick="showDetail(${l.id})">👁 View Detail</div>
-            <div class="dd-item" onclick="openEditLead(${l.id})">✎ Edit</div>
-            <div class="dd-sep"></div>
-            <div class="dd-item" onclick="convertLead(${l.id})">⟐ Convert to Deal</div>
-            <div class="dd-item danger" onclick="disqualifyLead(${l.id})">✗ Disqualify</div>
-          </div>
-        </div>
+        <button class="btn btn-xs" onclick="showDetail('${id}')">View</button>
+        <button class="btn btn-xs primary" onclick="openEditModal('${id}')">Edit</button>
+        <button class="btn btn-xs danger" onclick="deleteRecord('${id}')">✗</button>
       </div>
     </td>
-  </tr>`).join('');
-  const pg=document.getElementById('pagination');pg.innerHTML='';
-  for(let i=1;i<=pages;i++){const b=document.createElement('button');b.className='btn btn-xs'+(i===page?' primary':'');b.textContent=i;b.onclick=()=>{page=i;renderTable();};pg.appendChild(b);}
+  </tr>`;
 }
 
-function renderKanban(){
-  const statuses=['New','Contacted','Qualified','Nurturing','Disqualified'];
-  document.getElementById('leads-kanban').innerHTML=statuses.map(s=>{
-    const cfg=STATUS_CFG[s];
-    const leads=LEADS.filter(l=>l.status===s&&!l.converted);
+function renderCell(l, f) {
+  const val = l[f.systemKey];
+  if (val === undefined || val === null || val === '') return `<td style="color:var(--text3);">—</td>`;
+
+  // Special rendering by systemKey
+  if (f.systemKey === KEYS.name || ['student_name','name','full_name'].includes(f.systemKey)) {
+    const sub = KEYS.course ? `<div class="td-sub">${getVal(l, KEYS.course) || ''}</div>` : '';
+    return `<td><div class="td-main" style="cursor:pointer;" onclick="showDetail('${l._id}')">${val}</div>${sub}</td>`;
+  }
+  if (f.systemKey === KEYS.status || ['status','lead_status','stage'].includes(f.systemKey)) {
+    const cfg = statusCfg(val);
+    return `<td><span class="badge ${cfg.cls}">${val}</span></td>`;
+  }
+  if (f.systemKey === KEYS.score || ['score','lead_score','priority_score'].includes(f.systemKey)) {
+    const s = parseFloat(val) || 0;
+    return `<td><div style="display:flex;align-items:center;gap:6px;"><div style="width:32px;height:32px;border-radius:50%;background:${scoreBg(s)};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;color:${scoreColor(s)};">${s}</div><div class="prog" style="width:44px;"><div class="prog-fill" style="width:${Math.min(s,100)}%;background:${scoreColor(s)};"></div></div></div></td>`;
+  }
+  if (f.systemKey === KEYS.counsellor || ['counsellor','owner','assigned_to'].includes(f.systemKey)) {
+    return `<td><div style="display:flex;align-items:center;gap:6px;"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-dim);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--blue);">${initials(String(val))}</div><span style="font-size:12px;">${String(val).split(' ')[0]}</span></div></td>`;
+  }
+  if (f.systemKey === KEYS.followup || ['followup_date','followup','follow_up_date'].includes(f.systemKey)) {
+    const du = daysUntil(val);
+    let cls = 'followup-ok', lbl = '';
+    if (du < 0) { cls = 'followup-today'; lbl = `${Math.abs(du)}d overdue`; }
+    else if (du === 0) { cls = 'followup-today'; lbl = 'Today'; }
+    else if (du <= 3) { cls = 'followup-soon'; lbl = `In ${du}d`; }
+    else { lbl = fmtDate(val); }
+    return `<td><span class="followup-badge ${cls}">${lbl || fmtDate(val)}</span></td>`;
+  }
+  if (f.dataType === 'date') return `<td style="font-size:12px;color:var(--text3);">${fmtDate(val)}</td>`;
+  if (f.dataType === 'number') {
+    const isMoneyKey = ['budget','fees','deal_value','amount'].some(k => f.systemKey.includes(k));
+    return isMoneyKey
+      ? `<td style="font-family:var(--mono);font-size:12px;color:var(--accent);">${fmtMoney(val)}</td>`
+      : `<td style="font-family:var(--mono);font-size:12px;">${val}</td>`;
+  }
+  return `<td style="font-size:12px;">${val}</td>`;
+}
+
+function renderPagination(pages) {
+  const pg = document.getElementById('pagination');
+  pg.innerHTML = '';
+  for (let i = 1; i <= pages; i++) {
+    const b = document.createElement('button');
+    b.className = 'btn btn-xs' + (i === page ? ' primary' : '');
+    b.textContent = i;
+    b.onclick = () => { page = i; renderTable(); };
+    pg.appendChild(b);
+  }
+}
+
+// ── KANBAN ────────────────────────────────────────────────────────
+function renderKanban() {
+  const kanban = document.getElementById('leads-kanban');
+  if (!KEYS.status) {
+    kanban.innerHTML = `<div style="padding:40px;color:var(--text3);font-size:13px;">No "Status" column detected in your Excel. Import a sheet with a Status column to use Kanban view.</div>`;
+    return;
+  }
+  const statuses = [...new Set(LEADS.map(l => getVal(l, KEYS.status) || 'Unknown'))];
+  kanban.innerHTML = statuses.map(s => {
+    const cfg   = statusCfg(s);
+    const leads = LEADS.filter(l => (getVal(l, KEYS.status) || 'Unknown') === s);
     return `<div class="lk-col">
       <div class="lk-hd" style="background:${cfg.bg};">
         <span style="font-size:12px;font-weight:600;color:${cfg.col};font-family:var(--display);">${s}</span>
-        <span style="font-size:10px;font-family:var(--mono);background:${cfg.bg};color:${cfg.col};padding:2px 7px;border-radius:5px;">${leads.length}</span>
+        <span style="font-size:10px;font-family:var(--mono);color:${cfg.col};background:${cfg.bg};padding:2px 7px;border-radius:5px;">${leads.length}</span>
       </div>
       <div class="lk-body">
-        ${leads.map(l=>`<div class="lead-card" onclick="showDetail(${l.id})">
-          <div class="lc-name">${l.name}</div>
-          <div class="lc-co">${l.company}</div>
+        ${leads.map(l => `<div class="lead-card" onclick="showDetail('${l._id}')">
+          <div class="lc-name">${getVal(l, KEYS.name) || '—'}</div>
+          <div class="lc-co">${[getVal(l, KEYS.course), getVal(l, KEYS.college)].filter(Boolean).join(' · ') || '—'}</div>
           <div class="lc-foot">
-            <div style="width:28px;height:28px;border-radius:50%;background:${scoreBg(l.score)};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${scoreColor(l.score)};font-family:var(--mono);">${l.score}</div>
-            <span style="font-size:10px;background:var(--bg4);padding:1px 6px;border-radius:4px;color:var(--text3);">${l.source}</span>
+            ${KEYS.score ? `<div style="width:26px;height:26px;border-radius:50%;background:${scoreBg(parseFloat(getVal(l, KEYS.score))||0)};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:${scoreColor(parseFloat(getVal(l, KEYS.score))||0)};">${getVal(l, KEYS.score) || 0}</div>` : '<span></span>'}
+            <span style="font-size:10px;background:var(--bg4);padding:1px 7px;border-radius:4px;color:var(--text3);">${getVal(l, KEYS.source) || ''}</span>
           </div>
         </div>`).join('')}
-        ${leads.length===0?`<div style="text-align:center;padding:20px;color:var(--text3);font-size:11px;">No leads</div>`:''}
+        ${leads.length === 0 ? `<div style="text-align:center;padding:20px;color:var(--text3);font-size:11px;">Empty</div>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
-function renderHot(){
-  const hot=LEADS.filter(l=>l.score>=70&&!l.converted).sort((a,b)=>b.score-a.score);
-  document.getElementById('hot-tbody').innerHTML=hot.map(l=>`<tr>
-    <td><div class="td-main">${l.name}</div><div class="td-sub">${l.title}</div></td>
-    <td style="color:var(--text2);font-size:12px;">${l.company}</td>
-    <td><div style="font-size:12px;">${l.email}</div><div style="font-size:11px;color:var(--text3);">${l.phone}</div></td>
-    <td><div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:${scoreBg(l.score)};border-radius:8px;font-family:var(--mono);font-size:13px;font-weight:700;color:${scoreColor(l.score)};">🔥 ${l.score}</div></td>
-    <td><span style="font-size:11px;background:var(--bg4);padding:2px 8px;border-radius:5px;color:var(--text2);">${l.source}</span></td>
-    <td><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:${l.oCol};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${l.oi}</div><span style="font-size:12px;">${l.owner.split(' ')[0]}</span></div></td>
-    <td><div style="display:flex;gap:5px;"><button class="btn btn-xs primary" onclick="convertLead(${l.id})">Convert</button><button class="btn btn-xs" onclick="showDetail(${l.id})">View</button></div></td>
-  </tr>`).join('');
+// ── HOT LEADS ─────────────────────────────────────────────────────
+function renderHot() {
+  if (!KEYS.score) {
+    document.getElementById('hot-tbody').innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:40px;">No "Score" or "Lead Score" column in your Excel sheet.</td></tr>`;
+    return;
+  }
+  const data = getFiltered().sort((a, b) => (parseFloat(getVal(b, KEYS.score)) || 0) - (parseFloat(getVal(a, KEYS.score)) || 0));
+  document.getElementById('hot-tbody').innerHTML = data.map(l => buildRow(l)).join('');
 }
 
-function renderConverted(){
-  const conv=LEADS.filter(l=>l.converted);
-  document.getElementById('conv-tbody').innerHTML=conv.map(l=>`<tr>
-    <td><div class="td-main">${l.name}</div><div class="td-sub">${l.title}</div></td>
-    <td style="color:var(--text2);font-size:12px;">${l.company}</td>
-    <td><div style="font-size:12px;font-weight:500;color:var(--accent);">${l.dealName||'—'}</div></td>
-    <td style="font-family:var(--mono);color:var(--accent);font-weight:600;">${l.dealValue?fmt(l.dealValue):'—'}</td>
-    <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${fmtDate(l.convDate)}</td>
-    <td><div style="display:flex;align-items:center;gap:7px;"><div style="width:22px;height:22px;border-radius:50%;background:${l.oCol};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--bg);">${l.oi}</div><span style="font-size:12px;">${l.owner.split(' ')[0]}</span></div></td>
-  </tr>`).join('');
+// ── FOLLOW-UPS ────────────────────────────────────────────────────
+function renderFollowup() {
+  if (!KEYS.followup) {
+    document.getElementById('fu-tbody').innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:40px;">No "Follow-up Date" or "Followup" column detected in your Excel sheet.</td></tr>`;
+    return;
+  }
+  const data = getFiltered().sort((a, b) => {
+    return daysUntil(getVal(a, KEYS.followup)) - daysUntil(getVal(b, KEYS.followup));
+  });
+  document.getElementById('fu-tbody').innerHTML = data.map(l => buildRow(l)).join('');
 }
 
-function showDetail(id){
-  const l=LEADS.find(x=>x.id===id);if(!l)return;
-  editingId=id;
-  document.getElementById('det-name').textContent=l.name;
-  document.getElementById('det-company').textContent=`${l.title} · ${l.company}`;
-  const sb=document.getElementById('det-status-badge');sb.textContent=l.status;sb.className=`badge ${STATUS_CFG[l.status]?.cls||'b-gray'}`;
-  document.getElementById('detail-body').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-      <div style="padding:16px;background:var(--bg3);border-radius:10px;">
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:10px;">Contact Info</div>
-        <div style="display:flex;flex-direction:column;gap:7px;">
-          <div style="font-size:12px;"><span style="color:var(--text3);margin-right:8px;">✉</span>${l.email}</div>
-          <div style="font-size:12px;"><span style="color:var(--text3);margin-right:8px;">☏</span>${l.phone}</div>
-          <div style="font-size:12px;"><span style="color:var(--text3);margin-right:8px;">🏢</span>${l.company} · ${l.size} employees</div>
-          <div style="font-size:12px;"><span style="color:var(--text3);margin-right:8px;">💼</span>${l.title}</div>
-        </div>
-      </div>
-      <div style="padding:16px;background:var(--bg3);border-radius:10px;">
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:10px;">Lead Details</div>
-        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;">
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Source</span><span>${l.source}</span></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Product</span><span>${l.product}</span></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Budget</span><span style="color:var(--accent);font-family:var(--mono);">${l.budget?fmt(l.budget):'—'}</span></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Assigned</span><span>${l.owner}</span></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Created</span><span>${fmtDate(l.created)}</span></div>
-        </div>
-      </div>
+// ── ANALYTICS ─────────────────────────────────────────────────────
+function renderAnalytics() {
+  renderAnalyticsCard('analytics-status',     KEYS.status     || 'status',     'By Status',      'var(--blue)');
+  renderAnalyticsCard('analytics-source',     KEYS.source     || 'source',     'By Lead Source', 'var(--purple)');
+  renderAnalyticsCard('analytics-counsellor', KEYS.counsellor || 'counsellor', 'By Counsellor',  'var(--amber)');
+  renderAnalyticsCard('analytics-course',     KEYS.course     || 'course',     'By Course',      'var(--teal)');
+  renderAnalyticsCard('analytics-city',       KEYS.city       || 'city',       'By City',        'var(--accent)', true);
+}
+
+function renderAnalyticsCard(containerId, fieldKey, title, color, wide = false) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  const grouped = {};
+  LEADS.forEach(l => {
+    const v = l[fieldKey] || 'Unknown';
+    grouped[v] = (grouped[v] || 0) + 1;
+  });
+  const entries = Object.entries(grouped).sort((a, b) => b[1] - a[1]).slice(0, wide ? 15 : 8);
+  const max = entries[0]?.[1] || 1;
+
+  if (!entries.length || !fieldKey || !SCHEMA.fields.find(f => f.systemKey === fieldKey)) {
+    el.innerHTML = `<div class="card-hd"><div><div class="card-title">${title}</div><div class="card-sub" style="color:var(--rose);">Column not in Excel</div></div></div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="card-hd"><div><div class="card-title">${title}</div><div class="card-sub">${entries.length} unique values</div></div></div>
+    <div ${wide ? 'style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;"' : ''}>
+      ${entries.map(([k, v]) => `
+        <div class="bar-item">
+          <div class="bar-label" title="${k}">${k}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/max*100)}%;background:${color};"></div></div>
+          <div class="bar-count">${v}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── SELECTION ─────────────────────────────────────────────────────
+function rowSel(cb) {
+  if (cb.checked) selectedIds.add(cb.value);
+  else selectedIds.delete(cb.value);
+  updateBulkBar();
+}
+function toggleAllSel(cb) {
+  const cbs = document.querySelectorAll('.rck');
+  cbs.forEach(c => { c.checked = cb.checked; if (cb.checked) selectedIds.add(c.value); else selectedIds.delete(c.value); });
+  updateBulkBar();
+}
+function updateBulkBar() {
+  const n = selectedIds.size;
+  const bd = document.getElementById('bulk-del-btn');
+  const bs = document.getElementById('bulk-status-btn');
+  if (bd) bd.style.display = n > 0 ? '' : 'none';
+  if (bs) bs.style.display = (n > 0 && KEYS.status) ? '' : 'none';
+}
+
+// ── BULK STATUS ───────────────────────────────────────────────────
+function buildBulkStatusOptions() {
+  const sel = document.getElementById('bulk-status-val');
+  if (!sel || !KEYS.status) return;
+  const statuses = [...new Set(LEADS.map(l => getVal(l, KEYS.status)).filter(Boolean))];
+  sel.innerHTML = statuses.map(s => `<option>${s}</option>`).join('');
+}
+
+function openBulkStatus() { openModal('bulk-status-overlay'); }
+
+async function applyBulkStatus() {
+  const newStatus = document.getElementById('bulk-status-val').value;
+  if (!newStatus || !selectedIds.size) return;
+  try {
+    await apiFetch('/import/bulk-update', {
+      method: 'PATCH',
+      body: JSON.stringify({ ids: [...selectedIds], updates: { [KEYS.status]: newStatus }, system: SYSTEM, type: DATA_TYPE }),
+    });
+    selectedIds.clear();
+    closeModal('bulk-status-overlay');
+    toast(`Updated ${selectedIds.size || 'selected'} leads to "${newStatus}"`);
+    await loadData();
+  } catch (err) {
+    toast('Bulk update failed: ' + err.message, 'error');
+  }
+}
+
+async function bulkDelete() {
+  if (!selectedIds.size) return;
+  const ok = await confirm2('Delete Selected Leads', `Delete ${selectedIds.size} selected student records? This cannot be undone.`, 'Delete All');
+  if (!ok) return;
+  try {
+    await Promise.all([...selectedIds].map(id => apiFetch(`/import/record/${id}`, { method: 'DELETE' })));
+    selectedIds.clear();
+    toast('Deleted selected leads');
+    await loadData();
+  } catch (err) {
+    toast('Delete failed: ' + err.message, 'error');
+  }
+}
+
+// ── FILTER BUILDERS ───────────────────────────────────────────────
+function buildOwnerFilter() {
+  const sel = document.getElementById('owner-filter');
+  if (!sel || !KEYS.counsellor) return;
+  const owners = [...new Set(LEADS.map(l => getVal(l, KEYS.counsellor)).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">All Counsellors</option>' + owners.map(o => `<option>${o}</option>`).join('');
+}
+
+function buildStatusChips() {
+  const container = document.getElementById('status-chips');
+  if (!container || !KEYS.status) return;
+  const statuses = [...new Set(LEADS.map(l => getVal(l, KEYS.status)).filter(Boolean))];
+  container.innerHTML = `<button class="filter-chip active" onclick="setStatusFilter('',this)">All</button>` +
+    statuses.map(s => {
+      const cfg = statusCfg(s);
+      return `<button class="filter-chip" style="--fc:${cfg.col}" onclick="setStatusFilter('${s}',this)">${s}</button>`;
+    }).join('');
+}
+
+// ── DETAIL MODAL ──────────────────────────────────────────────────
+function showDetail(id) {
+  const l = LEADS.find(x => x._id === id);
+  if (!l) return;
+  editingId = id;
+
+  const name = getVal(l, KEYS.name) || 'Student';
+  document.getElementById('det-name').textContent = name;
+  document.getElementById('det-sub').textContent = [getVal(l, KEYS.course), getVal(l, KEYS.college)].filter(Boolean).join(' · ') || '';
+
+  // Render all fields in a grid
+  const fields = SCHEMA.fields;
+  document.getElementById('detail-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+      ${fields.map(f => {
+        const val = l[f.systemKey];
+        let display = val ?? '—';
+        if (f.dataType === 'date' && val) display = fmtDate(val);
+        if (f.dataType === 'number' && val) {
+          const isMoneyKey = ['budget','fees','deal_value','amount'].some(k => f.systemKey.includes(k));
+          display = isMoneyKey ? fmtMoney(val) : val;
+        }
+        if (f.systemKey === KEYS.status && val) {
+          const cfg = statusCfg(val);
+          display = `<span class="badge ${cfg.cls}">${val}</span>`;
+        }
+        if (f.systemKey === KEYS.followup && val) {
+          const du = daysUntil(val);
+          const cls = du < 0 ? 'followup-today' : du <= 3 ? 'followup-soon' : 'followup-ok';
+          display = `${fmtDate(val)} <span class="followup-badge ${cls}">${du < 0 ? 'Overdue' : du === 0 ? 'Today' : `In ${du}d`}</span>`;
+        }
+        return `<div style="padding:12px;background:var(--bg3);border-radius:9px;">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px;font-family:var(--display);">${f.label}</div>
+          <div style="font-size:13px;color:var(--text);font-weight:500;">${display}</div>
+        </div>`;
+      }).join('')}
     </div>
-    <div style="margin-bottom:16px;">
-      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-family:var(--display);margin-bottom:8px;">Lead Score</div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div style="width:48px;height:48px;border-radius:50%;background:${scoreBg(l.score)};display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:700;color:${scoreColor(l.score)};">${l.score}</div>
-        <div style="flex:1;"><div class="prog" style="height:8px;"><div class="prog-fill" style="width:${l.score}%;background:${scoreColor(l.score)};"></div></div><div style="font-size:11px;color:var(--text3);margin-top:4px;">${l.score>=70?'Hot — immediate outreach':l.score>=45?'Warm — continue nurturing':'Cold — needs qualification'}</div></div>
-      </div>
-    </div>
-    ${l.notes?`<div style="padding:12px;background:var(--bg3);border-radius:9px;font-size:13px;color:var(--text2);">${l.notes}</div>`:''}
-  `;
-  openModal('detail-modal');
-}
-function editFromDetail(){closeModal('detail-modal');openEditLead(editingId);}
-function disqualifyFromDetail(){const l=LEADS.find(x=>x.id===editingId);if(l)l.status='Disqualified';closeModal('detail-modal');renderCurrentView();toast('Lead disqualified.','error');}
-function convertToDetail(){closeModal('detail-modal');convertLead(editingId);}
+    <div style="margin-top:12px;padding:12px;background:var(--bg3);border-radius:9px;font-size:11px;color:var(--text3);">
+      Created: ${fmtDate(l.createdAt)} · ID: ${id}
+    </div>`;
 
-function openNewLead(){editingId=null;document.getElementById('lead-modal-title').textContent='New Lead';document.getElementById('l-id').value='';['l-name','l-company','l-email','l-phone','l-title','l-notes','l-budget'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});document.getElementById('l-score').value='50';openModal('lead-modal');}
-function openEditLead(id){
-  const l=LEADS.find(x=>x.id===id);if(!l)return;
-  editingId=id;document.getElementById('lead-modal-title').textContent='Edit Lead';document.getElementById('l-id').value=id;
-  document.getElementById('l-name').value=l.name;document.getElementById('l-company').value=l.company;
-  document.getElementById('l-email').value=l.email;document.getElementById('l-phone').value=l.phone;
-  document.getElementById('l-title').value=l.title;document.getElementById('l-score').value=l.score;
-  document.getElementById('l-source').value=l.source;document.getElementById('l-status').value=l.status;
-  document.getElementById('l-owner').value=l.owner;document.getElementById('l-product').value=l.product;
-  document.getElementById('l-budget').value=l.budget||'';document.getElementById('l-notes').value=l.notes||'';
-  openModal('lead-modal');
-}
-function saveLead(){
-  const name=document.getElementById('l-name').value.trim();const company=document.getElementById('l-company').value.trim();
-  if(!name){toast('Name required','error');return;}if(!company){toast('Company required','error');return;}
-  const owner=document.getElementById('l-owner').value;const id=document.getElementById('l-id').value;
-  const data={name,company,email:document.getElementById('l-email').value,phone:document.getElementById('l-phone').value,title:document.getElementById('l-title').value,score:+document.getElementById('l-score').value||50,source:document.getElementById('l-source').value,status:document.getElementById('l-status').value,owner,oi:initials(owner),oCol:OWNER_COL[owner]||'#00e5b0',product:document.getElementById('l-product').value,budget:+document.getElementById('l-budget').value||0,notes:document.getElementById('l-notes').value,lastActivity:new Date().toISOString().slice(0,10)};
-  if(id){Object.assign(LEADS.find(x=>x.id===+id),data);toast(`"${name}" updated!`);}
-  else{LEADS.unshift({id:Date.now(),...data,created:new Date().toISOString().slice(0,10),converted:false,size:document.getElementById('l-size').value});toast(`"${name}" added!`);}
-  closeModal('lead-modal');renderCurrentView();
+  document.getElementById('detail-footer').innerHTML = `
+    <button class="btn" onclick="closeModal('detail-overlay')">Close</button>
+    <button class="btn" onclick="closeModal('detail-overlay');openEditModal('${id}')">✎ Edit</button>
+    <button class="btn danger" onclick="deleteRecord('${id}');closeModal('detail-overlay')">✗ Delete</button>`;
+
+  openModal('detail-overlay');
 }
 
-function convertLead(id){
-  const l=LEADS.find(x=>x.id===id);if(!l||l.converted)return;
-  l.converted=true;l.status='Converted';l.dealName=l.company+' Deal';l.dealValue=l.budget||500000;l.convDate=new Date().toISOString().slice(0,10);
-  renderCurrentView();toast(`${l.name} converted to deal! 🎉`);
-}
-function disqualifyLead(id){
-  const l=LEADS.find(x=>x.id===id);if(!l)return;l.status='Disqualified';renderCurrentView();toast('Lead disqualified.','error');
+function openEditFromDetail() {
+  closeModal('detail-overlay');
+  if (editingId) openEditModal(editingId);
 }
 
-function rowSel(cb){if(cb.checked)selectedLeads.add(+cb.value);else selectedLeads.delete(+cb.value);document.getElementById('bulk-actions').style.display=selectedLeads.size>0?'flex':'none';}
-function toggleAll(cb){document.querySelectorAll('.rck').forEach(c=>{c.checked=cb.checked;if(cb.checked)selectedLeads.add(+c.value);else selectedLeads.delete(+c.value);});document.getElementById('bulk-actions').style.display=selectedLeads.size>0?'flex':'none';}
-function bulkAssign(){const o=prompt('Assign to:\nSanjay Kumar\nPriya Nair\nRahul Mehta\nAnjali Rao\nVikram Singh');if(o&&OWNER_COL[o]){LEADS.forEach(l=>{if(selectedLeads.has(l.id)){l.owner=o;l.oi=initials(o);l.oCol=OWNER_COL[o];}});selectedLeads.clear();renderCurrentView();toast(`Leads reassigned to ${o}.`);}}
-function bulkConvert(){LEADS.forEach(l=>{if(selectedLeads.has(l.id))convertLead(l.id);});selectedLeads.clear();toast('Selected leads converted!');}
-function bulkDisqualify(){LEADS.forEach(l=>{if(selectedLeads.has(l.id))l.status='Disqualified';});selectedLeads.clear();renderCurrentView();toast('Leads disqualified.','error');}
-function convertToDetail(){closeModal('detail-modal');convertLead(editingId);}
-function exportCSV(){const h=['Name','Company','Email','Status','Score','Source','Owner'];const rows=LEADS.map(l=>[l.name,l.company,l.email,l.status,l.score,l.source,l.owner]);const csv=[h,...rows].map(r=>r.join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='leads.csv';a.click();toast('CSV exported!');}
-function logout(){localStorage.removeItem('token');window.location.href='../../index.html';}
-
-/* ═══ DYNAMIC INIT ══════════════════════════════════════════ */
-async function initPage() {
-  const ok = await loadPageData('sales', 'leads', mapLead,
-    (mapped) => {
-      LEADS = mapped;
-      // Populate dynamic filters
-      populateFilter('owner-filter',  LEADS.map(l => l.owner),  'All Owners');
-      populateFilter('source-filter', LEADS.map(l => l.source), 'All Sources');
-      renderCurrentView();
-    },
-    'content'
-  );
+// ── ADD / EDIT MODAL ──────────────────────────────────────────────
+function openAddModal() {
+  editingId = null;
+  document.getElementById('lead-modal-title').textContent = 'Add Student Lead';
+  buildLeadForm({});
+  openModal('lead-modal-overlay');
 }
-initPage();
 
-<script src="../../assets/js/api.js"></script>
-<script src="../../assets/js/data-loader.js"></script>
-<script src="../../assets/js/auth.js"></script>
+function openEditModal(id) {
+  const l = LEADS.find(x => x._id === id);
+  if (!l) return;
+  editingId = id;
+  document.getElementById('lead-modal-title').textContent = 'Edit Student Lead';
+  buildLeadForm(l);
+  openModal('lead-modal-overlay');
+}
+
+function buildLeadForm(lead) {
+  const fields = SCHEMA.fields;
+  const statusOptions = KEYS.status ? [...new Set(LEADS.map(l => getVal(l, KEYS.status)).filter(Boolean))] : [];
+  const counsellorOptions = KEYS.counsellor ? [...new Set(LEADS.map(l => getVal(l, KEYS.counsellor)).filter(Boolean))] : [];
+  const courseOptions = KEYS.course ? [...new Set(LEADS.map(l => getVal(l, KEYS.course)).filter(Boolean))] : [];
+
+  document.getElementById('lead-form-fields').innerHTML = fields.map(f => {
+    const val = lead[f.systemKey] ?? '';
+    const isStatus     = ['status','lead_status','stage'].includes(f.systemKey);
+    const isCounsellor = ['counsellor','owner','assigned_to','counselor'].includes(f.systemKey);
+    const isCourse     = ['course','course_interested','program','subject'].includes(f.systemKey);
+
+    let input;
+    if (isStatus && statusOptions.length) {
+      input = `<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${statusOptions.map(o => `<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
+    } else if (isCounsellor && counsellorOptions.length) {
+      input = `<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${counsellorOptions.map(o => `<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
+    } else if (isCourse && courseOptions.length > 2) {
+      input = `<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${courseOptions.map(o => `<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
+    } else if (f.dataType === 'date') {
+      const dv = val ? new Date(val).toISOString().slice(0,10) : '';
+      input = `<input type="date" name="${f.systemKey}" value="${dv}">`;
+    } else if (f.dataType === 'number') {
+      input = `<input type="number" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
+    } else if (f.dataType === 'email') {
+      input = `<input type="email" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
+    } else if (f.dataType === 'phone') {
+      input = `<input type="tel" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
+    } else if (f.systemKey === KEYS.notes || ['notes','remarks','comments'].includes(f.systemKey)) {
+      input = `<textarea name="${f.systemKey}" placeholder="${f.label}">${val}</textarea>`;
+    } else {
+      input = `<input type="text" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
+    }
+
+    return `<div class="fg${['notes','remarks','comments'].includes(f.systemKey) ? ' full' : ''}">
+      <label>${f.label}${f.required ? ' <span style="color:var(--rose)">*</span>' : ''}</label>
+      ${input}
+    </div>`;
+  }).join('');
+}
+
+async function saveLead() {
+  const data = {};
+  document.querySelectorAll('#lead-form-fields [name]').forEach(el => {
+    if (el.value !== '') data[el.name] = el.value;
+  });
+
+  try {
+    if (editingId) {
+      await apiFetch(`/import/record/${editingId}`, { method: 'PUT', body: JSON.stringify(data) });
+      toast('Lead updated');
+    } else {
+      await apiFetch('/import/record', { method: 'POST', body: JSON.stringify({ system: SYSTEM, type: DATA_TYPE, data }) });
+      toast('Lead added');
+    }
+    closeModal('lead-modal-overlay');
+    await loadData();
+  } catch (err) {
+    toast('Save failed: ' + err.message, 'error');
+  }
+}
+
+// ── DELETE ────────────────────────────────────────────────────────
+async function deleteRecord(id) {
+  const l = LEADS.find(x => x._id === id);
+  const name = KEYS.name ? getVal(l, KEYS.name) : id;
+  const ok = await confirm2('Delete Lead', `Delete "${name}"? This cannot be undone.`);
+  if (!ok) return;
+  try {
+    await apiFetch(`/import/record/${id}`, { method: 'DELETE' });
+    toast('Lead deleted');
+    await loadData();
+  } catch (err) {
+    toast('Delete failed: ' + err.message, 'error');
+  }
+}
+
+// ── DROPDOWN TOGGLE ───────────────────────────────────────────────
+function toggleDD(e, id) {
+  e.stopPropagation();
+  document.querySelectorAll('.dropdown-menu').forEach(m => { if (m.id !== id) m.classList.remove('open'); });
+  document.getElementById(id)?.classList.toggle('open');
+}
+document.addEventListener('click', () => document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open')));
+</script>
 </body>
 </html>

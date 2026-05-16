@@ -19,6 +19,12 @@ router.get("/records",           auth, ic.getRecords);
 // Update a single record by id
 router.put("/record/:id",        auth, ic.updateRecord);
 
+// Create a single record (Add Lead / Add Deal modals)
+router.post("/record",           auth, ic.createRecord);
+
+// Bulk-update a field across multiple records (Bulk Status in Leads)
+router.patch("/bulk-update",     auth, ic.bulkUpdate);
+
 // Delete a single record by id
 router.delete("/record/:id",     auth, ic.deleteRecord);
 

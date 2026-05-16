@@ -152,6 +152,11 @@ textarea{resize:vertical;min-height:80px}
     <a class="nav-item" href="../../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
   </div>
   <div class="nav-section">
+    <div class="nav-label">Employees</div>
+    <a class="nav-item" href="../../employees/employees.html"><span class="nav-icon">👥</span> All Employees</a>
+    <a class="nav-item" href="../../employees/attendance.html"><span class="nav-icon">📅</span> Attendance</a>
+  </div>
+  <div class="nav-section">
     <div class="nav-label">Talent Acquisition</div>
     <a class="nav-item" href="../../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
     <a class="nav-item" href="../../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates <span class="nav-badge">14</span></a>
@@ -160,8 +165,8 @@ textarea{resize:vertical;min-height:80px}
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-label">Employee Lifecycle</div>
-    <a class="nav-item active" href="onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
     <a class="nav-item" href="../offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item active" href="../onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
     <a class="nav-item" href="../orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
     <a class="nav-item" href="../deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
   </div>
@@ -169,6 +174,7 @@ textarea{resize:vertical;min-height:80px}
   <div class="nav-section">
     <div class="nav-label">Operations</div>
     <a class="nav-item" href="../../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
+    <a class="nav-item" href="../../employees/shift-requests.html"><span class="nav-icon">🔄</span> Shift Requests</a>
     <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations <span class="nav-badge">3</span></a>
     <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
@@ -196,24 +202,24 @@ textarea{resize:vertical;min-height:80px}
     <!-- KPI -->
     <div class="grid g4" style="margin-bottom:20px;">
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--amber);">6</div>
+        <div style="font-size:26px;font-weight:600;color:var(--amber);" id="kpi-inprogress">0</div>
         <div style="font-size:12px;color:var(--text3);margin-top:4px;">In Progress</div>
         <div style="font-size:11px;color:var(--text3);margin-top:3px;">Active onboardings</div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--green);">3</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Completed This Week</div>
-        <div style="font-size:11px;color:var(--green);margin-top:3px;">All docs verified ✓</div>
+        <div style="font-size:26px;font-weight:600;color:var(--green);" id="kpi-docs-ready">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Docs Complete</div>
+        <div style="font-size:11px;color:var(--green);margin-top:3px;">Ready for offer letter</div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--accent);">5.2</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Avg. Days to Complete</div>
-        <div style="font-size:11px;color:var(--green);margin-top:3px;">▼ 0.8 days improvement</div>
+        <div style="font-size:26px;font-weight:600;color:var(--rose);" id="kpi-docs-pending">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Docs Pending</div>
+        <div style="font-size:11px;color:var(--amber);margin-top:3px;">Awaiting submission</div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--green);">97%</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Completion Rate</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:3px;">Last 90 days</div>
+        <div style="font-size:26px;font-weight:600;color:var(--accent);" id="kpi-total-ob">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Total Candidates</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;">Passed all 3 rounds</div>
       </div>
     </div>
 
@@ -313,19 +319,18 @@ textarea{resize:vertical;min-height:80px}
     <!-- ALL ONBOARDINGS TABLE -->
     <div class="card" style="margin-bottom:16px;">
       <div class="card-hd">
-        <div><div class="card-title">All Active Onboardings</div><div class="card-sub" id="ob-count">6 employees</div></div>
+        <div><div class="card-title">Candidates Passed All Rounds — Onboarding Queue</div><div class="card-sub" id="ob-count">Loading…</div></div>
         <div style="display:flex;gap:8px;">
-          <select onchange="renderTable()" id="status-filter" style="width:auto;padding:5px 10px;font-size:12px;">
-            <option value="">All Statuses</option>
-            <option>In Progress</option>
-            <option>Documents Pending</option>
-            <option>IT Setup</option>
-            <option>Completed</option>
-          </select>
+          <input type="text" id="ob-search" placeholder="Search candidates…" oninput="renderTable()" style="width:200px;padding:6px 12px;font-size:12px;">
         </div>
       </div>
-      <table>
-        <thead><tr><th>Employee</th><th>Role</th><th>Start Date</th><th>Stage</th><th>Progress</th><th>Buddy</th><th>Status</th><th>Actions</th></tr></thead>
+      <div id="ob-empty" style="display:none;padding:40px;text-align:center;color:var(--text3);">
+        <div style="font-size:32px;margin-bottom:10px;">🎯</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text2);">No candidates in onboarding yet</div>
+        <div style="font-size:13px;margin-top:6px;">Candidates who pass all 3 interview rounds (Coding, Technical, HR) will appear here automatically.</div>
+      </div>
+      <table id="ob-table">
+        <thead><tr><th>Candidate</th><th>Role</th><th>Passed On</th><th>Documents</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody id="ob-tbody"></tbody>
       </table>
     </div>
@@ -343,6 +348,32 @@ textarea{resize:vertical;min-height:80px}
     </div>
   </div>
 </div>
+</div>
+
+
+<!-- DOCUMENT PANEL MODAL -->
+<div class="overlay" id="doc-panel-modal" onclick="closeModal('doc-panel-modal')">
+  <div class="modal" style="width:560px;" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <span class="modal-title" id="doc-panel-title">Document Checklist</span>
+      <button class="modal-close" onclick="closeModal('doc-panel-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+          <span style="color:var(--text2);">Documents Submitted</span>
+          <span style="color:var(--text);font-weight:600;" id="doc-panel-pct">0/6</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="doc-panel-prog" style="width:0%;background:var(--accent2);transition:width .4s;"></div></div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Mark each document as submitted once the candidate has provided it. All 6 documents must be submitted to generate an offer letter.</div>
+      <div id="doc-panel-list"></div>
+    </div>
+    <div class="modal-ft" style="justify-content:space-between;">
+      <button class="btn" onclick="closeModal('doc-panel-modal')">Close</button>
+      <button class="btn primary" id="doc-panel-offer-btn" style="display:none;" onclick="generateOfferLetter(selectedCandEmail);closeModal('doc-panel-modal')">📝 Generate Offer Letter →</button>
+    </div>
+  </div>
 </div>
 
 <!-- START ONBOARDING MODAL -->
@@ -435,7 +466,188 @@ textarea{resize:vertical;min-height:80px}
 </div>
 
 <script>
-/* DATA */
+/* ══ ONBOARDING CONSTANTS ═══════════════════════════════════════════════════ */
+const LS_ONBOARDING    = 'onboarding_candidates';
+const LS_OB_DOCS       = 'onboarding_docs';
+const LS_OFFER_READY   = 'offer_ready_candidates';
+const PALETTE = ['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#22c55e','#f43f5e','#6366f1'];
+const REQUIRED_DOCS = [
+  'Aadhar Card',
+  'PAN Card',
+  'Degree / Educational Certificates',
+  'Relieving Letter (Previous Employer)',
+  'Bank Account Details',
+  'Passport Size Photo',
+];
+
+/* ══ STATE ═══════════════════════════════════════════════════════════════════ */
+let OB_CANDIDATES = [];
+let OB_DOCS       = {};
+let selectedCandEmail = null;
+
+/* ══ LOAD / SAVE ═════════════════════════════════════════════════════════════ */
+function loadOnboarding() {
+  try { OB_CANDIDATES = JSON.parse(localStorage.getItem(LS_ONBOARDING) || '[]'); } catch(e) { OB_CANDIDATES = []; }
+  try { OB_DOCS       = JSON.parse(localStorage.getItem(LS_OB_DOCS)    || '{}'); } catch(e) { OB_DOCS = {}; }
+  OB_CANDIDATES.forEach((c, i) => { c.col = c.col || PALETTE[i % PALETTE.length]; c.init = c.init || mkInitOb(c.name); });
+}
+
+function saveObDocs() { localStorage.setItem(LS_OB_DOCS, JSON.stringify(OB_DOCS)); }
+
+function mkInitOb(name) {
+  return (name||'?').trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+}
+
+/* ── Check if all required docs submitted for a candidate ─────────────────── */
+function docsComplete(email) {
+  const d = OB_DOCS[email] || {};
+  return REQUIRED_DOCS.every(doc => d[doc]);
+}
+
+function docsCount(email) {
+  const d = OB_DOCS[email] || {};
+  return REQUIRED_DOCS.filter(doc => d[doc]).length;
+}
+
+/* ── Push candidates with all docs to offer_ready ────────────────────────── */
+function syncOfferReady() {
+  const ready = OB_CANDIDATES.filter(c => docsComplete(c.email));
+  const existing = [];
+  try { existing.push(...JSON.parse(localStorage.getItem(LS_OFFER_READY) || '[]')); } catch {}
+  const existingEmails = new Set(existing.map(c => c.email));
+  ready.forEach(c => {
+    if (!existingEmails.has(c.email)) {
+      existing.push({ ...c, offerReadyDate: new Date().toLocaleDateString('en-IN') });
+      existingEmails.add(c.email);
+    }
+  });
+  localStorage.setItem(LS_OFFER_READY, JSON.stringify(existing));
+}
+
+/* ══ RENDER TABLE ════════════════════════════════════════════════════════════ */
+function renderTable() {
+  const q = (document.getElementById('ob-search') ? document.getElementById('ob-search').value : '').toLowerCase();
+  const data = OB_CANDIDATES.filter(c => !q || (c.name||'').toLowerCase().includes(q) || (c.position||'').toLowerCase().includes(q));
+
+  const inProgress = OB_CANDIDATES.filter(c => !docsComplete(c.email)).length;
+  const docsReady  = OB_CANDIDATES.filter(c => docsComplete(c.email)).length;
+  const setEl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  setEl('kpi-inprogress', inProgress);
+  setEl('kpi-docs-ready', docsReady);
+  setEl('kpi-docs-pending', inProgress);
+  setEl('kpi-total-ob', OB_CANDIDATES.length);
+  setEl('ob-count', data.length + ' candidate' + (data.length!==1?'s':''));
+
+  const empty = document.getElementById('ob-empty');
+  const table = document.getElementById('ob-table');
+  if (!data.length) {
+    if(empty) empty.style.display='block';
+    if(table) table.style.display='none';
+    return;
+  }
+  if(empty) empty.style.display='none';
+  if(table) table.style.display='table';
+
+  const cnt = docsCount;
+  const total = REQUIRED_DOCS.length;
+  document.getElementById('ob-tbody').innerHTML = data.map(c => {
+    const submitted = cnt(c.email);
+    const pct = Math.round(submitted/total*100);
+    const complete = docsComplete(c.email);
+    const pctColor = complete ? 'var(--green)' : pct >= 50 ? 'var(--accent2)' : 'var(--amber)';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:30px;height:30px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;">${c.init}</div>
+        <div><div class="td-main">${c.name}</div><div class="td-sub">${c.email||''}</div></div>
+      </div></td>
+      <td><div style="font-size:12px;color:var(--text2);">${c.position||'—'}</div></td>
+      <td style="font-size:12px;font-family:var(--mono);">${c.passedDate||'—'}</td>
+      <td>
+        <div style="font-size:12px;color:var(--text2);">${submitted}/${total} submitted</div>
+        ${complete ? '<span class="badge b-green" style="font-size:10px;margin-top:3px;">✓ All Docs Complete</span>' : ''}
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="prog-bar" style="width:90px;"><div class="prog-fill" style="width:${pct}%;background:${pctColor};"></div></div>
+          <span style="font-size:11px;color:var(--text3);">${pct}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${complete ? 'b-green' : 'b-amber'}">${complete ? 'Docs Complete' : 'Docs Pending'}</span></td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-sm" onclick="openDocPanel('${c.email}')">📄 Documents</button>
+          ${complete ? `<button class="btn btn-sm primary" style="font-size:11px;" onclick="generateOfferLetter('${c.email}')">📝 Offer Letter</button>` : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══ DOCUMENT PANEL ══════════════════════════════════════════════════════════ */
+function openDocPanel(email) {
+  selectedCandEmail = email;
+  const c = OB_CANDIDATES.find(x => x.email === email);
+  if (!c) return;
+  document.getElementById('doc-panel-title').textContent = c.name + ' — Document Checklist';
+  renderDocPanel();
+  openModal('doc-panel-modal');
+}
+
+function renderDocPanel() {
+  const email = selectedCandEmail;
+  const docs = OB_DOCS[email] || {};
+  const submitted = REQUIRED_DOCS.filter(d => docs[d]).length;
+  const pct = Math.round(submitted/REQUIRED_DOCS.length*100);
+  document.getElementById('doc-panel-prog').style.width = pct + '%';
+  document.getElementById('doc-panel-pct').textContent = submitted + '/' + REQUIRED_DOCS.length + ' submitted';
+
+  document.getElementById('doc-panel-list').innerHTML = REQUIRED_DOCS.map(doc => {
+    const done = docs[doc];
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:${done?'rgba(34,197,94,0.06)':'var(--navy3)'};border:1px solid ${done?'rgba(34,197,94,0.2)':'var(--border)'};border-radius:8px;margin-bottom:8px;">
+      <div style="width:22px;height:22px;border-radius:50%;background:${done?'var(--green)':'var(--navy4)'};display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">${done?'✓':'○'}</div>
+      <div style="flex:1;font-size:13px;color:${done?'var(--text)':'var(--text2)'};">${doc}</div>
+      ${done
+        ? `<button class="btn btn-sm" style="font-size:11px;color:var(--rose);border-color:rgba(244,63,94,0.3);" onclick="removeDoc('${doc}')">Remove</button>`
+        : `<button class="btn btn-sm primary" style="font-size:11px;" onclick="markDocSubmitted('${doc}')">✓ Mark Submitted</button>`
+      }
+    </div>`;
+  }).join('');
+
+  const allDone = submitted === REQUIRED_DOCS.length;
+  document.getElementById('doc-panel-offer-btn').style.display = allDone ? 'flex' : 'none';
+}
+
+function markDocSubmitted(doc) {
+  const email = selectedCandEmail;
+  if (!OB_DOCS[email]) OB_DOCS[email] = {};
+  OB_DOCS[email][doc] = true;
+  saveObDocs();
+  renderDocPanel();
+  renderTable();
+  const allDone = docsComplete(email);
+  if (allDone) {
+    syncOfferReady();
+    showToast('🎉 All documents submitted! Candidate is ready for offer letter.');
+  } else {
+    showToast('✓ ' + doc + ' marked as submitted');
+  }
+}
+
+function removeDoc(doc) {
+  const email = selectedCandEmail;
+  if (OB_DOCS[email]) delete OB_DOCS[email][doc];
+  saveObDocs();
+  renderDocPanel();
+  renderTable();
+  showToast('Document removed: ' + doc);
+}
+
+function generateOfferLetter(email) {
+  syncOfferReady();
+  window.location.href = '../offer_letters/offer_letters.html';
+}
+
+/* ══ CHECKLIST (for featured candidate card — static) ═══════════════════════ */
 const DOC_ITEMS = [
   {text:'PAN Card copy', status:'done'},
   {text:'Aadhar Card / ID Proof', status:'done'},
@@ -537,15 +749,44 @@ function startOnboarding(){
   const n=document.getElementById('nb-name').value.trim();
   if(!n){alert('Please enter employee name.');return;}
   const init=n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  EMPLOYEES.unshift({name:n,init,col:'#3b82f6',role:document.getElementById('nb-role').value,dept:document.getElementById('nb-dept').value,doj:'Today',stage:'Documents Pending',pct:0,buddy:document.getElementById('nb-buddy').value||'TBD',status:'In Progress'});
+  const email='manual_'+Date.now()+'@hrms.local';
+  const newCand={name:n,init,email,col:'#3b82f6',position:document.getElementById('nb-role').value,passedDate:'Today',documents:{}};
+  OB_CANDIDATES.unshift(newCand);
+  localStorage.setItem(LS_ONBOARDING, JSON.stringify(OB_CANDIDATES));
   closeModal('start-modal');
   renderTable();
-  alert(`Onboarding started for ${n}! Welcome email sent.`);
+  showToast('Onboarding started for '+n+'! Welcome email sent.');
 }
 
 function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'))});
+
+function showToast(msg) {
+  let t = document.getElementById('ob-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'ob-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--navy3);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;transition:opacity .3s;box-shadow:0 4px 20px rgba(0,0,0,.4);';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._to);
+  t._to = setTimeout(()=>t.style.opacity='0', 3500);
+}
+
+// Init
+loadOnboarding();
+renderTable();
+renderChecklist('doc-checklist', DOC_ITEMS);
+renderChecklist('it-checklist', IT_ITEMS);
+renderChecklist('hr-checklist', HR_ITEMS);
+
+window.addEventListener('storage', e => {
+  if (e.key === LS_ONBOARDING || e.key === LS_OB_DOCS) {
+    loadOnboarding(); renderTable();
+  }
+});
 
 /* PROGRESS RING */
 function drawRing(pct){

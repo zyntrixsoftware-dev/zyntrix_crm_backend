@@ -145,6 +145,55 @@ exports.deleteRecord = async (req, res) => {
   }
 };
 
+// ── POST /api/import/record ───────────────────────────────────────────────────
+// Create a single new record (used by Add Lead / Add Deal modals)
+exports.createRecord = async (req, res) => {
+  try {
+    const { system, type, data } = req.body;
+    if (!system || !type || !data) return res.status(400).json({ msg: "system, type, and data are required" });
+
+    const clientId = req.user.id;
+
+    // Verify schema exists for this system+type before inserting
+    const schema = await SchemaConfig.findOne({ clientId, system, type });
+    if (!schema) return res.status(404).json({ msg: "No schema configured for this system/type. Import an Excel first." });
+
+    const doc = await DynamicRecord.create({ clientId, system, type, data });
+    return res.status(201).json({ _id: doc._id, createdAt: doc.createdAt, ...doc.data });
+  } catch (err) {
+    console.error("CREATE RECORD ERROR:", err);
+    return res.status(500).json({ msg: "Server error: " + err.message });
+  }
+};
+
+// ── PATCH /api/import/bulk-update ────────────────────────────────────────────
+// Bulk-update a field across multiple records (used by Bulk Status in Leads)
+exports.bulkUpdate = async (req, res) => {
+  try {
+    const { ids, updates, system, type } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ msg: "ids must be a non-empty array" });
+    if (!updates || typeof updates !== "object") return res.status(400).json({ msg: "updates object is required" });
+
+    const clientId = req.user.id;
+
+    // Build $set payload that targets nested data fields
+    const setPayload = {};
+    for (const [k, v] of Object.entries(updates)) {
+      setPayload[`data.${k}`] = v;
+    }
+
+    const result = await DynamicRecord.updateMany(
+      { _id: { $in: ids }, clientId, system, type },
+      { $set: setPayload }
+    );
+
+    return res.json({ msg: "Bulk update successful", modifiedCount: result.modifiedCount });
+  } catch (err) {
+    console.error("BULK UPDATE ERROR:", err);
+    return res.status(500).json({ msg: "Server error: " + err.message });
+  }
+};
+
 // ── DELETE /api/import/all?system=hrms&type=candidates ───────────────────────
 exports.deleteAll = async (req, res) => {
   try {

@@ -23,8 +23,6 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
 .content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
-
-/* SIDEBAR */
 .brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
 .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
 .brand-name{font-size:15px;font-weight:600;color:var(--text)}
@@ -39,13 +37,10 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
 .nav-divider{height:1px;background:var(--border);margin:8px 10px}
 .sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
-.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
-.user-pill:hover{background:var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;}
 .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
 .user-name{font-size:13px;font-weight:500;color:var(--text)}
 .user-role{font-size:11px;color:var(--text3)}
-
-/* TOPBAR */
 .page-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
 .breadcrumb{font-size:12px;color:var(--text3)}
 .breadcrumb span{color:var(--text2)}
@@ -55,124 +50,98 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
 .topbar-btn:hover{background:var(--navy3)}
 .topbar-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.topbar-btn.primary:hover{background:var(--accent);border-color:var(--accent)}
-.notif-wrap{position:relative}
-.notif-dot{position:absolute;top:6px;right:14px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--navy2)}
-
-/* CARDS */
 .grid{display:grid;gap:16px}
 .g4{grid-template-columns:repeat(4,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
-.g2{grid-template-columns:repeat(2,1fr)}
-.g31{grid-template-columns:3fr 1fr}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;animation:fadeUp .3s ease both}
 .card-sm{padding:16px}
 .card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
 .card-title{font-size:14px;font-weight:600;color:var(--text)}
 .card-sub{font-size:12px;color:var(--text3);margin-top:2px}
-
-/* BADGES */
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
 .b-green{background:rgba(34,197,94,0.13);color:var(--green)}
 .b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
 .b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}
 .b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
 .b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
-.b-teal{background:rgba(45,212,191,0.13);color:var(--teal)}
 .b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
-
-/* TABS */
 .tabs{display:flex;gap:2px;background:var(--navy3);padding:4px;border-radius:10px;margin-bottom:18px;overflow-x:auto}
-.tab{padding:7px 16px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;white-space:nowrap}
+.tab{padding:7px 14px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;white-space:nowrap}
 .tab.active{background:var(--navy2);color:var(--text);font-weight:500}
 .tab:hover:not(.active){color:var(--text)}
-
-/* TABLE */
 table{width:100%;border-collapse:collapse}
 th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px}
-td{padding:13px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
+td{padding:11px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
 tr:first-child td{border-top:none}
 tr:hover td{background:rgba(255,255,255,.02)}
 .td-main{font-weight:500;color:var(--text)}
 .td-sub{font-size:11px;color:var(--text3);margin-top:1px}
-
-/* SCORE BAR */
-.score-bar{width:60px;height:5px;background:var(--navy4);border-radius:3px;overflow:hidden;margin-top:4px}
-.score-fill{height:100%;border-radius:3px}
-
-/* MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
-.overlay.open{display:flex}
-.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:560px;max-width:94vw;max-height:90vh;overflow-y:auto}
-.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.modal-title{font-size:15px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
-.modal-close:hover{color:var(--text)}
-.modal-body{padding:22px 24px}
-.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.fg{display:flex;flex-direction:column;gap:6px}
-label{font-size:12px;font-weight:500;color:var(--text2)}
-input,select,textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
-select option{background:var(--navy2)}
-textarea{resize:vertical;min-height:80px}
 .btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
 .btn:hover{background:var(--navy3)}
 .btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
 .btn.primary:hover{background:var(--accent);border-color:var(--accent)}
-.btn.danger{background:var(--rose);border-color:var(--rose);color:#fff}
-.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
-
-/* PROGRESS */
-.prog-bar{height:5px;background:var(--navy4);border-radius:3px;overflow:hidden}
-.prog-fill{height:100%;border-radius:3px}
-
-/* PIPELINE KANBAN */
+.btn.danger{background:rgba(244,63,94,0.15);border-color:rgba(244,63,94,0.35);color:var(--rose)}
+.btn.success{background:rgba(34,197,94,0.13);border-color:rgba(34,197,94,0.3);color:var(--green)}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.btn-sm:hover{background:var(--navy3);color:var(--text)}
+.btn-shortlist{background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.3);color:var(--purple)}
+.btn-shortlist:hover{background:rgba(167,139,250,0.22)}
+.btn-shortlisted{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green)}
+.btn-shortlisted:hover{background:rgba(244,63,94,0.1);border-color:rgba(244,63,94,0.3);color:var(--rose)}
+.profile-panel{position:fixed;right:-490px;top:0;width:490px;height:100vh;background:var(--navy2);border-left:1px solid var(--border2);z-index:200;overflow-y:auto;transition:right .3s ease;display:flex;flex-direction:column}
+.profile-panel.open{right:0}
+.pp-overlay{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.25)}
+.pp-overlay.open{display:block}
+.pp-banner{height:90px;background:linear-gradient(135deg,#1e3a5f,#132236);flex-shrink:0;position:relative}
+.pp-header{padding:0 24px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.pp-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.3);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.pp-close:hover{background:rgba(0,0,0,.5)}
+.pp-body{flex:1;padding:20px 24px;overflow-y:auto}
+.pp-section{margin-bottom:18px}
+.pp-section-title{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.pp-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;gap:10px}
+.pp-row:last-child{border-bottom:none}
+.pp-label{color:var(--text3);flex-shrink:0}
+.pp-val{color:var(--text);font-weight:500;text-align:right;word-break:break-word;max-width:280px}
+.stage-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;font-family:var(--font);transition:all .15s}
+.stage-btn:hover,.stage-btn.active{background:var(--accent-dim);border-color:var(--accent2);color:var(--accent)}
+.resume-link{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);border-radius:8px;color:var(--accent);font-size:13px;text-decoration:none;transition:all .15s}
+.resume-link:hover{background:rgba(59,130,246,0.2)}
 .kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
 .kanban-col{flex:0 0 200px;min-width:200px}
 .kanban-hd{padding:8px 12px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;background:var(--navy3);display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:500;color:var(--text2)}
 .kanban-body{border:1px solid var(--border);border-radius:0 0 8px 8px;padding:8px;min-height:120px;display:flex;flex-direction:column;gap:8px}
 .kanban-card{background:var(--navy4);border:1px solid var(--border2);border-radius:8px;padding:10px;cursor:pointer;transition:all .15s}
 .kanban-card:hover{border-color:rgba(59,130,246,0.4);transform:translateY(-1px)}
-.k-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
-.k-role{font-size:11px;color:var(--text3)}
-.k-score{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:5px}
-
-/* PROFILE SLIDE-IN */
-.profile-panel{position:fixed;right:-440px;top:0;width:440px;height:100vh;background:var(--navy2);border-left:1px solid var(--border2);z-index:200;overflow-y:auto;transition:right .3s ease;display:flex;flex-direction:column}
-.profile-panel.open{right:0}
-.pp-overlay{display:none;position:fixed;inset:0;z-index:199}
-.pp-overlay.open{display:block}
-.pp-banner{height:90px;background:linear-gradient(135deg,#1e3a5f,#132236);flex-shrink:0}
-.pp-header{padding:0 24px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
-.pp-close{position:absolute;top:16px;right:16px;background:rgba(0,0,0,.3);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
-.pp-close:hover{background:rgba(0,0,0,.5)}
-.pp-body{flex:1;padding:20px 24px;overflow-y:auto}
-.pp-section{margin-bottom:20px}
-.pp-section-title{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
-.pp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-.pp-row:last-child{border-bottom:none}
-.pp-label{color:var(--text3)}
-.pp-val{color:var(--text);font-weight:500}
-.skill-tag{display:inline-flex;padding:4px 10px;background:var(--navy4);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text2);margin:3px}
-.competency-row{margin-bottom:10px}
-.competency-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
-.competency-label span:first-child{color:var(--text2)}
-.competency-label span:last-child{color:var(--text);font-weight:500}
-.stage-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s}
-.stage-btn:hover,.stage-btn.active{background:var(--accent-dim);border-color:var(--accent2);color:var(--accent)}
-
-/* SCROLLBAR */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:520px;max-width:94vw;max-height:90vh;overflow-y:auto}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:22px 24px}
+label{font-size:12px;font-weight:500;color:var(--text2)}
+input,select,textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
+select option{background:var(--navy2)}
+textarea{resize:vertical;min-height:80px}
+/* SYNC BAR */
+.sync-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-size:12px;margin-bottom:18px;border:1px solid transparent}
+.sync-bar.ok{background:rgba(34,197,94,0.07);border-color:rgba(34,197,94,0.2);color:var(--green)}
+.sync-bar.err{background:rgba(244,63,94,0.07);border-color:rgba(244,63,94,0.2);color:var(--rose)}
+.sync-bar.loading{background:rgba(59,130,246,0.07);border-color:rgba(59,130,246,0.18);color:var(--accent)}
+.pulse{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;gap:14px;min-height:200px}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{display:flex;flex-direction:column;align-items:center;padding:50px 24px;gap:12px;text-align:center}
+.tag{display:inline-flex;padding:2px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text2)}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-
-/* TAG */
-.tag{display:inline-flex;padding:2px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text2)}
-
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.card{animation:fadeUp .3s ease both}
 </style>
 <script src="../../../../assets/js/api.js"></script>
 <script src="../../../../assets/js/auth.js?v=3"></script>
@@ -181,7 +150,6 @@ textarea{resize:vertical;min-height:80px}
 <script>requireAuth(); requireModuleAccess("hr");</script>
 <div class="shell">
 
-<!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-icon">👥</div>
@@ -192,9 +160,14 @@ textarea{resize:vertical;min-height:80px}
     <a class="nav-item" href="../../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
   </div>
   <div class="nav-section">
+    <div class="nav-label">Employees</div>
+    <a class="nav-item" href="../../employees/employees.html"><span class="nav-icon">👥</span> All Employees</a>
+    <a class="nav-item" href="../../employees/attendance.html"><span class="nav-icon">📅</span> Attendance</a>
+  </div>
+  <div class="nav-section">
     <div class="nav-label">Talent Acquisition</div>
     <a class="nav-item" href="../careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
-    <a class="nav-item active" href="candidates.html"><span class="nav-icon">👤</span> Candidates <span class="nav-badge">54</span></a>
+    <a class="nav-item active" href="candidates.html"><span class="nav-icon">👤</span> Candidates <span class="nav-badge" id="sidebar-badge">—</span></a>
     <a class="nav-item" href="../interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
   </div>
   <div class="nav-divider"></div>
@@ -209,19 +182,19 @@ textarea{resize:vertical;min-height:80px}
   <div class="nav-section">
     <div class="nav-label">Operations</div>
     <a class="nav-item" href="../../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
-    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations <span class="nav-badge">3</span></a>
+    <a class="nav-item" href="../../employees/shift-requests.html"><span class="nav-icon">🔄</span> Shift Requests</a>
+    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations</a>
     <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
   <div class="sidebar-footer">
     <div class="user-pill">
-      <div class="avatar">AR</div>
-      <div style="flex:1;min-width:0;"><div class="user-name">Arjun Rao</div><div class="user-role">HR Manager</div></div>
-      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+      <div class="avatar" id="sb-av">HR</div>
+      <div style="flex:1;min-width:0;"><div class="user-name" id="sb-name">HR Manager</div><div class="user-role">Talent Acquisition</div></div>
+      <button onclick="logout()" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;">⏻ Logout</button>
     </div>
   </div>
 </aside>
 
-<!-- ═══ MAIN ═══ -->
 <div class="main">
   <div class="topbar">
     <div>
@@ -230,95 +203,103 @@ textarea{resize:vertical;min-height:80px}
     </div>
     <div class="search-box">
       <span>🔍</span>
-      <input type="text" id="cand-search" placeholder="Search by name, role, source…" oninput="renderAll()">
+      <input type="text" id="cand-search" placeholder="Search name, role, location…" oninput="renderAll()">
     </div>
-    <div class="notif-wrap">
-      <button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button>
-      <span class="notif-dot"></span>
-    </div>
-    <button class="topbar-btn primary" onclick="openModal('add-modal')">＋ Add Candidate</button>
+    <button class="topbar-btn" id="refresh-btn" onclick="loadCandidates()">🔄 Refresh</button>
+    <label class="topbar-btn" style="cursor:pointer;" title="Import updated candidate CSV">
+      📂 Import CSV
+      <input type="file" accept=".csv" id="csv-upload-input" style="display:none;" onchange="handleCSVUpload(event)">
+    </label>
+    <button class="topbar-btn" onclick="openModal('info-modal')">ℹ️ How it works</button>
   </div>
 
-  <div class="content" id="content">
+  <div class="content">
 
-    <!-- KPI ROW -->
+    <!-- SYNC STATUS -->
+    <div class="sync-bar loading" id="sync-bar">
+      <div class="pulse" id="sync-pulse" style="background:var(--accent)"></div>
+      <span id="sync-msg">Connecting to Google Sheet…</span>
+      <span style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text3);" id="sync-time"></span>
+    </div>
+
+    <!-- KPIs -->
     <div class="grid g4" style="margin-bottom:20px;">
-      <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--accent);">142</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Total Applicants</div>
-        <div style="font-size:11px;color:var(--green);margin-top:3px;">▲ 24 this week</div>
+      <div class="card card-sm" style="display:flex;align-items:center;gap:14px;padding:18px 20px;">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(79,156,249,.15);border:1px solid rgba(79,156,249,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🧑‍💼</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:26px;font-weight:700;color:var(--accent);line-height:1;letter-spacing:-1px;" id="kpi-total">—</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:3px;">Total Applicants</div>
+          <div style="font-size:10px;color:var(--green);margin-top:3px;display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;"></span>Live · Google Sheet</div>
+        </div>
       </div>
-      <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--purple);">54</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Shortlisted</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:3px;">38% pass rate</div>
+      <div class="card card-sm" style="display:flex;align-items:center;gap:14px;padding:18px 20px;">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">⭐</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:26px;font-weight:700;color:var(--purple);line-height:1;letter-spacing:-1px;" id="kpi-shortlisted">—</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:3px;">Shortlisted</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px;" id="kpi-pct">For interview</div>
+        </div>
       </div>
-      <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--amber);">28</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Interviewing</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:3px;">Across 5 roles</div>
+      <div class="card card-sm" style="display:flex;align-items:center;gap:14px;padding:18px 20px;">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎤</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:26px;font-weight:700;color:var(--amber);line-height:1;letter-spacing:-1px;" id="kpi-interviewing">—</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:3px;">Interviewing</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px;">Scheduled rounds</div>
+        </div>
       </div>
-      <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--green);">8</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Offers Extended</div>
-        <div style="font-size:11px;color:var(--green);margin-top:3px;">6 accepted ✓</div>
+      <div class="card card-sm" style="display:flex;align-items:center;gap:14px;padding:18px 20px;">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📄</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:26px;font-weight:700;color:var(--teal);line-height:1;letter-spacing:-1px;" id="kpi-resumes">—</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:3px;">Have Resumes</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px;">Viewable CVs</div>
+        </div>
       </div>
     </div>
 
-    <!-- VIEWS -->
+    <!-- TABS + VIEW TOGGLE -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
-      <div class="tabs" style="margin-bottom:0;flex:1;">
-        <div class="tab active" onclick="setStageFilter(this,'All')">All (142)</div>
-        <div class="tab" onclick="setStageFilter(this,'Applied')">Applied (56)</div>
-        <div class="tab" onclick="setStageFilter(this,'Shortlisted')">Shortlisted (54)</div>
-        <div class="tab" onclick="setStageFilter(this,'Interviewing')">Interviewing (28)</div>
-        <div class="tab" onclick="setStageFilter(this,'Offered')">Offered (8)</div>
-        <div class="tab" onclick="setStageFilter(this,'Rejected')">Rejected (24)</div>
+      <div class="tabs" style="margin-bottom:0;flex:1;" id="stage-tabs">
+        <div class="tab active" onclick="setStageFilter(this,'All')">All</div>
+        <div class="tab" onclick="setStageFilter(this,'Applied')">Applied</div>
+        <div class="tab" onclick="setStageFilter(this,'Shortlisted')">Shortlisted</div>
+        <div class="tab" onclick="setStageFilter(this,'Interviewing')">Interviewing</div>
+        <div class="tab" onclick="setStageFilter(this,'Offered')">Offered</div>
+        <div class="tab" onclick="setStageFilter(this,'Rejected')">Rejected</div>
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn-sm" id="btn-list" onclick="switchView('list')" style="background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);">☰ List</button>
-        <button class="btn btn-sm" id="btn-kanban" onclick="switchView('kanban')">⊞ Pipeline</button>
+        <button class="btn-sm" id="btn-list" onclick="switchView('list')" style="background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);">☰ List</button>
+        <button class="btn-sm" id="btn-kanban" onclick="switchView('kanban')">⊞ Pipeline</button>
+        <button class="btn-sm" id="export-btn" onclick="exportShortlisted()" style="display:none;">📤 Export Shortlisted</button>
       </div>
     </div>
 
-    <!-- FILTERS ROW -->
-    <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
-      <select onchange="renderAll()" id="role-filter" style="width:auto;padding:6px 12px;font-size:12px;">
-        <option value="">All Roles</option>
-        <option>Sr. Backend Engineer</option>
-        <option>Product Manager</option>
-        <option>DevOps Engineer</option>
-        <option>Sales Dev Rep</option>
-        <option>UX Designer</option>
-      </select>
-      <select onchange="renderAll()" id="source-filter" style="width:auto;padding:6px 12px;font-size:12px;">
-        <option value="">All Sources</option>
-        <option>LinkedIn</option>
-        <option>Naukri</option>
-        <option>Referral</option>
-        <option>Direct Apply</option>
-        <option>AngelList</option>
-      </select>
+    <!-- FILTERS -->
+    <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;">
+      <select onchange="renderAll()" id="role-filter" style="width:auto;padding:6px 12px;font-size:12px;"><option value="">All Roles</option></select>
+      <select onchange="renderAll()" id="src-filter" style="width:auto;padding:6px 12px;font-size:12px;"><option value="">All Sources</option></select>
       <select onchange="renderAll()" id="sort-filter" style="width:auto;padding:6px 12px;font-size:12px;">
-        <option value="score">Sort: Score ↓</option>
-        <option value="date">Sort: Date Applied</option>
-        <option value="name">Sort: Name A–Z</option>
+        <option value="date">Date Applied</option>
+        <option value="name">Name A–Z</option>
+        <option value="position">Position</option>
       </select>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;">
+        <input type="checkbox" id="resume-only" onchange="renderAll()" style="width:auto;padding:0;"> Resume only
+      </label>
     </div>
 
     <!-- LIST VIEW -->
     <div id="list-view">
-      <div class="card">
-        <div class="card-hd">
-          <div><div class="card-title">Candidate Pipeline</div><div class="card-sub" id="cand-count">Showing all candidates</div></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">
+          <div>
+            <div class="card-title">Candidate Pipeline</div>
+            <div class="card-sub" id="cand-count">Loading…</div>
+          </div>
         </div>
-        <div style="overflow-x:auto;">
-          <table>
-            <thead><tr>
-              <th>Candidate</th><th>Applied For</th><th>Source</th><th>Experience</th><th>Match Score</th><th>Stage</th><th>Applied</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="cand-tbody"></tbody>
-          </table>
+        <div id="table-area">
+          <div class="loading-state"><div class="spinner"></div><div style="color:var(--text3);font-size:13px;">Fetching live data from Google Sheet…</div></div>
         </div>
       </div>
     </div>
@@ -328,331 +309,648 @@ textarea{resize:vertical;min-height:80px}
       <div class="kanban" id="kanban-board"></div>
     </div>
 
-    <!-- CHARTS ROW -->
+    <!-- CHARTS -->
     <div class="grid g3" style="margin-top:16px;">
-      <div class="card">
-        <div class="card-hd"><div class="card-title">Source Breakdown</div></div>
-        <div style="height:160px;position:relative;"><canvas id="sourceChart"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-hd"><div class="card-title">Applications Over Time</div></div>
-        <div style="height:160px;position:relative;"><canvas id="timeChart"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-hd"><div class="card-title">Score Distribution</div></div>
-        <div style="height:160px;position:relative;"><canvas id="scoreChart"></canvas></div>
-      </div>
+      <div class="card"><div class="card-hd"><div class="card-title">By Source</div></div><div style="height:160px;position:relative;"><canvas id="sourceChart"></canvas></div></div>
+      <div class="card"><div class="card-hd"><div class="card-title">Top Roles</div></div><div style="height:160px;position:relative;"><canvas id="roleChart"></canvas></div></div>
+      <div class="card"><div class="card-hd"><div class="card-title">Pipeline Stages</div></div><div style="height:160px;position:relative;"><canvas id="stageChart"></canvas></div></div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /shell -->
+  </div>
+</div>
+</div>
 
-<!-- ═══ CANDIDATE PROFILE PANEL ═══ -->
+<!-- PROFILE PANEL -->
 <div class="pp-overlay" id="pp-overlay" onclick="closeProfile()"></div>
 <div class="profile-panel" id="profile-panel">
-  <div class="pp-banner">
-    <button class="pp-close" onclick="closeProfile()" style="position:absolute;top:16px;right:16px;">×</button>
-  </div>
-  <div class="pp-header" style="position:relative;">
+  <div class="pp-banner"><button class="pp-close" onclick="closeProfile()">×</button></div>
+  <div class="pp-header">
     <div style="display:flex;align-items:flex-end;gap:14px;margin-top:-28px;margin-bottom:12px;">
       <div id="pp-av" style="width:56px;height:56px;border-radius:50%;border:3px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#fff;flex-shrink:0;"></div>
-      <div>
-        <div id="pp-name" style="font-size:17px;font-weight:600;color:var(--text);"></div>
-        <div id="pp-role" style="font-size:12px;color:var(--text3);margin-top:2px;"></div>
-      </div>
+      <div><div id="pp-name" style="font-size:17px;font-weight:600;color:var(--text);"></div><div id="pp-sub" style="font-size:12px;color:var(--text3);margin-top:2px;"></div></div>
     </div>
-    <div id="pp-badges" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+    <div id="pp-badges" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
+    <div id="pp-shortlist-btn"></div>
   </div>
   <div class="pp-body">
     <div class="pp-section">
       <div class="pp-section-title">Contact &amp; Details</div>
       <div class="pp-row"><span class="pp-label">Email</span><span class="pp-val" id="pp-email"></span></div>
       <div class="pp-row"><span class="pp-label">Phone</span><span class="pp-val" id="pp-phone"></span></div>
+      <div class="pp-row"><span class="pp-label">Location</span><span class="pp-val" id="pp-loc"></span></div>
       <div class="pp-row"><span class="pp-label">Experience</span><span class="pp-val" id="pp-exp"></span></div>
-      <div class="pp-row"><span class="pp-label">Source</span><span class="pp-val" id="pp-source"></span></div>
+      <div class="pp-row"><span class="pp-label">Qualifications</span><span class="pp-val" id="pp-qual"></span></div>
+      <div class="pp-row"><span class="pp-label">Source</span><span class="pp-val" id="pp-src"></span></div>
       <div class="pp-row"><span class="pp-label">Applied</span><span class="pp-val" id="pp-date"></span></div>
     </div>
     <div class="pp-section">
-      <div class="pp-section-title">Competency Scores</div>
-      <div id="pp-competencies"></div>
+      <div class="pp-section-title">Additional Info</div>
+      <div class="pp-row"><span class="pp-label">EdTech Experience</span><span class="pp-val" id="pp-edtech" style="font-size:12px;"></span></div>
+      <div class="pp-row"><span class="pp-label">WFH Availability</span><span class="pp-val" id="pp-avail" style="font-size:12px;"></span></div>
     </div>
     <div class="pp-section">
-      <div class="pp-section-title">Skills</div>
-      <div id="pp-skills"></div>
+      <div class="pp-section-title">Resume / CV</div>
+      <div id="pp-resume"></div>
     </div>
     <div class="pp-section">
-      <div class="pp-section-title">Move Stage</div>
-      <div id="pp-stages" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      <div class="pp-section-title">Pipeline Stage</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="pp-stages"></div>
     </div>
     <div class="pp-section">
       <div class="pp-section-title">HR Notes</div>
-      <textarea id="pp-notes" rows="3" placeholder="Add interview notes, observations…"></textarea>
+      <textarea id="pp-notes" rows="3" placeholder="Add notes, observations…" style="width:100%;"></textarea>
+      <button class="btn-sm" onclick="saveNotes()" style="margin-top:8px;">💾 Save Notes</button>
     </div>
-    <div style="display:flex;gap:10px;">
-      <button class="btn primary" onclick="scheduleInterview()" style="flex:1;">Schedule Interview</button>
-      <button class="btn danger btn-sm" onclick="rejectCandidate()">Reject</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:4px;">
+      <button class="btn primary" style="font-size:12px;padding:7px 14px;" onclick="goInterview()" id="pp-int-btn">🎤 Schedule Interview</button>
+      <button class="btn danger" style="font-size:12px;padding:7px 14px;" onclick="rejectCandidate()" id="pp-rej-btn">✗ Reject</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ ADD CANDIDATE MODAL ═══ -->
-<div class="overlay" id="add-modal" onclick="closeModal('add-modal')">
+<!-- INFO MODAL -->
+<div class="overlay" id="info-modal" onclick="closeModal('info-modal')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Add Candidate</span><button class="modal-close" onclick="closeModal('add-modal')">×</button></div>
-    <div class="modal-body">
-      <div class="frow">
-        <div class="fg"><label>Full Name *</label><input id="nc-name" placeholder="e.g. Kavya Reddy"></div>
-        <div class="fg"><label>Email *</label><input id="nc-email" type="email" placeholder="kavya@email.com"></div>
+    <div class="modal-hd"><span class="modal-title">🔄 Architecture: How Data Flows</span><button class="modal-close" onclick="closeModal('info-modal')">×</button></div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="padding:12px 14px;background:rgba(34,197,94,0.08);border-radius:8px;border-left:3px solid var(--green);font-size:13px;line-height:1.7;">
+        <strong>1 · Google Form → Google Sheet</strong><br>
+        <span style="color:var(--text3);">Applicants submit the form. Responses auto-populate Sheet1 columns A–L (Timestamp through Source).</span>
       </div>
-      <div class="frow">
-        <div class="fg"><label>Phone</label><input id="nc-phone" placeholder="+91 98765 43210"></div>
-        <div class="fg"><label>Applied For *</label>
-          <select id="nc-role"><option>Sr. Backend Engineer</option><option>Product Manager</option><option>DevOps Engineer</option><option>Sales Dev Rep</option><option>UX Designer</option></select>
-        </div>
+      <div style="padding:12px 14px;background:rgba(59,130,246,0.08);border-radius:8px;border-left:3px solid var(--accent2);font-size:13px;line-height:1.7;">
+        <strong>2 · Candidate Dashboard → Live Sheet</strong><br>
+        <span style="color:var(--text3);">This page calls the Apps Script <code style="font-family:var(--mono);background:rgba(255,255,255,.06);padding:0 3px;border-radius:3px;">doGet()</code> endpoint to read all rows. Hit 🔄 Refresh anytime to pull the latest data.</span>
       </div>
-      <div class="frow">
-        <div class="fg"><label>Experience (Years)</label><input id="nc-exp" type="number" placeholder="5"></div>
-        <div class="fg"><label>Source</label>
-          <select id="nc-source"><option>LinkedIn</option><option>Naukri</option><option>Referral</option><option>Direct Apply</option><option>AngelList</option></select>
-        </div>
+      <div style="padding:12px 14px;background:rgba(167,139,250,0.08);border-radius:8px;border-left:3px solid var(--purple);font-size:13px;line-height:1.7;">
+        <strong>3 · HR Actions → Write back to Sheet</strong><br>
+        <span style="color:var(--text3);">Shortlisting, stage changes, and HR notes call <code style="font-family:var(--mono);background:rgba(255,255,255,.06);padding:0 3px;border-radius:3px;">doPost(updateCandidate)</code>. Column N = shortlisted, O = stage, P = notes. Changes persist in the Sheet.</span>
       </div>
-      <div class="fg" style="margin-bottom:0;"><label>Resume Link</label><input id="nc-resume" placeholder="Paste Google Drive or URL link"></div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('add-modal')">Cancel</button>
-      <button class="btn primary" onclick="addCandidate()">Add Candidate</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ NOTIF ═══ -->
-<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
-  <div class="modal" style="width:400px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
-    <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="padding:12px;background:rgba(34,197,94,0.08);border-radius:8px;border-left:3px solid var(--green);font-size:13px;font-weight:500;">👤 3 new applications today — Sr. Backend Engineer</div>
-        <div style="padding:12px;background:var(--navy3);border-radius:8px;font-size:13px;">📅 Kavya Reddy — offer response pending (deadline May 5)</div>
+      <div style="padding:12px 14px;background:rgba(245,158,11,0.08);border-radius:8px;border-left:3px solid var(--amber);font-size:13px;line-height:1.7;">
+        <strong>4 · Shortlisted → Interview Panel</strong><br>
+        <span style="color:var(--text3);">Shortlisted candidates are saved to <code style="font-family:var(--mono);background:rgba(255,255,255,.06);padding:0 3px;border-radius:3px;">localStorage</code> and automatically surfaced in the Interview Panel for scheduling rounds.</span>
+      </div>
+      <div style="padding:10px 14px;background:var(--navy3);border-radius:8px;font-size:11px;color:var(--text3);">
+        ⚙️ Set your Apps Script deployment URL in <code style="font-family:var(--mono);">SHEET_SCRIPT_URL</code> at the top of this file's &lt;script&gt; block. Deploy the script as "Anyone" with execute access.
       </div>
     </div>
   </div>
 </div>
 
 <script>
-/* ───────────── DATA ───────────── */
-const STAGES=['Applied','Shortlisted','Interviewing','Offered','Rejected'];
-const STAGE_COLORS={Applied:'b-gray',Shortlisted:'b-purple',Interviewing:'b-amber',Offered:'b-blue',Rejected:'b-rose','Hired':'b-green'};
+// ══════════════════════════════════════════════════════════════════════════════
+// ⚙️  CONFIGURE THIS — paste your Apps Script web app URL here after deploying
+// ══════════════════════════════════════════════════════════════════════════════
+const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMU26puW-cuUsCu6iUECxGowyMSL4U1enosOxB9VIGp6YJ-5qO0b4MNp_vFNTrgghp/exec";
 
-let CANDIDATES = [];  // populated dynamically from imported Excel
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const STAGES       = ['Applied','Shortlisted','Interviewing','Offered','Rejected'];
+const STAGE_COLORS = {Applied:'b-gray',Shortlisted:'b-purple',Interviewing:'b-amber',Offered:'b-blue',Rejected:'b-rose'};
+const PALETTE      = ['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#22c55e','#f43f5e','#6366f1','#00e5b0','#ff7d40','#ec4899'];
 
-let stageFilter='All';
-let currentView='list';
-let openProfileId=null;
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let ALL         = [];
+let stageFilter = 'All';
+let currentView = 'list';
+let openIdx     = null;
+let srcChart, roleChart, stgChart;
 
-/* ───────────── FILTER + RENDER ───────────── */
-function filtered(){
-  const q=document.getElementById('cand-search').value.toLowerCase();
-  const role=document.getElementById('role-filter').value;
-  const src=document.getElementById('source-filter').value;
-  const sort=document.getElementById('sort-filter').value;
-  let res=CANDIDATES.filter(c=>{
-    if(stageFilter!=='All'&&c.stage!==stageFilter)return false;
-    if(role&&c.role!==role)return false;
-    if(src&&c.source!==src)return false;
-    if(q&&!c.name.toLowerCase().includes(q)&&!c.role.toLowerCase().includes(q)&&!c.source.toLowerCase().includes(q))return false;
+// ── LOCAL OVERRIDE STORE ──────────────────────────────────────────────────────
+// Stores HR edits keyed by candidate email so they survive page refresh
+// even before the Google Sheet write-back completes.
+// Normalise email so override keys are consistent regardless of
+// casing or accidental whitespace coming from Google Sheets.
+function normalizeEmail(email) {
+  return (email || '').trim().toLowerCase();
+}
+function getOverrides() {
+  try { return JSON.parse(localStorage.getItem('hrms_cand_overrides') || '{}'); } catch { return {}; }
+}
+function saveOverrides(obj) { localStorage.setItem('hrms_cand_overrides', JSON.stringify(obj)); }
+function setOverride(email, patch) {
+  const key = normalizeEmail(email);
+  const ov  = getOverrides();
+  ov[key]   = { ...(ov[key] || {}), ...patch };
+  saveOverrides(ov);
+}
+
+// ── REAL CANDIDATE DATA (from CSV — fallback when Google Apps Script is unreachable) ───
+const DEMO_CANDIDATES = [{"name": "Visrutha US", "email": "visrutha33@gmail.com", "position": "Full Stack Developer", "phone": "8825803385", "qualifications": "Mca", "experience": "2+ years", "location": "Dharmapuri", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBthpzc2BkQSY-Vzdeo2ACxAcYVmiwydKtO-zZA0nfTW6E?e=uYbGFL", "source": "", "edtech": "", "availability": "", "stage": "Shortlisted", "shortlisted": true, "timestamp": "", "init": "VU", "col": "#3b82f6"}, {"name": "Poosala Chandana Priya", "email": "chandana5115@gmail.com", "position": "Software Engineer", "phone": "6303127946", "qualifications": "BTech", "experience": "2.4 years", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQDqHm0287ehQpdjD3UogDltAWV7P6YUfuaTx4VBzA7TZyo?e=d1Kcyz", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "PC", "col": "#a78bfa"}, {"name": "SKANDA S", "email": "skandasubramanya23@gmail.com", "position": "Mobile App Development Intern", "phone": "7975910936", "qualifications": "B.E", "experience": "3 months", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQD7IZd-OXJJTpobvsAVcBWtAW8Fyv5oFd4l3E-qfFv_ErE?e=nEwRrm", "source": "", "edtech": "", "availability": "", "stage": "Shortlisted", "shortlisted": true, "timestamp": "", "init": "SS", "col": "#2dd4bf"}, {"name": "Samyak Thool", "email": "samthool@outlook.com", "position": "Software Engineer", "phone": "9370048698", "qualifications": "B.SC CS", "experience": "2.3+ years", "location": "Wardha", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBP6mZ7DFHlTpnim_iuIEQyAauU2kg4QC8qvOR-i2HHF28?e=c5Tg5L", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "ST", "col": "#f59e0b"}, {"name": "varun", "email": "sbvc.varun@gmail.com", "position": "Software Engineer", "phone": "9036469849", "qualifications": "MTech, CSE", "experience": "", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQC-DZeA_kmCT6VOkEANOgl_AVG7jTW7cgTRm33PUV6c2Wo?e=93CFYu", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "V", "col": "#22c55e"}, {"name": "Ayush Kumar", "email": "ayushsinha4343@gmail.com", "position": "Full Stack Developer", "phone": "7352186124", "qualifications": "BTech, CSE", "experience": "2.5+ years", "location": "Gaya", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAHt5hAC4nmR64TDOIk2XNcAQ7fwoH1Ju2DWjbnemTwFWU?e=TTdrb4", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "AK", "col": "#f43f5e"}, {"name": "Sarthak Arora", "email": "sarthakarora.9634@gmail.com", "position": "Associate Software Engineer", "phone": "9760288282", "qualifications": "BTech,CSE", "experience": "3.5+ years", "location": "Gurugram", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBgMiN_WLkuT7zS5mKgULlYAWLNbymydeR9H1BCYOCfQ_Q?e=mkolPP", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "SA", "col": "#6366f1"}, {"name": "Abhishek Kumar Singh", "email": "abhicse108@gmail.com", "position": "Back End Engineer", "phone": "8429400626", "qualifications": "BTech,CSE", "experience": "3.5+ years", "location": "Bengaluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBgMiN_WLkuT7zS5mKgULlYAWLNbymydeR9H1BCYOCfQ_Q?e=mkolPP", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "AK", "col": "#00e5b0"}, {"name": "Manthan Kailash Pelne", "email": "manthanpelneoo7@gmail.com", "position": "Full Stack Developer", "phone": "7028037166", "qualifications": "BE", "experience": "1.5+ years", "location": "Wardha, Maharashtra", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBOlhJjr5ywTLYBDk4PEwEZAaQxHnUXCfZRsm6rSz86L34", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "MK", "col": "#ff7d40"}, {"name": "Bheemavva", "email": "bheemu343@gmail.com", "position": "Software Engineer", "phone": "8150041026", "qualifications": "BE", "experience": "2+ years", "location": "Bengaluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAR8FJzg3NcRY9k0NqAiVP1AXo_EJ52DlS9AW6RgU2CjK4?e=QSaE7v", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "B", "col": "#ec4899"}, {"name": "M.S Swaroop", "email": "swaroopms658@gmail.com", "position": "Software Engineer", "phone": "8431950132", "qualifications": "MTech CSE", "experience": "1 year", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQApC0T0yYKeR4SrMm2sGurUAbcfqLPCjDctvcDkAMnEcp4", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "MS", "col": "#3b82f6"}, {"name": "Sannidhi C Shenava", "email": "scshenava@gmail.com", "position": "Software Engineer", "phone": "7338209150", "qualifications": "MCA", "experience": "1+ year", "location": "Mangaluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBdOMewzdxKTYT0PVE3cuUVAbPxybGmM4UNkI_w-gGbaJU?e=yUAFv9", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "SC", "col": "#a78bfa"}, {"name": "Balla Gayathri", "email": "gayathriballa2001@gmail.com", "position": "Software Engineer", "phone": "9398549344", "qualifications": "BTech", "experience": "2 years", "location": "Andhra Pradesh", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBdOMewzdxKTYT0PVE3cuUVAbPxybGmM4UNkI_w-gGbaJU?e=yUAFv9", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "BG", "col": "#2dd4bf"}, {"name": "Sahil Choudhary", "email": "sahil844101@gmail.com", "position": "Software Engineer", "phone": "9931004934", "qualifications": "BTech CSE", "experience": "1 year", "location": "Hyderabad", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQD5d7HbrJajQ5kW7o9GBerIAR63StfIcr_e5ZLqVfkc10A?e=ErpbqT", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "SC", "col": "#f59e0b"}, {"name": "alwin jaison", "email": "alwinjaison1@gmail.com", "position": "Software Engineer", "phone": "6364083131", "qualifications": "MCA", "experience": "", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQDHQIqK7NoZSa4x7kYN_wUOASEek0JA6nAO5-uhValWp5o?e=n2edFa", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "AJ", "col": "#22c55e"}, {"name": "smyla lucia", "email": "jsmylalucia14@gmail.com", "position": "Software Engineer", "phone": "6379297582", "qualifications": "BTech", "experience": "1 year", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQCDzcXaFUjQTbixG6-VlUepAf7uNOG2Jf9wlqzpm79PRQE?e=OgHTDI", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "SL", "col": "#f43f5e"}, {"name": "Cheekati Rinku", "email": "rinkucheekati9@gmail.com", "position": "Software Developer", "phone": "9686120042", "qualifications": "Bachelors of Engineering", "experience": "9 months", "location": "Hubballi karnataka", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQDOeVTZ1YaKTZUfT8AZ_MH8AZbmtTee469y9S9k78vOgaA?e=Ooz0HC", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "CR", "col": "#6366f1"}, {"name": "Sahithi Ambati", "email": "sahithiambati14@gmail.com", "position": "Front End Developer", "phone": "8978864465", "qualifications": "BTech", "experience": "3 years", "location": "Hyderabad", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQApKCxRwK43TIhyr-E3xvaGAQsRTY0Cm19Hf9qZFBr7rQ8?e=uJTfn3", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "SA", "col": "#00e5b0"}, {"name": "Bhupender Bhamla", "email": "bhupenderbhamla777@gmail.com", "position": "Data Anaylst", "phone": "9350851551", "qualifications": "BTech", "experience": "2 months", "location": "Gurugram", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAfQ2IigbkXQbegQfjq0k-CAUtbpuvuDaxgXyaD_w6ltvQ?e=uNLgna", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "BB", "col": "#ff7d40"}, {"name": "RAJAN C", "email": "rajanprabha050@gmail.com", "position": "Software Engineer", "phone": "7397635954", "qualifications": "BTech", "experience": "2 months", "location": "Chennai", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQDqXYFWBQpsT50ipuXYzWCyAbbSIgBmv8zY0KsPU1sSIIQ?e=vE95gJ", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "RC", "col": "#ec4899"}, {"name": "Kumar Gourav", "email": "kumargourav.gudu@gmail.com", "position": "Full Stack Developer", "phone": "8117866490", "qualifications": "BTech", "experience": "3+ years", "location": "Bhubaneswar", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQCyJ-BnrizcRbs0LDrFyufVAfTu0RhLjVQS2skmAE53APY?e=IORj0Q", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "KG", "col": "#3b82f6"}, {"name": "Vivek Sarvaiya", "email": "viveksarvaiya1873@gmail.com", "position": "AI Software Engineer", "phone": "9322962633", "qualifications": "BTech", "experience": "1+ years", "location": "Benguluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAkKH_18N_DRqA1IuLxjvSSAdL5k0taxmr8OCteaR2obKM?e=hwOq6D", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "VS", "col": "#a78bfa"}, {"name": "Darshan BK", "email": "darshan.bk92@gmail.com", "position": "Data Anaylst", "phone": "9916227924", "qualifications": "BE (ISE)", "experience": "8+ years", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:w:/p/hr/IQBDK_bnb4SoSpkaMTBqREPpAZMc4EJ1AdE78aCwAe_7Kc4?e=EbTqAK", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "DB", "col": "#2dd4bf"}, {"name": "Saad Aslam", "email": "saadaslamdev037@gmail.com", "position": "Senior Full Stack Engineer", "phone": "3099084294", "qualifications": "BTech", "experience": "5+ years", "location": "PAKISTAN", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQB3h7hP0ru-S5s5EUKRAgtxASvd98HPF3WHvVz31wNLjK4?e=OgPCo9", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "SA", "col": "#f59e0b"}, {"name": "Aditya Pawar", "email": "adityapawar826@gmail.com", "position": "Software Engineer", "phone": "7066336757", "qualifications": "BTech", "experience": "1.5+ years", "location": "Hyderabad", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBvf4fdqrQaRZwQSinfSOBBAcrqJBSIwmZN7we6BWVUTz4?e=GiDNb3", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "AP", "col": "#22c55e"}, {"name": "Seema Gupta", "email": "seemag7738@gmail.com", "position": "Software Engineer", "phone": "9819959176", "qualifications": "B.SC", "experience": "3 months", "location": "Mumbai", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQCXXl1Z_FCgSrdUYip2twiSAaC_NYTR-DXKrdoBAj7ROJU?e=dPUoTH", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "SG", "col": "#f43f5e"}, {"name": "Prateek Mander", "email": "choudharyprateek131@gmail.com", "position": "Software Engineer", "phone": "9258151068", "qualifications": "B.Tech CSE AIML", "experience": "1.5+ years", "location": "Bengaluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQCiSJBS1fKOTbq2keYXs1q3AZWktsTvYhNsEiAvSmWxnEY?e=goZJFJ", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "PM", "col": "#6366f1"}, {"name": "Prakhar Pandey", "email": "prakharp684@gmail.com", "position": "Java Developer", "phone": "6388065025", "qualifications": "B.tech(CSE)", "experience": "2 years", "location": "Bengaluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQDryPuMKOtETZ9gbyPpeGQCASlWpk320mgVX8eBHprTUwo?e=4mfrG1", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "PP", "col": "#00e5b0"}, {"name": "Vishnu Teja Kilaparthi", "email": "kilaparthivishnuteja@gmail.com", "position": "Software Engineer", "phone": "6304208875", "qualifications": "B.Tech", "experience": "1.5 years", "location": "Chennai", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQDM80A0A2o-TZLwcXNvQIaTAQ50xOcwhbN9FG2a5325jI0?e=50gU8d", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "VT", "col": "#ff7d40"}, {"name": "Avantika Dinkar Lad", "email": "connectavani@gmail.com", "position": "Full Stack Developer", "phone": "8767938125", "qualifications": "Arts, Commerce and Science", "experience": "3+ years", "location": "pune", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBIjzL7wd1jSb6aJyxLypeGAVvcSz2JqX96TV8seYluM2U?e=SycOfN", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "AD", "col": "#ec4899"}, {"name": "Aishwarya Ganeshan", "email": "ashganesh74@gmail.com", "position": "Software Engineer", "phone": "8129838593", "qualifications": "BTech", "experience": "2 months", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBbILwEXXwSRJlD5bu2TzRRAQ0s2HVA3WVWRFTuHOvBDkU?e=XB3FhB", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "AG", "col": "#3b82f6"}, {"name": "Mohammed Ammaar Hussain", "email": "ammaarhussain2002@gmail.com", "position": "Software Developer", "phone": "9849946391", "qualifications": "BTech", "experience": "2+ years", "location": "Warangal", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQArB7vxc9-oQ5fHu951rJg_Ad8cfna-p4XWXFnpNbfM9s0?e=uSbitn", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "MA", "col": "#a78bfa"}, {"name": "Manav Soni", "email": "soni.manav040905@gmail.com", "position": "Software Developer", "phone": "9811012371", "qualifications": "B.Sc", "experience": "", "location": "New Delhi", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQCIM4WR4TisSIx23G5bxKcRAWoVwJlBe6oiFLmCsntOxNY?e=rjrMgr", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "MS", "col": "#2dd4bf"}, {"name": "Parth Kandharkar", "email": "parthkandharkar@gmail.com", "position": "Software Developer", "phone": "7875263564", "qualifications": "MTech", "experience": "1.5+ years", "location": "Pune", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAaJ_wMjJnzSKWofoxrfisbAZeuelEhB0ErI_ZrOST6Ovk?e=cLCImi", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "PK", "col": "#f59e0b"}, {"name": "ABHISHEK GANGULA", "email": "abhishekgangula2004@gmail.com", "position": "Software Engineer", "phone": "9515791180", "qualifications": "BTech", "experience": "", "location": "HYDERABAD", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAuEmotdT24RYndxcag8U5mAdw-nhVkdC_NoT-NUP2nEuA?e=bnp5MX", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "AG", "col": "#22c55e"}, {"name": "Abhesh M", "email": "abheshm@gmail.com", "position": "Software Developer", "phone": "9074212887", "qualifications": "B.Com", "experience": "1.5 years", "location": "Kochi", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQBe3OfP3zs9TJOazUgI1iDnAVyaKIfFfy8ewqr4Pb4dIEA?e=vP08bq", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "AM", "col": "#f43f5e"}, {"name": "TARUN KULKARNI", "email": "tarunkulkarni4@gmail.com", "position": "Full Stack Developer", "phone": "9632915734", "qualifications": "MCA", "experience": "9 months", "location": "Bangalore", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQCBExUsI9mCTLPd14WBlxaXAXFFn3GFaUscp4z02GmDGbM?e=ATsNaa", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "TK", "col": "#6366f1"}, {"name": "Muppulakunta Keerthi", "email": "keerthimuppulakunta@gmail.com", "position": "Data Anaylst", "phone": "9014790213", "qualifications": "BTech", "experience": "6 months", "location": "BENGALURU", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQDfkAoN7vrWRoHzaPd96lJ5ASu_dJCYg-Yusql9fTnRNwQ?e=eAZ2H0", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "MK", "col": "#00e5b0"}, {"name": "Sahil Bhuwalka", "email": "sahilbhuwalka574@gmail.com", "position": "Software Engineer", "phone": "6363216206", "qualifications": "B.E", "experience": "2.5+ years", "location": "Asansol", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQDEvRV2MuHgQ7KVVYsq2EeDAbk4Mimm6IahV_78Wv86WlI?e=chwPOM", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "SB", "col": "#ff7d40"}, {"name": "Prateek Mander", "email": "choudharyprateek131@gmail.com", "position": "Software Engineer", "phone": "9258151068", "qualifications": "BTech", "experience": "1+ years", "location": "Bengaluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAhVS3EUn_tTbzfI7oXZJ5yATvnt8-g76b_mGuGwFE0MyI?e=XMglZZ", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "PM", "col": "#ec4899"}, {"name": "Mohamed Ibrahim", "email": "mdibrahim3057@gmail.com", "position": "Software Engineer", "phone": "9500920916", "qualifications": "B.E", "experience": "3+ years", "location": "Chennai", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQC_Y-qpmHXpSY8YYehrQtLmAaLmYo1xiy1UWY9VQyL-L8Y?e=emmkea", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "MI", "col": "#3b82f6"}, {"name": "Rohan Chitodkar", "email": "rohanchitodkar27@gmail.com", "position": "Software Engineer", "phone": "7249019265", "qualifications": "B.E", "experience": "1 month", "location": "Pune", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAb4Wt6qshMQKCmz54FEckTAQtTJaLG14opPu-gskcgy7A?e=SFAZab", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "RC", "col": "#a78bfa"}, {"name": "Kumar Ram krishna", "email": "ram89100@gmail.com", "position": "Software Engineer", "phone": "8073612896", "qualifications": "B.E", "experience": "1.5 years", "location": "Bengaluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQAZCs90__QwQrXM-dugZ0gvAX92OPHSVFVxwHJoHvmk_q4?e=u1XvFt", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "KR", "col": "#2dd4bf"}, {"name": "Harshitha", "email": "harshithaach0@gmail.com", "position": "BackEnd", "phone": "8867397082", "qualifications": "B.E", "experience": "1+ year", "location": "Bengaluru", "resumeLink": "https://zyntrixsoftware-my.sharepoint.com/:b:/p/hr/IQCvfkieNptHTLjwsjSJq5rNAaz5pCQrhRUbhM34vVvTxc4?e=tfpoaH", "source": "", "edtech": "", "availability": "", "stage": "Applied", "shortlisted": false, "timestamp": "", "init": "H", "col": "#f59e0b"}, {"name": "dinesh", "email": "dinesh.kolasani@zyntrixsoftware.com", "position": "Software Developer", "phone": "9949887725", "qualifications": "b.tech", "experience": "1", "location": "bapatla", "resumeLink": "https://drive.google.com/file/d/1hSAg_Rt-B3AZilRRi-RS95_dq8Py1TXC/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T05:37:29.828Z", "init": "D", "col": "#22c55e"}, {"name": "Ravi", "email": "ravi@gmail.com", "position": "Business Development Executive", "phone": "9654782125", "qualifications": "BTech", "experience": "2years", "location": "Delhi", "resumeLink": "https://drive.google.com/file/d/1W7LSxefjha1W1uT7bllZxrCmnJWnzwMA/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T06:10:35.358Z", "init": "R", "col": "#f43f5e"}, {"name": "Swapna Gajula", "email": "swapnagajula683@gmail.com", "position": "Software Developer", "phone": "918074436444", "qualifications": "B Tech, Artificial Intelligence and Machine Learning", "experience": "I have on my project", "location": "G.p.Nagar", "resumeLink": "https://drive.google.com/file/d/1YnCWESmXVyGm18pL81j0RGCihHiUEBvM/view?usp=drivesdk", "source": "Other", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T08:09:14.095Z", "init": "SG", "col": "#6366f1"}, {"name": "Ajim Sanadi", "email": "ajimsanadi11@gmail.com", "position": "Software Developer", "phone": "8983938786", "qualifications": "PG- DIPLOMA CDAC (PG-DAC), B.E Electrical", "experience": "Fresher", "location": "Maharashtra", "resumeLink": "https://drive.google.com/file/d/1WnZ6tt8P2odHbLkENKGgO9wZZuG1sZr-/view?usp=drivesdk", "source": "Other", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T08:09:30.157Z", "init": "AS", "col": "#00e5b0"}, {"name": "Ajim Sanadi", "email": "ajimsanadi11@gmail.com", "position": "Software Developer", "phone": "8983938786", "qualifications": "PG Diploma (CDAC) PG_DAC ,B.E Electrical", "experience": "Currenlty Doing an internship as trainee SQL Developer at PRM software Solution", "location": "Maharashtra", "resumeLink": "https://drive.google.com/file/d/1SIUdaRRutwQXN8aZgioJxN7qC1T8Zbfr/view?usp=drivesdk", "source": "Other", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T08:12:31.344Z", "init": "AS", "col": "#ff7d40"}, {"name": "Navya Dhawde", "email": "dhawde.navya24@gmail.com", "position": "Graphic Designer", "phone": "919755077877", "qualifications": "B.Tech in Computer Science Engineering (CSE)", "experience": "Graphic Designer and UI/UX Designer with experience in creating social media creatives, brand identity assets, and website UI designs. Worked on end-to-end design projects including an event planning app, portfolio websites, and brand visuals. Skilled in tools like Figma, Photoshop, and Illustrator, with additional experience in motion graphics for digital platforms.", "location": "Paras Tierea, Sector 137", "resumeLink": "https://drive.google.com/file/d/1V0D4Lpw86ucbS71AI8KrdGYuWTtMtWaV/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T08:57:20.493Z", "init": "ND", "col": "#ec4899"}, {"name": "Puspita  Akther Priya", "email": "priyapuspita75@gmail.com", "position": "Graphic Designer", "phone": "8801572909307", "qualifications": "Graphics design and freelancing", "experience": "2 years of Experience", "location": "Bagha Jatin Road", "resumeLink": "https://drive.google.com/file/d/1aUqDnOyjaock-yTgUUYD2aaNqvS5uhwJ/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T11:37:22.897Z", "init": "PA", "col": "#3b82f6"}, {"name": "Harsh Rai", "email": "sanjaykumarr627@gmail.com", "position": "Software Developer", "phone": "917990244768", "qualifications": "BTech Computer Science and Engineering", "experience": "Ex Software developer intern at ISRO", "location": "Ahmedabad, Gujarat", "resumeLink": "https://drive.google.com/file/d/1YXLgDsAz_uoqGJXnn-hCW1UaEilmnCNl/view?usp=drivesdk", "source": "Other", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T17:34:42.294Z", "init": "HR", "col": "#a78bfa"}, {"name": "Meghana Naveen", "email": "meghnanaveen19@gmail.com", "position": "Content Writer", "phone": "9551903103", "qualifications": "MBA in Business Analytics and Btech in Computer Science", "experience": "Strategic and results-oriented Content Strategist & Copywriter with 4+ years of \nexperience in SEO‑optimized content, digital marketing, and campaign analytics, \nbacked by a BTech in Computer Science Engineering. Skilled at blending creative \nstorytelling with data-driven insights to improve brand visibility, audience engagement, \nand conversion across social media, web, and email channels. Strong track record of \ncollaborating with design, sales, and product teams, analyzing performance metrics, \nand translating business goals into clear, impactful communication and \ndocumentation.", "location": "Bengaluru, Karnataka", "resumeLink": "https://drive.google.com/file/d/1zwWZvRKRIW3oaOkH79Cdk9ZXe1C1Mvxj/view?usp=drivesdk", "source": "Naukri", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-01T17:59:45.208Z", "init": "MN", "col": "#2dd4bf"}, {"name": "Pavan", "email": "ikuttipavan5@gmail.com", "position": "Marketing Executive", "phone": "9347485093", "qualifications": "Graduation", "experience": "SEO Analyst with 1.5+ years scaling organic growth for B2B SaaS platforms targeting the US market - including growing monthly sessions from 1K to 23K+ in seven months. Expertise in On-Page SEO, AEO, GEO, and AI search optimization, with recent upskilling in Google Ads, Meta Ads, SQL, Power BI, and Excel to deliver full-funnel digital marketing impact. Proven ability to translate performance data into prioritized strategies and mentor junior team members.", "location": "Bengaluru", "resumeLink": "https://drive.google.com/file/d/1xhbXRRMsPMyfvRTqLG18xCbgxcVgZnd9/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-02T05:39:22.226Z", "init": "P", "col": "#f59e0b"}, {"name": "Rishiraj Debnath", "email": "rishirajdebnath11@gmail.com", "position": "Graphic Designer", "phone": "7908573126", "qualifications": "BSc in Animation and Film Making, Advanced certification program in UI/UX Design", "experience": "1 year", "location": "Bangalore", "resumeLink": "https://drive.google.com/file/d/1UappSHSirph7Gp4kXEsRHNjodfS5S-Tp/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-02T16:16:08.835Z", "init": "RD", "col": "#22c55e"}, {"name": "Riya Tomar", "email": "riyatomar5015@gmail.com", "position": "Graphic Designer", "phone": "8770996545", "qualifications": "3rd year visual communication design student", "experience": "2 month experience in freelance it serives in indore", "location": "213,Barfani Nagar indore", "resumeLink": "https://drive.google.com/file/d/1bwfIU8XCSb6w-z22UVPHj2YWJEaXUU4A/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-02T17:31:15.135Z", "init": "RT", "col": "#f43f5e"}, {"name": "Harsh Kumar", "email": "harshkumar9995@gmail.com", "position": "Graphic Designer", "phone": "918882638598", "qualifications": "B.Tech", "experience": "With over 10+ years of experience in Brand Design, Creative Strategy, and Art Direction, I’ve had the privilege of working with globally recognized brands like Target, Nike, Technicolor, Byjus, and Vistaprint helping them realize and communicate their value through high-performing designs. My recent work at VerbaFlo AI reflects an AI-first mindset, leveraging design while keeping my core skills sharp.\n\nThroughout my career, I’ve honed my creative skills in Adobe Creative Suite (Photoshop, Illustrator, Premiere Pro), branding, typography, and design strategies, creating designs that not only look stunning but also drive results. At Technicolor, I’ve been designing digital, print, and branding concepts for global and India-based communications, ensuring consistency and impact across all touchpoints along with deliverables for Technicolor Mumbai Studio. My work with Byjus (featuring Disney) and other B2B/B2C brands showcased my ability to lead creative teams and deliver audience-focused projects. I also specialize in design systems, style guides, and brand identity development, ensuring cohesive and scalable solutions.\n\nMy extensive freelancing experience has not only honed my design skills but also strengthened my multitasking and communication abilities. What sets me apart is my ability to blend creativity with business acumen. I don’t just design; I strategize. Whether it’s crafting a brand identity, developing a marketing campaign, or mentoring a team of designers, I approach every project with a focus on problem-solving and collaboration.\n\nI've been building my eye and skills for creating seasoned design content across fields of design, print, advertising, and art direction. My specialties are:\n\nArt Direction ✦︎ Brand Design ✦︎ Print Design ✦︎ Visual Design ✦︎ Motion Design", "location": "Srishti Dhruva, Second floor - 107", "resumeLink": "https://drive.google.com/file/d/1AB43tb8Kc2XeyHYsUNVyQ3AQmSnWluA9/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-02T23:29:41.835Z", "init": "HK", "col": "#6366f1"}, {"name": "Harsh Kumar", "email": "harshkumar9995@gmail.com", "position": "Graphic Designer", "phone": "918882638598", "qualifications": "B.Tech", "experience": "With over 10+ years of experience in Brand Design, Creative Strategy, and Art Direction, I’ve had the privilege of working with globally recognized brands like Target, Nike, Technicolor, Byjus, and Vistaprint helping them realize and communicate their value through high-performing designs. My recent work at VerbaFlo AI reflects an AI-first mindset, leveraging design while keeping my core skills sharp.\n\nThroughout my career, I’ve honed my creative skills in Adobe Creative Suite (Photoshop, Illustrator, Premiere Pro), branding, typography, and design strategies, creating designs that not only look stunning but also drive results. At Technicolor, I’ve been designing digital, print, and branding concepts for global and India-based communications, ensuring consistency and impact across all touchpoints along with deliverables for Technicolor Mumbai Studio. My work with Byjus (featuring Disney) and other B2B/B2C brands showcased my ability to lead creative teams and deliver audience-focused projects. I also specialize in design systems, style guides, and brand identity development, ensuring cohesive and scalable solutions.\n\nMy extensive freelancing experience has not only honed my design skills but also strengthened my multitasking and communication abilities. What sets me apart is my ability to blend creativity with business acumen. I don’t just design; I strategize. Whether it’s crafting a brand identity, developing a marketing campaign, or mentoring a team of designers, I approach every project with a focus on problem-solving and collaboration.\n\nI've been building my eye and skills for creating seasoned design content across fields of design, print, advertising, and art direction. My specialties are:\n\nArt Direction ✦︎ Brand Design ✦︎ Print Design ✦︎ Visual Design ✦︎ Motion Design", "location": "Srishti Dhruva, Second floor - 107", "resumeLink": "https://drive.google.com/file/d/1y6vc7SL8yoOd-l_HxnO__wgnnzTniqWa/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-02T23:31:00.560Z", "init": "HK", "col": "#00e5b0"}, {"name": "Betha Dileep Kumar", "email": "dileepkumarbetha1947@gmail.com", "position": "Other", "phone": "917981309793", "qualifications": "MBA in Marketing & Startups from Bangalore University, Bangalore 2025", "experience": "I have a internship exposure in Digital Marketing. Having hands on experience with SEO, SEM and Campaign Management. completeled my internships from Internship Studio and The Website Makers.", "location": "8-3-677/E Flat No E-10  UCO Arcade, Navodaya Colony, Behind Ganapathi Complex, Yellareddy Guda, VTC: Khairatabad, PO: Srinagar Colony, Hyderabad, Telangana 500073", "resumeLink": "https://drive.google.com/file/d/1tgxJURmQna4GrRZ2YSWG2gOoef7yoTTb/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-03T04:02:00.768Z", "init": "BD", "col": "#ff7d40"}, {"name": "BIBHIN PILLAI", "email": "bibhinm@gmail.com", "position": "Graphic Designer", "phone": "8086366202", "qualifications": "BA. Animation and Graphics Design", "experience": "2monthe internship", "location": "Kerala,pathanamthitta", "resumeLink": "https://drive.google.com/file/d/1WLiBGlpyxjt9Dbf74Ksm9EjAHxtlbiZ_/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Partially", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-03T04:45:03.028Z", "init": "BP", "col": "#ec4899"}, {"name": "Priyesh Yadav", "email": "priyeshyadav03@gmail.com", "position": "Software Developer", "phone": "9648176720", "qualifications": "B.Tech Computer Science and Engineering", "experience": "I am currently Fresher and looking for a bright opportunity to start my career in IT industry.", "location": "Uttar Pradesh/ 48 Katra Abdul Gani GT Road", "resumeLink": "https://drive.google.com/file/d/1uc-HkD6M0YE3c26BnzpILb1huDJBUfOr/view?usp=drivesdk", "source": "Social Media (Instagram / Facebook / Twitter)", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-03T05:59:13.037Z", "init": "PY", "col": "#3b82f6"}, {"name": "Jumaana mohd", "email": "jumaanamohd@gmail.com", "position": "Graphic Designer", "phone": "919360966996", "qualifications": "B.Sc Visual Communication & Electronic Media", "experience": "I have experience working in the EdTech domain, designing user-centric interfaces for learning-focused platforms. My work involved creating intuitive dashboards, course discovery flows, and student-facing interfaces that balanced usability with clear information hierarchy.\nI focused on simplifying complex information, improving navigation, and ensuring accessibility for diverse users. I collaborated closely with product and development teams, iterated designs based on feedback, and used Figma for end-to-end design, prototyping, and handoff.", "location": "No.1,Bavaji Nagar,Ayyampet", "resumeLink": "https://drive.google.com/file/d/1Hg_9GaWE1xOQ1dKZEcgVFLhOZ6QfIWmC/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-03T06:06:59.366Z", "init": "JM", "col": "#a78bfa"}, {"name": "Krittika D", "email": "malhotrakrittika0@gmail.com", "position": "Business Development Executive", "phone": "917903634614", "qualifications": "MBA", "experience": "3 yrs of experience", "location": "24th main end , 1st cross,69, jp nagar 7 phase", "resumeLink": "https://drive.google.com/file/d/1ZKasQf5hUb26rPnBFqegdCS57gqBuuxF/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-03T15:26:24.554Z", "init": "KD", "col": "#2dd4bf"}, {"name": "Shubojyoti Sharma", "email": "shubojyotisharma@gmail.com", "position": "Graphic Designer", "phone": "9073703842", "qualifications": "B.sc animation and graphics", "experience": "Founder of a media production (dontsaveproduction) worked as a director/editor . Created multiple creative ads , logos , visiting cards , brochure , storyboards", "location": "West Bengal", "resumeLink": "https://drive.google.com/file/d/17ToPPTF6rejGDp2ME3EPb2DJTSaUbPXU/view?usp=drivesdk", "source": "Other", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-03T19:46:23.458Z", "init": "SS", "col": "#f59e0b"}, {"name": "A M Sachin", "email": "amsachin12345@gmail.com", "position": "Marketing Executive", "phone": "7338558634", "qualifications": "MBA in marketing & Business analytics", "experience": "-", "location": "Karnataka", "resumeLink": "https://drive.google.com/file/d/1_qjGL8Yaas6BNUx3Q2oEwUlzONiw1xB0/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T04:09:54.007Z", "init": "AM", "col": "#22c55e"}, {"name": "Akuolie Soliezuo", "email": "soliezuoakuolie@gmail.com", "position": "Marketing Executive", "phone": "#ERROR!", "qualifications": "BBA (2nd Year), currently pursuing. Expected 2027.", "experience": "I have completed a Digital Marketing certification and am actively involved in my college event committee, where I contribute to planning and structuring events. I am looking to gain hands-on experience and apply my learnings in a practical business environment.", "location": "Kohima, Nagaland", "resumeLink": "https://drive.google.com/file/d/1MDWUUn0ZlKel0NDzE8EaO-0yuedYijkn/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "No", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T04:31:34.114Z", "init": "AS", "col": "#f43f5e"}, {"name": "Shweta Kumari", "email": "shwetakumari15sept@gmail.com", "position": "Graphic Designer", "phone": "917007907259", "qualifications": "Bachelor in fine Arts", "experience": "4.5 years", "location": "Sector 76", "resumeLink": "https://drive.google.com/file/d/1DBpFo_xdNOsDGVL8Fv-Vrb4qOG-4X8ve/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T06:01:39.300Z", "init": "SK", "col": "#6366f1"}, {"name": "Akshaya KV", "email": "akshayakv.marketing@gmail.com", "position": "Other", "phone": "918548075215", "qualifications": "MBA in Marketing", "experience": "Fresher with Internship experience", "location": "Yelachenahalli", "resumeLink": "https://drive.google.com/file/d/1dq8_M6V7J_Fe2SrDVXI-G5RO7ULDiU2Z/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T10:30:42.074Z", "init": "AK", "col": "#00e5b0"}, {"name": "Dipendra Sharma", "email": "dipsharmadev@gmail.com", "position": "Software Developer", "phone": "919780111228", "qualifications": "Bachelor of Computer Application", "experience": "Only a Personal project Experience:\nYeti Jobs Which is a Personal Job Portal Project", "location": "Baddi, Solan, Himachal Pradesh, India", "resumeLink": "https://drive.google.com/file/d/1sJPzijZpYnQXtnLNDdrMQuUHBfmeGDGd/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T13:50:42.641Z", "init": "DS", "col": "#ff7d40"}, {"name": "Disha Rao", "email": "rao.disha16@gmail.com", "position": "Graphic Designer", "phone": "919611854888", "qualifications": "B.VOC Visual Communication Performing Arts and Psychology \nPG Diploma in Visual Communication", "experience": "0-1", "location": "1142, 43rd Cross Rd, Kumaraswamy Layout 1st Stage, Bendre Nagar", "resumeLink": "https://drive.google.com/file/d/1v_Axj3X7l_J-Y-y6ehOxn3p8XtfHE0wj/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T14:00:28.149Z", "init": "DR", "col": "#ec4899"}, {"name": "Arkin Singh", "email": "arkinutmal@gmail.com", "position": "Software Developer", "phone": "#ERROR!", "qualifications": "Pursuing B.Tech , Computer Scienece and Engineering from IIIT Nagpur", "experience": "Have been making websites and softwares since 2025 as a part of my freelancing and along with it have done sales since 2023 where I brought in sales of over 7000$+ and handles full customer life cycles.", "location": "maharashtra , magpur", "resumeLink": "https://drive.google.com/file/d/1k8vst5EH7uwagiEQQxcyvAL3_WURkAmu/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T14:00:13.950Z", "init": "AS", "col": "#3b82f6"}, {"name": "Malepati  Fani Priya", "email": "fanipriyamalepati@gmail.com", "position": "Marketing Executive", "phone": "919030158905", "qualifications": "btech, electronic and communication engineering", "experience": "i don't have any work experince. I am joining as an intern", "location": "andhra pradesh", "resumeLink": "https://drive.google.com/file/d/1tKAsTlK-z71xJJ2z1ijProinPTfnwQXZ/view?usp=drivesdk", "source": "Other", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T14:42:42.194Z", "init": "MF", "col": "#a78bfa"}, {"name": "Naushin Mohammed", "email": "naushin.dsgn@gmail.com", "position": "Graphic Designer", "phone": "918848473946", "qualifications": "B.A Animation and Graphic Designer", "experience": "Graphic designer - 1 year", "location": "Kakkanad, Kerala, India", "resumeLink": "https://drive.google.com/file/d/1QvrFZIVbh7Ch7rX4W2DNWnolEwghjE-k/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T14:47:22.437Z", "init": "NM", "col": "#2dd4bf"}, {"name": "Anand Pattar", "email": "pattaranand17@gmail.com", "position": "Graphic Designer", "phone": "919036836217", "qualifications": "B.F.A (Bachelor of Fine Arts) | Drawing painting", "experience": "I worked as a Graphic / Visual / UI Designer at Kalpita Technologies, where I was responsible for creating social media creatives, website visuals, and marketing materials. I also contributed to UI design projects, focusing on clean layouts, user-friendly interfaces, and brand consistency. I have hands-on experience with tools like Adobe Photoshop, Illustrator, Figma, and Filmora for both static and motion design. Additionally, I have worked on live projects, improving visual communication and overall user experience.", "location": "Kathreguppe, Banashankari 3rd Stage Bengaluru, Karnataka", "resumeLink": "https://drive.google.com/file/d/1bbHhGWMZlRYdyp1-cc-zGao6S-A7yJx1/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T15:36:30.208Z", "init": "AP", "col": "#f59e0b"}, {"name": "Venkata Krishna Sai Nimmakanti", "email": "vksn829@gmail.com", "position": "Software Developer", "phone": "#ERROR!", "qualifications": "Bachelor Of Engineering in Information Technology(Currently Pursuing 2023-2027)", "experience": "Have had experience in building my own projects, No professional Experience at the moment.", "location": "Hyderabad", "resumeLink": "https://drive.google.com/file/d/1Pd5ycZ_gayutd1E9sbgwUyKKJuMWclCi/view?usp=drivesdk", "source": "Social Media (Instagram / Facebook / Twitter)", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-04T16:51:18.817Z", "init": "VK", "col": "#22c55e"}, {"name": "ADITYA JAGDALE", "email": "jagdaleaditya2011@gmail.com", "position": "Other", "phone": "#ERROR!", "qualifications": "BE in computer engineering , diploma in information technology from government polytechnic awari,pune.", "experience": "i have done internship in my last semester as a full stack developer using AI at somayu infotech.", "location": "pune,maharashtra", "resumeLink": "https://drive.google.com/file/d/1Cf-7fld3Dbe54ixgkjB42Jvfa7bt_1HY/view?usp=drivesdk", "source": "Other", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-05T03:21:03.592Z", "init": "AJ", "col": "#f43f5e"}, {"name": "ADITYA JAGDALE", "email": "jagdaleaditya2011@gmail.com", "position": "Software Developer", "phone": "#ERROR!", "qualifications": "BE. Comp Engg", "experience": "internship at somayu infotech as full stack developer. worked on aerocode website", "location": "pune,maharashtra", "resumeLink": "https://drive.google.com/file/d/1Rs64ndMGkFF4RTkxByJKMT9m39AIDcfc/view?usp=drivesdk", "source": "Other", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-05T03:23:43.321Z", "init": "AJ", "col": "#6366f1"}, {"name": "Lakshmi B", "email": "lakshmilv256@gmail.com", "position": "Graphic Designer", "phone": "9886606294", "qualifications": "Diploma in motion graphic design", "experience": "I have a 2 years of experience in a print and digital media both", "location": "Karnataka, Bangalore", "resumeLink": "https://drive.google.com/file/d/1RJJUFcLB7fb7DKNY1mDqKofVBHUoR0Y6/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-05T06:41:19.374Z", "init": "LB", "col": "#00e5b0"}, {"name": "Pallavi Upadhyaya", "email": "pallaviupadhyaya94@gmail.com", "position": "Graphic Designer", "phone": "#ERROR!", "qualifications": "M.des in UX Design", "experience": "I am a creative thinker who likes to pay attention to details and understand how people interact with experiences around them. I enjoy being a part of design process from initial research to final implementation. I am a hardworking and an empathetic person who sees the positive side of life. I’m writing to you regarding the Graphic designer position which I came to know through a linkedIn post. After a quick review I was delighted to find that my academic accomplishments meet all the necessary requirements outlined in the description, so I would like to formally apply for the opportunity.\n\nTo introduce myself shortly I have worked as a graphic designer at Kraf Ventures, Pune. I worked in a team there, where my role was to design content according to the need. I have designed book pages, covers, diary covers, id cards, on Corel DRAW.  Working in a team has helped me engage with people and listen to them. After graduating I got placed in Amazon as a customer service associate. I handled customer queries, related to product deliveries, their returns and refunds. This built the patience in me to talk to people about certain issues when they are curious about something.\nI did a Google UX Design Professional Certificate. I did a UX design internship at Brain Quest, which helped me with website design. I even did a graphic design internship at Pristine Ideas Pvt. Ltd. which helped me learn product placements in social media posts, colors to be used, layouting.\nDuring the learning of my course in college I worked on several projects out of which some were in teams which helped me work in teams. While I was working at Amazon, my team was awarded the best team award which gave me the confidence of working in a team.\nAs software skills are an important part of the job, I can use Figma, adobe photoshop, adobe xd, and adobe illustrator.\nI would welcome the opportunity to meet you and discuss my application in more detail. Feel free to contact me at +917692905598 or pallaviupadhyaya94@gmail.com if you require any additional information. Thank you for your time and consideration.", "location": "Bengaluru, Karntaka", "resumeLink": "https://drive.google.com/file/d/16vMhobHYn6HhETsCxqaRhUVIfuosZgPN/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-05T08:00:53.659Z", "init": "PU", "col": "#ff7d40"}, {"name": "ANKUSH BHARDWAJ", "email": "ankushsadraik@gmail.com", "position": "Software Developer", "phone": "918278867579", "qualifications": "Pursuing Btech from National Institute of Technology, Hamirpur", "experience": "I may not come with years of industry experience yet, but I do come with something equally valuable for a fresher — the ability to learn fast, adapt quickly, and stay consistent under challenges.\nMost of my experience has been self-built through projects, problem-solving, and continuous learning rather than through a company title. I’ve spent my time strengthening fundamentals, working on practical implementations, and developing the mindset required to grow in a professional environment.\nSo while I’m starting my career officially, I’m not starting from zero.", "location": "Shimla , Himachal Pradesh", "resumeLink": "https://drive.google.com/file/d/1pwtVOcBRMfWby_RSEW2H2Ih4KyPyAYWe/view?usp=drivesdk", "source": "Social Media (Instagram / Facebook / Twitter)", "edtech": "No", "availability": "Partially", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-05T09:57:06.776Z", "init": "AB", "col": "#ec4899"}, {"name": "Shweta Pannalal Pande", "email": "shwetapande112@gmail.com", "position": "Software Developer", "phone": "919579428255", "qualifications": "B.Tech", "experience": "I have completed 6 months internship as Software Engineer Intern.", "location": "Karvenagar", "resumeLink": "https://drive.google.com/file/d/1doSRRZH3tsQkdp0Qtc82EtIw0cfPyEaf/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-05T16:56:41.214Z", "init": "SP", "col": "#3b82f6"}, {"name": "Tinku Kumar", "email": "tinkumuz8@gmail.com", "position": "Business Development Executive", "phone": "916206969245", "qualifications": "Bachelor Of Commerce (2026 Distance learning ﻿namaste)", "experience": "have hands-on experience in business development, sales, and client engagement across B2B and B2C environments. At Kido Enterprises, I generated 10+ qualified leads daily through market research and outreach, conducted 100+ cold calls per day, and consistently booked 2–3 meetings with potential clients.\n\nPreviously, at GIVA Jewellers, I handled customer interactions, understood client needs, and contributed to revenue growth through effective product positioning. At Altrust Technology, I focused on customer relationship management, issue resolution, and maintaining long-term client satisfaction.\n\nThese experiences have helped me develop strong communication, negotiation, and lead generation skills, which align well with the Business Development Executive role.", "location": "3rd main, Coconut Garden St, behind Ayyappa Swami Temple", "resumeLink": "https://drive.google.com/file/d/1-dFeeZdRLPPQJERJayK_q0QRRR6N_-_R/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-05T18:07:20.570Z", "init": "TK", "col": "#a78bfa"}, {"name": "Shivansh Srivastava", "email": "shivsriv9876@gmail.com", "position": "Business Development Executive", "phone": "917042547656", "qualifications": "B.Tech Electronics & Communications Engineering", "experience": "Manager- Risk Advisory, A dual role of B2B Sales and Third Party Risk Management Audits, Feb 2026- Currently Working here, Notice period- 15 days", "location": "GF,C-48,Emerald Hills, Sector-65", "resumeLink": "https://drive.google.com/file/d/1IgaB372uGupEpmLQJMnKSB_h4Ai5mSqt/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-05T23:48:18.109Z", "init": "SS", "col": "#2dd4bf"}, {"name": "Gayathri Kothandan", "email": "gayathrikothandan2@gmail.com", "position": "Marketing Executive", "phone": "919361870891", "qualifications": "MBA Hr and Marketing", "experience": "No", "location": "Karnataka, Cholurpalaya, Magadi road, Bengaluru,560023.", "resumeLink": "https://drive.google.com/file/d/1HavvRslM2gM8G8h_KHmmDc5kUbK8lYjk/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-06T04:07:53.962Z", "init": "GK", "col": "#f59e0b"}, {"name": "YAGNAK Jagdish GOHIL", "email": "yagnakgohil@gmail.com", "position": "Software Developer", "phone": "9920311268", "qualifications": "BE in IT from University of Mumbai.", "experience": "Have completed a three months internship in java recently.", "location": "Maharashtra, Mumbai", "resumeLink": "https://drive.google.com/file/d/1--zBQQo6VyZmmu4xkkEpMVNm4KicMZID/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-06T05:26:39.615Z", "init": "YJ", "col": "#22c55e"}, {"name": "Vinayak Yashwant", "email": "vinayakyashwant2041@gmail.com", "position": "Business Development Executive", "phone": "8296914025", "qualifications": "B.Tech computer science", "experience": "I have around 2 years of experience in sales and revenue-focused roles, where I worked closely with businesses, pitched solutions, and consistently exceeded targets. During this time, I achieved the highest revenue performance in my team and was recognized by leadership for my contributions", "location": "Karnataka", "resumeLink": "https://drive.google.com/file/d/12fKDgm6Y59vgyBa-p6EPnB6ZKTaL2vf1/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Partially", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-06T09:24:16.153Z", "init": "VY", "col": "#f43f5e"}, {"name": "Sameera Shitalnath Kanade", "email": "sameerakanade111@gmail.com", "position": "Software Developer", "phone": "8805984726", "qualifications": "BTech Electronics & Telecommunication Engineering", "experience": "Intern – Infosys Springboard\nWorked on the SkillForge project involving quiz generation, API integration, and database management using Java and MySQL.", "location": "Maharashtra", "resumeLink": "https://drive.google.com/file/d/15sIWp659_LSdTqFWEdDpBDuT1wswmT7I/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-06T16:29:57.972Z", "init": "SS", "col": "#6366f1"}, {"name": "Abhishek K", "email": "abhishekanddesign@gmail.com", "position": "Graphic Designer", "phone": "9620538572", "qualifications": "BBA - Management", "experience": "3", "location": "Karnataka", "resumeLink": "https://drive.google.com/file/d/1e5ZWJOruhqSMlBe3IaFY41T_AfxYGQk8/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-07T04:54:13.107Z", "init": "AK", "col": "#00e5b0"}, {"name": "Vanshika girdhar", "email": "girdharvanshika4@gmail.com", "position": "Graphic Designer", "phone": "919873191129", "qualifications": "Master's in graphic designing and visual communications in UI/UX", "experience": "4+ years of experience", "location": "G-250, 2nd floor, rishinagar, ranibagh, 4th lane from left", "resumeLink": "https://drive.google.com/file/d/1XvwQIUXUby0CxHCNb4OUKbgon6-bCRlZ/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-07T08:08:02.841Z", "init": "VG", "col": "#ff7d40"}, {"name": "Vanshika girdhar Vanshika girdhar", "email": "girdharvanshika4@gmail.com", "position": "Graphic Designer", "phone": "919873191129", "qualifications": "Master's in graphic design and visual communication in UI/UX", "experience": "4+", "location": "G-250, 2nd floor, rishinagar, ranibagh, 4th lane from left", "resumeLink": "https://drive.google.com/file/d/1K9_riDUM7yrsGzr17-lfUJ0Qr1qdzm_f/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-07T08:09:10.736Z", "init": "VG", "col": "#ec4899"}, {"name": "Satish Herakal", "email": "satishherakal1@gmail.com", "position": "Other", "phone": "918792008997", "qualifications": "B.Tech , M.Tech(3rd sem) in Computer Science", "experience": "Currently pursuing my M.TECH in RV University Bangalore . I'm interested in AI/ML field .", "location": "Mysore road pattanagere metro station, Bangalore", "resumeLink": "https://drive.google.com/file/d/13E-IYHqGr2pnNQ3n_GrVZwZm289v8kk_/view?usp=drivesdk", "source": "Social Media (Instagram / Facebook / Twitter)", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-07T08:17:18.831Z", "init": "SH", "col": "#3b82f6"}, {"name": "Md Yash Khan", "email": "yash67358@gmail.com", "position": "Marketing Executive", "phone": "-9996011641", "qualifications": "Pursuing BBA", "experience": "Sales and Growth Intern at Glidr Travel for 2 months.\nOperations Intern at Humans of Football for 2 Months", "location": "Karnataka, Kothanur 560077", "resumeLink": "https://drive.google.com/file/d/14ZOQt8gDX4BeqDDnWTHRl6F04TVvtjfh/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-07T10:05:20.154Z", "init": "MY", "col": "#a78bfa"}, {"name": "Lavanya R", "email": "lavanyarpdl@gmail.com", "position": "Other", "phone": "916380047560", "qualifications": "B.E in Electrical and Electronics Engineering", "experience": "Frontend Developer with experience in React.js, Vue.js, JavaScript, HTML, CSS, and API integration.", "location": "1/40, Sangamanaickenpalayam, Vagatholuvu", "resumeLink": "https://drive.google.com/file/d/1xddWxyGdJS6A0E-bpW46kgxrQmrLW3dI/view?usp=drivesdk", "source": "Company Website", "edtech": "No", "availability": "No", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-07T10:26:23.753Z", "init": "LR", "col": "#2dd4bf"}, {"name": "oviya", "email": "oviya9112@gmail.com", "position": "Other", "phone": "9585425045", "qualifications": "B.E ,MBA purusing", "experience": "I have hands-on experience in social media marketing through freelance projects and digital marketing practice, where I created content strategies, designed creatives in Canva, managed Instagram/Facebook content calendars, wrote engaging captions, researched trends, and optimized content for audience engagement. I also have experience with brand positioning, competitor analysis, basic performance tracking, and using AI tools to improve content creation and campaign efficiency.", "location": "bangalore", "resumeLink": "https://drive.google.com/file/d/1yUzZzYh1lDtCCBCfPHzQuvMhwfIO97W-/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-07T11:41:16.140Z", "init": "O", "col": "#f59e0b"}, {"name": "Pravin Kumar M", "email": "pravinkumarofficial2ta@gmail.com", "position": "Content Writer", "phone": "917695065620", "qualifications": "BE-EEE", "experience": "5.6 years as Software testing and 2 months as Digital marketing intern", "location": "122/2 New colony,Kakkaveri,Rasipuram", "resumeLink": "https://drive.google.com/file/d/1tOi_TZJVMuvryy4BB4SyTmp9mkvFrLqG/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-07T17:42:04.778Z", "init": "PK", "col": "#22c55e"}, {"name": "Harini C N", "email": "harinii173@gmail.com", "position": "Marketing Executive", "phone": "8610584705", "qualifications": "B.Sc.,AI &ML", "experience": "I’ve worked on a few short film projects where I helped with ad ideas and script writing. Even though the projects weren’t officially released, the experience helped me improve creative thinking, content planning, and understanding how to engage an audience.", "location": "Tamilnadu", "resumeLink": "https://drive.google.com/file/d/1Ncnnf6ZJnGhvSrrWSRV3KA7XuYZgliqF/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-08T13:17:05.740Z", "init": "HC", "col": "#f43f5e"}, {"name": "Madhusudhan S", "email": "madhumadhusudhans73@gmail.com", "position": "Other", "phone": "8431244069", "qualifications": "BBA, Degree", "experience": "I worked on freelancing for clints", "location": "Bengaluru", "resumeLink": "https://drive.google.com/file/d/10dHOotjTkzA0iyr59Xfpen23jkJA1bVw/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-08T19:20:21.508Z", "init": "MS", "col": "#6366f1"}, {"name": "Vanshika", "email": "vr5837630@gmail.com", "position": "Graphic Designer", "phone": "6239303725", "qualifications": "Bvoc(web technology & multimedia)", "experience": "No", "location": "Punjab Jalandhar", "resumeLink": "https://drive.google.com/file/d/1jKGkhZdR6UewdozmI-VGuQoheXXHSOht/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-09T05:24:13.294Z", "init": "V", "col": "#00e5b0"}, {"name": "Piponthung Ngullie", "email": "piponngullie90@gmail.com", "position": "Other", "phone": "87874 97997", "qualifications": "3rd year B.com student", "experience": "I am a 2nd year B.com student at St. Joseph's University, Bangalore, with hands on experience across marketing, community outreach, and business communication that directly aligns with this roles. In marketing and content creation, I prepared extensively for social media marketing task involving content ideation, reel creation, founder and brand videos, brand collaborations, and stall management building a strong working understanding of how digital brands communicate with audiences.\nIn business development, I have studied for BD roles focused on prospecting, pipeline building, lead follow ups, cold outreach, and collaboration with growth and marketing teams. I understand how to identify potential customers, maintain a structured outreach and tailor proposals to client needs.", "location": "karnataka", "resumeLink": "https://drive.google.com/file/d/1q8qbW1oDJDC-YUndQQ11sOzFDlPDMgLq/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-09T10:07:19.029Z", "init": "PN", "col": "#ff7d40"}, {"name": "Ayush roy", "email": "aayushrai0023@gmail.com", "position": "Other", "phone": "7975554709", "qualifications": "B.E in Electronics and Communication", "experience": "Designed, developed, and launched a professional live business website using WordPress and WooCommerce.\nManaged domain setup, hosting, SSL security, and technical website configuration.\nConducted keyword research and implemented on-page SEO strategies for improved search visibility.\nIntegrated Google Analytics 4 for traffic monitoring and user behavior tracking.\nPlanned digital growth strategies using Google Ads, Meta Ads, and social media concepts.", "location": "halehalli tc palya", "resumeLink": "https://drive.google.com/file/d/1dfiYDb26VAp-AlE30nJ0VK-mhIGbH7h1/view?usp=drivesdk", "source": "Company Website", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-10T04:09:29.775Z", "init": "AR", "col": "#ec4899"}, {"name": "Jaswanth Kumar Mamilla", "email": "jaswanthmamilla@gmail.com", "position": "Software Developer", "phone": "918125744350", "qualifications": "Bachelor of Technology in Computer Science and Engineering", "experience": "1) Intern- Game Developer | Happy Adda Studios Pvt Ltd., Bengaluru || Feb 2026– Apr 2026\n• Designed and integrated reusable, responsive user interface components and interactive menus utilizing React\nand modern CSS.\n• Programmed core interactive mechanics and state management using TypeScript within the Cocos game engine.\n• Collaborated with the development team to build, test, and debug cross-platform web experiences, ensuring optimal performance.\n\n2) Intern Full Stack Development | SmartBridge Educational Services || Oct 2025– Mar 2026\n• Completed a 6-month intensive virtual internship in collaboration with the Andhra Pradesh State Council of Higher Education (APSCHE).\n• Strengthened web development skills by building visually appealing, responsive web applications utilizing HTML, CSS, JavaScript, Bootstrap, and the MERN stack.", "location": "30/324/1, kothapeta", "resumeLink": "https://drive.google.com/file/d/1bhahgXCfhtoeH_dC4oLZTtAfO5p0Dnkr/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-10T14:56:53.074Z", "init": "JK", "col": "#3b82f6"}, {"name": "Akash kumar sah", "email": "sahakash17@gmail.com", "position": "Software Developer", "phone": "919729648364", "qualifications": "B.Tech", "experience": "I have hands-on experience in software development through internships and multiple full-stack and backend projects using Java, Spring Boot, React.js, Node.js, and PostgreSQL. During my internship at SoftTech Engineering, I developed responsive React components, integrated REST APIs, resolved cross-browser issues, and collaborated with developers using Agile and Git workflows. I also led the development of scalable backend systems such as a Hospital Management System using Spring Boot, JWT authentication, Docker, Kubernetes, AWS, and CI/CD pipelines. Additionally, I built RESTful services like a URL Shortener platform with monitoring and analytics features using Prometheus and Grafana. My experience includes designing secure APIs, implementing role-based access control, optimizing database queries, writing unit tests, and working in collaborative team environments with Agile methodologies.", "location": "karnatka,banglore", "resumeLink": "https://drive.google.com/file/d/1t-LOn_7X5d1AdKxUitFpk9y6W1Ym4aXZ/view?usp=drivesdk", "source": "Social Media (Instagram / Facebook / Twitter)", "edtech": "No", "availability": "No", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-10T15:47:31.340Z", "init": "AK", "col": "#a78bfa"}, {"name": "sachin", "email": "sachinnagraj123@gmail.com", "position": "Other", "phone": "8660583589", "qualifications": "PG in digital marketing", "experience": "Doing internship", "location": "karnataka", "resumeLink": "https://drive.google.com/file/d/11IVh1vidscQAb6WGwuJiwhgIXjkKsYiJ/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-11T08:29:25.107Z", "init": "S", "col": "#2dd4bf"}, {"name": "Jeel N. Vanpariya", "email": "vanpariyajeel@gmail.com", "position": "Graphic Designer", "phone": "#ERROR!", "qualifications": "Bachelor of Vocation", "experience": "I have 3 years and 4 months of experience as a Graphic Designer, working on branding, social media creatives, packaging design, marketing materials, and visual content creation. During this time, I have developed strong skills in creative design, brand communication, and design software while working on multiple projects across different industries.", "location": "Rajkot", "resumeLink": "https://drive.google.com/file/d/1ZzI4eXLnCgMeDn_D3f6nI7mioQwnlvd8/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-11T10:18:14.889Z", "init": "JN", "col": "#f59e0b"}, {"name": "Shaikh Fazil", "email": "shaikhmohamedfazil@gmail.com", "position": "Marketing Executive", "phone": "9712039492", "qualifications": "Master of Computer Applications (MCA) \nLok Jagruti Kendra University (2024 – 2026)\n\nBachelor of Computer Applications (BCA)\nLok Jagruti Kendra University (2021 – 2024)", "experience": "6 months of experience in Digital Marketing, Social Media Management, Lead Generation, and SEO support.\n\nWorked at Trend Tree Media on social media content creation, Meta Ads support, Google My Business optimization, client communication, and lead handling.\n\nAlso worked as a Business Development Executive Intern at Ewolyn Services, supporting lead generation and digital marketing activities.", "location": "maninagar", "resumeLink": "https://drive.google.com/file/d/1-ZW1gU0RUAnN9Fn0GagsMips59GNNUT0/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-11T11:59:47.902Z", "init": "SF", "col": "#22c55e"}, {"name": "Amal krishna", "email": "amalk34040@gmail.com", "position": "Other", "phone": "7994261451", "qualifications": "BBA logistics and supply chain management and Advanced digital marketing", "experience": "Iam a fresher", "location": "Bangalore madiwala", "resumeLink": "https://drive.google.com/file/d/1IrrJngiujMTceK76197A22F-CuvrS1GG/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-11T19:15:01.211Z", "init": "AK", "col": "#f43f5e"}, {"name": "Chhavi Jain", "email": "jainchhavi81@gmail.com", "position": "Other", "phone": "9407422333", "qualifications": "Currently pursuing PGDM in Marketing", "experience": "I have done 3 months internship in stackcart as a digital marketing intern which was remote based. I have done SEO analysis, keyword research, competitive analysis for  6+ websites.", "location": "Bengaluru, Karnataka", "resumeLink": "https://drive.google.com/file/d/1f9IcM03klztY6QCSSeV0_OwgXOR8USah/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-11T19:28:53.375Z", "init": "CJ", "col": "#6366f1"}, {"name": "Raghvesh Sharma", "email": "sharma.raghvesh7@gmail.com", "position": "Business Development Executive", "phone": "8070600000", "qualifications": "B.Com and Persuing MBA from Amity University Rajasthan", "experience": "Research analyst at Astegic Infosoft Pvt Ltd", "location": "Rajasthan", "resumeLink": "https://drive.google.com/file/d/1lngsMpGu3d5qyxKl1VfgJLDk9A1AEBRh/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-12T07:12:52.140Z", "init": "RS", "col": "#00e5b0"}, {"name": "Mahima", "email": "mk092783@gmail.com", "position": "Business Development Executive", "phone": "#ERROR!", "qualifications": "MBA MARKETING", "experience": "No", "location": "Nimatha cantt lucknow uttar pradesh", "resumeLink": "https://drive.google.com/file/d/1OzlqhExCbyNJsRiK9ZfafFeqIa4mHWop/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-12T07:46:07.676Z", "init": "M", "col": "#ff7d40"}, {"name": "Manasi Mahesh Dalvi", "email": "manasidalvi874@gmail.com", "position": "Software Developer", "phone": "919322132371", "qualifications": "BTech , Computer Science and Engineering", "experience": "I am an engineering student interested in full-stack web development and software technologies. I enjoy working with HTML, CSS, JavaScript, React, Node.js, MongoDB, PHP, and SQL. I have worked on projects like an Employee Management System and Blood Group Detection Using Fingerprint.\n\nI am a quick learner, hardworking, and passionate about improving my technical, problem-solving, and teamwork skills. I am always eager to learn new technologies and gain practical experience.", "location": "Maharashtra", "resumeLink": "https://drive.google.com/file/d/1nJ6CrYE0t9gJWWiIyIcysmHR2Zcjg_Rb/view?usp=drivesdk", "source": "Referral from a Friend / Colleague", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-12T14:04:08.754Z", "init": "MM", "col": "#ec4899"}, {"name": "Kavita Sutar", "email": "kavitasutar148@gmail.com", "position": "Graphic Designer", "phone": "9096733270", "qualifications": "Graphic designer & video editing Diploma 6 month", "experience": "Fresher", "location": "Maharashtra pune", "resumeLink": "https://drive.google.com/file/d/1D4qotwSYiyRu7Ub5RJqoDyAvZ_-SNgqZ/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-12T18:19:07.475Z", "init": "KS", "col": "#3b82f6"}, {"name": "Hamzathul Karrar", "email": "uk.hamzath@gmail.com", "position": "Software Developer", "phone": "9740195568", "qualifications": "B.tech in computer science", "experience": "Java full stack Trainee in quntnex for 9 months. \nWeb development internship in Vitvara technology for 1 months.", "location": "Karnataka", "resumeLink": "https://drive.google.com/file/d/1zi_VeFnJtnjVCAHrpe9yM8TIFlrSxz1Z/view?usp=drivesdk", "source": "Company Website", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T05:33:49.670Z", "init": "HK", "col": "#a78bfa"}, {"name": "Dinila rosy", "email": "dinilarosybabi@gmail.com", "position": "Graphic Designer", "phone": "9360186176", "qualifications": "Creative designer in blis UK for 2.5 years", "experience": "I have been part of 2 rebrands of Blis and merger branding for Tmobile. Part of campaigns which boosts business", "location": "Silverline layout road, krishnarajapuram , banglore", "resumeLink": "https://drive.google.com/file/d/1hwiCNhAU-0ElbI9wUXgcMZvODVl4r_qh/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T06:11:53.214Z", "init": "DR", "col": "#2dd4bf"}, {"name": "Namrata Rajpurohit", "email": "namrata98r@gmail.con", "position": "Graphic Designer", "phone": "9512283309", "qualifications": "Visual and communication arts", "experience": "Total Experience: 5 years | Key Job Titles Held: Graphic Designer (5 yrs), Video Editor (3+ yrs), PR & Media Coordinator (2 yrs) | Functional Skills: Graphic Design, Branding, Social Media Creatives, Motion Graphics, Video Editing, Client Servicing | Industries Worked In: Advertising, Events & Entertainment, Printing, NGO, IT | Tools & Technologies: Adobe Illustrator, Photoshop, Premiere Pro, After Effects, 3D Mockups", "location": "Ahmedabad, Gujarat", "resumeLink": "https://drive.google.com/file/d/1um0rVs6lCJALrt3ths58w6haagvYjA88/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T08:37:14.898Z", "init": "NR", "col": "#f59e0b"}, {"name": "Namrata Rajpurohit", "email": "namrata98r@gmail.con", "position": "Graphic Designer", "phone": "9512283309", "qualifications": "Visual and communication arts", "experience": "Total Experience: 5 years | Key Job Titles Held: Graphic Designer (5 yrs), Video Editor (3+ yrs), PR & Media Coordinator (2 yrs) | Functional Skills: Graphic Design, Branding, Social Media Creatives, Motion Graphics, Video Editing, Client Servicing | Industries Worked In: Advertising, Events & Entertainment, Printing, NGO, IT | Tools & Technologies: Adobe Illustrator, Photoshop, Premiere Pro, After Effects, 3D Mockups", "location": "Ahmedabad, Gujarat", "resumeLink": "https://drive.google.com/file/d/15GAiT5ZnfOyvvfqRH8BJpS0UgreApsV9/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T08:37:14.898Z", "init": "NR", "col": "#22c55e"}, {"name": "Amruth Y", "email": "amruth.designs@gmail.com", "position": "Graphic Designer", "phone": "8147780926", "qualifications": "Diploma in Printing technology and Graphic Design", "experience": "14 years experience as a Graphic Design", "location": "Karnataka, Bangalore", "resumeLink": "https://drive.google.com/file/d/17VQzambz9AvJj4KFx1PjYMgTQQXGQC1D/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T08:56:05.042Z", "init": "AY", "col": "#f43f5e"}, {"name": "Likhith R", "email": "likhithraju30@gmail.com", "position": "Marketing Executive", "phone": "8971308236", "qualifications": "Pursuing BBA", "experience": "I don't have experience", "location": "Karnataka,Bangalore", "resumeLink": "https://drive.google.com/file/d/1aGPMD9gtQUduTYhdqy8gvYjrfifQbeWR/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "No", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T11:02:55.271Z", "init": "LR", "col": "#6366f1"}, {"name": "Subha harini s.v", "email": "subhaharini2005@gmail.com", "position": "Business Development Executive", "phone": "8807149505", "qualifications": "B.COM DIGITAL MARKETING AND DATA MINING", "experience": "Fresher,undergraduate", "location": "Tamilnadu, coimbatore", "resumeLink": "https://drive.google.com/file/d/1KcDiK1meYQHLK9LojY_iFs1iUeljH_bb/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T13:19:24.373Z", "init": "SH", "col": "#00e5b0"}, {"name": "Subha harini s.v", "email": "subhaharini2005@gmail.com", "position": "Business Development Executive", "phone": "8807149505", "qualifications": "B.COM DIGITAL MARKETING AND DATA MINING", "experience": "Fresher ,undergraduate", "location": "Tamil Nadu, Tirupur", "resumeLink": "https://drive.google.com/file/d/1cmpSZ-POFxHeIQZrD-yWcji2kUwmmruX/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "No", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T13:20:37.616Z", "init": "SH", "col": "#ff7d40"}, {"name": "Arti M", "email": "artimahesh1507@gmail.com", "position": "Graphic Designer", "phone": "8524992898", "qualifications": "BSC computer science", "experience": "I have completed my internship in Coimbatore from UI&UX", "location": "Erode,Tamilnadu", "resumeLink": "https://drive.google.com/file/d/1nk8CDFLPaSsvOK6ktLw4uFQfz76Al2UP/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T16:31:15.081Z", "init": "AM", "col": "#ec4899"}, {"name": "N Sumukh Kashyap", "email": "sumukhkashyapn@gmail.com", "position": "Business Development Executive", "phone": "918904305271", "qualifications": "BE CSE", "experience": "Fresher", "location": "Bangalore", "resumeLink": "https://drive.google.com/file/d/1Ft7q-J0nUBrvoMtblgdNCxPVomtDR1uk/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-13T17:55:50.211Z", "init": "NS", "col": "#3b82f6"}, {"name": "Syed Sufiyan", "email": "sufiyan.syed.0526@gmail.com", "position": "Business Development Executive", "phone": "7349755353", "qualifications": "Bachelors in Business Administration", "experience": "Kotak securities- Finance Intern\nInterned for a duration of 3 months, part of the private client group which provided catered financial services to HNI'S and UHNI's", "location": "Karnataka", "resumeLink": "https://drive.google.com/file/d/1YeFG73I0jryzNuJqnWEBCcMR4RBpoaDw/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-14T05:41:24.206Z", "init": "SS", "col": "#a78bfa"}, {"name": "Shreya", "email": "shreya2018bharti@gmail.com", "position": "Graphic Designer", "phone": "9113168589", "qualifications": "BBA", "experience": "3+", "location": "Bihar", "resumeLink": "https://drive.google.com/file/d/1k3_epRWADGx2CAClvAz50zMKaITn_2EP/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-14T06:21:39.129Z", "init": "S", "col": "#2dd4bf"}, {"name": "dinesh", "email": "kolasanidinesh875@gmail.com", "position": "Software Developer", "phone": "9949887725", "qualifications": "b.tech", "experience": "1", "location": "bapatla", "resumeLink": "https://drive.google.com/file/d/1a-hfYfzM2bVgwltJiBfnL3W6JphB_yua/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Offered", "shortlisted": true, "timestamp": "2026-05-14T09:59:36.468Z", "init": "D", "col": "#f59e0b"}, {"name": "Paritosh Raman Raghu", "email": "paritoshraman6@gmail.com", "position": "Graphic Designer", "phone": "917892476479", "qualifications": "C-Tech program in communication design", "experience": "1 + years of experience in performance ccreative designs, ad campaings, branding.", "location": "Bengaluru, Karnataka, Vignanagar 560075", "resumeLink": "https://drive.google.com/file/d/1CEGBmSQscqZUM7NerEVRgPCe00maOkix/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-14T11:39:39.845Z", "init": "PR", "col": "#22c55e"}, {"name": "Yash Choudhary", "email": "yashch4248@gmail.com", "position": "Graphic Designer", "phone": "8708280032", "qualifications": "Bachelor in Design \nCommunication Design \nNIFT Bhopal", "experience": "Worked on Government projects for the college", "location": "Gurugram India", "resumeLink": "https://drive.google.com/file/d/10j8H1MI5bZNxpvWbTNtqvFoWWtfQzGFz/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-14T12:50:53.181Z", "init": "YC", "col": "#f43f5e"}, {"name": "Narmi Guria", "email": "narmi.guria@gmail.com", "position": "Business Development Executive", "phone": "8951858206", "qualifications": "BTech computer science", "experience": "Over all having 6 year of experience in b2b saas sales and lead generation,strong sales pipeline ,", "location": "Banagalore", "resumeLink": "https://drive.google.com/file/d/1RwO7pWII3Po7sjst1ugWPiL7VimcVF2-/view?usp=drivesdk", "source": "LinkedIn", "edtech": "No", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-14T16:04:56.603Z", "init": "NG", "col": "#6366f1"}, {"name": "Pallavi Parihar", "email": "pallaviparihar191@gmail.com", "position": "Graphic Designer", "phone": "7568392097", "qualifications": "BCA - Bachelor's in Computer Applications", "experience": "I bring over 5 years of experience as a Graphic Designer.", "location": "45, Tagore Nagar, Pali - Rajasthan", "resumeLink": "https://drive.google.com/file/d/1UPTvJ-TREe6QacWMyzhF7igJy6Rxp-UK/view?usp=drivesdk", "source": "LinkedIn", "edtech": "Yes", "availability": "Yes", "stage": "Applied", "shortlisted": false, "timestamp": "2026-05-14T18:02:20.787Z", "init": "PP", "col": "#00e5b0"}];
+function loadDemoData() {
+  const overrides = getOverrides();
+  ALL = DEMO_CANDIDATES.map((c, i) => {
+    const base = {
+      ...c,
+      email: normalizeEmail(c.email),
+      _idx:  i,
+      init:  mkInit(c.name),
+      col:   PALETTE[i % PALETTE.length],
+      hrNotes: c.hrNotes || '',
+    };
+    const key = normalizeEmail(c.email);
+    // Apply any local HR overrides on top (respects shortlist toggles done in demo mode)
+    return { ...base, ...(overrides[key] || {}) };
+  });
+  syncShortlistedCache();
+  updateKPIs();
+  populateFilters();
+  renderAll();
+  buildCharts();
+  const sb = document.getElementById('sidebar-badge');
+  if (sb) sb.textContent = ALL.length;
+}
+
+// ── SHORTLISTED CACHE → shared with Interview Panel ───────────────────────────
+function syncShortlistedCache() {
+  const sl = ALL.filter(c => c.shortlisted).map(c => ({
+    email: normalizeEmail(c.email),
+    name: c.name, position: c.position, phone: c.phone,
+    qualifications: c.qualifications, experience: c.experience,
+    location: c.location, resumeLink: c.resumeLink, source: c.source,
+    timestamp: c.timestamp, edtech: c.edtech, availability: c.availability,
+    hrNotes: c.hrNotes || '', stage: c.stage, col: c.col, init: c.init,
+    shortlisted: true,
+  }));
+  localStorage.setItem('shortlisted_candidates', JSON.stringify(sl));
+  localStorage.setItem('shortlisted_count', sl.length);
+  console.log(`[syncShortlistedCache] saved ${sl.length} shortlisted candidate(s):`,
+    sl.map(c => c.email));
+  // Also cache the full candidates list so interview panel can rebuild if needed
+  const allCache = ALL.map(c => ({
+    email: normalizeEmail(c.email),
+    name: c.name, position: c.position, phone: c.phone,
+    qualifications: c.qualifications, experience: c.experience,
+    location: c.location, resumeLink: c.resumeLink, source: c.source,
+    timestamp: c.timestamp, edtech: c.edtech, availability: c.availability,
+    hrNotes: c.hrNotes || '', stage: c.stage, col: c.col, init: c.init,
+    shortlisted: !!c.shortlisted,
+  }));
+  localStorage.setItem('hrms_all_candidates', JSON.stringify(allCache));
+}
+
+// ── FETCH FROM GOOGLE APPS SCRIPT ─────────────────────────────────────────────
+async function loadCandidates() {
+  const btn = document.getElementById('refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Loading…'; }
+  setSyncBar('loading', 'Connecting to Google Apps Script…');
+  showLoading();
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    const res = await fetch(SHEET_SCRIPT_URL, { method: 'GET', redirect: 'follow', signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Apps Script returned success:false');
+
+    const overrides = getOverrides();
+    ALL = (data.candidates || []).map((c, i) => {
+      const base = {
+        ...c,
+        // Normalise email so it always matches the override key
+        email: normalizeEmail(c.email),
+        _idx:  i,
+        name:  c.fullName || c.name || '',
+        init:  mkInit(c.fullName || c.name),
+        col:   PALETTE[i % PALETTE.length],
+      };
+      // Merge any local HR overrides on top (stage, shortlisted, hrNotes)
+      const key = normalizeEmail(c.email);
+      return { ...base, ...(overrides[key] || {}) };
+    });
+
+    setSyncBar('ok', `✓ ${ALL.length} candidates synced from Sheet`);
+    document.getElementById('export-btn').style.display = '';
+    updateKPIs();
+    populateFilters();
+    renderAll();
+    buildCharts();
+    syncShortlistedCache();
+    const sb = document.getElementById('sidebar-badge');
+    if (sb) sb.textContent = ALL.length;
+
+  } catch (err) {
+    let hint = err.message;
+    if (hint.includes('aborted') || hint.includes('Failed to fetch')) {
+      hint = 'Network error — check SHEET_SCRIPT_URL or CORS. Is the script deployed as "Anyone"?';
+    }
+    setSyncBar('err', '⚠ API unavailable — showing demo data. Connect Google Apps Script to load real candidates.');
+    // Load demo data so the UI (and Interview Panel) still works offline
+    loadDemoData();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Refresh'; }
+  }
+}
+
+function setSyncBar(state, msg) {
+  const bar   = document.getElementById('sync-bar');
+  const pulse = document.getElementById('sync-pulse');
+  const msgEl = document.getElementById('sync-msg');
+  const time  = document.getElementById('sync-time');
+  if (!bar) return;
+  bar.className = 'sync-bar ' + state;
+  if (pulse) pulse.style.background = state === 'ok' ? 'var(--green)' : state === 'err' ? 'var(--rose)' : 'var(--accent)';
+  if (msgEl) msgEl.textContent = msg;
+  if (time && state !== 'loading') time.textContent = new Date().toLocaleTimeString();
+}
+
+function mkInit(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+// ── WRITE BACK TO GOOGLE SHEET ────────────────────────────────────────────────
+async function writeBackToSheet(c) {
+  try {
+    const body = JSON.stringify({
+      action:      'updateCandidate',
+      email:       c.email,
+      shortlisted: c.shortlisted,
+      stage:       c.stage,
+      hrNotes:     c.hrNotes || '',
+    });
+    // Apps Script requires content-type text/plain for doPost
+    const res  = await fetch(SHEET_SCRIPT_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain' }, body });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Script error');
+    return true;
+  } catch (err) {
+    console.warn('[Sheet write-back failed – local state preserved]', err.message);
+    return false;
+  }
+}
+
+// ── KPIs ──────────────────────────────────────────────────────────────────────
+function updateKPIs() {
+  const total = ALL.length;
+  const sl    = ALL.filter(c => c.shortlisted).length;
+  const iv    = ALL.filter(c => c.stage === 'Interviewing').length;
+  const res   = ALL.filter(c => c.resumeLink).length;
+  set('kpi-total', total);
+  set('kpi-shortlisted', sl);
+  set('kpi-interviewing', iv);
+  set('kpi-resumes', res);
+  if (total) set('kpi-pct', `${Math.round(sl / total * 100)}% shortlisted`);
+
+  const cnts = {};
+  STAGES.forEach(s => cnts[s] = 0);
+  ALL.forEach(c => { if (cnts[c.stage] !== undefined) cnts[c.stage]++; });
+  const tabs = document.querySelectorAll('#stage-tabs .tab');
+  ['All', ...STAGES].forEach((lbl, i) => {
+    if (tabs[i]) tabs[i].textContent = lbl === 'All' ? `All (${total})` : `${lbl} (${cnts[lbl] || 0})`;
+  });
+}
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function populateFilters() {
+  const roles = [...new Set(ALL.map(c => c.position).filter(Boolean))].sort();
+  const srcs  = [...new Set(ALL.map(c => c.source).filter(Boolean))].sort();
+  document.getElementById('role-filter').innerHTML = '<option value="">All Roles</option>'    + roles.map(r => `<option value="${e(r)}">${e(r)}</option>`).join('');
+  document.getElementById('src-filter').innerHTML  = '<option value="">All Sources</option>'  + srcs.map(s  => `<option value="${e(s)}">${e(s)}</option>`).join('');
+}
+
+function filtered() {
+  const q    = document.getElementById('cand-search').value.toLowerCase();
+  const role = document.getElementById('role-filter').value;
+  const src  = document.getElementById('src-filter').value;
+  const sort = document.getElementById('sort-filter').value;
+  const ro   = document.getElementById('resume-only').checked;
+  let res = ALL.filter(c => {
+    if (stageFilter !== 'All' && c.stage !== stageFilter) return false;
+    if (role && c.position !== role) return false;
+    if (src  && c.source  !== src)  return false;
+    if (ro   && !c.resumeLink)      return false;
+    if (q) {
+      const hay = [c.name, c.position, c.source, c.location, c.qualifications].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
     return true;
   });
-  if(sort==='score') res.sort((a,b)=>b.score-a.score);
-  else if(sort==='name') res.sort((a,b)=>a.name.localeCompare(b.name));
+  if (sort === 'name')     res.sort((a, b) => (a.name     || '').localeCompare(b.name     || ''));
+  if (sort === 'position') res.sort((a, b) => (a.position || '').localeCompare(b.position || ''));
   return res;
 }
 
-function renderAll(){
-  const data=filtered();
-  document.getElementById('cand-count').textContent=`Showing ${data.length} candidate${data.length!==1?'s':''}`;
-  renderList(data);
-  if(currentView==='kanban') renderKanban();
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderAll() {
+  const data = filtered();
+  set('cand-count', `Showing ${data.length} of ${ALL.length} candidates`);
+  if (currentView === 'list') renderList(data);
+  else renderKanban();
 }
 
-function scoreColor(s){return s>=85?'var(--green)':s>=70?'var(--amber)':'var(--rose)';}
-
-function renderList(data){
-  document.getElementById('cand-tbody').innerHTML=data.map(c=>`
-    <tr onclick="openProfile(${c.id})" style="cursor:pointer;">
-      <td>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:32px;height:32px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;">${c.init}</div>
-          <div><div class="td-main">${c.name}</div><div class="td-sub">${c.email}</div></div>
-        </div>
-      </td>
-      <td><div style="font-size:13px;color:var(--text2);">${c.role}</div></td>
-      <td><span class="tag">${c.source}</span></td>
-      <td>${c.exp}</td>
-      <td>
-        <div style="font-size:13px;font-weight:600;color:${scoreColor(c.score)};">${c.score}%</div>
-        <div class="score-bar"><div class="score-fill" style="width:${c.score}%;background:${scoreColor(c.score)};"></div></div>
-      </td>
-      <td><span class="badge ${STAGE_COLORS[c.stage]||'b-gray'}">${c.stage}</span></td>
-      <td style="font-size:12px;color:var(--text3);">${c.date}</td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-sm" onclick="event.stopPropagation();openProfile(${c.id})">Profile</button>
-          ${c.stage!=='Rejected'&&c.stage!=='Offered'?`<button class="btn btn-sm" style="color:var(--accent);border-color:rgba(59,130,246,0.3);" onclick="event.stopPropagation();scheduleFor(${c.id})">Interview</button>`:''}
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function renderKanban(){
-  const board=document.getElementById('kanban-board');
-  const stageOrder=['Applied','Shortlisted','Interviewing','Offered','Rejected'];
-  board.innerHTML=stageOrder.map(st=>{
-    const cards=CANDIDATES.filter(c=>c.stage===st);
-    return `
-      <div class="kanban-col">
-        <div class="kanban-hd">${st} <span class="badge ${STAGE_COLORS[st]||'b-gray'}" style="font-size:10px;">${cards.length}</span></div>
-        <div class="kanban-body">
-          ${cards.map(c=>`
-            <div class="kanban-card" onclick="openProfile(${c.id})">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <div style="width:24px;height:24px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">${c.init}</div>
-                <div class="k-name">${c.name}</div>
-              </div>
-              <div class="k-role">${c.role}</div>
-              <div class="k-score"><span style="color:${scoreColor(c.score)};font-weight:600;">${c.score}%</span><span style="color:var(--text3);">· ${c.source}</span></div>
+function renderList(data) {
+  const area = document.getElementById('table-area');
+  if (!data.length) {
+    area.innerHTML = '<div class="empty-state"><div style="font-size:44px;margin-bottom:8px;">🔍</div><div style="color:var(--text2);font-size:14px;font-weight:500;">No candidates found</div><div style="color:var(--text3);font-size:12px;margin-top:4px;">Try adjusting your filters or search query</div></div>';
+    return;
+  }
+  area.innerHTML = `<div style="overflow-x:auto;"><table>
+    <thead><tr>
+      <th style="padding-left:20px;">Candidate</th><th>Applied For</th><th>Experience</th><th>Source</th><th>Resume</th><th>Stage</th><th style="text-align:center;">Actions</th>
+    </tr></thead>
+    <tbody>${data.map(c => `
+      <tr onclick="openProfile(${c._idx})" style="cursor:pointer;transition:background .12s;">
+        <td style="padding:14px 14px 14px 20px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:12px;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.3px;">${c.init}</div>
+            <div>
+              <div style="font-weight:600;color:var(--text);font-size:13px;">${e(c.name)}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;">${e(c.email || '—')}</div>
             </div>
-          `).join('')}
-          ${cards.length===0?`<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px 0;">No candidates</div>`:''}
-        </div>
+          </div>
+        </td>
+        <td>
+          <div style="color:var(--text);font-size:13px;font-weight:500;">${e(c.position || '—')}</div>
+          ${c.qualifications ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;">${e(c.qualifications)}</div>` : ''}
+        </td>
+        <td>
+          <span style="display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:var(--navy4);color:var(--text2);">${e(c.experience || '—')}</span>
+        </td>
+        <td style="font-size:12px;color:var(--text3);">
+          ${c.source ? `<span style="display:inline-flex;padding:3px 9px;border-radius:20px;font-size:11px;background:rgba(79,156,249,.1);color:var(--accent);border:1px solid rgba(79,156,249,.2);">${e(c.source)}</span>` : '—'}
+        </td>
+        <td onclick="event.stopPropagation()">
+          ${c.resumeLink
+            ? `<a href="${e(c.resumeLink)}" target="_blank" rel="noopener" class="resume-link" style="font-size:11px;padding:5px 11px;gap:4px;">📄 CV</a>`
+            : `<span style="font-size:11px;color:var(--text3);">—</span>`}
+        </td>
+        <td><span class="badge ${STAGE_COLORS[c.stage] || 'b-gray'}">${c.stage}</span></td>
+        <td onclick="event.stopPropagation()" style="text-align:center;">
+          <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn-sm" onclick="openProfile(${c._idx})" style="gap:4px;">👁 View</button>
+            ${c.shortlisted
+              ? `<button class="btn-sm btn-shortlisted" onclick="toggleShortlist(event,${c._idx})" title="Remove from shortlist" style="gap:4px;">✓ Listed</button>`
+              : `<button class="btn-sm btn-shortlist" onclick="toggleShortlist(event,${c._idx})" style="gap:4px;">⭐ List</button>`}
+          </div>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function renderKanban() {
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = STAGES.map(st => {
+    const cards = ALL.filter(c => c.stage === st);
+    return `<div class="kanban-col">
+      <div class="kanban-hd">${st} <span class="badge ${STAGE_COLORS[st] || 'b-gray'}" style="font-size:10px;">${cards.length}</span></div>
+      <div class="kanban-body">
+        ${cards.map(c => `<div class="kanban-card" onclick="openProfile(${c._idx})">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <div style="width:22px;height:22px;border-radius:50%;background:${c.col};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">${c.init}</div>
+            <div style="font-size:12px;font-weight:500;color:var(--text);">${e(c.name)}</div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);">${e(c.position || '—')}</div>
+          ${c.resumeLink ? `<div style="margin-top:6px;"><a href="${e(c.resumeLink)}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:var(--accent);">📄 Resume ↗</a></div>` : ''}
+        </div>`).join('')}
+        ${!cards.length ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px 0;">Empty</div>` : ''}
       </div>
-    `;
+    </div>`;
   }).join('');
 }
 
-/* ───────────── PROFILE PANEL ───────────── */
-function openProfile(id){
-  const c=CANDIDATES.find(x=>x.id===id);
-  if(!c)return;
-  openProfileId=id;
-  document.getElementById('pp-av').textContent=c.init;
-  document.getElementById('pp-av').style.background=c.col;
-  document.getElementById('pp-name').textContent=c.name;
-  document.getElementById('pp-role').textContent=c.role+' · Applied '+c.date;
-  document.getElementById('pp-email').textContent=c.email;
-  document.getElementById('pp-phone').textContent=c.phone;
-  document.getElementById('pp-exp').textContent=c.exp;
-  document.getElementById('pp-source').textContent=c.source;
-  document.getElementById('pp-date').textContent=c.date;
-  document.getElementById('pp-badges').innerHTML=`<span class="badge ${STAGE_COLORS[c.stage]}">${c.stage}</span><span class="badge b-blue">Score: ${c.score}%</span>`;
-  document.getElementById('pp-competencies').innerHTML=Object.entries(c.competencies).map(([k,v])=>`
-    <div class="competency-row">
-      <div class="competency-label"><span>${k}</span><span>${v}/100</span></div>
-      <div class="prog-bar"><div class="prog-fill" style="width:${v}%;background:${scoreColor(v)};"></div></div>
-    </div>
-  `).join('');
-  document.getElementById('pp-skills').innerHTML=c.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('');
-  document.getElementById('pp-stages').innerHTML=STAGES.map(s=>`
-    <button class="stage-btn ${c.stage===s?'active':''}" onclick="moveStage(${id},'${s}')">${s}</button>
-  `).join('');
+// ── SHORTLIST TOGGLE ──────────────────────────────────────────────────────────
+async function toggleShortlist(ev, idx) {
+  if (ev) ev.stopPropagation();
+  const c = ALL[idx];
+  if (!c) return;
+  const newState = !c.shortlisted;
+  if (!newState && !confirm(`Remove ${c.name} from shortlist?`)) return;
+
+  // Optimistic update
+  ALL[idx].shortlisted = newState;
+  ALL[idx].stage       = newState ? 'Shortlisted' : 'Applied';
+  setOverride(c.email, { shortlisted: newState, stage: ALL[idx].stage });
+
+  updateKPIs();
+  renderAll();
+  syncShortlistedCache();
+  if (openIdx === idx) openProfile(idx);
+
+  toast(newState
+    ? `⭐ ${c.name} shortlisted — now visible in Interview Panel!`
+    : `Removed ${c.name} from shortlist`);
+
+  // Fire-and-forget write-back to Sheet
+  writeBackToSheet(ALL[idx]).then(ok => {
+    if (!ok) toast('⚠️ Sheet sync failed — local state preserved');
+  });
+}
+
+// ── PROFILE PANEL ─────────────────────────────────────────────────────────────
+function openProfile(idx) {
+  const c = ALL[idx];
+  if (!c) return;
+  openIdx = idx;
+
+  document.getElementById('pp-av').textContent      = c.init;
+  document.getElementById('pp-av').style.background = c.col;
+  document.getElementById('pp-name').textContent    = c.name;
+  document.getElementById('pp-sub').textContent     = (c.position || 'Applicant') + (c.timestamp ? ' · ' + c.timestamp : '');
+  document.getElementById('pp-email').textContent   = c.email        || '—';
+  document.getElementById('pp-phone').textContent   = c.phone        || '—';
+  document.getElementById('pp-loc').textContent     = c.location     || '—';
+  document.getElementById('pp-exp').textContent     = c.experience   || '—';
+  document.getElementById('pp-qual').textContent    = c.qualifications || '—';
+  document.getElementById('pp-src').textContent     = c.source       || '—';
+  document.getElementById('pp-date').textContent    = c.timestamp    || '—';
+  document.getElementById('pp-edtech').textContent  = c.edtech       || '—';
+  document.getElementById('pp-avail').textContent   = c.availability || '—';
+  document.getElementById('pp-notes').value         = c.hrNotes      || '';
+
+  document.getElementById('pp-badges').innerHTML =
+    `<span class="badge ${STAGE_COLORS[c.stage] || 'b-gray'}">${c.stage}</span>` +
+    (c.shortlisted ? `<span class="badge b-green">✓ Shortlisted</span>` : '') +
+    (c.resumeLink  ? `<span class="badge b-blue">📄 CV on file</span>` : '');
+
+  document.getElementById('pp-shortlist-btn').innerHTML = c.shortlisted
+    ? `<button class="btn success" style="width:100%;justify-content:center;margin-top:8px;font-size:13px;" onclick="toggleShortlist(null,${idx})">✓ Shortlisted — Click to Remove</button>`
+    : `<button class="btn primary" style="width:100%;justify-content:center;margin-top:8px;font-size:13px;" onclick="toggleShortlist(null,${idx})">⭐ Shortlist for Interview</button>`;
+
+  document.getElementById('pp-resume').innerHTML = c.resumeLink
+    ? `<a href="${e(c.resumeLink)}" target="_blank" rel="noopener" class="resume-link">📄 Open Resume / CV &nbsp;↗</a>
+       <div style="font-size:11px;color:var(--text3);margin-top:8px;">Opens Google Drive link in new tab</div>`
+    : `<div style="font-size:13px;color:var(--text3);padding:4px 0;">No resume on file for this candidate.</div>`;
+
+  document.getElementById('pp-stages').innerHTML = STAGES.map(s =>
+    `<button class="stage-btn ${c.stage === s ? 'active' : ''}" onclick="moveStage(${idx},'${s}')">${s}</button>`
+  ).join('');
+
+  const hidden = c.stage === 'Rejected' || c.stage === 'Offered';
+  document.getElementById('pp-int-btn').style.display = hidden ? 'none' : '';
+  document.getElementById('pp-rej-btn').style.display = c.stage === 'Rejected' ? 'none' : '';
+
   document.getElementById('profile-panel').classList.add('open');
   document.getElementById('pp-overlay').classList.add('open');
 }
 
-function closeProfile(){
+function closeProfile() {
   document.getElementById('profile-panel').classList.remove('open');
   document.getElementById('pp-overlay').classList.remove('open');
 }
 
-function moveStage(id,stage){
-  const c=CANDIDATES.find(x=>x.id===id);
-  if(c){ c.stage=stage; renderAll(); openProfile(id); }
+async function moveStage(idx, stage) {
+  const c = ALL[idx];
+  if (!c) return;
+  ALL[idx].stage = stage;
+  // Keep shortlisted: true through Interviewing/Offered so the
+  // candidate stays visible in the Interview Panel after progression.
+  // Only remove the flag if the stage is reverted to Applied or Rejected.
+  if (stage === 'Shortlisted')   ALL[idx].shortlisted = true;
+  if (stage === 'Interviewing')  ALL[idx].shortlisted = true;
+  if (stage === 'Offered')       ALL[idx].shortlisted = true;
+  if (stage === 'Applied')       ALL[idx].shortlisted = false;
+  if (stage === 'Rejected')      ALL[idx].shortlisted = false;
+  setOverride(c.email, { stage, shortlisted: ALL[idx].shortlisted });
+  updateKPIs();
+  renderAll();
+  syncShortlistedCache();
+  openProfile(idx);
+  const ok = await writeBackToSheet(ALL[idx]);
+  toast(ok ? `Stage → ${stage} ✓ (saved to Sheet)` : `Stage → ${stage} (Sheet sync failed)`);
 }
 
-function scheduleFor(id){
-  window.location.href='../interview_panel/interviews.html';
+async function saveNotes() {
+  const c = ALL[openIdx];
+  if (!c) return;
+  c.hrNotes = document.getElementById('pp-notes').value;
+  setOverride(c.email, { hrNotes: c.hrNotes });
+  syncShortlistedCache();
+  const ok = await writeBackToSheet(c);
+  toast(ok ? 'Notes saved to Sheet ✓' : 'Notes saved locally (Sheet sync failed)');
 }
-function scheduleInterview(){
-  window.location.href='../interview_panel/interviews.html';
+
+async function rejectCandidate() {
+  if (openIdx === null) return;
+  if (!confirm('Mark this candidate as Rejected?')) return;
+  await moveStage(openIdx, 'Rejected');
+  closeProfile();
 }
-function rejectCandidate(){
-  if(openProfileId && confirm('Reject this candidate?')){
-    const c=CANDIDATES.find(x=>x.id===openProfileId);
-    if(c){ c.stage='Rejected'; renderAll(); closeProfile(); }
+
+function goInterview() {
+  const c = ALL[openIdx];
+  if (!c) return;
+  if (!c.shortlisted) {
+    if (!confirm(`${c.name} is not shortlisted yet. Auto-shortlist and go to Interview Panel?`)) return;
+    toggleShortlist(null, openIdx).then(() => {
+      window.location.href = '../interview_panel/interviews.html';
+    });
+    return;
   }
+  window.location.href = '../interview_panel/interviews.html';
 }
 
-function setStageFilter(el,stage){
-  stageFilter=stage;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function exportShortlisted() {
+  const sl = ALL.filter(c => c.shortlisted);
+  if (!sl.length) { toast('No shortlisted candidates to export'); return; }
+  const rows = [
+    ['Name','Position','Email','Phone','Qualifications','Experience','Location','Resume','Source','Applied'],
+    ...sl.map(c => [c.name, c.position, c.email, c.phone, c.qualifications, c.experience, c.location, c.resumeLink, c.source, c.timestamp])
+  ];
+  const csv  = rows.map(r => r.map(v => `"${String(v || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `shortlisted_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  toast(`📥 Exported ${sl.length} shortlisted candidates`);
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────────────────
+function setStageFilter(el, stage) {
+  stageFilter = stage;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   renderAll();
 }
-
-function switchView(v){
-  currentView=v;
-  document.getElementById('list-view').style.display=v==='list'?'block':'none';
-  document.getElementById('kanban-view').style.display=v==='kanban'?'block':'none';
-  document.getElementById('btn-list').style.cssText=v==='list'?'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;':'';
-  document.getElementById('btn-kanban').style.cssText=v==='kanban'?'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;':'';
-  if(v==='kanban') renderKanban();
-}
-
-function addCandidate(){
-  const name=document.getElementById('nc-name').value.trim();
-  if(!name){alert('Please enter a candidate name.');return;}
-  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const colors=['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#22c55e','#f43f5e','#6366f1'];
-  CANDIDATES.unshift({
-    id:Date.now(),name,init:initials,col:colors[CANDIDATES.length%colors.length],
-    email:document.getElementById('nc-email').value,phone:document.getElementById('nc-phone').value,
-    role:document.getElementById('nc-role').value,exp:document.getElementById('nc-exp').value+'yrs',
-    source:document.getElementById('nc-source').value,date:'Today',stage:'Applied',score:Math.floor(60+Math.random()*35),
-    competencies:{Technical:70,Communication:70,'Problem Solving':70,'Culture Fit':70,Leadership:70},
-    skills:[]
-  });
-  closeModal('add-modal');
+function switchView(v) {
+  currentView = v;
+  document.getElementById('list-view').style.display   = v === 'list'   ? 'block' : 'none';
+  document.getElementById('kanban-view').style.display = v === 'kanban' ? 'block' : 'none';
+  document.getElementById('btn-list').style.cssText    = v === 'list'   ? 'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);' : '';
+  document.getElementById('btn-kanban').style.cssText  = v === 'kanban' ? 'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);' : '';
   renderAll();
 }
-
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open')); closeProfile(); } });
-
-/* ───────────── CHARTS ───────────── */
-const ctd={plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}},
-  scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}}}};
-
-new Chart(document.getElementById('sourceChart'),{
-  type:'doughnut',
-  data:{labels:['LinkedIn','Naukri','Referral','Direct','AngelList'],datasets:[{data:[48,32,22,24,16],backgroundColor:['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#f43f5e'],borderWidth:0,hoverOffset:3}]},
-  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:8,padding:6}},tooltip:{...ctd.plugins.tooltip}}}
-});
-new Chart(document.getElementById('timeChart'),{
-  type:'line',
-  data:{labels:['Apr 1','Apr 8','Apr 15','Apr 22','Apr 29','May 1'],datasets:[{data:[12,28,45,72,118,142],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.07)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#3b82f6'}]},
-  options:{...ctd,responsive:true,maintainAspectRatio:false}
-});
-new Chart(document.getElementById('scoreChart'),{
-  type:'bar',
-  data:{labels:['<60','60–70','70–80','80–90','90+'],datasets:[{data:[12,28,54,34,14],backgroundColor:['#f43f5e','#f59e0b','#3b82f6','#2dd4bf','#22c55e'],borderRadius:5}]},
-  options:{...ctd,responsive:true,maintainAspectRatio:false}
-});
-
-/* ═══ DYNAMIC INIT ═══════════════════════════════════════════ */
-async function initPage() {
-  await loadPageData('hrms', 'candidates', mapCandidate,
-    (mapped) => {
-      CANDIDATES = mapped;
-      renderAll();
-    }, 'content'
-  );
+function showLoading() {
+  const a = document.getElementById('table-area');
+  if (a) a.innerHTML = '<div class="loading-state"><div class="spinner"></div><div style="color:var(--text3);font-size:13px;">Fetching live data…</div></div>';
 }
-initPage();
+function showError(msg) {
+  const a = document.getElementById('table-area');
+  if (a) a.innerHTML = `<div class="empty-state">
+    <div style="font-size:44px;">⚠️</div>
+    <div style="color:var(--rose);font-size:13px;">${e(msg)}</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:6px;max-width:400px;text-align:center;">
+      Ensure the Apps Script is deployed as a web app with <strong>Execute as: Me</strong> and <strong>Who has access: Anyone</strong>.
+      Then paste the deployment URL into <code style="font-family:var(--mono)">SHEET_SCRIPT_URL</code> in this file.
+    </div>
+    <button class="btn-sm" onclick="loadCandidates()" style="margin-top:14px;">🔄 Retry</button>
+  </div>`;
+}
+function set(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+function e(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+let _tt;
+function toast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div'); t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a2d42;border:1px solid rgba(59,130,246,.4);color:#e2e8f0;padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(_tt); _tt = setTimeout(() => { t.style.opacity = '0'; }, 3500);
+}
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') {
+    document.querySelectorAll('.overlay.open').forEach(m => m.classList.remove('open'));
+    closeProfile();
+  }
+});
+
+// ── CHARTS ────────────────────────────────────────────────────────────────────
+const ctd = {
+  plugins: { legend: { display: false }, tooltip: { backgroundColor:'#1a2d42', titleColor:'#e2e8f0', bodyColor:'#94a3b8', borderColor:'#263d5e', borderWidth:1 } },
+  scales:  { x: { grid: { color:'rgba(255,255,255,0.04)' }, ticks: { color:'#64748b', font:{ size:10 } } }, y: { grid: { color:'rgba(255,255,255,0.04)' }, ticks: { color:'#64748b', font:{ size:10 } } } }
+};
+function buildCharts() {
+  const sc = {};
+  ALL.forEach(c => { const s = c.source || 'Unknown'; sc[s] = (sc[s] || 0) + 1; });
+  const sl = Object.keys(sc).slice(0, 6), sd = sl.map(l => sc[l]);
+  if (srcChart) srcChart.destroy();
+  srcChart = new Chart(document.getElementById('sourceChart'), { type:'doughnut', data:{ labels:sl, datasets:[{ data:sd, backgroundColor:PALETTE.slice(0,sl.length), borderWidth:0, hoverOffset:3 }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{ display:true, position:'right', labels:{ color:'#94a3b8', font:{ size:10 }, boxWidth:8, padding:6 } }, tooltip:{ ...ctd.plugins.tooltip } } } });
+
+  const rc = {};
+  ALL.forEach(c => { const r = c.position || 'Other'; rc[r] = (rc[r] || 0) + 1; });
+  const re = Object.entries(rc).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const rl = re.map(e => e[0].length > 16 ? e[0].slice(0, 16) + '…' : e[0]), rd = re.map(e => e[1]);
+  if (roleChart) roleChart.destroy();
+  roleChart = new Chart(document.getElementById('roleChart'), { type:'bar', data:{ labels:rl, datasets:[{ data:rd, backgroundColor:'#3b82f6', borderRadius:4 }] }, options:{ ...ctd, responsive:true, maintainAspectRatio:false } });
+
+  const stc = {};
+  STAGES.forEach(s => stc[s] = 0);
+  ALL.forEach(c => { if (stc[c.stage] !== undefined) stc[c.stage]++; });
+  if (stgChart) stgChart.destroy();
+  stgChart = new Chart(document.getElementById('stageChart'), { type:'bar', data:{ labels:STAGES, datasets:[{ data:STAGES.map(s => stc[s]), backgroundColor:['#64748b','#a78bfa','#f59e0b','#3b82f6','#f43f5e'], borderRadius:4 }] }, options:{ ...ctd, responsive:true, maintainAspectRatio:false } });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+try {
+  const u = JSON.parse(localStorage.getItem('user') || '{}');
+  if (u.name) { set('sb-name', u.name); const av = document.getElementById('sb-av'); if (av) av.textContent = mkInit(u.name); }
+} catch (e) {}
+
+loadCandidates();
 </script>
 <script src="../../../../assets/js/api.js"></script>
 <script src="../../../../assets/js/data-loader.js"></script>
 <script src="../../../../assets/js/auth.js"></script>
+
 </body>
 </html>

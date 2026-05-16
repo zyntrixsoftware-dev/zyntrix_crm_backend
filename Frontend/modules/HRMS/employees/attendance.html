@@ -68,24 +68,31 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .kpi-val{font-size:24px;font-weight:600;line-height:1;letter-spacing:-1px;margin-bottom:4px}
 .kpi-lbl{font-size:11px;color:var(--text3)}
 
-/* CALENDAR */
-.calendar-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-.cal-title{font-size:15px;font-weight:600}
-.cal-legend{display:flex;gap:14px;flex-wrap:wrap}
-.leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
-.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.cal-day-name{text-align:center;font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;padding:4px 0;letter-spacing:.5px}
-.cal-cell{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:500;cursor:default;transition:all .15s;border:1px solid transparent}
-.cal-cell:hover{border-color:var(--border2)}
-.cal-cell.present{background:rgba(34,197,94,.15);color:var(--green);border-color:rgba(34,197,94,.2)}
-.cal-cell.absent{background:rgba(244,63,94,.12);color:var(--rose);border-color:rgba(244,63,94,.2)}
-.cal-cell.weekend{background:rgba(100,116,139,.08);color:var(--text3)}
-.cal-cell.future{opacity:.3}
-.cal-cell.today{box-shadow:0 0 0 2px var(--accent2)}
-.cal-cell.empty{background:transparent;border-color:transparent}
-.cal-hours{font-size:9px;opacity:.75;margin-top:1px;font-family:var(--mono)}
+/* CALENDAR — redesigned */
+.calendar-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden}
+.cal-top-bar{background:linear-gradient(135deg,#1e3a5f 0%,#132236 100%);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.cal-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.cal-legend{display:flex;gap:16px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cal-body{padding:20px 24px 24px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-day-name{text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;padding:0 0 10px;letter-spacing:.8px}
+.cal-cell{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;cursor:default;transition:all .15s;border:1px solid transparent;min-height:64px;gap:3px;position:relative}
+.cal-cell:hover:not(.empty):not(.future){transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.cal-num{font-size:15px;font-weight:600;line-height:1}
+.cal-icon{font-size:13px;line-height:1}
+.cal-time{font-size:9px;opacity:.8;font-family:var(--mono);line-height:1.2;text-align:center;max-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-cell.present{background:rgba(34,197,94,.14);color:var(--green);border-color:rgba(34,197,94,.25)}
+.cal-cell.present:hover:not(.empty){background:rgba(34,197,94,.22);border-color:rgba(34,197,94,.4)}
+.cal-cell.absent{background:rgba(244,63,94,.1);color:var(--rose);border-color:rgba(244,63,94,.18)}
+.cal-cell.absent:hover:not(.empty){background:rgba(244,63,94,.18)}
+.cal-cell.weekend{background:rgba(100,116,139,.06);color:var(--text3);border-color:var(--border)}
+.cal-cell.future{opacity:.25;cursor:not-allowed}
+.cal-cell.today{box-shadow:0 0 0 2px var(--accent2),0 4px 12px rgba(59,130,246,.2);z-index:1}
+.cal-cell.today .cal-num{color:var(--accent)}
+.cal-cell.empty{background:transparent;border-color:transparent;cursor:default;min-height:0}
+.cal-cell.empty:hover{transform:none;box-shadow:none}
 
 /* CARD / TABLE */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
@@ -198,15 +205,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
   <div class="nav-section">
     <div class="nav-label">Talent Acquisition</div>
-    <a class="nav-item" href="../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Jobs</a>
+    <a class="nav-item" href="../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
     <a class="nav-item" href="../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates</a>
     <a class="nav-item" href="../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-label">Employee Lifecycle</div>
-    <a class="nav-item" href="../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
     <a class="nav-item" href="../employee_lifecycle/offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item" href="../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
     <a class="nav-item" href="../employee_lifecycle/orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
     <a class="nav-item" href="../employee_lifecycle/deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
   </div>
@@ -294,15 +301,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
       <!-- CALENDAR -->
       <div class="calendar-wrap">
-        <div class="cal-header">
+        <div class="cal-top-bar">
           <div class="cal-title" id="cal-month-label">—</div>
           <div class="cal-legend">
-            <div class="leg-item"><div class="leg-dot" style="background:rgba(34,197,94,.6)"></div>Present</div>
-            <div class="leg-item"><div class="leg-dot" style="background:rgba(244,63,94,.5)"></div>Absent</div>
-            <div class="leg-item"><div class="leg-dot" style="background:rgba(100,116,139,.3)"></div>Weekend</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Present</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--rose)"></div>Absent</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--text3)"></div>Weekend</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--accent2);box-shadow:0 0 0 2px rgba(59,130,246,.4)"></div>Today</div>
           </div>
         </div>
-        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-body">
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
       </div>
 
       <!-- DAILY LOG TABLE -->
@@ -539,26 +549,50 @@ function renderKPIs() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  CALENDAR
+//  CALENDAR — redesigned
 // ══════════════════════════════════════════════════════════════════
 function renderCalendar(month) {
   const [y, m]   = month.split("-").map(Number);
   const firstDow = new Date(y, m - 1, 1).getDay();
   const tStr     = todayStr();
-  const DN       = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+  const DN       = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
   let html = DN.map(d => `<div class="cal-day-name">${d}</div>`).join("");
   for (let i = 0; i < firstDow; i++) html += `<div class="cal-cell empty"></div>`;
 
   allRows.forEach(r => {
     const isToday = r.dateStr === tStr;
-    let tip = r.dateStr;
-    if (r.rec && r.rec.punchIn)  tip += " · In: "  + fmtTime(r.rec.punchIn);
-    if (r.rec && r.rec.punchOut) tip += " · Out: " + fmtTime(r.rec.punchOut);
-    const hLbl = r.hours != null
-      ? `<span class="cal-hours">${Math.floor(r.hours/60)}h${r.hours%60?""+r.hours%60+"m":""}</span>` : "";
-    html += `<div class="cal-cell ${r.status}${isToday?" today":""}" title="${tip}">
-      <span>${r.jsDate.getDate()}</span>${hLbl}
+    const dayNum  = r.jsDate.getDate();
+
+    let icon = "";
+    let timeStr = "";
+
+    if (r.status === "present") {
+      icon = "✓";
+      if (r.rec && r.rec.punchIn) {
+        const inTime  = fmtTime(r.rec.punchIn);
+        const outTime = r.rec.punchOut ? fmtTime(r.rec.punchOut) : "—";
+        timeStr = `${inTime}–${outTime}`;
+        if (r.hours != null) {
+          const h = Math.floor(r.hours/60), mn = r.hours%60;
+          timeStr = `${h}h${mn?""+mn+"m":""}`;
+        }
+      }
+    } else if (r.status === "absent") {
+      icon = "✕";
+    } else if (r.status === "weekend") {
+      icon = "—";
+    }
+
+    const todayCls = isToday ? " today" : "";
+    const tipParts = [r.dateStr];
+    if (r.rec && r.rec.punchIn)  tipParts.push("In: "  + fmtTime(r.rec.punchIn));
+    if (r.rec && r.rec.punchOut) tipParts.push("Out: " + fmtTime(r.rec.punchOut));
+
+    html += `<div class="cal-cell ${r.status}${todayCls}" title="${tipParts.join(" · ")}">
+      <span class="cal-num">${dayNum}</span>
+      ${icon ? `<span class="cal-icon">${icon}</span>` : ""}
+      ${timeStr ? `<span class="cal-time">${timeStr}</span>` : ""}
     </div>`;
   });
 
