@@ -214,7 +214,7 @@ textarea.letter-body{font-family:var(--mono);font-size:12.5px;line-height:1.65;m
             </div>
             <div class="fg">
               <label>Employee Type</label>
-              <select id="f-employeeType" onchange="regenerateIfClean()">
+              <select id="f-employeeType" onchange="toggleInternFields(); regenerateIfClean()">
                 <option>Full-time</option>
                 <option>Part-time</option>
                 <option>Contract</option>
@@ -255,6 +255,81 @@ textarea.letter-body{font-family:var(--mono);font-size:12.5px;line-height:1.65;m
               <input type="text" id="f-additionalTerms" placeholder="e.g. 90-day probation" oninput="regenerateIfClean()">
             </div>
           </div>
+
+          <!-- ── ADVANCED VERZEO-STYLE TERMS ───────────────────────────────── -->
+          <details style="margin-top:14px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--navy2);" id="adv-block">
+            <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text);user-select:none;">
+              ⚙ Advanced terms (Verzeo-style letter)
+              <span style="font-weight:400;color:var(--text3);font-size:11px;margin-left:6px;">
+                training dates · hours/week · notice period · revenue target
+              </span>
+            </summary>
+
+            <div style="margin-top:14px;">
+              <div class="frow">
+                <div class="fg">
+                  <label>Currency</label>
+                  <select id="f-ctcCurrency" onchange="regenerateIfClean()">
+                    <option value="INR">INR (₹)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                  </select>
+                </div>
+                <div class="fg">
+                  <label>Hours per Week</label>
+                  <input type="number" id="f-hoursPerWeek" min="1" max="168" value="40" oninput="regenerateIfClean()">
+                </div>
+              </div>
+
+              <div class="frow">
+                <div class="fg">
+                  <label>Working Hours per Day <span style="color:var(--text3);font-weight:400;">(inc. lunch)</span></label>
+                  <input type="number" id="f-workingHoursPerDay" min="1" max="24" value="9" oninput="regenerateIfClean()">
+                </div>
+                <div class="fg">
+                  <label>Acceptance Window (working days)</label>
+                  <input type="number" id="f-acceptanceWindowDays" min="1" max="60" value="2" oninput="regenerateIfClean()">
+                </div>
+              </div>
+
+              <div class="frow">
+                <div class="fg">
+                  <label>Notice Period (days)</label>
+                  <input type="number" id="f-noticePeriodDays" min="0" max="365" value="30" oninput="regenerateIfClean()">
+                </div>
+                <div class="fg">
+                  <label>Revenue Target <span style="color:var(--text3);font-weight:400;">(sales only)</span></label>
+                  <input type="text" id="f-revenueTarget" placeholder="e.g. INR 1,50,000 / month" oninput="regenerateIfClean()">
+                </div>
+              </div>
+
+              <!-- Internship-specific row — shown only when Employee Type = Intern -->
+              <div id="intern-only" style="display:none;">
+                <hr style="border:none;border-top:1px dashed var(--border2);margin:14px 0;">
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">
+                  Internship fields
+                </div>
+                <div class="frow">
+                  <div class="fg">
+                    <label>Training Start Date</label>
+                    <input type="date" id="f-trainingStartDate" oninput="regenerateIfClean()">
+                  </div>
+                  <div class="fg">
+                    <label>Training End Date</label>
+                    <input type="date" id="f-trainingEndDate" oninput="regenerateIfClean()">
+                  </div>
+                </div>
+                <div class="frow">
+                  <div class="fg">
+                    <label>Internship End Date</label>
+                    <input type="date" id="f-internshipEndDate" oninput="regenerateIfClean()">
+                  </div>
+                  <div class="fg"></div>
+                </div>
+              </div>
+            </div>
+          </details>
 
           <div class="fg" style="margin-top:18px;">
             <label>Letter body <span id="bodyEditedFlag" class="badge b-amber" style="display:none;">✏ Edited</span></label>
@@ -419,6 +494,19 @@ function showEditor() {
   document.getElementById("f-reportingTo").value     = o.reportingTo      || "";
   document.getElementById("f-additionalTerms").value = o.additionalTerms  || "";
 
+  // ── Verzeo-style extended fields (defaults match OfferLetter model) ──
+  document.getElementById("f-ctcCurrency").value          = o.ctcCurrency          || "INR";
+  document.getElementById("f-hoursPerWeek").value         = o.hoursPerWeek         || 40;
+  document.getElementById("f-workingHoursPerDay").value   = o.workingHoursPerDay   || 9;
+  document.getElementById("f-acceptanceWindowDays").value = o.acceptanceWindowDays || 2;
+  document.getElementById("f-noticePeriodDays").value     = o.noticePeriodDays     || 30;
+  document.getElementById("f-revenueTarget").value        = o.revenueTarget        || "";
+  document.getElementById("f-trainingStartDate").value    = o.trainingStartDate    || "";
+  document.getElementById("f-trainingEndDate").value      = o.trainingEndDate      || "";
+  document.getElementById("f-internshipEndDate").value    = o.internshipEndDate    || "";
+
+  toggleInternFields();
+
   const editedFlag = document.getElementById("bodyEditedFlag");
   if (current.bodyEdited) {
     editedFlag.style.display = "inline-flex";
@@ -484,8 +572,27 @@ function collectForm() {
     offerExpiryDate: document.getElementById("f-offerExpiryDate").value,
     location:        document.getElementById("f-location").value.trim(),
     reportingTo:     document.getElementById("f-reportingTo").value.trim(),
-    additionalTerms: document.getElementById("f-additionalTerms").value.trim()
+    additionalTerms: document.getElementById("f-additionalTerms").value.trim(),
+
+    // Verzeo-style extended fields
+    ctcCurrency:          document.getElementById("f-ctcCurrency").value,
+    hoursPerWeek:         Number(document.getElementById("f-hoursPerWeek").value || 40),
+    workingHoursPerDay:   Number(document.getElementById("f-workingHoursPerDay").value || 9),
+    acceptanceWindowDays: Number(document.getElementById("f-acceptanceWindowDays").value || 2),
+    noticePeriodDays:     Number(document.getElementById("f-noticePeriodDays").value || 30),
+    revenueTarget:        document.getElementById("f-revenueTarget").value.trim(),
+    trainingStartDate:    document.getElementById("f-trainingStartDate").value,
+    trainingEndDate:      document.getElementById("f-trainingEndDate").value,
+    internshipEndDate:    document.getElementById("f-internshipEndDate").value
   };
+}
+
+// Show internship-only fields when Employee Type === "Intern", hide otherwise.
+function toggleInternFields() {
+  const et = document.getElementById("f-employeeType").value;
+  document.getElementById("intern-only").style.display = (et === "Intern") ? "block" : "none";
+  // Auto-open advanced panel for interns so the extra fields are visible
+  if (et === "Intern") document.getElementById("adv-block").open = true;
 }
 
 // ════════════════════════════════════════════════════════════════════

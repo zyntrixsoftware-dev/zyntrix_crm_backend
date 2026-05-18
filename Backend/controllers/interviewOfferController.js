@@ -204,83 +204,251 @@ exports.toggleOffered = async (req, res) => {
 // OFFER LETTER TEMPLATES
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPANY CONSTANTS — pulled from env so they can be overridden per deployment
+// ─────────────────────────────────────────────────────────────────────────────
+const COMPANY = {
+  name:      process.env.COMPANY_NAME      || "Zyntrix Software Solutions Pvt. Ltd.",
+  shortName: process.env.COMPANY_SHORTNAME || "ZYNTRIX SOFTWARE SOLUTIONS",
+  address:   process.env.COMPANY_ADDRESS   || "Hyderabad, Telangana, India",
+  hrEmail:   process.env.COMPANY_HR_EMAIL  || "hr@zyntrixsoftware.com",
+  support:   process.env.COMPANY_SUPPORT_EMAIL || "support@zyntrixsoftware.com",
+  phone:     process.env.COMPANY_PHONE     || "",
+  cin:       process.env.COMPANY_CIN       || "",
+  gstn:      process.env.COMPANY_GSTN      || "",
+  pan:       process.env.COMPANY_PAN       || ""
+};
+
 const OFFER_TEMPLATES = {
   default: {
     key:   "default",
     label: "Default",
-    intro: "We are pleased to offer you the position of {{appliedFor}} at Zyntrix Software Pvt. Ltd."
+    intro: "We are pleased to inform you that you have been selected for the position of {{appliedFor}} " +
+           "at {{companyName}}. Please find below the confirmation of your employment offer."
   },
   engineer: {
     key:   "engineer",
     label: "Engineering",
-    intro: "We are excited to extend an offer for the role of {{appliedFor}} on the Zyntrix Engineering team. " +
-           "Your experience and technical strengths impressed us through every round of our interview process."
+    intro: "We are excited to confirm your selection for the position of {{appliedFor}} on the " +
+           "{{companyName}} Engineering team. Your technical strengths and problem-solving approach " +
+           "stood out across every round of our interview process. Please find below the confirmation " +
+           "of your employment offer."
   },
   sales: {
     key:   "sales",
     label: "Sales",
-    intro: "We are delighted to offer you the position of {{appliedFor}} in the Zyntrix Sales organization. " +
-           "Your drive and customer-first mindset stood out across all interview rounds."
+    intro: "We are delighted to confirm your selection for the position of {{appliedFor}} in the " +
+           "{{companyName}} Sales organisation. Your customer-first mindset and ownership impressed us " +
+           "throughout the interview process. Please find below the confirmation of your employment offer."
   },
   intern: {
     key:   "intern",
     label: "Internship",
-    intro: "We are happy to offer you an internship as a {{appliedFor}} at Zyntrix Software Pvt. Ltd. " +
-           "This will be a fixed-term programme designed to give you hands-on experience."
+    intro: "We congratulate you for being selected for an Internship with {{companyName}} on an “At will basis” " +
+           "which can be extended based on performance. Please find below the confirmation of your Internship."
   },
   manager: {
     key:   "manager",
     label: "Manager / Lead",
-    intro: "We are pleased to extend an offer for the leadership role of {{appliedFor}} at Zyntrix Software Pvt. Ltd. " +
-           "We are confident you will be a strong addition to our leadership team."
+    intro: "We are pleased to extend an offer for the leadership role of {{appliedFor}} at {{companyName}}. " +
+           "We are confident you will be a strong addition to our leadership team. Please find below the " +
+           "confirmation of your employment offer."
   }
 };
 
 function fillIntro(template, data) {
-  return (template.intro || "").replace(/\{\{appliedFor\}\}/g, data.appliedFor || "the role");
+  return (template.intro || "")
+    .replace(/\{\{appliedFor\}\}/g,  data.appliedFor  || "the role")
+    .replace(/\{\{companyName\}\}/g, COMPANY.name);
 }
 
+// Format a YYYY-MM-DD string as "21 June 2021" style (Verzeo style)
+function fmtDate(s) {
+  if (!s) return "—";
+  const d = new Date(s + (s.length === 10 ? "T00:00:00" : ""));
+  if (isNaN(d.getTime())) return s;
+  return d.toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
+}
+
+function rule() {
+  return "────────────────────────────────────────────────────────────────────────";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN LETTER GENERATOR — mirrors the Verzeo offer letter structure under
+// Zyntrix branding. Sections adapt based on employeeType + supplied fields.
+// ─────────────────────────────────────────────────────────────────────────────
 function generateLetterBody(data, templateKey = "default") {
   const template = OFFER_TEMPLATES[templateKey] || OFFER_TEMPLATES.default;
-  const today    = new Date().toLocaleDateString("en-IN", {
+  const isIntern = (data.employeeType || "").toLowerCase() === "intern";
+
+  const today          = new Date().toLocaleDateString("en-IN", {
     day: "2-digit", month: "long", year: "numeric"
   });
-  const intro    = fillIntro(template, data);
-  const salary   = Number(data.offeredSalary || 0).toLocaleString("en-IN");
+  const positionLabel  = isIntern ? "Internship" : "Employment";
+  const positionWord   = isIntern ? "Internship" : "Position";
+  const ctcLabel       = isIntern ? "Internship Stipend" : "CTC Offered";
+  const ctcUnit        = isIntern ? "per month"          : "per annum";
+  const currency       = data.ctcCurrency || "INR";
+  const salaryStr      = Number(data.offeredSalary || 0).toLocaleString("en-IN");
+  const intro          = fillIntro(template, data);
 
-  return `
-Date: ${today}
+  // Compose key-terms block — only include lines we have data for
+  const keyTerms = [];
+  keyTerms.push(`${positionWord} Title       : ${data.appliedFor || "—"}`);
+  if (data.department) keyTerms.push(`Department          : ${data.department}`);
+  if (isIntern && data.trainingStartDate)
+    keyTerms.push(`Training Date       : ${fmtDate(data.trainingStartDate)} to ${fmtDate(data.trainingEndDate)}`);
+  keyTerms.push(`${isIntern ? "Internship Start" : "Date of Joining "}    : ${fmtDate(data.joiningDate)}`);
+  if (isIntern && data.internshipEndDate)
+    keyTerms.push(`Internship End Date : ${fmtDate(data.internshipEndDate)}`);
 
-To,
-${data.candidateName}
+  // Working terms block
+  const workTerms = [];
+  if (data.hoursPerWeek) workTerms.push(`Number of Hours     : ${data.hoursPerWeek} hours a week`);
+  workTerms.push(`Location            : ${data.location || "Zyntrix Office"}`);
+  if (data.reportingTo)  workTerms.push(`Reporting To        : ${data.reportingTo}`);
+  workTerms.push(`${ctcLabel.padEnd(20, " ")}: ${currency} ${salaryStr} ${ctcUnit}` +
+                 (isIntern ? " (Subject to statutory deductions)" : ""));
+  if (data.revenueTarget) workTerms.push(`Revenue Target      : ${data.revenueTarget}`);
+  if (data.offerExpiryDate) workTerms.push(`Offer Valid Until   : ${fmtDate(data.offerExpiryDate)}`);
 
-Subject: Offer of Employment — ${data.appliedFor}
+  const acceptanceDays = data.acceptanceWindowDays || 2;
+  const reportingByDate = isIntern && data.trainingStartDate
+    ? fmtDate(data.trainingStartDate)
+    : fmtDate(data.joiningDate);
 
-Dear ${data.candidateName},
+  // ── POLICY SECTION (Verzeo page 2 — adapted for both intern and FT) ──
+  const policyHeader = isIntern ? "INTERNSHIP POLICY" : "EMPLOYMENT POLICY";
+  const noticeDays   = data.noticePeriodDays || (isIntern ? 15 : 30);
+  const workingHrs   = data.workingHoursPerDay || 9;
 
-${intro}
+  const policyLines = [
+    `• By accepting this ${isIntern ? "internship" : "employment"} offer you agree to perform all`,
+    `  responsibilities assigned to you with due care and diligence and in compliance`,
+    `  with the management norms.`,
+    "",
+    `• You are required to substantially use your time and effort to perform these tasks`,
+    `  during business hours and such reasonable additional time as may be necessary.`,
+    "",
+    `  Working Hours : ${workingHrs} hours a day (inc. lunch break)`,
+    `  Job Type      : ${data.employeeType || "Full-time"}`,
+    `  Location      : ${data.location || "Zyntrix Office"}` +
+      (data.revenueTarget ? `\n  Revenue Target: ${data.revenueTarget}` : ""),
+    "",
+    isIntern
+      ? `• As an intern you will not receive employee benefits that regular employees receive.`
+      : `• You will be eligible for the standard employee benefits offered by ${COMPANY.name}, as`,
+    isIntern ? "" : `  detailed separately in the Employee Handbook.`,
+    "",
+    `• During the ${isIntern ? "internship" : "probation"} period, the Company reserves the right to`,
+    `  terminate your services without offering any reason, and you are required to give`,
+    `  ${noticeDays} days' notice should you wish to resign before the end of your tenure.`,
+    "",
+    isIntern
+      ? `• If you discontinue the internship for personal reasons, you will pay a`
+      : `• If you leave before completing your probation, you will compensate the Company`,
+    isIntern
+      ? `  compensation equal to 1 month stipend to the Company.`
+      : `  in line with the standard probation-exit policy.`,
+    "",
+    `• All information acquired during your tenure shall be strictly confidential and you`,
+    `  shall refrain from using it for your own purpose or from disclosing it to anyone`,
+    `  outside of the Company.`,
+    "",
+    `• Upon conclusion of your tenure, you will immediately return to the Company all of`,
+    `  its property, equipment and documents — including electronically stored information.`,
+    "",
+    `• You will observe all policies and practices governing the conduct of our business`,
+    `  and employees.`,
+    "",
+    `• Official communication, within or outside the Company, must be through the company`,
+    `  email account assigned to you or via your reporting manager.`,
+    "",
+    isIntern
+      ? `• Post successful completion of the internship tenure, the candidate will be`
+      : `• Continued employment is subject to satisfactory performance reviews and`,
+    isIntern
+      ? `  considered for performance-based pre-placement offers by the Company.`
+      : `  adherence to Company policy.`
+  ].filter(l => l !== "");      // drop empty filler lines
 
-Your employment details are as follows:
+  // ── ANNEXURE (Verzeo page 3 — required documents) ──
+  const annexure = [
+    "1. Professional / Educational Certificates and Mark Sheets:",
+    "     • 10th standard or equivalent examination (Original MS for verification)",
+    "     • 12th standard or equivalent examination (Original MS for verification)",
+    "     • Graduation",
+    "     • Post-graduation / Doctorate",
+    "     • Other relevant educational or skill certifications",
+    "",
+    "2. Colour scanned copy of your photograph",
+    "",
+    "3. PAN Card, Voter ID or Driving Licence (scanned copy)",
+    "",
+    "4. Bank Account Details — Bank Name, Name as per bank records,",
+    "   Account Number, IFSC Code"
+  ];
 
-  • Position         : ${data.appliedFor}
-  • Department       : ${data.department || "—"}
-  • Employee Type    : ${data.employeeType || "Full-time"}
-  • Location         : ${data.location || "Zyntrix Office"}
-  • Reporting To     : ${data.reportingTo || "Respective Manager"}
-  • Date of Joining  : ${data.joiningDate}
-  • CTC Offered      : ₹${salary} per annum
-  • Offer Valid Until: ${data.offerExpiryDate || "—"}
+  // ── FOOTER (company identity block, Verzeo footer style) ──
+  const footerLines = [
+    rule(),
+    COMPANY.name,
+    COMPANY.address,
+    [COMPANY.hrEmail, COMPANY.phone].filter(Boolean).join("  ·  ")
+  ];
+  const legalLine = [
+    COMPANY.cin  ? `CIN: ${COMPANY.cin}`   : "",
+    COMPANY.gstn ? `GSTN: ${COMPANY.gstn}` : "",
+    COMPANY.pan  ? `PAN: ${COMPANY.pan}`   : ""
+  ].filter(Boolean).join("  ·  ");
+  if (legalLine) footerLines.push(legalLine);
+  footerLines.push(rule());
 
-${data.additionalTerms ? "Additional Terms:\n" + data.additionalTerms + "\n" : ""}
-Please confirm your acceptance of this offer by replying to this email before the offer expiry date.
-
-We look forward to having you on the Zyntrix team!
-
-Warm regards,
-HR Department
-Zyntrix Software Pvt. Ltd.
-hr@zyntrixsoftware.com
-`.trim();
+  // ────────────────────────────────────────────────────────────────────────
+  // ASSEMBLE
+  // ────────────────────────────────────────────────────────────────────────
+  return [
+    `Date: ${today}`,
+    "",
+    `Dear ${data.candidateName},`,
+    "",
+    `Subject: Offer of ${positionLabel} — ${data.appliedFor}`,
+    "",
+    intro,
+    "",
+    keyTerms.join("\n"),
+    "",
+    workTerms.join("\n"),
+    "",
+    `Please indicate your acceptance by signing this letter and mailing the signed,`,
+    `scanned soft copy of this Offer Letter — along with the documents listed in the`,
+    `Annexure below — to <${COMPANY.hrEmail}> within ${acceptanceDays} working days`,
+    `of receipt. The offer shall stand automatically withdrawn without further action on`,
+    `the part of ${COMPANY.shortName} if we do not receive your acceptance within this timeline.`,
+    "",
+    `I have read and understood the above terms and conditions, and I accept this offer`,
+    `as set forth above with ${COMPANY.name}, and will report on or before ${reportingByDate}.`,
+    "",
+    `SIGNATURE: ____________________________     DATE: ____________________________`,
+    `(Candidate's Signature)`,
+    "",
+    data.additionalTerms ? `Additional Terms:\n${data.additionalTerms}\n` : "",
+    ...footerLines,
+    "",
+    "",
+    policyHeader,
+    rule(),
+    policyLines.join("\n"),
+    "",
+    "",
+    "ANNEXURE — Documents required at the time of joining",
+    rule(),
+    annexure.join("\n"),
+    "",
+    `SIGNATURE: ____________________________     DATE: ____________________________`,
+    `(Candidate's Signature)`
+  ].filter(l => l !== null && l !== undefined).join("\n").trim();
 }
 
 // GET /api/hr/offers/templates — list available templates
@@ -308,12 +476,22 @@ exports.previewOffer = async (req, res) => {
       appliedFor:     interview.appliedFor,
       department:     interview.department,
       offeredSalary:  req.body.offeredSalary  || 0,
+      ctcCurrency:    req.body.ctcCurrency    || "INR",
       joiningDate:    req.body.joiningDate    || "",
       offerExpiryDate:req.body.offerExpiryDate|| "",
       employeeType:   req.body.employeeType   || "Full-time",
       location:       req.body.location       || "",
       reportingTo:    req.body.reportingTo    || "",
-      additionalTerms:req.body.additionalTerms|| ""
+      additionalTerms:req.body.additionalTerms|| "",
+      // Verzeo-style extended fields
+      trainingStartDate:    req.body.trainingStartDate    || "",
+      trainingEndDate:      req.body.trainingEndDate      || "",
+      internshipEndDate:    req.body.internshipEndDate    || "",
+      hoursPerWeek:         req.body.hoursPerWeek         || 40,
+      workingHoursPerDay:   req.body.workingHoursPerDay   || 9,
+      acceptanceWindowDays: req.body.acceptanceWindowDays || 2,
+      noticePeriodDays:     req.body.noticePeriodDays     || 30,
+      revenueTarget:        req.body.revenueTarget        || ""
     };
 
     const body = generateLetterBody(data, templateKey);
@@ -359,8 +537,11 @@ exports.createOffer = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    const { interviewId, offeredSalary, joiningDate, offerExpiryDate,
+    const { interviewId, offeredSalary, ctcCurrency, joiningDate, offerExpiryDate,
             employeeType, location, reportingTo, additionalTerms,
+            trainingStartDate, trainingEndDate, internshipEndDate,
+            hoursPerWeek, workingHoursPerDay, acceptanceWindowDays,
+            noticePeriodDays, revenueTarget,
             templateKey, letterBody } = req.body;
 
     if (!interviewId || !offeredSalary || !joiningDate)
@@ -375,6 +556,18 @@ exports.createOffer = async (req, res) => {
 
     const chosenTemplate = OFFER_TEMPLATES[templateKey] ? templateKey : "default";
 
+    const extended = {
+      ctcCurrency:           ctcCurrency           || "INR",
+      trainingStartDate:     trainingStartDate     || "",
+      trainingEndDate:       trainingEndDate       || "",
+      internshipEndDate:     internshipEndDate     || "",
+      hoursPerWeek:          hoursPerWeek          || 40,
+      workingHoursPerDay:    workingHoursPerDay    || 9,
+      acceptanceWindowDays:  acceptanceWindowDays  || 2,
+      noticePeriodDays:      noticePeriodDays      || 30,
+      revenueTarget:         revenueTarget         || ""
+    };
+
     const letterData = {
       candidateName:  interview.candidateName,
       candidateEmail: interview.candidateEmail,
@@ -382,7 +575,8 @@ exports.createOffer = async (req, res) => {
       department:     interview.department,
       offeredSalary, joiningDate, offerExpiryDate,
       employeeType: employeeType || "Full-time",
-      location, reportingTo, additionalTerms
+      location, reportingTo, additionalTerms,
+      ...extended
     };
 
     // If HR supplied a custom letterBody, use it as-is (and mark bodyEdited)
@@ -398,6 +592,7 @@ exports.createOffer = async (req, res) => {
       offeredSalary, joiningDate, offerExpiryDate,
       employeeType: employeeType || "Full-time",
       location, reportingTo, additionalTerms,
+      ...extended,
       templateKey: chosenTemplate,
       bodyEdited:  !!customBody,
       letterBody:  finalBody,
@@ -423,8 +618,14 @@ exports.updateOffer = async (req, res) => {
     if (offer.status === "sent")
       return res.status(400).json({ msg: "Cannot edit an already sent offer" });
 
-    const allowed = ["offeredSalary","joiningDate","offerExpiryDate","employeeType",
-                     "location","reportingTo","additionalTerms","templateKey"];
+    const allowed = [
+      "offeredSalary","ctcCurrency","joiningDate","offerExpiryDate","employeeType",
+      "location","reportingTo","additionalTerms","templateKey",
+      // Verzeo-style extended fields
+      "trainingStartDate","trainingEndDate","internshipEndDate",
+      "hoursPerWeek","workingHoursPerDay","acceptanceWindowDays",
+      "noticePeriodDays","revenueTarget"
+    ];
     allowed.forEach(f => { if (req.body[f] !== undefined) offer[f] = req.body[f]; });
 
     // If HR supplied a custom body, mark it edited and use it verbatim.
@@ -436,16 +637,25 @@ exports.updateOffer = async (req, res) => {
     } else if (!offer.bodyEdited) {
       // Re-generate from template if HR has not hand-edited it yet
       offer.letterBody = generateLetterBody({
-        candidateName:   offer.candidateName,
-        appliedFor:      offer.appliedFor,
-        department:      offer.department,
-        offeredSalary:   offer.offeredSalary,
-        joiningDate:     offer.joiningDate,
-        offerExpiryDate: offer.offerExpiryDate,
-        employeeType:    offer.employeeType,
-        location:        offer.location,
-        reportingTo:     offer.reportingTo,
-        additionalTerms: offer.additionalTerms
+        candidateName:      offer.candidateName,
+        appliedFor:         offer.appliedFor,
+        department:         offer.department,
+        offeredSalary:      offer.offeredSalary,
+        ctcCurrency:        offer.ctcCurrency,
+        joiningDate:        offer.joiningDate,
+        offerExpiryDate:    offer.offerExpiryDate,
+        employeeType:       offer.employeeType,
+        location:           offer.location,
+        reportingTo:        offer.reportingTo,
+        additionalTerms:    offer.additionalTerms,
+        trainingStartDate:  offer.trainingStartDate,
+        trainingEndDate:    offer.trainingEndDate,
+        internshipEndDate:  offer.internshipEndDate,
+        hoursPerWeek:       offer.hoursPerWeek,
+        workingHoursPerDay: offer.workingHoursPerDay,
+        acceptanceWindowDays: offer.acceptanceWindowDays,
+        noticePeriodDays:   offer.noticePeriodDays,
+        revenueTarget:      offer.revenueTarget
       }, offer.templateKey);
     }
 

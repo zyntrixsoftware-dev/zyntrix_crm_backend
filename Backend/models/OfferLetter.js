@@ -12,12 +12,28 @@ const offerLetterSchema = new mongoose.Schema({
 
   // Offer terms (HR fills these in the panel)
   offeredSalary:  { type: Number, required: true },
+  ctcCurrency:    { type: String, default: "INR" },   // INR / USD / EUR — currency label
   joiningDate:    { type: String, required: true },   // "YYYY-MM-DD"
   offerExpiryDate:{ type: String, default: "" },      // "YYYY-MM-DD"
   employeeType:   { type: String, enum: ["Full-time","Part-time","Contract","Intern"], default: "Full-time" },
   location:       { type: String, default: "" },
   reportingTo:    { type: String, default: "" },      // Manager name
   additionalTerms:{ type: String, default: "" },
+
+  // ── Verzeo-style extended terms ─────────────────────────────────────────
+  // Internship-specific (only rendered in letter when employeeType=Intern)
+  trainingStartDate:  { type: String, default: "" },   // "YYYY-MM-DD"
+  trainingEndDate:    { type: String, default: "" },   // "YYYY-MM-DD"
+  internshipEndDate:  { type: String, default: "" },   // "YYYY-MM-DD"
+
+  // Common employment terms (defaults follow standard Zyntrix policy)
+  hoursPerWeek:         { type: Number, default: 40 },
+  workingHoursPerDay:   { type: Number, default: 9 },     // inc. lunch break
+  acceptanceWindowDays: { type: Number, default: 2 },     // days candidate has to accept
+  noticePeriodDays:     { type: Number, default: 30 },    // notice required to resign
+
+  // Sales-specific (rendered when present, regardless of employeeType)
+  revenueTarget: { type: String, default: "" },           // free-text e.g. "INR 1,50,000 per month"
 
   // Status
   status: {
