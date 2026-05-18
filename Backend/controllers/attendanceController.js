@@ -112,3 +112,96 @@ exports.resetAttendance = async (req, res) => {
     return res.status(500).json({ msg: "Server error" });
   }
 };
+
+// ── EDIT / CREATE ATTENDANCE (HR / super_admin only) ─────────────────────────
+// POST  /api/attendance/edit  → create record for absent day
+// PATCH /api/attendance/edit  → update punch times for existing record
+exports.editAttendance = async (req, res) => {
+  try {
+    const { role } = req.user;
+    if (!["hr", "super_admin"].includes(role)) {
+      return res.status(403).json({ msg: "Only HR or super_admin can edit attendance" });
+    }
+
+    const { userId, date, punchIn, punchOut, note } = req.body;
+
+    if (!userId || !date) {
+      return res.status(400).json({ msg: "userId and date are required" });
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return res.status(400).json({ msg: "date must be in YYYY-MM-DD format" });
+    }
+
+    const today = getUTCDate();
+    if (date > today) {
+      return res.status(400).json({ msg: "Cannot edit a future date" });
+    }
+
+    // Build the datetime strings (combine date + time)
+    const buildDateTime = (dateStr, timeStr) => {
+      if (!timeStr) return null;
+      return new Date(`${dateStr}T${timeStr}:00.000Z`);
+    };
+
+    const existing = await Attendance.findOne({ userId, date });
+
+    if (existing) {
+      // UPDATE existing record
+      if (punchIn)  existing.punchIn  = buildDateTime(date, punchIn);
+      if (punchOut) existing.punchOut = buildDateTime(date, punchOut);
+      if (note !== undefined) existing.note = note;
+      await existing.save();
+      return res.json({ msg: "Attendance updated", record: existing });
+    } else {
+      // CREATE new record (absent → present)
+      if (!punchIn) {
+        return res.status(400).json({ msg: "punchIn time is required to create attendance" });
+      }
+      const record = await Attendance.create({
+        userId,
+        date,
+        punchIn:  buildDateTime(date, punchIn),
+        punchOut: punchOut ? buildDateTime(date, punchOut) : null,
+        note:     note || ""
+      });
+      return res.json({ msg: "Attendance created", record });
+    }
+
+  } catch (err) {
+    console.error("EDIT ATTENDANCE ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── SAVE NOTE ON ATTENDANCE RECORD (HR / super_admin only) ───────────────────
+// PATCH /api/attendance/note  body: { userId, date, note }
+exports.saveNote = async (req, res) => {
+  try {
+    const { role } = req.user;
+    if (!["hr", "super_admin"].includes(role)) {
+      return res.status(403).json({ msg: "Only HR or super_admin can add notes" });
+    }
+
+    const { userId, date, note } = req.body;
+    if (!userId || !date) {
+      return res.status(400).json({ msg: "userId and date are required" });
+    }
+
+    const record = await Attendance.findOneAndUpdate(
+      { userId, date },
+      { $set: { note: note || "" } },
+      { new: true }
+    );
+
+    if (!record) {
+      return res.status(404).json({ msg: "No attendance record found for this date" });
+    }
+
+    return res.json({ msg: "Note saved", record });
+
+  } catch (err) {
+    console.error("SAVE NOTE ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
