@@ -30,7 +30,18 @@ const offerLetterSchema = new mongoose.Schema({
   sentAt:    { type: Date },
   sentBy:    { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
-  // The rendered letter body (auto-generated from template + candidate data)
+  // ── Template selection ─────────────────────────────────────────────────
+  // Drives which boilerplate fills letterBody initially. HR can still edit
+  // the rendered body freely; once bodyEdited=true, we stop auto-regenerating.
+  templateKey: {
+    type: String,
+    enum: ["default", "engineer", "sales", "intern", "manager"],
+    default: "default"
+  },
+  bodyEdited: { type: Boolean, default: false },
+
+  // The rendered letter body (auto-generated from template + candidate data,
+  // or HR-edited when bodyEdited=true)
   letterBody: { type: String, default: "" },
 
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }

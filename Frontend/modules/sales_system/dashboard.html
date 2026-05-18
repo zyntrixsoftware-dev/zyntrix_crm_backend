@@ -876,6 +876,8 @@ function handlePeriodChange(period) {
 
 /* ══ INIT ══ */
 async function init() {
+  requireAuth();
+  requireModuleAccess('sales');
   await loadPageData('sales', 'deals', mapDeal,
     (mapped) => {
       DEALS = mapped;
@@ -892,7 +894,7 @@ async function init() {
   );
 }
 
-init();
+window.addEventListener('load', init);
 </script>
 <script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/data-loader.js"></script>

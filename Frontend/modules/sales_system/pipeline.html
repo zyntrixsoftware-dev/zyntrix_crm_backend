@@ -460,11 +460,6 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="snav-right">
       <select id="owner-filter" onchange="applyFilters()" style="font-size:12px;padding:6px 10px;">
         <option value="">All Owners</option>
-        <option>Sanjay Kumar</option>
-        <option>Priya Nair</option>
-        <option>Rahul Mehta</option>
-        <option>Anjali Rao</option>
-        <option>Vikram Singh</option>
       </select>
       <select id="period-filter" onchange="applyFilters()" style="font-size:12px;padding:6px 10px;">
         <option>Q2 2025</option>
@@ -484,33 +479,33 @@ textarea { resize: vertical; min-height: 80px; }
         <div class="kpi-row">
           <div class="kpi-card ani" style="--glow: rgba(0,229,176,0.08);">
             <span class="kpi-icon">◎</span>
-            <div class="kpi-val" style="color:var(--accent);">₹4.2Cr</div>
+            <div class="kpi-val" style="color:var(--accent);" id="kpi-pipeline">—</div>
             <div class="kpi-lbl">Total Pipeline</div>
-            <div class="kpi-delta up">▲ 23% vs Q1</div>
+            <div class="kpi-delta up" id="kpi-pipeline-delta">Active deals value</div>
           </div>
           <div class="kpi-card ani" style="--glow: rgba(61,142,240,0.08);">
             <span class="kpi-icon">◈</span>
-            <div class="kpi-val" style="color:var(--blue);">18</div>
+            <div class="kpi-val" style="color:var(--blue);" id="kpi-active">—</div>
             <div class="kpi-lbl">Active Deals</div>
-            <div class="kpi-delta up">▲ 6 new this month</div>
+            <div class="kpi-delta up" id="kpi-active-delta">Excl. Closed Won/Lost</div>
           </div>
           <div class="kpi-card ani" style="--glow: rgba(245,166,35,0.08);">
             <span class="kpi-icon">⟐</span>
-            <div class="kpi-val" style="color:var(--amber);">₹52.4L</div>
+            <div class="kpi-val" style="color:var(--amber);" id="kpi-negotiation">—</div>
             <div class="kpi-lbl">In Negotiation</div>
-            <div class="kpi-delta neu">6 deals · avg 85%</div>
+            <div class="kpi-delta neu" id="kpi-negotiation-delta">Final stage deals</div>
           </div>
           <div class="kpi-card ani" style="--glow: rgba(0,229,176,0.06);">
             <span class="kpi-icon">✓</span>
-            <div class="kpi-val" style="color:var(--accent);">68%</div>
+            <div class="kpi-val" style="color:var(--accent);" id="kpi-winrate">—</div>
             <div class="kpi-lbl">Win Rate</div>
-            <div class="kpi-delta up">▲ 5% vs last Q</div>
+            <div class="kpi-delta up" id="kpi-winrate-delta">Won ÷ (Won + Lost)</div>
           </div>
           <div class="kpi-card ani" style="--glow: rgba(255,77,109,0.08);">
             <span class="kpi-icon">⚠</span>
-            <div class="kpi-val" style="color:var(--rose);">3</div>
+            <div class="kpi-val" style="color:var(--rose);" id="kpi-atrisk">—</div>
             <div class="kpi-lbl">Deals At Risk</div>
-            <div class="kpi-delta dn">Stalled 14+ days</div>
+            <div class="kpi-delta dn" id="kpi-atrisk-delta">Stalled 14+ days</div>
           </div>
         </div>
       </div>
@@ -710,11 +705,7 @@ textarea { resize: vertical; min-height: 80px; }
         <div class="card ani">
           <div class="card-hd"><div class="card-title">Win / Loss</div><div class="card-sub">Q2 2025</div></div>
           <div style="height:160px;position:relative;"><canvas id="winLossChart"></canvas></div>
-          <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;font-size:12px;">
-            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;background:var(--accent);border-radius:50%;display:inline-block;"></span>Won</span><strong style="color:var(--accent);">68% · 34 deals</strong></div>
-            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;background:var(--rose);border-radius:50%;display:inline-block;"></span>Lost</span><strong style="color:var(--rose);">24% · 12 deals</strong></div>
-            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;background:var(--text3);border-radius:50%;display:inline-block;"></span>Stalled</span><strong style="color:var(--text3);">8% · 4 deals</strong></div>
-          </div>
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;font-size:12px;" id="winloss-legend"></div>
         </div>
         <div class="card ani">
           <div class="card-hd"><div class="card-title">Lead Sources</div><div class="card-sub">By volume this quarter</div></div>
@@ -1042,11 +1033,37 @@ function renderCurrentView() {
 /* ══════════════════════════════════════════════
    BOARD VIEW
 ══════════════════════════════════════════════ */
+function updateKPIs() {
+  const active = DEALS.filter(d => d.stage !== 'Closed Won' && d.stage !== 'Closed Lost');
+  const won    = DEALS.filter(d => d.stage === 'Closed Won');
+  const lost   = DEALS.filter(d => d.stage === 'Closed Lost');
+  const neg    = DEALS.filter(d => d.stage === 'Negotiation');
+  const atRisk = DEALS.filter(d => daysSince(d.lastContact) >= riskDays && d.stage !== 'Closed Won' && d.stage !== 'Closed Lost');
+
+  const pipelineVal = active.reduce((s,d) => s+d.value, 0);
+  const negVal      = neg.reduce((s,d) => s+d.value, 0);
+  const winRate     = (won.length + lost.length) > 0 ? Math.round(won.length / (won.length + lost.length) * 100) : 0;
+  const weighted    = active.reduce((s,d) => s + weightedVal(d), 0);
+
+  const el = id => document.getElementById(id);
+  el('kpi-pipeline').textContent        = pipelineVal > 0 ? fmt(pipelineVal) : '—';
+  el('kpi-pipeline-delta').textContent  = `${fmt(weighted)} weighted`;
+  el('kpi-active').textContent          = active.length;
+  el('kpi-active-delta').textContent    = `${won.length} won · ${lost.length} lost`;
+  el('kpi-negotiation').textContent     = negVal > 0 ? fmt(negVal) : `${neg.length} deals`;
+  el('kpi-negotiation-delta').textContent = `${neg.length} deal${neg.length!==1?'s':''} · final stage`;
+  el('kpi-winrate').textContent         = winRate + '%';
+  el('kpi-winrate-delta').textContent   = `${won.length} won of ${won.length+lost.length} closed`;
+  el('kpi-atrisk').textContent          = atRisk.length;
+  el('kpi-atrisk-delta').textContent    = atRisk.length > 0 ? `₹${atRisk.reduce((s,d)=>s+d.value,0)/100000 | 0}L at risk` : 'All deals healthy ✓';
+  el('tc-board').textContent            = active.length;
+}
+
 function renderBoard() {
+  updateKPIs();
   const data = getFilteredDeals();
   const total = data.length;
   document.getElementById('board-filter-info').textContent = `Showing ${total} of ${DEALS.length} deals`;
-  document.getElementById('tc-board').textContent = DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost').length;
 
   renderPipelineSummary(data);
   renderKanban(data);
@@ -1594,11 +1611,12 @@ const chartTooltip = { backgroundColor:'#0d1624', titleColor:'#e8f0fe', bodyColo
 const gridLines = { color:'rgba(255,255,255,0.04)' };
 const tickStyle = { color:'#4e6680', font:{size:10.5} };
 
-let chartsBuilt = false;
+let stageChartInst = null, winLossChartInst = null, sourceChartInst = null, funnelChartInst = null;
+
 function renderAnalytics() {
   renderVelocityList();
   renderPerfTable();
-  if (!chartsBuilt) { buildAllCharts(); chartsBuilt = true; }
+  buildAllCharts();
 }
 
 function renderVelocityList() {
@@ -1621,14 +1639,20 @@ function renderVelocityList() {
 }
 
 function renderPerfTable() {
-  const perf = [
-    {name:'Sanjay Kumar',init:'SK',col:'#00e5b0',deals:8,rev:'₹68.5L',win:76,avg:'₹8.6L'},
-    {name:'Priya Nair',  init:'PN',col:'#3d8ef0',deals:6,rev:'₹52.2L',win:72,avg:'₹8.7L'},
-    {name:'Rahul Mehta', init:'RM',col:'#b57bee',deals:5,rev:'₹38.1L',win:60,avg:'₹7.6L'},
-    {name:'Anjali Rao',  init:'AR',col:'#f5a623',deals:4,rev:'₹24.6L',win:58,avg:'₹6.2L'},
-    {name:'Vikram Singh',init:'VS',col:'#22d3ee',deals:2,rev:'₹11.8L',win:40,avg:'₹5.9L'},
-  ];
-  document.getElementById('perf-tbody').innerHTML = perf.map(p=>`
+  // Compute from real DEALS data grouped by owner
+  const ownerMap = {};
+  DEALS.forEach(d => {
+    if (!ownerMap[d.owner]) ownerMap[d.owner] = {name:d.owner,init:d.oi,col:d.oCol,total:0,rev:0,won:0,closed:0};
+    ownerMap[d.owner].total++;
+    if (d.stage==='Closed Won')  { ownerMap[d.owner].won++; ownerMap[d.owner].rev+=d.value; ownerMap[d.owner].closed++; }
+    if (d.stage==='Closed Lost') ownerMap[d.owner].closed++;
+  });
+  const rows = Object.values(ownerMap).sort((a,b)=>b.rev-a.rev);
+  if (!rows.length) { document.getElementById('perf-tbody').innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No deals data yet</td></tr>'; return; }
+  document.getElementById('perf-tbody').innerHTML = rows.map(p => {
+    const win = p.closed>0 ? Math.round(p.won/p.closed*100) : 0;
+    const avg = p.won>0 ? Math.round(p.rev/p.won) : 0;
+    return `
     <tr>
       <td>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -1652,24 +1676,44 @@ function renderPerfTable() {
 function buildAllCharts() {
   buildRevChart('monthly');
 
-  new Chart(document.getElementById('stageChart'), {
+  // Stage distribution — computed from real DEALS
+  const stageCols = {'Prospecting':'#4e6680','Qualification':'#3d8ef0','Demo Scheduled':'#b57bee','Proposal Sent':'#f5a623','Negotiation':'#ff7d40','Closed Won':'#00e5b0','Closed Lost':'#ff4d6d'};
+  const stageLabels = Object.keys(stageCols);
+  const stageVals   = stageLabels.map(s => DEALS.filter(d=>d.stage===s).reduce((sum,d)=>sum+d.value,0)/100000);
+  if (stageChartInst) stageChartInst.destroy();
+  stageChartInst = new Chart(document.getElementById('stageChart'), {
     type:'doughnut',
-    data:{
-      labels:['Prospecting','Qualification','Demo','Proposal','Negotiation','Closed Won','Closed Lost'],
-      datasets:[{data:[153,152,178,150,277,99,85], backgroundColor:['#4e6680','#3d8ef0','#b57bee','#f5a623','#ff7d40','#00e5b0','#ff4d6d'], borderWidth:0, hoverOffset:4}]
-    },
-    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:8}},tooltip:chartTooltip}}
+    data:{labels:stageLabels,datasets:[{data:stageVals,backgroundColor:Object.values(stageCols),borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#8ba3bf',font:{size:10},boxWidth:10,padding:8}},tooltip:{...chartTooltip,callbacks:{label:ctx=>`${ctx.label}: ₹${ctx.parsed.toFixed(1)}L`}}}}
   });
 
-  new Chart(document.getElementById('winLossChart'), {
+  // Win / Loss chart from real DEALS
+  const wonCount    = DEALS.filter(d=>d.stage==='Closed Won').length;
+  const lostCount   = DEALS.filter(d=>d.stage==='Closed Lost').length;
+  const stalledCount= DEALS.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost'&&daysSince(d.lastContact)>=riskDays).length;
+  const total       = wonCount + lostCount + stalledCount || 1;
+  if (winLossChartInst) winLossChartInst.destroy();
+  winLossChartInst = new Chart(document.getElementById('winLossChart'), {
     type:'doughnut',
-    data:{labels:['Won','Lost','Stalled'],datasets:[{data:[68,24,8],backgroundColor:['#00e5b0','#ff4d6d','#4e6680'],borderWidth:0,hoverOffset:3}]},
+    data:{labels:['Won','Lost','Stalled'],datasets:[{data:[wonCount,lostCount,stalledCount],backgroundColor:['#00e5b0','#ff4d6d','#4e6680'],borderWidth:0,hoverOffset:3}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:chartTooltip}}
   });
+  const legendEl = document.getElementById('winloss-legend');
+  if (legendEl) legendEl.innerHTML = [
+    {label:'Won',   col:'var(--accent)', n:wonCount},
+    {label:'Lost',  col:'var(--rose)',   n:lostCount},
+    {label:'Stalled',col:'var(--text3)',n:stalledCount},
+  ].map(r=>`<div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;background:${r.col};border-radius:50%;display:inline-block;"></span>${r.label}</span><strong style="color:${r.col};">${Math.round(r.n/total*100)}% · ${r.n} deal${r.n!==1?'s':''}</strong></div>`).join('');
 
-  new Chart(document.getElementById('sourceChart'), {
+  // Source chart from real DEALS
+  const sourceMap = {};
+  DEALS.forEach(d => { sourceMap[d.source] = (sourceMap[d.source]||0) + 1; });
+  const srcEntries = Object.entries(sourceMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const COLS = ['#00e5b0','#3d8ef0','#b57bee','#f5a623','#22d3ee','#ff7d40'];
+  if (sourceChartInst) sourceChartInst.destroy();
+  sourceChartInst = new Chart(document.getElementById('sourceChart'), {
     type:'bar',
-    data:{labels:['Website','Referral','LinkedIn','Campaign','Cold Call','Event'],datasets:[{data:[18,14,9,12,7,4],backgroundColor:['#00e5b0','#3d8ef0','#b57bee','#f5a623','#22d3ee','#ff7d40'],borderRadius:5,borderSkipped:false}]},
+    data:{labels:srcEntries.map(e=>e[0]),datasets:[{data:srcEntries.map(e=>e[1]),backgroundColor:COLS,borderRadius:5,borderSkipped:false}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:chartTooltip},scales:{x:{grid:{display:false},ticks:{color:'#4e6680',font:{size:10}}},y:{grid:gridLines,ticks:tickStyle,beginAtZero:true}}}
   });
 
@@ -1835,6 +1879,9 @@ async function init() {
     (mapped) => {
       DEALS = mapped;
 
+      // Populate owner filter dynamically from data
+      populateFilter('owner-filter', DEALS.map(d => d.owner), 'All Owners');
+
       // Populate deal select in activity modal
       const aSelect = document.getElementById('a-deal');
       if (aSelect) {
@@ -1844,13 +1891,23 @@ async function init() {
       const aDate = document.getElementById('a-date');
       if (aDate) aDate.value = new Date().toISOString().slice(0,16);
 
+      // Seed smart notifications from real data
+      const atRisk = DEALS.filter(d => daysSince(d.lastContact) >= riskDays && d.stage !== 'Closed Won' && d.stage !== 'Closed Lost');
+      const highVal = DEALS.filter(d => d.stage === 'Negotiation').sort((a,b)=>b.value-a.value);
+      const won     = DEALS.filter(d => d.stage === 'Closed Won').slice(0,1);
+      NOTIFICATIONS = [];
+      if (won.length)    NOTIFICATIONS.push({id:1,icon:'🎉',type:'success',title:`${won[0].name} is Closed Won!`,body:`${fmt(won[0].value)} · ${won[0].owner}`,read:false});
+      if (highVal.length)NOTIFICATIONS.push({id:2,icon:'⚡',type:'info',title:`${highVal[0].name} is in Negotiation`,body:`${fmt(highVal[0].value)} · ${highVal[0].owner}`,read:false});
+      atRisk.slice(0,2).forEach((d,i)=>NOTIFICATIONS.push({id:10+i,icon:'⚠️',type:'danger',title:`${d.name} stalled for ${daysSince(d.lastContact)} days`,body:`${fmt(d.value)} · ${d.owner}`,read:false}));
+      document.getElementById('notif-count').textContent = NOTIFICATIONS.filter(n=>!n.read).length || '';
+
       renderNotifications();
       renderBoard();
     }, 'content'
   );
 }
 
-init();
+window.addEventListener('load', init);
 </script>
 <script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/data-loader.js"></script>

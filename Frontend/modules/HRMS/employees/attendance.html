@@ -62,13 +62,21 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .b-blue{background:rgba(79,156,249,.13);color:var(--accent)}
 .b-gray{background:rgba(100,116,139,.13);color:var(--text3)}
 
+/* Month Picker Dropdowns */
+.month-selector{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.month-selector label{font-size:11px;color:var(--text3)}
+.month-dropdowns{display:flex;gap:8px;align-items:center}
+.month-dropdowns select{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.month-dropdowns select:focus{border-color:var(--accent2)}
+.month-dropdowns select option{background:var(--navy2)}
+
 /* KPI */
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
 .kpi-val{font-size:24px;font-weight:600;line-height:1;letter-spacing:-1px;margin-bottom:4px}
 .kpi-lbl{font-size:11px;color:var(--text3)}
 
-/* CALENDAR — redesigned */
+/* CALENDAR */
 .calendar-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden}
 .cal-top-bar{background:linear-gradient(135deg,#1e3a5f 0%,#132236 100%);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
 .cal-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
@@ -87,6 +95,8 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .cal-cell.present:hover:not(.empty){background:rgba(34,197,94,.22);border-color:rgba(34,197,94,.4)}
 .cal-cell.absent{background:rgba(244,63,94,.1);color:var(--rose);border-color:rgba(244,63,94,.18)}
 .cal-cell.absent:hover:not(.empty){background:rgba(244,63,94,.18)}
+.cal-cell.saturday-present{background:rgba(34,197,94,.14);color:var(--green);border-color:rgba(34,197,94,.25)}
+.cal-cell.saturday-absent{background:rgba(244,63,94,.1);color:var(--rose);border-color:rgba(244,63,94,.18)}
 .cal-cell.weekend{background:rgba(100,116,139,.06);color:var(--text3);border-color:var(--border)}
 .cal-cell.future{opacity:.25;cursor:not-allowed}
 .cal-cell.today{box-shadow:0 0 0 2px var(--accent2),0 4px 12px rgba(59,130,246,.2);z-index:1}
@@ -102,8 +112,6 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .ctrl-select{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;cursor:pointer}
 .ctrl-select:focus{border-color:var(--accent2)}
 .ctrl-select option{background:var(--navy2)}
-.ctrl-month{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none}
-.ctrl-month:focus{border-color:var(--accent2)}
 .btn-reset{padding:6px 14px;border-radius:8px;border:1px solid rgba(244,63,94,.35);background:rgba(244,63,94,.1);color:var(--rose);cursor:pointer;font-size:12px;font-weight:500;font-family:var(--font);display:inline-flex;align-items:center;gap:6px;transition:all .15s}
 .btn-reset:hover{background:rgba(244,63,94,.2)}
 .table-wrap{overflow-x:auto}
@@ -119,7 +127,19 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .mono{font-family:var(--mono);font-size:12px}
 .hours-good{color:var(--green);font-weight:500}
 .hours-low{color:var(--amber);font-weight:500}
-.empty{text-align:center;padding:48px;color:var(--text3)}
+
+/* Note editing in table */
+.note-cell{display:flex;align-items:center;gap:6px;min-width:140px}
+.note-text{color:var(--text2);font-size:12px;flex:1}
+.note-text.empty-note{color:var(--text3)}
+.btn-edit-note{background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:2px 4px;border-radius:4px;transition:all .12s;line-height:1}
+.btn-edit-note:hover{color:var(--accent);background:var(--accent-dim)}
+.note-input-wrap{display:flex;align-items:center;gap:4px;flex:1}
+.note-input{background:var(--navy3);border:1px solid var(--accent2);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;flex:1;min-width:0}
+.btn-note-save{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green);border-radius:5px;padding:3px 8px;font-size:11px;font-family:var(--font);cursor:pointer;white-space:nowrap}
+.btn-note-save:hover{background:rgba(34,197,94,.25)}
+.btn-note-cancel{background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px}
+.btn-note-cancel:hover{color:var(--rose)}
 
 /* NO EMPLOYEE STATE / EMPLOYEE PICKER */
 .no-id{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;padding-top:40px;color:var(--text3);text-align:center}
@@ -145,7 +165,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:460px;max-width:94vw;max-height:90vh;overflow-y:auto}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:500px;max-width:94vw;max-height:90vh;overflow-y:auto}
 .modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--navy2);z-index:1}
 .modal-title{font-size:15px;font-weight:600}
 .modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1;padding:2px}
@@ -154,14 +174,26 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--navy2)}
 .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
 .fg label{font-size:12px;font-weight:500;color:var(--text2)}
-.fg input{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;width:100%;transition:border .15s}
-.fg input:focus{border-color:var(--accent2)}
+.fg input,.fg select,.fg textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;width:100%;transition:border .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent2)}
+.fg textarea{resize:vertical;min-height:72px}
+
+/* Modal tab system */
+.modal-tabs{display:flex;gap:4px;background:var(--navy3);border-radius:10px;padding:4px;margin-bottom:20px}
+.modal-tab{flex:1;padding:8px;border-radius:7px;border:none;background:none;color:var(--text3);font-size:13px;font-family:var(--font);font-weight:500;cursor:pointer;transition:all .15s;text-align:center}
+.modal-tab.active{background:var(--navy2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.modal-tab:hover:not(.active){color:var(--text2)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.time-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
 .info-row:last-child{border-bottom:none}
 .info-key{color:var(--text3);font-size:12px}
 .info-val{font-weight:500;color:var(--text);font-family:var(--mono);font-size:12px}
 .warn-box{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--rose);line-height:1.5;margin-bottom:16px}
-.preview-box{background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:4px}
+.info-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--amber);line-height:1.5;margin-bottom:16px}
+.preview-box{background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:4px;margin-bottom:14px}
 .preview-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
 .msg-note{font-size:12px;color:var(--amber);margin-top:8px;display:none}
 .msg-err{font-size:12px;color:var(--rose);margin-top:8px;display:none}
@@ -169,6 +201,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .btn:hover{background:var(--navy3)}
 .btn.danger{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.3);color:var(--rose)}
 .btn.danger:hover:not(:disabled){background:rgba(244,63,94,.22)}
+.btn.primary{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.35);color:var(--accent)}
+.btn.primary:hover:not(:disabled){background:rgba(59,130,246,.25)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 
 /* TOAST */
@@ -284,9 +318,12 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div class="emp-meta" id="emp-meta">—</div>
           <div class="emp-badges" id="emp-badges"></div>
         </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Viewing month</div>
-          <input type="month" id="month-picker" class="ctrl-month" style="font-size:14px;font-weight:500">
+        <div class="month-selector">
+          <label>Viewing month</label>
+          <div class="month-dropdowns">
+            <select id="month-sel" onchange="onMonthSelChange()"></select>
+            <select id="year-sel" onchange="onMonthSelChange()"></select>
+          </div>
         </div>
       </div>
 
@@ -306,7 +343,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div class="cal-legend">
             <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Present</div>
             <div class="leg-item"><div class="leg-dot" style="background:var(--rose)"></div>Absent</div>
-            <div class="leg-item"><div class="leg-dot" style="background:var(--text3)"></div>Weekend</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--text3)"></div>Sunday</div>
             <div class="leg-item"><div class="leg-dot" style="background:var(--accent2);box-shadow:0 0 0 2px rgba(59,130,246,.4)"></div>Today</div>
           </div>
         </div>
@@ -325,9 +362,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
               <option value="present">Present only</option>
               <option value="absent">Absent only</option>
             </select>
-            <!-- Visible to HR / super_admin only — shown via JS after login check -->
             <button class="btn-reset" id="reset-btn" onclick="openResetModal()" style="display:none">
-              ↺ Reset by Date
+              ↺ Manage Attendance
             </button>
           </div>
         </div>
@@ -350,56 +386,90 @@ tr:hover td{background:rgba(255,255,255,.02)}
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════
-     RESET ATTENDANCE MODAL  —  HR / super_admin only
+     MANAGE ATTENDANCE MODAL  —  HR / super_admin only
 ══════════════════════════════════════════════════════════════ -->
 <div class="overlay" id="reset-modal" onclick="if(event.target===this)closeResetModal()">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd">
-      <span class="modal-title">↺ Reset Attendance by Date</span>
+      <span class="modal-title">🗓 Manage Attendance</span>
       <button class="modal-close" onclick="closeResetModal()">×</button>
     </div>
     <div class="modal-body">
-
-      <div class="warn-box">
-        ⚠ This permanently deletes the punch-in / punch-out record for the selected date.
-        The employee will be able to punch in again on that day.
-        <strong>This cannot be undone.</strong>
-      </div>
 
       <!-- Employee summary -->
       <div style="background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:18px;display:flex;align-items:center;gap:12px">
         <div class="avatar" id="r-emp-avatar" style="width:38px;height:38px;font-size:13px;flex-shrink:0;border-radius:10px">?</div>
         <div>
           <div style="font-size:14px;font-weight:600" id="r-emp-name">—</div>
-          <div style="font-size:12px;color:var(--text3)"  id="r-emp-meta">—</div>
+          <div style="font-size:12px;color:var(--text3)" id="r-emp-meta">—</div>
         </div>
       </div>
 
       <!-- Date picker -->
       <div class="fg">
-        <label>Date to reset <span style="color:var(--rose)">*</span></label>
+        <label>Date <span style="color:var(--rose)">*</span></label>
         <input type="date" id="r-date" onchange="onResetDateChange()">
-        <div style="font-size:11px;color:var(--text3);margin-top:3px">
-          Only days with an existing punch-in can be reset. Future dates are blocked.
-        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">Select any past or present date to manage attendance.</div>
       </div>
 
       <!-- Existing record preview -->
       <div class="preview-box" id="r-preview" style="display:none">
-        <div class="preview-title">Record that will be deleted</div>
-        <div class="info-row"><span class="info-key">Date</span>     <span class="info-val" id="r-prev-date">—</span></div>
-        <div class="info-row"><span class="info-key">Punch In</span> <span class="info-val" id="r-prev-in">—</span></div>
-        <div class="info-row"><span class="info-key">Punch Out</span><span class="info-val" id="r-prev-out">—</span></div>
+        <div class="preview-title">Current Record</div>
+        <div class="info-row"><span class="info-key">Date</span>      <span class="info-val" id="r-prev-date">—</span></div>
+        <div class="info-row"><span class="info-key">Punch In</span>  <span class="info-val" id="r-prev-in">—</span></div>
+        <div class="info-row"><span class="info-key">Punch Out</span> <span class="info-val" id="r-prev-out">—</span></div>
         <div class="info-row" style="border:none"><span class="info-key">Hours</span><span class="info-val" id="r-prev-hrs">—</span></div>
       </div>
 
-      <div class="msg-note" id="r-no-record">⚠ No attendance record found for this date — nothing to reset.</div>
+      <div class="msg-note" id="r-no-record">⚠ No attendance record found for this date.</div>
       <div class="msg-err"  id="r-err-msg"></div>
 
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeResetModal()">Cancel</button>
-      <button class="btn danger" id="r-confirm-btn" onclick="confirmReset()" disabled>Delete &amp; Reset</button>
+      <!-- Action tabs -->
+      <div id="r-action-area" style="display:none">
+        <div class="modal-tabs">
+          <button class="modal-tab active" id="tab-edit-btn"   onclick="switchTab('edit')">✏️ Edit Punch Times</button>
+          <button class="modal-tab"        id="tab-delete-btn" onclick="switchTab('delete')">🗑 Delete Record</button>
+        </div>
+
+        <!-- EDIT TAB -->
+        <div class="tab-panel active" id="tab-edit">
+          <div class="info-box" id="r-edit-infobox">
+            ✏️ Update the punch-in and/or punch-out times for this day.
+          </div>
+          <div class="time-row">
+            <div class="fg">
+              <label>New Punch In time</label>
+              <input type="time" id="r-new-in" placeholder="HH:MM">
+            </div>
+            <div class="fg">
+              <label>New Punch Out time</label>
+              <input type="time" id="r-new-out" placeholder="HH:MM">
+            </div>
+          </div>
+          <div class="fg">
+            <label>Note / Reason for edit</label>
+            <textarea id="r-edit-note" placeholder="Optional: reason for time change…"></textarea>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px">
+            <button class="btn" onclick="closeResetModal()">Cancel</button>
+            <button class="btn primary" id="r-save-btn" onclick="confirmEdit()">Save Changes</button>
+          </div>
+        </div>
+
+        <!-- DELETE TAB -->
+        <div class="tab-panel" id="tab-delete">
+          <div class="warn-box">
+            ⚠ This permanently deletes the punch-in / punch-out record for the selected date.
+            The employee will be able to punch in again on that day.
+            <strong>This cannot be undone.</strong>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px">
+            <button class="btn" onclick="closeResetModal()">Cancel</button>
+            <button class="btn danger" id="r-confirm-btn" onclick="confirmReset()">Delete &amp; Reset</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -413,8 +483,58 @@ tr:hover td{background:rgba(255,255,255,.02)}
 // ══════════════════════════════════════════════════════════════════
 const params = new URLSearchParams(window.location.search);
 const userId = params.get("userId");
-let allRows  = [];   // one entry per calendar day in loaded month
-let empData  = null; // User object returned by API
+let allRows  = [];
+let empData  = null;
+let isHR     = false;
+
+// ══════════════════════════════════════════════════════════════════
+//  TIMEZONE FIX — convert local HH:MM + date → UTC ISO string
+//  e.g. "2026-05-04" + "10:00" in IST → "2026-05-04T04:30:00.000Z"
+//  The browser knows the user's timezone, so new Date(localStr) is correct.
+// ══════════════════════════════════════════════════════════════════
+function toUTCISO(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null;
+  // "2026-05-04T10:00:00" — NO trailing Z means local time → JS converts to UTC
+  return new Date(`${dateStr}T${timeStr}:00`).toISOString();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  Month / Year dropdowns
+// ══════════════════════════════════════════════════════════════════
+const MONTH_NAMES = ["January","February","March","April","May","June",
+                     "July","August","September","October","November","December"];
+
+function populateMonthYearDropdowns() {
+  const today    = new Date();
+  const curYear  = today.getFullYear();
+  const curMonth = today.getMonth() + 1;
+  const mSel = document.getElementById("month-sel");
+  const ySel = document.getElementById("year-sel");
+
+  MONTH_NAMES.forEach((name, i) => {
+    const opt = document.createElement("option");
+    opt.value = String(i + 1).padStart(2, "0");
+    opt.textContent = name;
+    if (i + 1 === curMonth) opt.selected = true;
+    mSel.appendChild(opt);
+  });
+
+  for (let y = curYear + 1; y >= curYear - 5; y--) {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    if (y === curYear) opt.selected = true;
+    ySel.appendChild(opt);
+  }
+}
+
+function getSelectedMonth() {
+  const m = document.getElementById("month-sel").value;
+  const y = document.getElementById("year-sel").value;
+  return `${y}-${m}`;
+}
+
+function onMonthSelChange() { loadAttendance(); }
 
 // ══════════════════════════════════════════════════════════════════
 //  BOOT
@@ -425,8 +545,8 @@ let empData  = null; // User object returned by API
     document.getElementById("sb-name").textContent   = u.name || "HR";
     document.getElementById("sb-role").textContent   = u.role || "hr";
     document.getElementById("sb-avatar").textContent = mkInitials(u.name || "HR");
-    // Show reset button only for HR and super_admin
     if (["hr","super_admin"].includes(u.role)) {
+      isHR = true;
       document.getElementById("reset-btn").style.display = "inline-flex";
     }
   }
@@ -434,16 +554,13 @@ let empData  = null; // User object returned by API
   if (!userId) {
     document.getElementById("no-id-state").style.display  = "flex";
     document.getElementById("loaded-state").style.display = "none";
-    loadPickerEmployees(); // populate the search picker
+    loadPickerEmployees();
     return;
   }
 
   document.getElementById("no-id-state").style.display  = "none";
   document.getElementById("loaded-state").style.display = "block";
-
-  const mp  = document.getElementById("month-picker");
-  mp.value  = todayStr().slice(0, 7);
-  mp.addEventListener("change", loadAttendance);
+  populateMonthYearDropdowns();
   loadAttendance();
 })();
 
@@ -451,12 +568,12 @@ let empData  = null; // User object returned by API
 //  LOAD FROM API
 // ══════════════════════════════════════════════════════════════════
 async function loadAttendance() {
-  const month = document.getElementById("month-picker").value;
-  setTbody('<tr><td colspan="7" class="empty" style="color:var(--text3)">Loading…</td></tr>');
+  const month = getSelectedMonth();
+  setTbody('<tr><td colspan="7" style="color:var(--text3);padding:20px;text-align:center">Loading…</td></tr>');
 
   const res = await apiRequest(`/hr/employee/${userId}/attendance?month=${month}`);
   if (res.error) {
-    setTbody(`<tr><td colspan="7" class="empty" style="color:var(--rose)">${esc(res.msg)}</td></tr>`);
+    setTbody(`<tr><td colspan="7" style="color:var(--rose);padding:20px;text-align:center">${esc(res.msg)}</td></tr>`);
     return;
   }
 
@@ -478,15 +595,15 @@ function fillEmpHeader(u) {
   av.textContent      = init;
   av.style.background = grad;
 
-  document.getElementById("emp-name").textContent     = u.name;
-  document.getElementById("emp-meta").textContent     =
+  document.getElementById("emp-name").textContent  = u.name;
+  document.getElementById("emp-meta").textContent  =
     u.email + (u.designation ? " · " + u.designation : "") + (u.department ? " · " + u.department : "");
   document.getElementById("topbar-emp").textContent   = u.name;
   document.getElementById("topbar-title").textContent = u.name + " — Attendance";
 
   const bEl = document.getElementById("emp-badges");
   bEl.innerHTML = `<span class="badge b-blue">${esc(u.role)}</span>`;
-  if (u.employeeType)   bEl.innerHTML += `<span class="badge b-gray">${esc(u.employeeType)}</span>`;
+  if (u.employeeType) bEl.innerHTML += `<span class="badge b-gray">${esc(u.employeeType)}</span>`;
   if (u.employeeStatus) {
     const cls = {Active:"b-green","On Leave":"b-amber",Terminated:"b-rose",Resigned:"b-gray"}[u.employeeStatus]||"b-gray";
     bEl.innerHTML += `<span class="badge ${cls}">${esc(u.employeeStatus)}</span>`;
@@ -494,7 +611,7 @@ function fillEmpHeader(u) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  BUILD allRows  (fills absent + weekend days)
+//  BUILD allRows — Saturday is a working day, only Sunday is off
 // ══════════════════════════════════════════════════════════════════
 function buildRows(records, month) {
   const [y, m]  = month.split("-").map(Number);
@@ -505,24 +622,26 @@ function buildRows(records, month) {
 
   allRows = [];
   for (let d = 1; d <= daysInM; d++) {
-    const dateStr   = `${y}-${pad(m)}-${pad(d)}`;
-    const jsDate    = new Date(dateStr + "T00:00:00");
-    const dow       = jsDate.getDay();
-    const isFuture  = dateStr > tStr;
-    const isWeekend = dow === 0 || dow === 6;
-    const rec       = recMap[dateStr] || null;
-    const hasPunchIn= rec && rec.punchIn;
+    const dateStr    = `${y}-${pad(m)}-${pad(d)}`;
+    const jsDate     = new Date(dateStr + "T00:00:00");
+    const dow        = jsDate.getDay();
+    const isFuture   = dateStr > tStr;
+    const isSunday   = dow === 0;
+    const isSaturday = dow === 6;
+    const rec        = recMap[dateStr] || null;
+    const hasPunchIn = rec && rec.punchIn;
 
-    let status = "absent";
-    if (isFuture)    status = "future";
-    else if (isWeekend) status = "weekend";
+    let status;
+    if (isFuture)        status = "future";
+    else if (isSunday)   status = "weekend";
     else if (hasPunchIn) status = "present";
+    else                 status = "absent";
 
     let hours = null;
     if (rec && rec.punchIn && rec.punchOut) {
       hours = Math.max(0, Math.floor((new Date(rec.punchOut) - new Date(rec.punchIn)) / 60000));
     }
-    allRows.push({ dateStr, jsDate, dow, isFuture, isWeekend, status, rec, hours });
+    allRows.push({ dateStr, jsDate, dow, isFuture, isSunday, isSaturday, status, rec, hours });
   }
 }
 
@@ -530,13 +649,13 @@ function buildRows(records, month) {
 //  KPIs
 // ══════════════════════════════════════════════════════════════════
 function renderKPIs() {
-  const working = allRows.filter(r => !r.isWeekend && !r.isFuture);
+  const working = allRows.filter(r => !r.isSunday && !r.isFuture);
   const present = working.filter(r => r.status === "present");
   const absent  = working.filter(r => r.status === "absent");
   const rate    = working.length ? Math.round(present.length / working.length * 100) : 0;
   const totalM  = present.reduce((s, r) => s + (r.hours || 0), 0);
 
-  const [y, mo] = document.getElementById("month-picker").value.split("-").map(Number);
+  const [y, mo] = getSelectedMonth().split("-").map(Number);
   document.getElementById("cal-month-label").textContent =
     new Date(y, mo - 1, 1).toLocaleDateString("en-US", { month:"long", year:"numeric" });
 
@@ -549,7 +668,7 @@ function renderKPIs() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  CALENDAR — redesigned
+//  CALENDAR
 // ══════════════════════════════════════════════════════════════════
 function renderCalendar(month) {
   const [y, m]   = month.split("-").map(Number);
@@ -563,20 +682,13 @@ function renderCalendar(month) {
   allRows.forEach(r => {
     const isToday = r.dateStr === tStr;
     const dayNum  = r.jsDate.getDate();
-
-    let icon = "";
-    let timeStr = "";
+    let icon = "", timeStr = "";
 
     if (r.status === "present") {
       icon = "✓";
-      if (r.rec && r.rec.punchIn) {
-        const inTime  = fmtTime(r.rec.punchIn);
-        const outTime = r.rec.punchOut ? fmtTime(r.rec.punchOut) : "—";
-        timeStr = `${inTime}–${outTime}`;
-        if (r.hours != null) {
-          const h = Math.floor(r.hours/60), mn = r.hours%60;
-          timeStr = `${h}h${mn?""+mn+"m":""}`;
-        }
+      if (r.rec && r.rec.punchIn && r.hours != null) {
+        const h = Math.floor(r.hours/60), mn = r.hours%60;
+        timeStr = `${h}h${mn ? mn+"m" : ""}`;
       }
     } else if (r.status === "absent") {
       icon = "✕";
@@ -586,12 +698,13 @@ function renderCalendar(month) {
 
     const todayCls = isToday ? " today" : "";
     const tipParts = [r.dateStr];
+    if (r.isSaturday && !r.isFuture) tipParts.push("Saturday (working day)");
     if (r.rec && r.rec.punchIn)  tipParts.push("In: "  + fmtTime(r.rec.punchIn));
     if (r.rec && r.rec.punchOut) tipParts.push("Out: " + fmtTime(r.rec.punchOut));
 
     html += `<div class="cal-cell ${r.status}${todayCls}" title="${tipParts.join(" · ")}">
       <span class="cal-num">${dayNum}</span>
-      ${icon ? `<span class="cal-icon">${icon}</span>` : ""}
+      ${icon    ? `<span class="cal-icon">${icon}</span>`    : ""}
       ${timeStr ? `<span class="cal-time">${timeStr}</span>` : ""}
     </div>`;
   });
@@ -614,53 +727,129 @@ function renderTable() {
   });
 
   if (!rows.length) {
-    setTbody('<tr><td colspan="7" class="empty">No records for this filter.</td></tr>');
+    setTbody('<tr><td colspan="7" style="padding:20px;text-align:center;color:var(--text3)">No records for this filter.</td></tr>');
     return;
   }
 
   setTbody(rows.map(r => {
-    const statusHtml = {
-      present: `<span class="status-dot present">Present</span>`,
-      absent:  `<span class="status-dot absent">Absent</span>`,
-      weekend: `<span style="color:var(--text3);font-size:12px">Weekend</span>`,
-    }[r.status] || "—";
+    let statusHtml;
+    if (r.status === "present") {
+      statusHtml = `<span class="status-dot present">Present</span>`;
+    } else if (r.status === "absent") {
+      statusHtml = `<span class="status-dot absent">Absent</span>`;
+    } else if (r.isSunday) {
+      statusHtml = `<span style="color:var(--text3);font-size:12px">Sunday (Off)</span>`;
+    } else {
+      statusHtml = "—";
+    }
 
     const hVal = r.hours != null
       ? `<span class="mono ${r.hours >= 480 ? "hours-good" : "hours-low"}">${Math.floor(r.hours/60)}h ${r.hours%60}m</span>`
       : `<span style="color:var(--text3)">—</span>`;
 
+    const noteVal = r.rec && r.rec.note ? esc(r.rec.note) : "";
+    let noteHtml;
+    if (isHR) {
+      noteHtml = `<div class="note-cell" id="note-cell-${r.dateStr}">
+        <span class="note-text ${noteVal ? "" : "empty-note"}" id="note-txt-${r.dateStr}"
+          data-raw-note="${noteVal}">${noteVal || "Add note…"}</span>
+        <button class="btn-edit-note" title="Edit note" onclick="startNoteEdit('${r.dateStr}')">✏️</button>
+      </div>`;
+    } else {
+      noteHtml = `<span style="color:var(--text3);font-size:12px">${noteVal || "—"}</span>`;
+    }
+
     return `<tr>
       <td class="mono">${r.dateStr}</td>
-      <td style="color:var(--text2);font-size:12px">${WDAYS[r.dow]}</td>
+      <td style="color:var(--text2);font-size:12px">${WDAYS[r.dow]}${r.isSaturday ? ' <span style="color:var(--amber);font-size:10px">(Sat)</span>' : ""}</td>
       <td>${statusHtml}</td>
       <td class="mono">${r.rec && r.rec.punchIn  ? fmtTime(r.rec.punchIn)  : '<span style="color:var(--text3)">—</span>'}</td>
       <td class="mono">${r.rec && r.rec.punchOut ? fmtTime(r.rec.punchOut) : '<span style="color:var(--text3)">—</span>'}</td>
       <td>${hVal}</td>
-      <td style="color:var(--text3);font-size:12px">${r.rec && r.rec.note ? esc(r.rec.note) : "—"}</td>
+      <td>${noteHtml}</td>
     </tr>`;
   }).join(""));
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  RESET MODAL
+//  INLINE NOTE EDITING
 // ══════════════════════════════════════════════════════════════════
+function startNoteEdit(dateStr) {
+  const cell    = document.getElementById(`note-cell-${dateStr}`);
+  const txtEl   = document.getElementById(`note-txt-${dateStr}`);
+  const current = txtEl.dataset.rawNote || "";
+
+  cell.innerHTML = `
+    <div class="note-input-wrap">
+      <input class="note-input" id="note-inp-${dateStr}" type="text"
+        value="${esc(current)}" placeholder="Enter note…"
+        onkeydown="if(event.key==='Enter')saveNote('${dateStr}');if(event.key==='Escape')cancelNoteEdit('${dateStr}','${esc(current)}')">
+      <button class="btn-note-save" onclick="saveNote('${dateStr}')">Save</button>
+      <button class="btn-note-cancel" title="Cancel" onclick="cancelNoteEdit('${dateStr}','${esc(current)}')">✕</button>
+    </div>`;
+  document.getElementById(`note-inp-${dateStr}`).focus();
+}
+
+function cancelNoteEdit(dateStr, prevNote) {
+  const cell    = document.getElementById(`note-cell-${dateStr}`);
+  const isEmpty = !prevNote;
+  cell.innerHTML = `
+    <span class="note-text ${isEmpty ? "empty-note" : ""}" id="note-txt-${dateStr}"
+      data-raw-note="${esc(prevNote)}">${isEmpty ? "Add note…" : esc(prevNote)}</span>
+    <button class="btn-edit-note" title="Edit note" onclick="startNoteEdit('${dateStr}')">✏️</button>`;
+}
+
+async function saveNote(dateStr) {
+  const inp  = document.getElementById(`note-inp-${dateStr}`);
+  if (!inp) return;
+  const note = inp.value.trim();
+  const cell = document.getElementById(`note-cell-${dateStr}`);
+
+  cell.innerHTML = `<span style="color:var(--text3);font-size:12px">Saving…</span>`;
+
+  const res = await apiRequest("/attendance/note", "PATCH", { userId, date: dateStr, note });
+
+  if (res.error) {
+    showToast("Failed to save note: " + res.msg, "err");
+    cancelNoteEdit(dateStr, note);
+    return;
+  }
+
+  const row = allRows.find(r => r.dateStr === dateStr);
+  if (row) { if (!row.rec) row.rec = {}; row.rec.note = note; }
+
+  const isEmpty = !note;
+  cell.innerHTML = `
+    <span class="note-text ${isEmpty ? "empty-note" : ""}" id="note-txt-${dateStr}"
+      data-raw-note="${esc(note)}">${isEmpty ? "Add note…" : esc(note)}</span>
+    <button class="btn-edit-note" title="Edit note" onclick="startNoteEdit('${dateStr}')">✏️</button>`;
+
+  showToast("Note saved ✓", "ok");
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  MANAGE ATTENDANCE MODAL
+// ══════════════════════════════════════════════════════════════════
+let _currentModalRow = null;
+
 function openResetModal() {
   if (!userId || !empData) return;
 
-  // Populate employee pill
-  document.getElementById("r-emp-avatar").textContent  = mkInitials(empData.name || "?");
-  document.getElementById("r-emp-avatar").style.background = mkGrad(empData._id || "");
-  document.getElementById("r-emp-name").textContent    = empData.name;
-  document.getElementById("r-emp-meta").textContent    =
+  document.getElementById("r-emp-avatar").textContent     = mkInitials(empData.name || "?");
+  document.getElementById("r-emp-avatar").style.background= mkGrad(empData._id || "");
+  document.getElementById("r-emp-name").textContent       = empData.name;
+  document.getElementById("r-emp-meta").textContent       =
     empData.email + (empData.department ? " · " + empData.department : "");
 
-  // Default date = last present day, fallback to today
-  const lastPresent = [...allRows].reverse().find(r => r.status === "present");
-  const inp = document.getElementById("r-date");
-  inp.value = lastPresent ? lastPresent.dateStr : todayStr();
-  inp.max   = todayStr();
+  const inp      = document.getElementById("r-date");
+  const todayDow = new Date().getDay();
+  inp.value = todayDow !== 0
+    ? todayStr()
+    : ([...allRows].reverse().find(r => !r.isSunday && !r.isFuture)?.dateStr || todayStr());
+  inp.max = todayStr();
 
   resetModalUI();
+  switchTab("edit");
   onResetDateChange();
 
   document.getElementById("reset-modal").classList.add("open");
@@ -670,11 +859,22 @@ function closeResetModal() {
   document.getElementById("reset-modal").classList.remove("open");
 }
 
+function switchTab(tab) {
+  document.getElementById("tab-edit-btn").classList.toggle("active",   tab === "edit");
+  document.getElementById("tab-delete-btn").classList.toggle("active", tab === "delete");
+  document.getElementById("tab-edit").classList.toggle("active",       tab === "edit");
+  document.getElementById("tab-delete").classList.toggle("active",     tab === "delete");
+}
+
 function resetModalUI() {
-  document.getElementById("r-preview").style.display    = "none";
-  document.getElementById("r-no-record").style.display  = "none";
-  document.getElementById("r-err-msg").style.display    = "none";
-  document.getElementById("r-confirm-btn").disabled     = true;
+  document.getElementById("r-preview").style.display     = "none";
+  document.getElementById("r-no-record").style.display   = "none";
+  document.getElementById("r-err-msg").style.display     = "none";
+  document.getElementById("r-action-area").style.display = "none";
+  document.getElementById("r-new-in").value    = "";
+  document.getElementById("r-new-out").value   = "";
+  document.getElementById("r-edit-note").value = "";
+  _currentModalRow = null;
 }
 
 async function onResetDateChange() {
@@ -682,56 +882,138 @@ async function onResetDateChange() {
   resetModalUI();
   if (!date) return;
 
-  if (date > todayStr()) {
-    showResetErr("Cannot reset a future date.");
-    return;
-  }
+  if (date > todayStr()) { showResetErr("Cannot manage a future date."); return; }
 
-  // 1. Try the already-loaded month first (no extra network request)
-  const loadedMonth = document.getElementById("month-picker").value; // "YYYY-MM"
+  const dow = new Date(date + "T00:00:00").getDay();
+  if (dow === 0) { showResetErr("Sunday is a day off — attendance cannot be added."); return; }
+
+  const loadedMonth = getSelectedMonth();
   let row = null;
 
   if (date.slice(0, 7) === loadedMonth) {
-    // Date is in the currently viewed month — check allRows directly
-    row = allRows.find(r => r.dateStr === date) || null;
+    const found = allRows.find(r => r.dateStr === date) || null;
+    if (found && !found.isFuture) row = found;
   } else {
-    // Date is in a DIFFERENT month — fetch that month from the API
     const noRec = document.getElementById("r-no-record");
-    noRec.textContent = "⏳ Checking record…";
-    noRec.style.display = "block";
+    noRec.textContent    = "⏳ Loading record…";
+    noRec.style.display  = "block";
 
     const month = date.slice(0, 7);
-    const res = await apiRequest(`/hr/employee/${userId}/attendance?month=${month}`);
+    const res   = await apiRequest(`/hr/employee/${userId}/attendance?month=${month}`);
 
     noRec.style.display = "none";
-    noRec.textContent = "⚠ No attendance record found for this date — nothing to reset.";
+    noRec.textContent   = "⚠ Could not load attendance data for this date.";
 
-    if (!res.error && res.records) {
-      const rec = (res.records || []).find(r => r.date === date) || null;
-      if (rec && rec.punchIn) {
-        const mins = rec.punchOut
-          ? Math.max(0, Math.floor((new Date(rec.punchOut) - new Date(rec.punchIn)) / 60000))
-          : null;
-        row = { dateStr: date, status: "present", rec, hours: mins };
-      }
+    if (res.error) { document.getElementById("r-no-record").style.display = "block"; return; }
+
+    const rec        = (res.records || []).find(r => r.date === date) || null;
+    const hasPunchIn = rec && rec.punchIn;
+    const mins       = hasPunchIn && rec.punchOut
+      ? Math.max(0, Math.floor((new Date(rec.punchOut) - new Date(rec.punchIn)) / 60000)) : null;
+    const jsDate = new Date(date + "T00:00:00");
+    row = {
+      dateStr: date, jsDate,
+      dow: jsDate.getDay(), isSunday: false,
+      isSaturday: jsDate.getDay() === 6, isFuture: false,
+      status: hasPunchIn ? "present" : "absent",
+      rec: rec || null, hours: mins
+    };
+  }
+
+  if (!row) { document.getElementById("r-no-record").style.display = "block"; return; }
+
+  _currentModalRow = row;
+  const isAbsent   = row.status === "absent";
+
+  // Populate preview
+  document.getElementById("r-prev-date").textContent = date;
+  document.getElementById("r-prev-in").textContent   = row.rec && row.rec.punchIn  ? fmtTime(row.rec.punchIn)  : "No record";
+  document.getElementById("r-prev-out").textContent  = row.rec && row.rec.punchOut ? fmtTime(row.rec.punchOut) : "No record";
+  document.getElementById("r-prev-hrs").textContent  = row.hours != null
+    ? `${Math.floor(row.hours / 60)}h ${row.hours % 60}m` : "—";
+  document.getElementById("r-preview").style.display = "block";
+
+  // Hide delete tab for absent days
+  const deleteTabBtn = document.getElementById("tab-delete-btn");
+  if (isAbsent) { deleteTabBtn.style.display = "none"; switchTab("edit"); }
+  else          { deleteTabBtn.style.display = ""; }
+
+  // Info box wording
+  const editInfoBox = document.getElementById("r-edit-infobox");
+  if (isAbsent) {
+    editInfoBox.style.cssText = "background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--green);line-height:1.5;margin-bottom:16px";
+    editInfoBox.innerHTML = "➕ This day is currently <strong>absent</strong>. Enter punch-in (required) and optionally punch-out time to mark the employee as present.";
+    document.getElementById("r-new-in").required = true;
+  } else {
+    editInfoBox.style.cssText = "background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--amber);line-height:1.5;margin-bottom:16px";
+    editInfoBox.innerHTML = "✏️ Update the punch-in and/or punch-out times. Leave a field unchanged to keep its current value.";
+    document.getElementById("r-new-in").required = false;
+
+    // ── TIMEZONE FIX: pre-fill using getHours/getMinutes (local time) ──
+    // new Date(punchIn) from UTC ISO → getHours() returns LOCAL hours (IST)
+    if (row.rec && row.rec.punchIn) {
+      const d = new Date(row.rec.punchIn);
+      document.getElementById("r-new-in").value  = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+    if (row.rec && row.rec.punchOut) {
+      const d = new Date(row.rec.punchOut);
+      document.getElementById("r-new-out").value = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
   }
 
-  if (!row || row.status !== "present") {
-    document.getElementById("r-no-record").style.display = "block";
+  document.getElementById("r-action-area").style.display = "block";
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CONFIRM EDIT — TIMEZONE FIX applied here
+//  toUTCISO() converts local HH:MM → correct UTC ISO string
+//  so "10:00 AM IST" is stored as "04:30 UTC", not "10:00 UTC"
+// ══════════════════════════════════════════════════════════════════
+async function confirmEdit() {
+  const date   = document.getElementById("r-date").value;
+  const newIn  = document.getElementById("r-new-in").value;
+  const newOut = document.getElementById("r-new-out").value;
+  const note   = document.getElementById("r-edit-note").value.trim();
+
+  if (!date || !userId) return;
+
+  const isAbsent = _currentModalRow && _currentModalRow.status === "absent";
+
+  if (isAbsent && !newIn) {
+    showResetErr("Punch-in time is required to mark this day as present.");
+    return;
+  }
+  if (!isAbsent && !newIn && !newOut && !note) {
+    showResetErr("Please enter at least one value to update.");
     return;
   }
 
-  // Show existing record preview
-  document.getElementById("r-prev-date").textContent = date;
-  document.getElementById("r-prev-in").textContent   = row.rec && row.rec.punchIn  ? fmtTime(row.rec.punchIn)  : "—";
-  document.getElementById("r-prev-out").textContent  = row.rec && row.rec.punchOut ? fmtTime(row.rec.punchOut) : "Not punched out";
-  document.getElementById("r-prev-hrs").textContent  = row.hours != null
-    ? `${Math.floor(row.hours / 60)}h ${row.hours % 60}m` : "—";
-  document.getElementById("r-preview").style.display   = "block";
-  document.getElementById("r-confirm-btn").disabled    = false;
+  const btn = document.getElementById("r-save-btn");
+  btn.disabled    = true;
+  btn.textContent = isAbsent ? "Adding…" : "Saving…";
+
+  // ── KEY FIX: send UTC ISO strings, not raw "HH:MM" strings ──
+  const payload = { userId, date };
+  if (newIn)  payload.punchIn  = toUTCISO(date, newIn);   // e.g. "2026-05-04T04:30:00.000Z"
+  if (newOut) payload.punchOut = toUTCISO(date, newOut);  // e.g. "2026-05-04T11:30:00.000Z"
+  if (note)   payload.note     = note;
+
+  const method = isAbsent ? "POST" : "PATCH";
+  const res    = await apiRequest("/attendance/edit", method, payload);
+
+  btn.disabled    = false;
+  btn.textContent = "Save Changes";
+
+  if (res.error) { showResetErr(res.msg); return; }
+
+  closeResetModal();
+  showToast(isAbsent ? `Attendance added for ${date} ✓` : `Attendance for ${date} updated ✓`, "ok");
+  loadAttendance();
 }
 
+// ══════════════════════════════════════════════════════════════════
+//  CONFIRM DELETE
+// ══════════════════════════════════════════════════════════════════
 async function confirmReset() {
   const date = document.getElementById("r-date").value;
   if (!date || !userId) return;
@@ -748,8 +1030,8 @@ async function confirmReset() {
   if (res.error) { showResetErr(res.msg); return; }
 
   closeResetModal();
-  showToast(`Attendance for ${date} reset ✓`, "ok");
-  loadAttendance(); // live refresh
+  showToast(`Attendance for ${date} deleted ✓`, "ok");
+  loadAttendance();
 }
 
 function showResetErr(msg) {
@@ -764,8 +1046,8 @@ function showResetErr(msg) {
 function todayStr()  { return new Date().toISOString().slice(0, 10); }
 function pad(n)      { return String(n).padStart(2, "0"); }
 function mkInitials(name) { return name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase(); }
-function fmtTime(v) { return v ? new Date(v).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }) : "—"; }
-function esc(s)     { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function fmtTime(v)  { return v ? new Date(v).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }) : "—"; }
+function esc(s)      { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function setTbody(html) { document.getElementById("att-tbody").innerHTML = html; }
 
 const GRADS = ["#3b82f6,#6366f1","#2dd4bf,#0d9488","#a78bfa,#7c3aed","#f59e0b,#d97706","#f43f5e,#dc2626"];
@@ -784,15 +1066,12 @@ function showToast(msg, type = "ok") {
   _toastTimer = setTimeout(() => t.classList.remove("show"), 3500);
 }
 
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closeResetModal();
-});
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeResetModal(); });
 
 // ══════════════════════════════════════════════════════════════════
-//  EMPLOYEE PICKER  (shown when no userId in URL)
+//  EMPLOYEE PICKER
 // ══════════════════════════════════════════════════════════════════
-let _pickerAll = [];   // full list from API
-let _pickerTimer = null;
+let _pickerAll = [], _pickerTimer = null;
 
 async function loadPickerEmployees() {
   const res = await apiRequest("/hr/employees");
@@ -814,8 +1093,7 @@ function onPickerSearch(q) {
           (e.name        || "").toLowerCase().includes(lq) ||
           (e.email       || "").toLowerCase().includes(lq) ||
           (e.department  || "").toLowerCase().includes(lq) ||
-          (e.designation || "").toLowerCase().includes(lq)
-        )
+          (e.designation || "").toLowerCase().includes(lq))
       : _pickerAll;
     renderPickerList(filtered, lq);
   }, 180);
@@ -823,8 +1101,8 @@ function onPickerSearch(q) {
 
 const ROLE_COLORS = {
   employee:"#3b82f6,#6366f1", hr:"#2dd4bf,#0d9488",
-  sales:"#f59e0b,#d97706", marketing:"#a78bfa,#7c3aed",
-  lms:"#22c55e,#16a34a", super_admin:"#f43f5e,#dc2626"
+  sales:"#f59e0b,#d97706",    marketing:"#a78bfa,#7c3aed",
+  lms:"#22c55e,#16a34a",      super_admin:"#f43f5e,#dc2626"
 };
 const ROLE_BADGE = {
   employee:"rgba(59,130,246,.15);color:#4f9cf9",

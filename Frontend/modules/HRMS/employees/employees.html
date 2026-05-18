@@ -158,12 +158,17 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.ok{border-color:rgba(34,197,94,.3);color:var(--green)}
 .toast.err{border-color:rgba(244,63,94,.3);color:var(--rose)}
+
+/* RETRY BANNER — shown when backend is cold-starting */
+.retry-banner{display:none;align-items:center;gap:12px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:12px 18px;margin-bottom:16px;font-size:13px;color:var(--amber)}
+.retry-banner.show{display:flex}
+.retry-banner .spin{animation:spin 1s linear infinite;font-size:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.retry-banner button{margin-left:auto;padding:5px 14px;border-radius:6px;border:1px solid rgba(245,158,11,0.4);background:rgba(245,158,11,0.12);color:var(--amber);cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s}
+.retry-banner button:hover{background:rgba(245,158,11,0.22)}
 </style>
-<script src="../../../assets/js/api.js"></script>
-<script src="../../../assets/js/auth.js?v=4"></script>
 </head>
 <body>
-<script>requireAuth(); requireModuleAccess("hr");</script>
 
 <div class="shell">
 
@@ -252,6 +257,13 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <div class="kpi-icon" style="background:rgba(167,139,250,0.12)">🏢</div>
         <div><div class="kpi-val" id="kpi-depts">—</div><div class="kpi-lbl">Departments</div></div>
       </div>
+    </div>
+
+    <!-- RETRY BANNER (shown when backend is waking up) -->
+    <div class="retry-banner" id="retry-banner">
+      <span class="spin">⟳</span>
+      <span id="retry-msg">Connecting to server — this may take a few seconds on first load…</span>
+      <button onclick="retryLoad()">Retry Now</button>
     </div>
 
     <!-- FILTERS -->
@@ -421,17 +433,27 @@ let searchTimer   = null;
 let isEditMode    = false;
 
 // ── BOOT ──────────────────────────────────────────────────────────
-(async function init() {
-  // sidebar user
+// DOMContentLoaded guarantees:
+//   1. All external scripts (api.js, auth.js) are fully executed
+//   2. All DOM elements exist and are queryable
+//   3. Auth guard runs before any API call is made
+document.addEventListener("DOMContentLoaded", async function init() {
+
+  // ── Auth guard (replaces the old inline requireAuth() at top of body)
+  requireAuth();
+  requireModuleAccess("hr");
+
+  // ── Sidebar user info
   const u = getUser();
   if (u) {
-    document.getElementById("sb-name").textContent  = u.name  || "HR";
-    document.getElementById("sb-role").textContent  = u.role  || "hr";
+    document.getElementById("sb-name").textContent   = u.name  || "HR";
+    document.getElementById("sb-role").textContent   = u.role  || "hr";
     document.getElementById("sb-avatar").textContent = (u.name || "HR").slice(0,2).toUpperCase();
   }
 
+  // ── Load all data (api.js pingBackend() already running in background)
   await Promise.all([loadDashboardKPIs(), loadEmployees(), loadDepartments()]);
-})();
+});
 
 // ── KPIs ──────────────────────────────────────────────────────────
 async function loadDashboardKPIs() {
@@ -468,16 +490,26 @@ async function loadEmployees() {
   if (type)   url += `type=${encodeURIComponent(type)}&`;
   if (search) url += `search=${encodeURIComponent(search)}&`;
 
+  hideBanner();
   document.getElementById("emp-tbody").innerHTML =
     `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Loading…</td></tr>`;
 
   const res = await apiRequest(url);
   if (res.error) {
+    // Show the retry banner so user knows what happened
+    showBanner(res.msg);
     document.getElementById("emp-tbody").innerHTML =
-      `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--rose)">${res.msg}</td></tr>`;
+      `<tr><td colspan="7">
+        <div class="empty">
+          <div class="empty-icon">⚠️</div>
+          <div class="empty-title">Could not load employees</div>
+          <div class="empty-sub">${esc(res.msg)}</div>
+        </div>
+      </td></tr>`;
     return;
   }
 
+  hideBanner();
   allEmployees = res.employees || [];
   document.getElementById("filter-count").textContent =
     `${allEmployees.length} employee${allEmployees.length !== 1 ? "s" : ""}`;
@@ -781,6 +813,22 @@ function showToast(msg, type = "ok") {
   toastTimer = setTimeout(() => t.classList.remove("show"), 3500);
 }
 
+// ── RETRY BANNER HELPERS ──────────────────────────────────────────
+function showBanner(msg) {
+  const b = document.getElementById("retry-banner");
+  const m = document.getElementById("retry-msg");
+  if (m) m.textContent = msg || "Server is slow to respond. Click Retry Now.";
+  if (b) b.classList.add("show");
+}
+function hideBanner() {
+  const b = document.getElementById("retry-banner");
+  if (b) b.classList.remove("show");
+}
+async function retryLoad() {
+  hideBanner();
+  await Promise.all([loadDashboardKPIs(), loadEmployees(), loadDepartments()]);
+}
+
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     document.querySelectorAll(".overlay.open").forEach(m => m.classList.remove("open"));
@@ -788,5 +836,9 @@ document.addEventListener("keydown", e => {
   }
 });
 </script>
+
+<!-- Scripts loaded at END of body so DOM is always ready when they execute -->
+<script src="../../../assets/js/api.js"></script>
+<script src="../../../assets/js/auth.js?v=4"></script>
 </body>
 </html>

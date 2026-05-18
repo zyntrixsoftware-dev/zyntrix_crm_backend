@@ -1,5 +1,6 @@
 const Interview   = require("../models/Interview");
 const OfferLetter = require("../models/OfferLetter");
+const Candidate   = require("../models/Candidate");
 const sendEmail   = require("../utils/sendEmail");
 
 function checkHrAccess(req, res) {
@@ -14,14 +15,19 @@ function checkHrAccess(req, res) {
 // INTERVIEW PANEL
 // ─────────────────────────────────────────────────────────────────────────────
 
-// GET /api/hr/interviews  — list all candidates (with optional filter)
+// GET /api/hr/interviews
+//   ?status=in_progress|passed|failed|on_hold
+//   ?offered=true|false
+//   ?search=<text>
 exports.getInterviews = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    const { status, search } = req.query;
+    const { status, search, offered } = req.query;
     const query = {};
-    if (status)  query.overallStatus   = status;
+    if (status)  query.overallStatus = status;
+    if (offered === "true")  query.offered = true;
+    if (offered === "false") query.offered = false;
     if (search) {
       query.$or = [
         { candidateName:  { $regex: search, $options: "i" } },
@@ -41,7 +47,7 @@ exports.getInterviews = async (req, res) => {
   }
 };
 
-// GET /api/hr/interviews/passed  — ONLY candidates who passed all rounds
+// GET /api/hr/interviews/passed — kept for back-compat
 exports.getPassedCandidates = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -57,20 +63,23 @@ exports.getPassedCandidates = async (req, res) => {
   }
 };
 
-// POST /api/hr/interviews  — add new candidate
+// POST /api/hr/interviews — manual create (still supported alongside auto-shortlist)
 exports.createInterview = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    const { candidateName, candidateEmail, candidatePhone, appliedFor, department, rounds, notes } = req.body;
+    const { candidateName, candidateEmail, candidatePhone, appliedFor, department, note } = req.body;
     if (!candidateName || !candidateEmail || !appliedFor)
       return res.status(400).json({ msg: "candidateName, candidateEmail and appliedFor are required" });
 
     const interview = await Interview.create({
       candidateName, candidateEmail, candidatePhone,
       appliedFor, department,
-      rounds: rounds || [],
-      notes,
+      round1: { status: "pending", durationMin: 50 },
+      round2: { status: "pending", durationMin: 50 },
+      round3: { status: "pending", durationMin: 50 },
+      note: note || "",
+      overallStatus: "in_progress",
       createdBy: req.user.id
     });
 
@@ -81,34 +90,37 @@ exports.createInterview = async (req, res) => {
   }
 };
 
-// PATCH /api/hr/interviews/:id/round  — update a single round result
+// PATCH /api/hr/interviews/:id/round
+// body: { roundKey: "round1"|"round2"|"round3", status: "qualified"|"not_qualified"|"pending",
+//         scheduledAt?, interviewer?, remarks? }
 exports.updateRound = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    const { roundIndex, status, remarks, conductedBy } = req.body;
-    if (roundIndex === undefined || !status)
-      return res.status(400).json({ msg: "roundIndex and status are required" });
+    const { roundKey, status, scheduledAt, interviewer, remarks } = req.body;
+    const validKeys    = ["round1", "round2", "round3"];
+    const validStatus  = ["pending", "qualified", "not_qualified"];
+
+    if (!validKeys.includes(roundKey))
+      return res.status(400).json({ msg: "roundKey must be round1, round2 or round3" });
+    if (!validStatus.includes(status))
+      return res.status(400).json({ msg: "status must be pending, qualified or not_qualified" });
 
     const interview = await Interview.findById(req.params.id);
     if (!interview) return res.status(404).json({ msg: "Interview not found" });
 
-    if (!interview.rounds[roundIndex])
-      return res.status(400).json({ msg: "Round index out of range" });
+    interview[roundKey] = interview[roundKey] || {};
+    interview[roundKey].status      = status;
+    interview[roundKey].durationMin = 50;   // enforced 50-min slot
+    if (scheduledAt !== undefined) interview[roundKey].scheduledAt = scheduledAt || null;
+    if (interviewer !== undefined) interview[roundKey].interviewer = interviewer || "";
+    if (remarks     !== undefined) interview[roundKey].remarks     = remarks     || "";
+    if (status !== "pending")      interview[roundKey].conductedAt = new Date();
 
-    interview.rounds[roundIndex].status      = status;
-    interview.rounds[roundIndex].remarks     = remarks || "";
-    interview.rounds[roundIndex].conductedBy = conductedBy || "";
-    interview.rounds[roundIndex].conductedAt = new Date();
-
-    // ── Auto-derive overallStatus ────────────────────────────────
-    const anyFailed  = interview.rounds.some(r => r.status === "failed");
-    const allPassed  = interview.rounds.length > 0 &&
-                       interview.rounds.every(r => r.status === "passed");
-
-    if (anyFailed)       interview.overallStatus = "failed";
-    else if (allPassed)  interview.overallStatus = "passed";
-    else                 interview.overallStatus = "in_progress";
+    // Auto-derive overallStatus (unless HR has put it on_hold manually)
+    if (interview.overallStatus !== "on_hold") {
+      interview.overallStatus = interview.deriveOverallStatus();
+    }
 
     await interview.save();
     return res.json({ msg: "Round updated", interview });
@@ -118,7 +130,7 @@ exports.updateRound = async (req, res) => {
   }
 };
 
-// PATCH /api/hr/interviews/:id/status  — manually override overall status
+// PATCH /api/hr/interviews/:id/status — manual override
 exports.updateInterviewStatus = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -129,9 +141,7 @@ exports.updateInterviewStatus = async (req, res) => {
       return res.status(400).json({ msg: "Invalid status" });
 
     const interview = await Interview.findByIdAndUpdate(
-      req.params.id,
-      { overallStatus: status },
-      { new: true }
+      req.params.id, { overallStatus: status }, { new: true }
     );
     if (!interview) return res.status(404).json({ msg: "Interview not found" });
 
@@ -141,19 +151,102 @@ exports.updateInterviewStatus = async (req, res) => {
   }
 };
 
+// PATCH /api/hr/interviews/:id/note
+exports.updateInterviewNote = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+    const note = (req.body?.note || "").toString().slice(0, 1000);
+    const interview = await Interview.findByIdAndUpdate(
+      req.params.id, { note }, { new: true }
+    );
+    if (!interview) return res.status(404).json({ msg: "Interview not found" });
+    return res.json({ msg: "Note updated", interview });
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// PATCH /api/hr/interviews/:id/offered
+// body: { offered: true|false }
+// When flipping to true, candidate becomes eligible for an Offer Letter.
+exports.toggleOffered = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const offered = req.body?.offered === true;
+    const interview = await Interview.findById(req.params.id);
+    if (!interview) return res.status(404).json({ msg: "Interview not found" });
+
+    interview.offered   = offered;
+    interview.offeredAt = offered ? new Date() : null;
+    interview.offeredBy = offered ? req.user.id : null;
+
+    // If marking offered, require all 3 rounds qualified (or status=passed)
+    if (offered) {
+      const allQualified = ["round1","round2","round3"]
+        .every(k => interview[k] && interview[k].status === "qualified");
+      if (!allQualified && interview.overallStatus !== "passed") {
+        return res.status(400).json({
+          msg: "Cannot mark Offered — all 3 rounds must be Qualified first (or status set to Passed)."
+        });
+      }
+    }
+
+    await interview.save();
+    return res.json({ msg: offered ? "Marked as Offered" : "Unmarked Offered", interview });
+  } catch (err) {
+    console.error("TOGGLE OFFERED ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
-// OFFER LETTER PANEL
+// OFFER LETTER TEMPLATES
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * generateLetterBody — auto-fills the offer letter template
- * with the candidate's real data.
- * ✅ YES — this is fully automatic. HR doesn't type the candidate name manually.
- */
-function generateLetterBody(data) {
-  const today = new Date().toLocaleDateString("en-IN", {
+const OFFER_TEMPLATES = {
+  default: {
+    key:   "default",
+    label: "Default",
+    intro: "We are pleased to offer you the position of {{appliedFor}} at Zyntrix Software Pvt. Ltd."
+  },
+  engineer: {
+    key:   "engineer",
+    label: "Engineering",
+    intro: "We are excited to extend an offer for the role of {{appliedFor}} on the Zyntrix Engineering team. " +
+           "Your experience and technical strengths impressed us through every round of our interview process."
+  },
+  sales: {
+    key:   "sales",
+    label: "Sales",
+    intro: "We are delighted to offer you the position of {{appliedFor}} in the Zyntrix Sales organization. " +
+           "Your drive and customer-first mindset stood out across all interview rounds."
+  },
+  intern: {
+    key:   "intern",
+    label: "Internship",
+    intro: "We are happy to offer you an internship as a {{appliedFor}} at Zyntrix Software Pvt. Ltd. " +
+           "This will be a fixed-term programme designed to give you hands-on experience."
+  },
+  manager: {
+    key:   "manager",
+    label: "Manager / Lead",
+    intro: "We are pleased to extend an offer for the leadership role of {{appliedFor}} at Zyntrix Software Pvt. Ltd. " +
+           "We are confident you will be a strong addition to our leadership team."
+  }
+};
+
+function fillIntro(template, data) {
+  return (template.intro || "").replace(/\{\{appliedFor\}\}/g, data.appliedFor || "the role");
+}
+
+function generateLetterBody(data, templateKey = "default") {
+  const template = OFFER_TEMPLATES[templateKey] || OFFER_TEMPLATES.default;
+  const today    = new Date().toLocaleDateString("en-IN", {
     day: "2-digit", month: "long", year: "numeric"
   });
+  const intro    = fillIntro(template, data);
+  const salary   = Number(data.offeredSalary || 0).toLocaleString("en-IN");
 
   return `
 Date: ${today}
@@ -165,21 +258,20 @@ Subject: Offer of Employment — ${data.appliedFor}
 
 Dear ${data.candidateName},
 
-We are pleased to offer you the position of ${data.appliedFor} at Zyntrix Software Pvt. Ltd.,
-in the ${data.department || "respective"} department.
+${intro}
 
 Your employment details are as follows:
 
-  • Position       : ${data.appliedFor}
-  • Department     : ${data.department || "—"}
-  • Employee Type  : ${data.employeeType}
-  • Location       : ${data.location || "Zyntrix Office"}
-  • Reporting To   : ${data.reportingTo || "Respective Manager"}
-  • Date of Joining: ${data.joiningDate}
-  • CTC Offered    : ₹${Number(data.offeredSalary).toLocaleString("en-IN")} per annum
+  • Position         : ${data.appliedFor}
+  • Department       : ${data.department || "—"}
+  • Employee Type    : ${data.employeeType || "Full-time"}
+  • Location         : ${data.location || "Zyntrix Office"}
+  • Reporting To     : ${data.reportingTo || "Respective Manager"}
+  • Date of Joining  : ${data.joiningDate}
+  • CTC Offered      : ₹${salary} per annum
   • Offer Valid Until: ${data.offerExpiryDate || "—"}
 
-${data.additionalTerms ? `Additional Terms:\n${data.additionalTerms}\n` : ""}
+${data.additionalTerms ? "Additional Terms:\n" + data.additionalTerms + "\n" : ""}
 Please confirm your acceptance of this offer by replying to this email before the offer expiry date.
 
 We look forward to having you on the Zyntrix team!
@@ -191,16 +283,55 @@ hr@zyntrixsoftware.com
 `.trim();
 }
 
-// GET /api/hr/offers  — list all offer letters
-exports.getOffers = async (req, res) => {
+// GET /api/hr/offers/templates — list available templates
+exports.getOfferTemplates = async (req, res) => {
+  if (!checkHrAccess(req, res)) return;
+  return res.json({ templates: Object.values(OFFER_TEMPLATES) });
+};
+
+// POST /api/hr/offers/preview
+// body: { interviewId, templateKey, offeredSalary, joiningDate, ... }
+// Returns the generated letter body WITHOUT saving. Used by the offer letter
+// page to update the preview when HR changes the template or any field.
+exports.previewOffer = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
+    const { interviewId, templateKey = "default" } = req.body;
+    if (!interviewId) return res.status(400).json({ msg: "interviewId required" });
+
+    const interview = await Interview.findById(interviewId);
+    if (!interview) return res.status(404).json({ msg: "Interview not found" });
+
+    const data = {
+      candidateName:  interview.candidateName,
+      appliedFor:     interview.appliedFor,
+      department:     interview.department,
+      offeredSalary:  req.body.offeredSalary  || 0,
+      joiningDate:    req.body.joiningDate    || "",
+      offerExpiryDate:req.body.offerExpiryDate|| "",
+      employeeType:   req.body.employeeType   || "Full-time",
+      location:       req.body.location       || "",
+      reportingTo:    req.body.reportingTo    || "",
+      additionalTerms:req.body.additionalTerms|| ""
+    };
+
+    const body = generateLetterBody(data, templateKey);
+    return res.json({ letterBody: body, templateKey });
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error: " + err.message });
+  }
+};
+
+// GET /api/hr/offers
+exports.getOffers = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
     const { status } = req.query;
     const query = status ? { status } : {};
 
     const offers = await OfferLetter.find(query)
-      .populate("interviewId", "rounds overallStatus")
+      .populate("interviewId", "round1 round2 round3 overallStatus offered")
       .populate("sentBy", "name")
       .sort({ createdAt: -1 });
 
@@ -211,7 +342,7 @@ exports.getOffers = async (req, res) => {
   }
 };
 
-// GET /api/hr/offers/:id  — single offer letter (preview)
+// GET /api/hr/offers/:id
 exports.getOffer = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -223,25 +354,27 @@ exports.getOffer = async (req, res) => {
   }
 };
 
-// POST /api/hr/offers  — create offer letter for a passed candidate
+// POST /api/hr/offers — create offer letter for a candidate marked offered=true
 exports.createOffer = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
     const { interviewId, offeredSalary, joiningDate, offerExpiryDate,
-            employeeType, location, reportingTo, additionalTerms } = req.body;
+            employeeType, location, reportingTo, additionalTerms,
+            templateKey, letterBody } = req.body;
 
     if (!interviewId || !offeredSalary || !joiningDate)
       return res.status(400).json({ msg: "interviewId, offeredSalary and joiningDate are required" });
 
-    // Fetch the interview — must be "passed"
     const interview = await Interview.findById(interviewId);
-    if (!interview)
-      return res.status(404).json({ msg: "Interview not found" });
-    if (interview.overallStatus !== "passed")
-      return res.status(400).json({ msg: "Offer can only be created for candidates who have passed all rounds" });
+    if (!interview) return res.status(404).json({ msg: "Interview not found" });
+    if (!interview.offered)
+      return res.status(400).json({
+        msg: "Offer can only be created for candidates marked Offered on the Interview Panel."
+      });
 
-    // Auto-generate the letter body with candidate details
+    const chosenTemplate = OFFER_TEMPLATES[templateKey] ? templateKey : "default";
+
     const letterData = {
       candidateName:  interview.candidateName,
       candidateEmail: interview.candidateEmail,
@@ -252,7 +385,9 @@ exports.createOffer = async (req, res) => {
       location, reportingTo, additionalTerms
     };
 
-    const letterBody = generateLetterBody(letterData);
+    // If HR supplied a custom letterBody, use it as-is (and mark bodyEdited)
+    const customBody = (letterBody || "").toString().trim();
+    const finalBody  = customBody || generateLetterBody(letterData, chosenTemplate);
 
     const offer = await OfferLetter.create({
       interviewId,
@@ -263,22 +398,22 @@ exports.createOffer = async (req, res) => {
       offeredSalary, joiningDate, offerExpiryDate,
       employeeType: employeeType || "Full-time",
       location, reportingTo, additionalTerms,
-      letterBody,
-      status: "draft",
-      createdBy: req.user.id
+      templateKey: chosenTemplate,
+      bodyEdited:  !!customBody,
+      letterBody:  finalBody,
+      status:      "draft",
+      createdBy:   req.user.id
     });
 
-    // Link offer back to interview
     await Interview.findByIdAndUpdate(interviewId, { offerId: offer._id });
-
     return res.status(201).json({ msg: "Offer letter created", offer });
   } catch (err) {
     console.error("CREATE OFFER ERROR:", err);
-    return res.status(500).json({ msg: "Server error" });
+    return res.status(500).json({ msg: "Server error: " + err.message });
   }
 };
 
-// PUT /api/hr/offers/:id  — edit offer letter (before sending)
+// PUT /api/hr/offers/:id — edit before send. Re-generates body unless HR edited it.
 exports.updateOffer = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -289,23 +424,30 @@ exports.updateOffer = async (req, res) => {
       return res.status(400).json({ msg: "Cannot edit an already sent offer" });
 
     const allowed = ["offeredSalary","joiningDate","offerExpiryDate","employeeType",
-                     "location","reportingTo","additionalTerms"];
+                     "location","reportingTo","additionalTerms","templateKey"];
     allowed.forEach(f => { if (req.body[f] !== undefined) offer[f] = req.body[f]; });
 
-    // Re-generate letter body with updated terms
-    offer.letterBody = generateLetterBody({
-      candidateName:   offer.candidateName,
-      candidateEmail:  offer.candidateEmail,
-      appliedFor:      offer.appliedFor,
-      department:      offer.department,
-      offeredSalary:   offer.offeredSalary,
-      joiningDate:     offer.joiningDate,
-      offerExpiryDate: offer.offerExpiryDate,
-      employeeType:    offer.employeeType,
-      location:        offer.location,
-      reportingTo:     offer.reportingTo,
-      additionalTerms: offer.additionalTerms
-    });
+    // If HR supplied a custom body, mark it edited and use it verbatim.
+    if (typeof req.body.letterBody === "string") {
+      const incoming = req.body.letterBody.trim();
+      // Treat any non-empty incoming body as a manual edit
+      offer.letterBody = incoming;
+      offer.bodyEdited = true;
+    } else if (!offer.bodyEdited) {
+      // Re-generate from template if HR has not hand-edited it yet
+      offer.letterBody = generateLetterBody({
+        candidateName:   offer.candidateName,
+        appliedFor:      offer.appliedFor,
+        department:      offer.department,
+        offeredSalary:   offer.offeredSalary,
+        joiningDate:     offer.joiningDate,
+        offerExpiryDate: offer.offerExpiryDate,
+        employeeType:    offer.employeeType,
+        location:        offer.location,
+        reportingTo:     offer.reportingTo,
+        additionalTerms: offer.additionalTerms
+      }, offer.templateKey);
+    }
 
     await offer.save();
     return res.json({ msg: "Offer updated", offer });
@@ -315,7 +457,7 @@ exports.updateOffer = async (req, res) => {
   }
 };
 
-// POST /api/hr/offers/:id/send  — send offer letter via hr@zyntrixsoftware.com
+// POST /api/hr/offers/:id/send — send offer letter via email
 exports.sendOffer = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -325,7 +467,6 @@ exports.sendOffer = async (req, res) => {
     if (offer.status === "sent")
       return res.status(400).json({ msg: "Offer already sent" });
 
-    // Send email to candidate
     await sendEmail(
       offer.candidateEmail,
       `Offer Letter — ${offer.appliedFor} | Zyntrix Software`,
@@ -344,7 +485,7 @@ exports.sendOffer = async (req, res) => {
   }
 };
 
-// PATCH /api/hr/offers/:id/status  — mark as accepted / declined / expired
+// PATCH /api/hr/offers/:id/status — accepted / declined / expired
 exports.updateOfferStatus = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -356,6 +497,15 @@ exports.updateOfferStatus = async (req, res) => {
       req.params.id, { status }, { new: true }
     );
     if (!offer) return res.status(404).json({ msg: "Offer not found" });
+
+    // If accepted, mark the linked candidate as hired
+    if (status === "accepted" && offer.interviewId) {
+      const itv = await Interview.findById(offer.interviewId);
+      if (itv && itv.candidateId) {
+        await Candidate.findByIdAndUpdate(itv.candidateId, { status: "hired" });
+      }
+    }
+
     return res.json({ msg: "Offer status updated", offer });
   } catch (err) {
     return res.status(500).json({ msg: "Server error" });
