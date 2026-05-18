@@ -1,6 +1,6 @@
 const Attendance = require("../models/attendance");
 
-// ── Helper: returns "YYYY-MM-DD" in UTC (consistent across server & client) ──
+// ── Helper: returns "YYYY-MM-DD" in UTC ──────────────────────────────────────
 function getUTCDate() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -15,7 +15,6 @@ exports.punchIn = async (req, res) => {
       return res.status(400).json({ msg: "Already punched in for today" });
     }
 
-    // FIX: unique index on {userId, date} handles race conditions at DB level
     const record = await Attendance.create({
       userId:  req.user.id,
       date:    today,
@@ -58,7 +57,7 @@ exports.punchOut = async (req, res) => {
   }
 };
 
-// ── GET MY ATTENDANCE ─────────────────────────────────────────────────────────
+// ── GET MY ATTENDANCE ────────────────────────────────────────────────────────
 exports.getMyAttendance = async (req, res) => {
   try {
     const data = await Attendance.find({ userId: req.user.id }).sort({ date: -1 });
@@ -69,9 +68,8 @@ exports.getMyAttendance = async (req, res) => {
   }
 };
 
-// ── RESET ATTENDANCE FOR A DATE (HR / super_admin only) ───────────────────────
-// DELETE /api/attendance/reset  body: { userId, date }
-// Deletes the attendance record so the employee can punch in fresh on that date.
+// ── RESET ATTENDANCE FOR A DATE (HR / super_admin only) ──────────────────────
+// DELETE /api/attendance/reset   body: { userId, date }
 exports.resetAttendance = async (req, res) => {
   try {
     const { role } = req.user;
@@ -85,12 +83,10 @@ exports.resetAttendance = async (req, res) => {
       return res.status(400).json({ msg: "userId and date are required" });
     }
 
-    // validate date format YYYY-MM-DD
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       return res.status(400).json({ msg: "date must be in YYYY-MM-DD format" });
     }
 
-    // don't allow resetting future dates (no record would exist anyway, but be explicit)
     const today = getUTCDate();
     if (date > today) {
       return res.status(400).json({ msg: "Cannot reset a future date" });
@@ -114,8 +110,13 @@ exports.resetAttendance = async (req, res) => {
 };
 
 // ── EDIT / CREATE ATTENDANCE (HR / super_admin only) ─────────────────────────
-// POST  /api/attendance/edit  → create record for absent day
-// PATCH /api/attendance/edit  → update punch times for existing record
+// POST  /api/attendance/edit  → create a new record for an absent day
+// PATCH /api/attendance/edit  → update punch times for an existing record
+//
+// TIMEZONE NOTE:
+//   The frontend sends full UTC ISO strings (e.g. "2026-05-04T04:30:00.000Z")
+//   already converted from the user's local time via toUTCISO().
+//   We just wrap them in new Date() — no manual offset arithmetic needed.
 exports.editAttendance = async (req, res) => {
   try {
     const { role } = req.user;
@@ -138,34 +139,33 @@ exports.editAttendance = async (req, res) => {
       return res.status(400).json({ msg: "Cannot edit a future date" });
     }
 
-    // Build the datetime strings (combine date + time)
-    const buildDateTime = (dateStr, timeStr) => {
-      if (!timeStr) return null;
-      return new Date(`${dateStr}T${timeStr}:00.000Z`);
-    };
-
     const existing = await Attendance.findOne({ userId, date });
 
     if (existing) {
-      // UPDATE existing record
-      if (punchIn)  existing.punchIn  = buildDateTime(date, punchIn);
-      if (punchOut) existing.punchOut = buildDateTime(date, punchOut);
-      if (note !== undefined) existing.note = note;
+      // ── UPDATE existing record ──
+      // punchIn / punchOut arrive as UTC ISO strings from the frontend
+      if (punchIn)              existing.punchIn  = new Date(punchIn);
+      if (punchOut)             existing.punchOut = new Date(punchOut);
+      if (note !== undefined)   existing.note     = note;
+
       await existing.save();
       return res.json({ msg: "Attendance updated", record: existing });
+
     } else {
-      // CREATE new record (absent → present)
+      // ── CREATE new record (absent → present) ──
       if (!punchIn) {
         return res.status(400).json({ msg: "punchIn time is required to create attendance" });
       }
+
       const record = await Attendance.create({
         userId,
         date,
-        punchIn:  buildDateTime(date, punchIn),
-        punchOut: punchOut ? buildDateTime(date, punchOut) : null,
+        punchIn:  new Date(punchIn),
+        punchOut: punchOut ? new Date(punchOut) : null,
         note:     note || ""
       });
-      return res.json({ msg: "Attendance created", record });
+
+      return res.status(201).json({ msg: "Attendance created", record });
     }
 
   } catch (err) {
@@ -175,7 +175,7 @@ exports.editAttendance = async (req, res) => {
 };
 
 // ── SAVE NOTE ON ATTENDANCE RECORD (HR / super_admin only) ───────────────────
-// PATCH /api/attendance/note  body: { userId, date, note }
+// PATCH /api/attendance/note   body: { userId, date, note }
 exports.saveNote = async (req, res) => {
   try {
     const { role } = req.user;
@@ -184,6 +184,7 @@ exports.saveNote = async (req, res) => {
     }
 
     const { userId, date, note } = req.body;
+
     if (!userId || !date) {
       return res.status(400).json({ msg: "userId and date are required" });
     }
