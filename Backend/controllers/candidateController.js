@@ -80,12 +80,28 @@ exports.bulkImport = async (req, res) => {
       return res.status(400).json({ msg: "No valid rows — each candidate needs at least a name and email" });
     }
 
+    // ── REPLACE-ON-IMPORT ─────────────────────────────────────────────────
+    // A new import wipes the previous candidate roster AND the related
+    // interview records, so the Candidates and Interview Panel pages reflect
+    // only the latest spreadsheet. We keep interviews where offered=true
+    // (those have legal offer letters attached) — those will be left orphaned
+    // but visible on the offer letter page.
+    const wipedInterviews = await Interview.deleteMany({
+      createdBy: req.user.id,
+      offered:   { $ne: true }
+    });
+    const wipedCandidates = await Candidate.deleteMany({
+      createdBy: req.user.id
+    });
+
     const inserted = await Candidate.insertMany(docs, { ordered: false });
 
     return res.status(201).json({
-      msg:           `Imported ${inserted.length} candidates`,
-      count:         inserted.length,
-      skipped:       candidates.length - inserted.length,
+      msg:               `Imported ${inserted.length} candidates (replaced ${wipedCandidates.deletedCount} previous, cleared ${wipedInterviews.deletedCount} pending interviews)`,
+      count:             inserted.length,
+      replacedCount:     wipedCandidates.deletedCount,
+      clearedInterviews: wipedInterviews.deletedCount,
+      skipped:           candidates.length - inserted.length,
       importBatchId
     });
   } catch (err) {

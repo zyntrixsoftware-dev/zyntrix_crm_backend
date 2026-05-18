@@ -169,8 +169,8 @@ select option{background:var(--navy2)}
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-label">Employee Lifecycle</div>
-    <a class="nav-item" href="../../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
     <a class="nav-item" href="../../employee_lifecycle/offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item" href="../../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
     <a class="nav-item" href="../../employee_lifecycle/orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
     <a class="nav-item" href="../../employee_lifecycle/deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
   </div>
@@ -343,6 +343,11 @@ select option{background:var(--navy2)}
       <div style="margin-bottom:14px;font-size:12px;color:var(--text3);">
         Pick which column from your file maps to each candidate field.
         Name and Email are required.
+      </div>
+      <div style="margin-bottom:14px;padding:10px 14px;border-radius:8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);color:var(--amber);font-size:12px;line-height:1.5;">
+        ⚠ <b>This is a full replacement.</b> Importing will <b>remove all existing
+        candidates and their pending interview records</b> before adding the new ones.
+        Candidates who already have a sent offer letter are preserved.
       </div>
       <div id="map-form"></div>
       <div class="hint" style="margin-top:14px;">
@@ -734,7 +739,22 @@ async function commitImport() {
     return;
   }
 
-  setSync("loading", `Importing ${payload.length} candidates…`);
+  // ── REPLACE-ON-IMPORT confirmation ───────────────────────────────────
+  // Show the user the impact before we wipe their existing data.
+  const existingCount  = candidates.length;
+  const pendingItvNote = existingCount > 0
+    ? `\n\nThis will REMOVE all ${existingCount} existing candidate(s) and any pending interviews in the Interview Panel.`
+    : "";
+  const ok = confirm(
+    `Import ${payload.length} new candidates?` + pendingItvNote +
+    `\n\nCandidates with a sent offer letter will be preserved.`
+  );
+  if (!ok) {
+    setSync("idle", "Import cancelled");
+    return;
+  }
+
+  setSync("loading", `Replacing roster with ${payload.length} candidates…`);
   const res = await apiRequest("/hr/candidates/bulk-import", "POST", {
     candidates: payload,
     importedFrom: pendingSource
