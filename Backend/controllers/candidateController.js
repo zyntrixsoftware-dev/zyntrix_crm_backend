@@ -60,32 +60,56 @@ exports.bulkImport = async (req, res) => {
     const source = validSources.includes(importedFrom) ? importedFrom : "manual";
     const importBatchId = `${source}-${Date.now()}`;
 
-    const docs = candidates
-      .filter(c => c && c.name && c.email)
-      .map(c => ({
-        name:         String(c.name).trim().slice(0, 200),
-        email:        String(c.email).trim().toLowerCase().slice(0, 200),
-        phone:        String(c.phone || "").trim().slice(0, 50),
-        appliedFor:   String(c.appliedFor || "").trim().slice(0, 200),
-        department:   String(c.department || "").trim().slice(0, 100),
-        resumeUrl:    String(c.resumeUrl || "").trim().slice(0, 500),
+    // ── Build docs DEFENSIVELY ────────────────────────────────────────────
+    // Map first (trim/normalize all fields) THEN filter — the original code
+    // filtered before trimming, so rows with whitespace-only name/email
+    // slipped through and later failed Mongoose `required: true` validation,
+    // which threw a BulkWriteError → "Internal server error".
+    //
+    // We also collect rejected rows so HR sees what was dropped and why,
+    // and we preserve the FULL original row in `raw` so client-specific
+    // custom columns aren't lost (those are displayed in the "Details" modal).
+    const rejected = [];
+    const docs     = [];
+
+    candidates.forEach((c, idx) => {
+      const name  = String(c?.name  || "").trim().slice(0, 200);
+      const email = String(c?.email || "").trim().toLowerCase().slice(0, 200);
+
+      // Basic sanity check on email (must contain "@" and a "." after it)
+      const looksLikeEmail = /^\S+@\S+\.\S+$/.test(email);
+
+      if (!name && !email)            { rejected.push({ idx, reason: "name & email empty" }); return; }
+      if (!name)                       { rejected.push({ idx, reason: "name empty" });         return; }
+      if (!email)                      { rejected.push({ idx, reason: "email empty" });        return; }
+      if (!looksLikeEmail)             { rejected.push({ idx, reason: "email invalid: " + email }); return; }
+
+      docs.push({
+        name,
+        email,
+        phone:        String(c?.phone      || "").trim().slice(0, 50),
+        appliedFor:   String(c?.appliedFor || "").trim().slice(0, 200),
+        department:   String(c?.department || "").trim().slice(0, 100),
+        resumeUrl:    String(c?.resumeUrl  || "").trim().slice(0, 500),
         status:       "new",
         importedFrom: source,
         importBatchId,
-        raw:          c.raw || {},
+        raw:          c?.raw || {},        // full original row — all 16 columns preserved
         createdBy:    req.user.id
-      }));
+      });
+    });
 
     if (docs.length === 0) {
-      return res.status(400).json({ msg: "No valid rows — each candidate needs at least a name and email" });
+      return res.status(400).json({
+        msg: "No valid rows. Every candidate needs a non-empty Name AND a valid Email address.",
+        rejectedSamples: rejected.slice(0, 5)
+      });
     }
 
     // ── REPLACE-ON-IMPORT ─────────────────────────────────────────────────
     // A new import wipes the previous candidate roster AND the related
-    // interview records, so the Candidates and Interview Panel pages reflect
-    // only the latest spreadsheet. We keep interviews where offered=true
-    // (those have legal offer letters attached) — those will be left orphaned
-    // but visible on the offer letter page.
+    // interview records. Interviews where offered=true are preserved (those
+    // have legal offer letters attached).
     const wipedInterviews = await Interview.deleteMany({
       createdBy: req.user.id,
       offered:   { $ne: true }
@@ -94,19 +118,48 @@ exports.bulkImport = async (req, res) => {
       createdBy: req.user.id
     });
 
-    const inserted = await Candidate.insertMany(docs, { ordered: false });
+    // ── insertMany with partial-success handling ──────────────────────────
+    // ordered:false continues past individual row failures.
+    // rawResult:true gives us the inserted-count even on BulkWriteError.
+    let insertedCount = 0;
+    const insertErrors = [];
+    try {
+      const result = await Candidate.insertMany(docs, { ordered: false, rawResult: true });
+      insertedCount = result.insertedCount || (result.length || 0);
+    } catch (bulkErr) {
+      // BulkWriteError: partial success. Pull the inserted count from the
+      // mongo-driver result if available, otherwise count what got through.
+      insertedCount = bulkErr?.result?.nInserted
+                   || bulkErr?.result?.result?.nInserted
+                   || (bulkErr?.insertedDocs?.length ?? 0);
+      const writeErrs = bulkErr?.writeErrors || bulkErr?.result?.result?.writeErrors || [];
+      writeErrs.slice(0, 5).forEach(e => insertErrors.push({
+        index: e.index ?? e.err?.index,
+        msg:   e.errmsg || e.err?.errmsg || String(e)
+      }));
+      console.error("BULK IMPORT — partial failure:",
+        bulkErr.message,
+        "inserted:", insertedCount,
+        "errors:",   insertErrors);
+    }
+
+    const skipped = (candidates.length - docs.length) + (docs.length - insertedCount);
 
     return res.status(201).json({
-      msg:               `Imported ${inserted.length} candidates (replaced ${wipedCandidates.deletedCount} previous, cleared ${wipedInterviews.deletedCount} pending interviews)`,
-      count:             inserted.length,
+      msg: `Imported ${insertedCount} candidates` +
+           ` (replaced ${wipedCandidates.deletedCount} previous, cleared ${wipedInterviews.deletedCount} pending interviews` +
+           (skipped > 0 ? `, skipped ${skipped} invalid rows` : "") + ")",
+      count:             insertedCount,
       replacedCount:     wipedCandidates.deletedCount,
       clearedInterviews: wipedInterviews.deletedCount,
-      skipped:           candidates.length - inserted.length,
+      skipped,
+      rejectedSamples:   rejected.slice(0, 5),
+      insertErrors:      insertErrors,
       importBatchId
     });
   } catch (err) {
     console.error("BULK IMPORT CANDIDATES ERROR:", err);
-    return res.status(500).json({ msg: "Import failed: " + err.message });
+    return res.status(500).json({ msg: "Import failed: " + (err.message || "unknown error") });
   }
 };
 

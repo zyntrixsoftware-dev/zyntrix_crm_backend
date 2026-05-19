@@ -329,6 +329,25 @@ select option{background:var(--navy2)}
 
 <input type="file" id="file-input" style="display:none;" onchange="onFilePicked(event)">
 
+<!-- ════════ CANDIDATE DETAILS MODAL (shows ALL imported columns) ════════ -->
+<div class="overlay" id="details-modal">
+  <div class="modal" style="width:640px;">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="details-title">Candidate details</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="details-sub">All columns from your imported file</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('details-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="details-body" style="font-size:13px;"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" onclick="closeModal('details-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════ MAPPING MODAL (step 2) ════════ -->
 <div class="overlay" id="map-modal">
   <div class="modal">
@@ -467,10 +486,17 @@ function renderTable() {
           ? `<button class="btn-sm success" onclick="shortlist('${c._id}')">⭐ Shortlist</button>
              <button class="btn-sm danger"  onclick="reject('${c._id}')">✖ Reject</button>`
           : interviewLink}
+        <button class="btn-sm" onclick="viewDetails('${c._id}')" title="View all imported columns">👁 Details${rawCount(c) ? ` <span style="background:var(--accent-dim);color:var(--accent);padding:1px 6px;border-radius:10px;font-size:10px;margin-left:2px;">${rawCount(c)}</span>` : ""}</button>
         <button class="btn-sm" onclick="del('${c._id}')" title="Delete">🗑</button>
       </div></td>
     </tr>`;
   }).join("");
+}
+
+// Count of original spreadsheet columns we have for this candidate
+function rawCount(c) {
+  if (!c || !c.raw || typeof c.raw !== "object") return 0;
+  return Object.keys(c.raw).length;
 }
 
 function setFilter(f, el) {
@@ -519,6 +545,73 @@ async function del(id) {
   if (res.error) return setSync("err", res.msg);
   setSync("ok","Candidate deleted");
   await loadCandidates();
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  DETAILS MODAL — show every column from the original imported file
+// ════════════════════════════════════════════════════════════════════
+function viewDetails(id) {
+  const c = candidates.find(x => x._id === id);
+  if (!c) return;
+
+  document.getElementById("details-title").textContent = c.name || "Candidate";
+  document.getElementById("details-sub").textContent =
+    `${c.email || ""}${c.appliedFor ? "  ·  " + c.appliedFor : ""}` +
+    `  ·  ${rawCount(c)} column${rawCount(c) === 1 ? "" : "s"} imported`;
+
+  // Build the field list:
+  //  1. The standard parsed fields (so HR sees what we extracted)
+  //  2. ALL the original spreadsheet columns from `raw` (custom client columns)
+  const standardRows = [
+    ["Name",        c.name],
+    ["Email",       c.email],
+    ["Phone",       c.phone],
+    ["Applied For", c.appliedFor],
+    ["Department",  c.department],
+    ["Resume URL",  c.resumeUrl],
+    ["Source",      c.importedFrom],
+    ["Status",      c.status]
+  ].filter(([_,v]) => v !== undefined && v !== null && v !== "");
+
+  const raw = (c.raw && typeof c.raw === "object") ? c.raw : {};
+  const rawKeys = Object.keys(raw);
+
+  const rowHtml = (k, v) => {
+    const text = (v === null || v === undefined) ? "" :
+                 (typeof v === "object") ? JSON.stringify(v) : String(v);
+    const isLink = /^https?:\/\//i.test(text);
+    const valEl  = isLink
+      ? `<a href="${escapeHtml(text)}" target="_blank" rel="noopener" style="color:var(--accent);word-break:break-all;">${escapeHtml(text)}</a>`
+      : `<span style="word-break:break-word;white-space:pre-wrap;">${escapeHtml(text) || "<span style='color:var(--text3);'>—</span>"}</span>`;
+    return `<div style="display:grid;grid-template-columns:160px 1fr;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">${escapeHtml(k)}</div>
+      <div style="font-size:13px;color:var(--text);">${valEl}</div>
+    </div>`;
+  };
+
+  const html = `
+    <div style="font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">
+      Parsed fields
+    </div>
+    ${standardRows.map(([k,v]) => rowHtml(k, v)).join("")}
+
+    ${rawKeys.length ? `
+      <div style="font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:20px 0 6px;">
+        All ${rawKeys.length} columns from your file
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3);font-size:11px;">
+          (including any custom columns your client added)
+        </span>
+      </div>
+      ${rawKeys.map(k => rowHtml(k, raw[k])).join("")}
+    ` : `
+      <div style="margin-top:18px;padding:14px;background:var(--navy2);border-radius:8px;font-size:12px;color:var(--text3);text-align:center;">
+        No raw column data stored for this candidate.
+      </div>
+    `}
+  `;
+
+  document.getElementById("details-body").innerHTML = html;
+  openModal("details-modal");
 }
 
 // ════════════════════════════════════════════════════════════════════
