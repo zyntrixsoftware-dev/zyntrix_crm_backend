@@ -80,22 +80,45 @@ exports.sendOtp = async (req, res) => {
     const rawEmail = req.body?.email || "";
     const email    = rawEmail.trim().toLowerCase();
 
+    console.log("[sendOtp] request for:", email);
+
     if (!email) {
       return res.status(400).json({ msg: "Email is required" });
     }
 
-    // Domain restriction
+    // Domain restriction (env-driven). If ALLOWED_EMAIL_DOMAIN is set on
+    // Railway it can silently block legit reset attempts — log it so the
+    // Railway logs reveal that misconfiguration immediately.
     const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN || "";
     if (allowedDomain && !email.endsWith("@" + allowedDomain)) {
+      console.warn(
+        "[sendOtp] BLOCKED by ALLOWED_EMAIL_DOMAIN=" + allowedDomain +
+        " — incoming email did not match. Unset this env var if you want to allow any domain."
+      );
       return res.status(400).json({ msg: `Use your @${allowedDomain} company email` });
+    }
+
+    // Loud warning if DEV_SKIP_EMAIL is on in prod — most common reason
+    // OTP "doesn't arrive": the email is just being printed to console.
+    if (process.env.DEV_SKIP_EMAIL === "true") {
+      console.warn(
+        "[sendOtp] DEV_SKIP_EMAIL=true is active — OTP will be PRINTED to logs " +
+        "instead of being emailed. Set DEV_SKIP_EMAIL=false (or unset it) on Railway " +
+        "to deliver real OTPs."
+      );
     }
 
     const user = await User.findOne({ email });
 
-    // Always return success — prevents user enumeration
+    // Always return success — prevents user enumeration. Log so we know
+    // whether the email matched a user account or not.
     if (!user) {
+      console.warn("[sendOtp] no user found for", email,
+        "— returning generic success to avoid leaking user existence.");
       return res.json({ msg: "If that email is registered, an OTP has been sent." });
     }
+
+    console.log("[sendOtp] user found:", user._id.toString(), "name:", user.name);
 
     // Generate OTP
     const otp       = generateOTP();
@@ -114,15 +137,27 @@ exports.sendOtp = async (req, res) => {
         "Zyntrix CRM — Your Password Reset OTP",
         `Hello ${user.name},\n\nYour OTP to reset your password is:\n\n  ${otp}\n\nThis OTP is valid for 10 minutes. Do not share it with anyone.\n\nIf you did not request this, please ignore this email.\n\n— Zyntrix CRM Team`
       );
+      console.log("[sendOtp] OTP email dispatched OK to", email);
     } catch (emailErr) {
-      console.error("OTP EMAIL FAILED:", emailErr.message);
-      return res.status(500).json({ msg: "Could not send OTP email. Please contact admin." });
+      console.error("[sendOtp] OTP EMAIL FAILED to", email);
+      console.error("  message :", emailErr.message);
+      console.error("  code    :", emailErr.code);
+      console.error("  response:", emailErr.response);
+      console.error("  command :", emailErr.command);
+      // In development we surface the real error so the dev can fix it fast.
+      // In production we hide the details but the full stack is in Railway logs.
+      const isProd = process.env.NODE_ENV === "production";
+      return res.status(500).json({
+        msg: isProd
+          ? "Could not send OTP email. Please contact admin."
+          : "Could not send OTP email: " + emailErr.message
+      });
     }
 
     return res.json({ msg: "If that email is registered, an OTP has been sent." });
 
   } catch (err) {
-    console.error("SEND OTP ERROR:", err);
+    console.error("[sendOtp] UNEXPECTED ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
   }
 };

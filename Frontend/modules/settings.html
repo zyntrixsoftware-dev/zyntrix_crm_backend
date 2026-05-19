@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings – Zyntrix</title>
+<link rel="stylesheet" href="../assets/css/attendance.css">
+<link rel="stylesheet" href="../assets/css/module-pages.css">
+<link rel="stylesheet" href="../assets/css/profile-settings.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="brand-mark">Z</div>
+        <div>
+          <strong>Zyntrix</strong>
+          <span>EdTech CRM</span>
+        </div>
+      </div>
+      <nav class="side-nav" aria-label="Primary">
+        <a href="attendance.html"><span class="nav-icon">▣</span>Schedule</a>
+        <a href="timecard.html"><span class="nav-icon">◷</span>Timecard</a>
+        <a href="find-shifts.html"><span class="nav-icon">⌕</span>Find Shifts</a>
+        <a href="profile.html"><span class="nav-icon">♙</span>Profile</a>
+        <a class="active" href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
+      </nav>
+    </div>
+    <button onclick="logout()" type="button" aria-label="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;font-family:inherit;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+
+  </aside>
+
+  <!-- ── MAIN ─────────────────────────────────────────────────────── -->
+  <main class="main">
+    <header class="topbar">
+      <h1>Settings</h1>
+      <div class="topbar-actions">
+        <div class="top-profile">
+          <img id="topAvatar" src="https://i.pravatar.cc/80?img=12" alt="Avatar">
+          <div>
+            <strong id="userName">Zyntrix Employee</strong>
+            <span id="userRole">Employee</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="module-content settings-layout">
+
+      <!-- ── SETTINGS SIDEBAR ── -->
+      <nav class="settings-nav">
+        <button class="snav-item active" data-section="notifications">
+          <span class="snav-icon">🔔</span>
+          <div>
+            <strong>Notifications</strong>
+            <span>Alerts &amp; reminders</span>
+          </div>
+        </button>
+        <button class="snav-item" data-section="appearance">
+          <span class="snav-icon">🎨</span>
+          <div>
+            <strong>Appearance</strong>
+            <span>Theme &amp; display</span>
+          </div>
+        </button>
+        <button class="snav-item" data-section="attendance">
+          <span class="snav-icon">📅</span>
+          <div>
+            <strong>Attendance</strong>
+            <span>Punch &amp; shift rules</span>
+          </div>
+        </button>
+        <button class="snav-item" data-section="privacy">
+          <span class="snav-icon">🔒</span>
+          <div>
+            <strong>Privacy</strong>
+            <span>Visibility controls</span>
+          </div>
+        </button>
+        <button class="snav-item" data-section="language">
+          <span class="snav-icon">🌐</span>
+          <div>
+            <strong>Language &amp; Region</strong>
+            <span>Locale preferences</span>
+          </div>
+        </button>
+        <button class="snav-item" data-section="integrations">
+          <span class="snav-icon">🔗</span>
+          <div>
+            <strong>Integrations</strong>
+            <span>Connected apps</span>
+          </div>
+        </button>
+        <button class="snav-item" data-section="danger">
+          <span class="snav-icon">⚠️</span>
+          <div>
+            <strong>Danger Zone</strong>
+            <span>Account actions</span>
+          </div>
+        </button>
+      </nav>
+
+      <!-- ── SETTINGS CONTENT ── -->
+      <div class="settings-content">
+        <p class="toast-msg" id="settingsToast"></p>
+
+        <!-- ── NOTIFICATIONS ── -->
+        <div class="settings-panel active" id="section-notifications">
+          <div class="settings-panel-hd">
+            <h2>Notification Preferences</h2>
+            <p>Control how and when Zyntrix notifies you.</p>
+          </div>
+
+          <div class="notif-channel-header">
+            <span></span>
+            <span>Email</span>
+            <span>In-App</span>
+            <span>SMS</span>
+          </div>
+
+          <div class="notif-rows">
+            <div class="notif-row">
+              <div>
+                <strong>Punch Reminder</strong>
+                <p>Remind me to punch in / out</p>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="n-punch-email" checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-punch-app"   checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-punch-sms"       ><span class="toggle-knob"></span></label>
+            </div>
+            <div class="notif-row">
+              <div>
+                <strong>Leave Status Update</strong>
+                <p>When your leave request is approved or rejected</p>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="n-leave-email" checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-leave-app"   checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-leave-sms"   checked><span class="toggle-knob"></span></label>
+            </div>
+            <div class="notif-row">
+              <div>
+                <strong>Shift Change Alert</strong>
+                <p>When your shift schedule changes</p>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="n-shift-email" checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-shift-app"   checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-shift-sms"       ><span class="toggle-knob"></span></label>
+            </div>
+            <div class="notif-row">
+              <div>
+                <strong>Missed Punch Warning</strong>
+                <p>Alert if I forget to record a punch</p>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="n-miss-email" checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-miss-app"   checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-miss-sms"        ><span class="toggle-knob"></span></label>
+            </div>
+            <div class="notif-row">
+              <div>
+                <strong>Payslip Available</strong>
+                <p>When monthly payslip is generated</p>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="n-pay-email" checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-pay-app"   checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-pay-sms"   checked><span class="toggle-knob"></span></label>
+            </div>
+            <div class="notif-row">
+              <div>
+                <strong>Holiday Announcements</strong>
+                <p>Company-wide holiday notices</p>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="n-hol-email" checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-hol-app"   checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-hol-sms"        ><span class="toggle-knob"></span></label>
+            </div>
+            <div class="notif-row">
+              <div>
+                <strong>Performance Reports</strong>
+                <p>Monthly attendance &amp; performance summary</p>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" id="n-perf-email" checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-perf-app"   checked><span class="toggle-knob"></span></label>
+              <label class="toggle-switch"><input type="checkbox" id="n-perf-sms"        ><span class="toggle-knob"></span></label>
+            </div>
+          </div>
+
+          <!-- Reminder Timing -->
+          <div class="subsection">
+            <h3>Reminder Timing</h3>
+            <div class="field-grid col2">
+              <div class="field-group">
+                <label>Punch-in reminder before shift (minutes)</label>
+                <select id="s-punchBefore">
+                  <option value="0">Don't remind</option>
+                  <option value="5">5 minutes</option>
+                  <option value="10" selected>10 minutes</option>
+                  <option value="15">15 minutes</option>
+                  <option value="30">30 minutes</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Punch-out reminder before shift ends (minutes)</label>
+                <select id="s-punchAfter">
+                  <option value="0">Don't remind</option>
+                  <option value="5">5 minutes</option>
+                  <option value="10" selected>10 minutes</option>
+                  <option value="15">15 minutes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="saveSettings('notifications')">Save Notification Settings</button>
+        </div>
+
+        <!-- ── APPEARANCE ── -->
+        <div class="settings-panel" id="section-appearance">
+          <div class="settings-panel-hd">
+            <h2>Appearance</h2>
+            <p>Personalise how the app looks and feels.</p>
+          </div>
+
+          <div class="subsection">
+            <h3>Theme</h3>
+            <div class="theme-options">
+              <label class="theme-card active" id="theme-dark">
+                <input type="radio" name="theme" value="dark" checked hidden>
+                <div class="theme-preview dark-preview"></div>
+                <span>Dark</span>
+              </label>
+              <label class="theme-card" id="theme-light">
+                <input type="radio" name="theme" value="light" hidden>
+                <div class="theme-preview light-preview"></div>
+                <span>Light <span class="coming-pill">Soon</span></span>
+              </label>
+              <label class="theme-card" id="theme-system">
+                <input type="radio" name="theme" value="system" hidden>
+                <div class="theme-preview system-preview"></div>
+                <span>System</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Display Density</h3>
+            <div class="density-options">
+              <label class="density-opt">
+                <input type="radio" name="density" value="compact"> Compact
+              </label>
+              <label class="density-opt">
+                <input type="radio" name="density" value="default" checked> Default
+              </label>
+              <label class="density-opt">
+                <input type="radio" name="density" value="comfortable"> Comfortable
+              </label>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Calendar View</h3>
+            <div class="field-grid col2">
+              <div class="field-group">
+                <label>Default view</label>
+                <select id="s-calView">
+                  <option value="month" selected>Month</option>
+                  <option value="week">Week</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Week starts on</label>
+                <select id="s-weekStart">
+                  <option value="sun" selected>Sunday</option>
+                  <option value="mon">Monday</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Sidebar</h3>
+            <div class="setting-row">
+              <div>
+                <strong>Compact sidebar by default</strong>
+                <p>Collapse labels on load, show icons only</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-compactSidebar">
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="saveSettings('appearance')">Save Appearance</button>
+        </div>
+
+        <!-- ── ATTENDANCE SETTINGS ── -->
+        <div class="settings-panel" id="section-attendance">
+          <div class="settings-panel-hd">
+            <h2>Attendance Preferences</h2>
+            <p>Configure how your punches and shifts behave.</p>
+          </div>
+
+          <div class="subsection">
+            <h3>Punch Settings</h3>
+            <div class="setting-row">
+              <div>
+                <strong>Confirm before punching</strong>
+                <p>Show a confirmation dialog before recording a punch</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-punchConfirm" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>Show punch timer</strong>
+                <p>Display elapsed work time after punching in</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-punchTimer" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>Auto punch-out reminder</strong>
+                <p>Get reminded if you're still punched in after shift end</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-autoRemind" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Shift Preferences</h3>
+            <div class="field-grid col2">
+              <div class="field-group">
+                <label>Preferred shift start</label>
+                <input type="time" id="s-shiftStart" value="09:00">
+              </div>
+              <div class="field-group">
+                <label>Preferred shift end</label>
+                <input type="time" id="s-shiftEnd" value="18:00">
+              </div>
+              <div class="field-group">
+                <label>Break duration (minutes)</label>
+                <select id="s-breakDur">
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                  <option value="60" selected>60 minutes (1 hour)</option>
+                  <option value="90">90 minutes</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>WFH days per week</label>
+                <select id="s-wfhDays">
+                  <option value="0" selected>None (full on-site)</option>
+                  <option value="1">1 day</option>
+                  <option value="2">2 days</option>
+                  <option value="3">3 days</option>
+                  <option value="5">Full remote</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-group" style="margin-top:10px;">
+              <label>Preferred WFH days</label>
+              <div class="day-picker" id="wfhDayPicker">
+                <button type="button" class="day-btn" data-day="mon">Mon</button>
+                <button type="button" class="day-btn" data-day="tue">Tue</button>
+                <button type="button" class="day-btn" data-day="wed">Wed</button>
+                <button type="button" class="day-btn" data-day="thu">Thu</button>
+                <button type="button" class="day-btn" data-day="fri">Fri</button>
+                <button type="button" class="day-btn" data-day="sat">Sat</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Overtime</h3>
+            <div class="setting-row">
+              <div>
+                <strong>Opt-in for overtime tracking</strong>
+                <p>Record hours beyond standard shift in the Timecard</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-overtime">
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="field-group" style="margin-top:10px;">
+              <label>Overtime threshold (hours beyond shift)</label>
+              <select id="s-otThreshold">
+                <option value="0.5">30 minutes</option>
+                <option value="1" selected>1 hour</option>
+                <option value="2">2 hours</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="saveSettings('attendance')">Save Attendance Preferences</button>
+        </div>
+
+        <!-- ── PRIVACY ── -->
+        <div class="settings-panel" id="section-privacy">
+          <div class="settings-panel-hd">
+            <h2>Privacy Controls</h2>
+            <p>Decide what information others can see about you.</p>
+          </div>
+
+          <div class="subsection">
+            <h3>Profile Visibility</h3>
+            <div class="setting-row">
+              <div>
+                <strong>Show online status</strong>
+                <p>Let team members see when you're active</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="p-onlineStatus" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>Show phone number to teammates</strong>
+                <p>Visible in your employee directory listing</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="p-showPhone">
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>Show date of birth</strong>
+                <p>Show month &amp; day on team calendar</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="p-showDob" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Activity &amp; Data</h3>
+            <div class="setting-row">
+              <div>
+                <strong>Allow HR to view attendance in real time</strong>
+                <p>HR can see your live punch status on their dashboard</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="p-hrView" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>Include me in team reports</strong>
+                <p>Your attendance contributes to aggregate team statistics</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="p-teamReport" checked>
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3>Data Export</h3>
+            <p class="panel-desc">Download a copy of your personal data stored in Zyntrix.</p>
+            <button class="btn-outline" onclick="requestDataExport()">Request Data Export</button>
+          </div>
+
+          <button class="btn-primary" onclick="saveSettings('privacy')">Save Privacy Settings</button>
+        </div>
+
+        <!-- ── LANGUAGE & REGION ── -->
+        <div class="settings-panel" id="section-language">
+          <div class="settings-panel-hd">
+            <h2>Language &amp; Region</h2>
+            <p>Set your preferred language, date formats, and timezone.</p>
+          </div>
+
+          <div class="field-grid col2">
+            <div class="field-group">
+              <label>Language</label>
+              <select id="s-lang">
+                <option value="en" selected>English</option>
+                <option value="hi">Hindi</option>
+                <option value="te">Telugu</option>
+                <option value="ta">Tamil</option>
+                <option value="kn">Kannada</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>Time Zone</label>
+              <select id="s-tz">
+                <option value="Asia/Kolkata" selected>IST — India Standard Time (UTC+5:30)</option>
+                <option value="Asia/Dubai">GST — Gulf Standard Time (UTC+4)</option>
+                <option value="Europe/London">GMT — Greenwich Mean Time (UTC+0)</option>
+                <option value="America/New_York">EST — Eastern Standard Time (UTC-5)</option>
+                <option value="America/Los_Angeles">PST — Pacific Standard Time (UTC-8)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>Date Format</label>
+              <select id="s-dateFormat">
+                <option value="DD/MM/YYYY" selected>DD/MM/YYYY</option>
+                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                <option value="D MMM YYYY">D MMM YYYY</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>Time Format</label>
+              <select id="s-timeFormat">
+                <option value="12" selected>12-hour (AM/PM)</option>
+                <option value="24">24-hour</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>Currency Symbol</label>
+              <select id="s-currency">
+                <option value="INR" selected>₹ Indian Rupee</option>
+                <option value="USD">$ US Dollar</option>
+                <option value="EUR">€ Euro</option>
+                <option value="GBP">£ British Pound</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>Number Format</label>
+              <select id="s-numFormat">
+                <option value="IN" selected>Indian (1,00,000)</option>
+                <option value="US">US (100,000)</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-primary" style="margin-top:8px;" onclick="saveSettings('language')">Save Region Settings</button>
+        </div>
+
+        <!-- ── INTEGRATIONS ── -->
+        <div class="settings-panel" id="section-integrations">
+          <div class="settings-panel-hd">
+            <h2>Connected Integrations</h2>
+            <p>Apps and services connected to your Zyntrix account.</p>
+          </div>
+
+          <div class="integration-list">
+            <div class="integration-item">
+              <div class="int-icon" style="background:#1a73e8;">G</div>
+              <div class="int-info">
+                <strong>Google Calendar</strong>
+                <p>Sync your shifts and leave days to Google Calendar</p>
+              </div>
+              <button class="btn-connect" id="gc-btn" onclick="toggleIntegration('google-calendar', this)">Connect</button>
+            </div>
+            <div class="integration-item">
+              <div class="int-icon" style="background:#4a154b;">Sl</div>
+              <div class="int-info">
+                <strong>Slack</strong>
+                <p>Receive attendance notifications in your Slack workspace</p>
+              </div>
+              <button class="btn-connect" id="sl-btn" onclick="toggleIntegration('slack', this)">Connect</button>
+            </div>
+            <div class="integration-item">
+              <div class="int-icon" style="background:#217346;">Ex</div>
+              <div class="int-info">
+                <strong>Microsoft Excel Export</strong>
+                <p>Export timecard and attendance data as .xlsx</p>
+              </div>
+              <button class="btn-connect enabled" id="ex-btn" onclick="exportExcel()">Export Now</button>
+            </div>
+            <div class="integration-item">
+              <div class="int-icon" style="background:#0078d4;">Te</div>
+              <div class="int-info">
+                <strong>Microsoft Teams</strong>
+                <p>Status sync and notifications in Teams</p>
+              </div>
+              <button class="btn-connect" id="teams-btn" onclick="toggleIntegration('teams', this)">Connect</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── DANGER ZONE ── -->
+        <div class="settings-panel" id="section-danger">
+          <div class="settings-panel-hd">
+            <h2>Danger Zone</h2>
+            <p>These actions are irreversible. Please proceed with caution.</p>
+          </div>
+
+          <div class="danger-list">
+            <div class="danger-item">
+              <div>
+                <strong>Clear local cache</strong>
+                <p>Remove all locally stored preferences and cached data from this device.</p>
+              </div>
+              <button class="btn-danger" onclick="clearCache()">Clear Cache</button>
+            </div>
+            <div class="danger-item">
+              <div>
+                <strong>Sign out of all devices</strong>
+                <p>Revoke all active sessions and sign out everywhere.</p>
+              </div>
+              <button class="btn-danger" onclick="signOutAll()">Sign Out Everywhere</button>
+            </div>
+            <div class="danger-item">
+              <div>
+                <strong>Deactivate account</strong>
+                <p>Temporarily deactivate your account. Contact HR to reactivate.</p>
+              </div>
+              <button class="btn-danger" onclick="deactivateAccount()">Deactivate Account</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /settings-content -->
+
+    </section>
+  </main>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script>
+requireAuth();
+requireModuleAccess("attendance");
+
+// ── Bootstrap user ────────────────────────────────────────────────
+const user = getUser();
+if (user) {
+  const name = user.name || "Zyntrix Employee";
+  const role = (user.role || "employee").replace(/_/g, " ");
+  document.getElementById("userName").innerText      = name;
+  document.getElementById("userRole").innerText      = role;
+  document.getElementById("sideUserName").innerText  = name;
+  document.getElementById("sideUserEmail").innerText = user.email || "";
+}
+
+// ── Settings Navigation ───────────────────────────────────────────
+const SETTINGS_STORAGE_KEY = "zyntrix_settings";
+
+document.querySelectorAll(".snav-item").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".snav-item").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".settings-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("section-" + btn.dataset.section).classList.add("active");
+  });
+});
+
+// ── WFH Day Picker ────────────────────────────────────────────────
+document.querySelectorAll(".day-btn").forEach(btn => {
+  btn.addEventListener("click", () => btn.classList.toggle("day-selected"));
+});
+
+// ── Theme picker ──────────────────────────────────────────────────
+document.querySelectorAll(".theme-card").forEach(card => {
+  card.addEventListener("click", () => {
+    document.querySelectorAll(".theme-card").forEach(c => c.classList.remove("active"));
+    card.classList.add("active");
+  });
+});
+
+// ── Save settings (reads UI, persists to localStorage + API) ──────
+async function saveSettings(section) {
+  const stored = loadLocalSettings();
+  let patch = {};
+
+  if (section === "notifications") {
+    patch.notifications = {
+      punch:   { email: chk("n-punch-email"), app: chk("n-punch-app"), sms: chk("n-punch-sms") },
+      leave:   { email: chk("n-leave-email"), app: chk("n-leave-app"), sms: chk("n-leave-sms") },
+      shift:   { email: chk("n-shift-email"), app: chk("n-shift-app"), sms: chk("n-shift-sms") },
+      missed:  { email: chk("n-miss-email"),  app: chk("n-miss-app"),  sms: chk("n-miss-sms")  },
+      payslip: { email: chk("n-pay-email"),   app: chk("n-pay-app"),   sms: chk("n-pay-sms")   },
+      holiday: { email: chk("n-hol-email"),   app: chk("n-hol-app"),   sms: chk("n-hol-sms")   },
+      perf:    { email: chk("n-perf-email"),  app: chk("n-perf-app"),  sms: chk("n-perf-sms")  },
+      punchBefore: val("s-punchBefore"),
+      punchAfter:  val("s-punchAfter")
+    };
+  } else if (section === "appearance") {
+    patch.appearance = {
+      theme:          document.querySelector('input[name="theme"]:checked')?.value || "dark",
+      density:        document.querySelector('input[name="density"]:checked')?.value || "default",
+      calView:        val("s-calView"),
+      weekStart:      val("s-weekStart"),
+      compactSidebar: chk("s-compactSidebar")
+    };
+  } else if (section === "attendance") {
+    const wfhDays = [...document.querySelectorAll(".day-btn.day-selected")].map(b => b.dataset.day);
+    patch.attendance = {
+      punchConfirm: chk("s-punchConfirm"),
+      punchTimer:   chk("s-punchTimer"),
+      autoRemind:   chk("s-autoRemind"),
+      shiftStart:   val("s-shiftStart"),
+      shiftEnd:     val("s-shiftEnd"),
+      breakDur:     val("s-breakDur"),
+      wfhDays:      parseInt(val("s-wfhDays")),
+      wfhDaysList:  wfhDays,
+      overtime:     chk("s-overtime"),
+      otThreshold:  parseFloat(val("s-otThreshold"))
+    };
+  } else if (section === "privacy") {
+    patch.privacy = {
+      onlineStatus: chk("p-onlineStatus"),
+      showPhone:    chk("p-showPhone"),
+      showDob:      chk("p-showDob"),
+      hrView:       chk("p-hrView"),
+      teamReport:   chk("p-teamReport")
+    };
+  } else if (section === "language") {
+    patch.language = {
+      lang:       val("s-lang"),
+      tz:         val("s-tz"),
+      dateFormat: val("s-dateFormat"),
+      timeFormat: val("s-timeFormat"),
+      currency:   val("s-currency"),
+      numFormat:  val("s-numFormat")
+    };
+  }
+
+  // Merge and persist locally
+  const merged = { ...stored, ...patch };
+  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+
+  // Try to persist to server
+  const res = await apiRequest("/employee/settings", "PUT", patch);
+  if (res.error) {
+    showToast("settingsToast", "Saved locally (server sync pending)", "warn");
+  } else {
+    showToast("settingsToast", "Settings saved!", "ok");
+  }
+}
+
+// ── Load and apply saved settings ────────────────────────────────
+function loadLocalSettings() {
+  try { return JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) || "{}"); }
+  catch { return {}; }
+}
+
+function applySettings(s) {
+  if (!s) return;
+
+  // Notifications
+  if (s.notifications) {
+    const n = s.notifications;
+    const map = { punch:"n-punch",leave:"n-leave",shift:"n-shift",missed:"n-miss",payslip:"n-pay",holiday:"n-hol",perf:"n-perf" };
+    Object.entries(map).forEach(([key, prefix]) => {
+      if (n[key]) {
+        setChk(prefix + "-email", n[key].email);
+        setChk(prefix + "-app",   n[key].app);
+        setChk(prefix + "-sms",   n[key].sms);
+      }
+    });
+    if (n.punchBefore) setVal("s-punchBefore", n.punchBefore);
+    if (n.punchAfter)  setVal("s-punchAfter",  n.punchAfter);
+  }
+
+  // Appearance
+  if (s.appearance) {
+    const a = s.appearance;
+    if (a.compactSidebar !== undefined) setChk("s-compactSidebar", a.compactSidebar);
+    if (a.calView)   setVal("s-calView",   a.calView);
+    if (a.weekStart) setVal("s-weekStart", a.weekStart);
+  }
+
+  // Attendance
+  if (s.attendance) {
+    const at = s.attendance;
+    setChk("s-punchConfirm", at.punchConfirm);
+    setChk("s-punchTimer",   at.punchTimer);
+    setChk("s-autoRemind",   at.autoRemind);
+    setChk("s-overtime",     at.overtime);
+    if (at.shiftStart)  setVal("s-shiftStart",  at.shiftStart);
+    if (at.shiftEnd)    setVal("s-shiftEnd",     at.shiftEnd);
+    if (at.breakDur)    setVal("s-breakDur",     at.breakDur);
+    if (at.wfhDays !== undefined) setVal("s-wfhDays", String(at.wfhDays));
+    if (at.wfhDaysList) {
+      document.querySelectorAll(".day-btn").forEach(btn => {
+        btn.classList.toggle("day-selected", at.wfhDaysList.includes(btn.dataset.day));
+      });
+    }
+    if (at.otThreshold) setVal("s-otThreshold", String(at.otThreshold));
+  }
+
+  // Privacy
+  if (s.privacy) {
+    const p = s.privacy;
+    setChk("p-onlineStatus", p.onlineStatus);
+    setChk("p-showPhone",    p.showPhone);
+    setChk("p-showDob",      p.showDob);
+    setChk("p-hrView",       p.hrView);
+    setChk("p-teamReport",   p.teamReport);
+  }
+
+  // Language
+  if (s.language) {
+    const l = s.language;
+    if (l.lang)       setVal("s-lang",       l.lang);
+    if (l.tz)         setVal("s-tz",         l.tz);
+    if (l.dateFormat) setVal("s-dateFormat", l.dateFormat);
+    if (l.timeFormat) setVal("s-timeFormat", l.timeFormat);
+    if (l.currency)   setVal("s-currency",   l.currency);
+    if (l.numFormat)  setVal("s-numFormat",  l.numFormat);
+  }
+}
+
+// ── Integrations ──────────────────────────────────────────────────
+function toggleIntegration(name, btn) {
+  const connected = btn.classList.contains("enabled");
+  if (connected) {
+    if (!confirm(`Disconnect ${name}?`)) return;
+    btn.classList.remove("enabled");
+    btn.textContent = "Connect";
+    showToast("settingsToast", name + " disconnected", "ok");
+  } else {
+    // Simulate OAuth popup
+    showToast("settingsToast", name + " connection coming soon (OAuth not configured)", "warn");
+  }
+}
+
+function exportExcel() {
+  showToast("settingsToast", "Requesting export… check your email shortly.", "ok");
+  apiRequest("/attendance/export", "POST");
+}
+
+// ── Danger Zone ───────────────────────────────────────────────────
+function clearCache() {
+  if (!confirm("Clear all local preferences and cached data?")) return;
+  const token = localStorage.getItem("token");
+  const user  = localStorage.getItem("user");
+  localStorage.clear();
+  if (token) localStorage.setItem("token", token);
+  if (user)  localStorage.setItem("user", user);
+  showToast("settingsToast", "Cache cleared!", "ok");
+}
+
+async function signOutAll() {
+  if (!confirm("Sign out of all devices? You'll need to log in again here.")) return;
+  const res = await apiRequest("/auth/revoke-sessions", "POST");
+  if (res.error) { showToast("settingsToast", res.msg || "Failed", "err"); return; }
+  logout();
+}
+
+async function deactivateAccount() {
+  const confirmed = prompt("Type DEACTIVATE to confirm account deactivation:");
+  if (confirmed !== "DEACTIVATE") { showToast("settingsToast", "Deactivation cancelled", "warn"); return; }
+  const res = await apiRequest("/employee/deactivate", "POST");
+  if (res.error) { showToast("settingsToast", res.msg || "Failed — contact HR", "err"); return; }
+  logout();
+}
+
+function requestDataExport() {
+  showToast("settingsToast", "Data export request submitted. You'll receive an email within 48 hours.", "ok");
+  apiRequest("/employee/data-export", "POST");
+}
+
+// ── Helpers ───────────────────────────────────────────────────────
+function chk(id) { return document.getElementById(id)?.checked || false; }
+function val(id) { return document.getElementById(id)?.value || ""; }
+function setChk(id, v) { const el = document.getElementById(id); if (el) el.checked = !!v; }
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+
+function showToast(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = "toast-msg " + (type === "ok" ? "toast-ok" : type === "warn" ? "toast-warn" : "toast-err");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.textContent = ""; el.className = "toast-msg"; }, 4500);
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+async function init() {
+  const local = loadLocalSettings();
+  applySettings(local);
+
+  // Try server settings too
+  const res = await apiRequest("/employee/settings");
+  if (!res.error && res.settings) {
+    const merged = { ...local, ...res.settings };
+    applySettings(merged);
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+  }
+}
+
+init();
+</script>
+</body>
+</html>

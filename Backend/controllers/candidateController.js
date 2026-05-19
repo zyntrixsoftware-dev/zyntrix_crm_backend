@@ -2,6 +2,11 @@ const Candidate = require("../models/Candidate");
 const Interview = require("../models/Interview");
 const mongoose  = require("mongoose");
 const https     = require("https");
+const {
+  notifyApplicationReceived,
+  notifyShortlisted,
+  notifyRejected
+} = require("../utils/candidateEmails");
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -181,10 +186,40 @@ exports.bulkImport = async (req, res) => {
 
     const skipped = (candidates.length - docs.length) + (docs.length - insertedCount);
 
+    // ── FIRE-AND-FORGET: send "Application Received" email to each new candidate.
+    // We don't await — Office365 can be slow and we don't want the import HTTP
+    // response to wait for 100+ SMTP roundtrips. Each send is independently
+    // logged; failures don't affect the import response.
+    setImmediate(async () => {
+      try {
+        const fresh = await Candidate.find({
+          createdBy:     req.user.id,
+          importBatchId,
+          applicationEmailSentAt: null
+        }).select("_id name email appliedFor");
+
+        for (const c of fresh) {
+          const result = await notifyApplicationReceived(c);
+          if (result.sent) {
+            await Candidate.updateOne(
+              { _id: c._id },
+              { $set: { applicationEmailSentAt: new Date() } }
+            );
+          }
+          // Small breathing room to be friendly to Office365 rate limits
+          await new Promise(r => setTimeout(r, 300));
+        }
+        console.log(`[bulkImport] application emails dispatched for batch ${importBatchId}`);
+      } catch (e) {
+        console.error("[bulkImport] async email dispatch error:", e.message);
+      }
+    });
+
     return res.status(201).json({
       msg: `Imported ${insertedCount} candidates` +
            ` (replaced ${wipedCandidates.deletedCount} previous, cleared ${wipedInterviews.deletedCount} pending interviews` +
-           (skipped > 0 ? `, skipped ${skipped} invalid rows` : "") + ")",
+           (skipped > 0 ? `, skipped ${skipped} invalid rows` : "") +
+           "). Application-received emails are being sent in the background.)",
       count:             insertedCount,
       replacedCount:     wipedCandidates.deletedCount,
       clearedInterviews: wipedInterviews.deletedCount,
@@ -235,7 +270,21 @@ exports.shortlistCandidate = async (req, res) => {
     candidate.interviewId = interview._id;
     await candidate.save();
 
-    return res.status(201).json({ msg: "Shortlisted", candidate, interview });
+    // Notify candidate they were shortlisted (await so a network slowness shows
+    // up in the response, but a failure does NOT block the shortlist action).
+    const emailResult = await notifyShortlisted(interview);
+    if (emailResult.sent) {
+      interview.shortlistEmailSentAt = new Date();
+      await interview.save();
+    }
+
+    return res.status(201).json({
+      msg:           "Shortlisted",
+      candidate,
+      interview,
+      emailDelivered: emailResult.sent,
+      emailReason:    emailResult.reason || undefined
+    });
   } catch (err) {
     console.error("SHORTLIST CANDIDATE ERROR:", err);
     return res.status(500).json({ msg: "Server error: " + err.message });
@@ -253,8 +302,25 @@ exports.rejectCandidate = async (req, res) => {
       req.params.id, { status: "rejected" }, { new: true }
     );
     if (!c) return res.status(404).json({ msg: "Candidate not found" });
-    return res.json({ msg: "Rejected", candidate: c });
+
+    // Send rejection email (only once — gate on rejectionEmailSentAt)
+    let emailResult = { sent: false };
+    if (!c.rejectionEmailSentAt) {
+      emailResult = await notifyRejected(c);
+      if (emailResult.sent) {
+        c.rejectionEmailSentAt = new Date();
+        await c.save();
+      }
+    }
+
+    return res.json({
+      msg:           "Rejected",
+      candidate:     c,
+      emailDelivered: emailResult.sent,
+      emailReason:    emailResult.reason || undefined
+    });
   } catch (err) {
+    console.error("REJECT CANDIDATE ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
   }
 };

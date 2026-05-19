@@ -184,11 +184,25 @@ textarea.letter-body{font-family:var(--mono);font-size:12.5px;line-height:1.65;m
       <!-- LEFT: list of Offered candidates -->
       <div class="cand-list">
         <div class="cand-list-hd">
-          <span>📩 Offered candidates</span>
-          <span class="badge b-teal" id="offered-count">0</span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)"
+                   style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent2);" title="Select all">
+            <span>📩 Offered candidates</span>
+            <span class="badge b-teal" id="offered-count">0</span>
+          </span>
+          <span style="font-size:11px;color:var(--text3);" id="select-count">0 selected</span>
         </div>
         <div class="cand-list-body" id="cand-list-body">
           <div class="empty">Loading…</div>
+        </div>
+        <!-- Bulk action bar (hidden until >= 1 selected) -->
+        <div id="bulk-bar" style="display:none;padding:12px 14px;border-top:1px solid var(--border);background:var(--navy2);">
+          <button class="btn success" style="width:100%;justify-content:center;" onclick="openBulkSendModal()">
+            📨 Send Selected (<span id="bulk-count">0</span>)
+          </button>
+          <div style="font-size:10.5px;color:var(--text3);margin-top:8px;text-align:center;line-height:1.5;">
+            Per-candidate uses each saved draft. Shared applies one set of terms to all.
+          </div>
         </div>
       </div>
 
@@ -346,7 +360,8 @@ textarea.letter-body{font-family:var(--mono);font-size:12.5px;line-height:1.65;m
           <div>
             <button class="btn btn-sm" onclick="resetToTemplate()">↺ Reset to template</button>
           </div>
-          <div style="display:flex;gap:10px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn"          onclick="downloadPdf()" title="Preview the formatted PDF before sending">⬇ Download PDF</button>
             <button class="btn"          onclick="saveDraft()">💾 Save Draft</button>
             <button class="btn success"  onclick="sendOffer()">📨 Send Offer</button>
           </div>
@@ -364,6 +379,103 @@ textarea.letter-body{font-family:var(--mono);font-size:12.5px;line-height:1.65;m
 </div>
 </div>
 
+<!-- ════════ BULK SEND MODAL ════════ -->
+<div class="overlay" id="bulk-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+  <div style="background:var(--navy2);border:1px solid var(--border2);border-radius:14px;width:560px;max-width:94vw;max-height:90vh;overflow-y:auto;">
+    <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:15px;font-weight:600;">Send offer letters in bulk</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="bulk-meta">0 candidates selected</div>
+      </div>
+      <button onclick="closeBulkModal()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;">×</button>
+    </div>
+
+    <div style="padding:20px 22px;">
+      <!-- Mode picker -->
+      <div style="margin-bottom:18px;">
+        <label style="font-size:12px;font-weight:500;color:var(--text2);">How should the terms be applied?</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+          <label class="mode-card" onclick="setBulkMode('perCandidate')">
+            <input type="radio" name="bulk-mode" value="perCandidate" checked
+                   style="margin-right:6px;accent-color:var(--accent2);">
+            <b>Per-candidate</b>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;">
+              Use each candidate's saved draft. Open any without a draft first.
+            </div>
+          </label>
+          <label class="mode-card" onclick="setBulkMode('shared')">
+            <input type="radio" name="bulk-mode" value="shared"
+                   style="margin-right:6px;accent-color:var(--accent2);">
+            <b>Shared terms</b>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;">
+              Apply the same template + salary + joining date to all selected.
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Shared-terms form (hidden in per-candidate mode) -->
+      <div id="bulk-shared-form" style="display:none;border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--navy3);">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">
+          Shared terms (apply to all)
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label>Template</label>
+            <select id="b-template"></select>
+          </div>
+          <div class="fg">
+            <label>Employee Type</label>
+            <select id="b-employeeType">
+              <option>Full-time</option><option>Part-time</option>
+              <option>Contract</option><option>Intern</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label>Salary / Stipend</label>
+            <input type="number" id="b-offeredSalary" min="0">
+          </div>
+          <div class="fg">
+            <label>Date of Joining</label>
+            <input type="date" id="b-joiningDate">
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label>Location</label>
+            <input type="text" id="b-location" placeholder="e.g. Hyderabad">
+          </div>
+          <div class="fg">
+            <label>Currency</label>
+            <select id="b-ctcCurrency">
+              <option value="INR">INR (₹)</option><option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--amber);margin-top:6px;line-height:1.5;">
+          ⚠ Shared mode <b>overwrites</b> each candidate's saved draft with these terms before sending.
+        </div>
+      </div>
+
+      <!-- Progress / result -->
+      <div id="bulk-progress" style="display:none;margin-top:16px;padding:14px;border-radius:10px;background:var(--navy3);font-size:12px;color:var(--text2);"></div>
+    </div>
+
+    <div style="padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn" onclick="closeBulkModal()">Cancel</button>
+      <button class="btn success" id="bulk-send-btn" onclick="runBulkSend()">📨 Send to <span id="bulk-send-count">0</span></button>
+    </div>
+  </div>
+</div>
+
+<style>
+.mode-card{display:block;padding:10px 12px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;background:var(--navy3);font-size:13px;color:var(--text);}
+.mode-card:hover{border-color:var(--accent);}
+</style>
+
 <script>
 // ════════════════════════════════════════════════════════════════════
 //  STATE
@@ -372,6 +484,8 @@ let templates  = [];   // [{key,label,intro}]
 let offered    = [];   // interviews with offered=true
 let offers     = [];   // saved OfferLetter docs
 let current    = null; // {interview, offer (or null), bodyEdited:bool}
+const selected = new Set();   // interview ids ticked for bulk send
+let bulkMode   = "perCandidate";
 
 // ════════════════════════════════════════════════════════════════════
 //  INIT
@@ -413,6 +527,9 @@ async function reloadAll() {
 
 function renderList() {
   const body = document.getElementById("cand-list-body");
+  // Prune selections that no longer exist (e.g. just sent or un-offered)
+  const liveIds = new Set(offered.map(i => i._id));
+  for (const id of Array.from(selected)) if (!liveIds.has(id)) selected.delete(id);
   if (offered.length === 0) {
     body.innerHTML = `<div class="empty">
       No offered candidates yet.<br>
@@ -423,16 +540,24 @@ function renderList() {
   body.innerHTML = offered.map(i => {
     const offer = findOfferForInterview(i._id);
     const initials = (i.candidateName||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
-    const sBadge = offer ? statusBadge(offer.status) : `<span class="badge b-gray">Draft</span>`;
-    return `<div class="cand-row" data-id="${i._id}" onclick="selectCandidate('${i._id}')">
-      <div class="av">${escapeHtml(initials)}</div>
-      <div class="info">
+    const sBadge   = offer ? statusBadge(offer.status) : `<span class="badge b-gray">Draft</span>`;
+    const checked  = selected.has(i._id) ? "checked" : "";
+    const disabled = (offer && offer.status === "sent") ? "disabled title='Already sent'" : "";
+    return `<div class="cand-row" data-id="${i._id}">
+      <input type="checkbox" ${checked} ${disabled}
+             onclick="event.stopPropagation();"
+             onchange="toggleSelect('${i._id}', this.checked)"
+             style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent2);flex-shrink:0;">
+      <div class="av" onclick="selectCandidate('${i._id}')">${escapeHtml(initials)}</div>
+      <div class="info" onclick="selectCandidate('${i._id}')">
         <div class="nm">${escapeHtml(i.candidateName)}</div>
         <div class="em">${escapeHtml(i.appliedFor||"—")}</div>
       </div>
       ${sBadge}
     </div>`;
   }).join("");
+  // Refresh bulk action bar in case selection set changed
+  updateBulkBar();
 }
 
 function statusBadge(s) {
@@ -652,6 +777,160 @@ async function refreshOffersList() {
       const row = document.querySelector(`.cand-row[data-id="${current.interview._id}"]`);
       if (row) row.classList.add("active");
     }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  BULK SELECT + BULK SEND
+// ════════════════════════════════════════════════════════════════════
+function toggleSelect(id, on) {
+  if (on) selected.add(id); else selected.delete(id);
+  updateBulkBar();
+}
+
+function toggleSelectAll(on) {
+  const sendable = offered.filter(i => {
+    const o = findOfferForInterview(i._id);
+    return !o || o.status !== "sent";
+  });
+  if (on) sendable.forEach(i => selected.add(i._id));
+  else    selected.clear();
+  renderList();
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const count = selected.size;
+  document.getElementById("select-count").textContent = count + " selected";
+  document.getElementById("bulk-count").textContent   = count;
+  document.getElementById("bulk-bar").style.display   = count > 0 ? "block" : "none";
+  // Sync "select all" checkbox
+  const all = offered.filter(i => {
+    const o = findOfferForInterview(i._id);
+    return !o || o.status !== "sent";
+  });
+  const cb  = document.getElementById("select-all");
+  if (cb) cb.checked = (all.length > 0 && all.every(i => selected.has(i._id)));
+}
+
+function openBulkSendModal() {
+  if (selected.size === 0) return;
+  document.getElementById("bulk-meta").textContent =
+    `${selected.size} candidate${selected.size === 1 ? "" : "s"} selected`;
+  document.getElementById("bulk-send-count").textContent = selected.size;
+
+  // Populate template dropdown in shared form
+  document.getElementById("b-template").innerHTML =
+    templates.map(t => `<option value="${t.key}">${escapeHtml(t.label)}</option>`).join("");
+
+  // Reset mode + form
+  document.querySelector('input[name="bulk-mode"][value="perCandidate"]').checked = true;
+  bulkMode = "perCandidate";
+  document.getElementById("bulk-shared-form").style.display = "none";
+  document.getElementById("bulk-progress").style.display    = "none";
+  document.getElementById("bulk-progress").innerHTML        = "";
+
+  document.getElementById("bulk-modal").style.display = "flex";
+}
+
+function closeBulkModal() {
+  document.getElementById("bulk-modal").style.display = "none";
+}
+
+function setBulkMode(mode) {
+  bulkMode = mode;
+  document.querySelector(`input[name="bulk-mode"][value="${mode}"]`).checked = true;
+  document.getElementById("bulk-shared-form").style.display = (mode === "shared") ? "block" : "none";
+}
+
+async function runBulkSend() {
+  const interviewIds = Array.from(selected);
+  if (interviewIds.length === 0) return;
+
+  const payload = { interviewIds, mode: bulkMode };
+  if (bulkMode === "shared") {
+    payload.sharedTerms = {
+      templateKey:   document.getElementById("b-template").value,
+      employeeType:  document.getElementById("b-employeeType").value,
+      offeredSalary: Number(document.getElementById("b-offeredSalary").value || 0),
+      ctcCurrency:   document.getElementById("b-ctcCurrency").value,
+      joiningDate:   document.getElementById("b-joiningDate").value,
+      location:      document.getElementById("b-location").value.trim()
+    };
+    if (!payload.sharedTerms.offeredSalary) return alert("Please enter a shared Offered Salary.");
+    if (!payload.sharedTerms.joiningDate)   return alert("Please pick a shared Date of Joining.");
+  }
+
+  const btn = document.getElementById("bulk-send-btn");
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Sending…";
+
+  const prog = document.getElementById("bulk-progress");
+  prog.style.display = "block";
+  prog.innerHTML = `Sending ${interviewIds.length} offer letters — please don't close this tab…`;
+
+  const res = await apiRequest("/hr/offers/bulk-send", "POST", payload);
+  if (res.error) {
+    prog.innerHTML = `<span style="color:var(--rose);">✗ ${escapeHtml(res.msg)}</span>`;
+    btn.disabled = false;
+    btn.innerHTML = `📨 Send to <span id="bulk-send-count">${interviewIds.length}</span>`;
+    return;
+  }
+
+  const sentN   = (res.sent || []).length;
+  const failedN = (res.failed || []).length;
+  const warnN   = (res.warnings || []).length;
+
+  let html = `<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px;">✓ Sent ${sentN} of ${interviewIds.length}</div>`;
+  if (failedN) {
+    html += `<div style="font-size:12px;color:var(--rose);margin-top:6px;"><b>${failedN} failed:</b><ul style="margin:4px 0 0 16px;padding:0;">`
+         + res.failed.slice(0, 10).map(f => `<li>${escapeHtml(f.reason || "Failed")}</li>`).join("")
+         + `</ul></div>`;
+  }
+  if (warnN) {
+    html += `<div style="font-size:12px;color:var(--amber);margin-top:6px;"><b>${warnN} skipped:</b><ul style="margin:4px 0 0 16px;padding:0;">`
+         + res.warnings.slice(0, 10).map(w => `<li>${escapeHtml(w.msg || "Skipped")}</li>`).join("")
+         + `</ul></div>`;
+  }
+  prog.innerHTML = html;
+  setSync("ok", `Bulk send: ${sentN} sent, ${failedN} failed`);
+
+  // Clear successful selections and refresh
+  (res.sent || []).forEach(s => selected.delete(s.interviewId));
+  await reloadAll();
+  updateBulkBar();
+
+  btn.disabled = false;
+  btn.innerHTML = `📨 Send to <span id="bulk-send-count">${selected.size}</span>`;
+  if (selected.size === 0) setTimeout(closeBulkModal, 1200);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  DOWNLOAD PDF (single offer preview)
+// ════════════════════════════════════════════════════════════════════
+async function downloadPdf() {
+  if (!current) return alert("Select a candidate first.");
+  // Make sure latest form values are saved so the PDF reflects current edits
+  await saveDraft();
+  if (!current.offer || !current.offer._id) return;
+
+  setSync("loading", "Building PDF preview…");
+  const token = localStorage.getItem("token");
+  try {
+    const r = await fetch(API_BASE + `/hr/offers/${current.offer._id}/pdf`, {
+      headers: { Authorization: "Bearer " + token }
+    });
+    if (!r.ok) {
+      const errText = await r.text();
+      throw new Error("HTTP " + r.status + " — " + errText.slice(0, 120));
+    }
+    const blob = await r.blob();
+    const url  = URL.createObjectURL(blob);
+    // Open in a new tab so HR can review/print
+    window.open(url, "_blank");
+    setSync("ok", "PDF opened in a new tab");
+  } catch (err) {
+    setSync("err", "PDF download failed: " + err.message);
   }
 }
 

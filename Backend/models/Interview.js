@@ -41,6 +41,13 @@ const interviewSchema = new mongoose.Schema({
   offeredAt: { type: Date },
   offeredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
+  // ── Lifecycle email tracking (per-round + key milestones) ──
+  shortlistEmailSentAt:    { type: Date, default: null },
+  offerNotificationSentAt: { type: Date, default: null },
+  round1NotifiedAt:        { type: Date, default: null },
+  round2NotifiedAt:        { type: Date, default: null },
+  round3NotifiedAt:        { type: Date, default: null },
+
   // Auto-derived from the 3 rounds (see deriveOverallStatus below)
   //   - in_progress : at least one round still pending and none failed
   //   - passed      : all 3 qualified

@@ -3,6 +3,11 @@ const OfferLetter      = require("../models/OfferLetter");
 const Candidate        = require("../models/Candidate");
 const sendEmail        = require("../utils/sendEmail");
 const generateOfferPDF = require("../utils/generateOfferPDF");
+const {
+  notifyRoundQualified,
+  notifyRoundNotQualified,
+  notifyMarkedForOffer
+} = require("../utils/candidateEmails");
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -110,6 +115,9 @@ exports.updateRound = async (req, res) => {
     const interview = await Interview.findById(req.params.id);
     if (!interview) return res.status(404).json({ msg: "Interview not found" });
 
+    // Snapshot the prior status so we can detect a real transition
+    const priorStatus = (interview[roundKey] && interview[roundKey].status) || "pending";
+
     interview[roundKey] = interview[roundKey] || {};
     interview[roundKey].status      = status;
     interview[roundKey].durationMin = 50;   // enforced 50-min slot
@@ -123,8 +131,29 @@ exports.updateRound = async (req, res) => {
       interview.overallStatus = interview.deriveOverallStatus();
     }
 
+    // ── Notify candidate when a round transitions to qualified/not_qualified.
+    // Only fire ONCE per round (gated on roundNNotifiedAt). Pending → status
+    // edits or schedule edits don't re-trigger.
+    let emailResult = { sent: false };
+    const notifiedKey = roundKey + "NotifiedAt";   // "round1NotifiedAt" etc.
+    const isTerminal  = status === "qualified" || status === "not_qualified";
+    const isTransition = priorStatus !== status;
+
+    if (isTerminal && isTransition && !interview[notifiedKey]) {
+      const roundNum = Number(roundKey.replace("round", "")) || 1;
+      emailResult = (status === "qualified")
+        ? await notifyRoundQualified(interview, roundNum)
+        : await notifyRoundNotQualified(interview, roundNum);
+      if (emailResult.sent) interview[notifiedKey] = new Date();
+    }
+
     await interview.save();
-    return res.json({ msg: "Round updated", interview });
+    return res.json({
+      msg: "Round updated",
+      interview,
+      emailDelivered: emailResult.sent,
+      emailReason:    emailResult.reason || undefined
+    });
   } catch (err) {
     console.error("UPDATE ROUND ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
@@ -178,6 +207,8 @@ exports.toggleOffered = async (req, res) => {
     const interview = await Interview.findById(req.params.id);
     if (!interview) return res.status(404).json({ msg: "Interview not found" });
 
+    const wasOffered = !!interview.offered;
+
     interview.offered   = offered;
     interview.offeredAt = offered ? new Date() : null;
     interview.offeredBy = offered ? req.user.id : null;
@@ -193,8 +224,20 @@ exports.toggleOffered = async (req, res) => {
       }
     }
 
+    // Notify candidate when transitioning off → on, but only once
+    let emailResult = { sent: false };
+    if (offered && !wasOffered && !interview.offerNotificationSentAt) {
+      emailResult = await notifyMarkedForOffer(interview);
+      if (emailResult.sent) interview.offerNotificationSentAt = new Date();
+    }
+
     await interview.save();
-    return res.json({ msg: offered ? "Marked as Offered" : "Unmarked Offered", interview });
+    return res.json({
+      msg:           offered ? "Marked as Offered" : "Unmarked Offered",
+      interview,
+      emailDelivered: emailResult.sent,
+      emailReason:    emailResult.reason || undefined
+    });
   } catch (err) {
     console.error("TOGGLE OFFERED ERROR:", err);
     return res.status(500).json({ msg: "Server error" });

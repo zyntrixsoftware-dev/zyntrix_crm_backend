@@ -9,13 +9,37 @@ JWT_SECRET=supersecret
 MONGO_URI=mongodb+srv://softwarezentrix_db_user:FFD6n4a5UP2TSHW2@cluster0.fl11xck.mongodb.net/?appName=Cluster0
 FRONTEND_URL=https://zyntrixsoftware.com
 DEV_SKIP_EMAIL=false
+
+# ── SMTP (Office365) ────────────────────────────────────────────────
+# IMPORTANT: EMAIL_FROM must equal EMAIL_USER, otherwise Office365 will
+# reject with "550 5.7.60 — SMTP Client does not have permissions to
+# send as this sender". Previous config used EMAIL_FROM=noreply@... which
+# silently broke the forgot-password OTP flow AND any candidate email
+# sent by the HRMS. Keep these two in lock-step.
 EMAIL_USER=dinesh.kolasani@zyntrixsoftware.com
 EMAIL_PASS=Sonu@875100
+EMAIL_FROM=dinesh.kolasani@zyntrixsoftware.com
 EMAIL_HOST=smtp.office365.com
 EMAIL_PORT=587
-EMAIL_FROM=noreply@zyntrixsoftware.com
-EMAIL_SENDER_NAME=Zyntrix CRM
-ALLOWED_EMAIL_DOMAIN=zyntrixsoftware.com
+EMAIL_SENDER_NAME=Zyntrix HR — Talent Acquisition
+
+# Leave ALLOWED_EMAIL_DOMAIN UNSET so internal users with any email can
+# request a password reset. Set it to a specific domain only if you want
+# to restrict OTP requests to that one domain.
+# ALLOWED_EMAIL_DOMAIN=zyntrixsoftware.com
+
+# ── Offer letter & company branding (used by generateOfferPDF) ──────
+COMPANY_NAME=Zyntrix Software Solutions Pvt. Ltd.
+COMPANY_SHORTNAME=ZYNTRIX SOFTWARE SOLUTIONS
+COMPANY_ADDRESS=Hyderabad, Telangana, India
+COMPANY_HR_EMAIL=dinesh.kolasani@zyntrixsoftware.com
+COMPANY_SUPPORT_EMAIL=support@zyntrixsoftware.com
+# COMPANY_PHONE=
+# COMPANY_CIN=
+# COMPANY_GSTN=
+# COMPANY_PAN=
+
+# ── Payroll rates ───────────────────────────────────────────────────
 HOURLY_RATE=200
 HRA_PERCENT=0.20
 TAX_PERCENT=0.10
@@ -30,4 +54,45 @@ OVERTIME_BONUS_AMOUNT=1000
   Railway → Variables → change JWT_SECRET to a strong random string.
   You can generate one here: https://generate-secret.vercel.app/64
   Example strong value: a3f9b2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0
+════════════════════════════════════════════════════════════════════
+
+════════════════════════════════════════════════════════════════════
+  📨  EMAIL TROUBLESHOOTING  (forgot-password / candidate emails)
+════════════════════════════════════════════════════════════════════
+  If OTP emails or candidate emails are NOT being delivered:
+
+  1. EMAIL_FROM must equal EMAIL_USER.
+     Office365 rejects mismatched From: addresses with 550 5.7.60
+     unless explicit "Send As" delegation is configured.
+
+  2. DEV_SKIP_EMAIL must be "false" (or unset) on Railway.
+     If it is "true", emails are only printed to logs, never sent.
+
+  3. Office 365 Authenticated SMTP must be ENABLED for the sender
+     account (dinesh.kolasani@zyntrixsoftware.com):
+       Microsoft 365 Admin Center
+         → Users → Active users → select dinesh.kolasani
+         → Mail tab → Manage email apps
+         → Enable "Authenticated SMTP"
+
+  4. EMAIL_PASS must be the mailbox password (NOT an app password
+     unless MFA is enabled, in which case generate an app password
+     under My Account → Security → App passwords).
+
+  5. ALLOWED_EMAIL_DOMAIN, if set, silently blocks any email that
+     doesn't end in that domain. Leave it unset to allow all.
+
+  6. Watch the Railway service logs while testing. The controller now
+     logs detailed reasons:
+       [sendOtp] request for: <email>
+       [sendOtp] user found: <id> name: <name>
+       [sendOtp] OTP EMAIL FAILED to <email>
+         message: ...   code: ...   response: ...   command: ...
+     Those four diagnostic lines pinpoint the SMTP error code instantly.
+
+  Common SMTP error codes:
+    535        — Authentication failed (wrong EMAIL_PASS, or SMTP AUTH off)
+    550 5.7.60 — From-address mismatch (EMAIL_FROM != EMAIL_USER)
+    554 5.2.0  — Sending limit hit (Office365 ~30/min, 10k/day)
+    ETIMEDOUT  — Wrong EMAIL_HOST/EMAIL_PORT
 ════════════════════════════════════════════════════════════════════

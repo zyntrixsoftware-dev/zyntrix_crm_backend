@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile – Zyntrix</title>
+<link rel="stylesheet" href="../assets/css/attendance.css">
+<link rel="stylesheet" href="../assets/css/module-pages.css">
+<link rel="stylesheet" href="../assets/css/profile-settings.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="brand-mark">Z</div>
+        <div>
+          <strong>Zyntrix</strong>
+          <span>EdTech CRM</span>
+        </div>
+      </div>
+      <nav class="side-nav" aria-label="Primary">
+        <a href="attendance.html"><span class="nav-icon">▣</span>Schedule</a>
+        <a href="timecard.html"><span class="nav-icon">◷</span>Timecard</a>
+        <a href="find-shifts.html"><span class="nav-icon">⌕</span>Find Shifts</a>
+        <a class="active" href="profile.html"><span class="nav-icon">♙</span>Profile</a>
+        <a href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
+      </nav>
+    </div>
+    
+    <button onclick="logout()" type="button" aria-label="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;font-family:inherit;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+
+  </aside>
+
+  <!-- ── MAIN ──────────────────────────────────────────────────────── -->
+  <main class="main">
+    <header class="topbar">
+      <h1>My Profile</h1>
+      <div class="topbar-actions">
+        <div class="top-profile">
+          <img id="topAvatar" src="https://i.pravatar.cc/80?img=12" alt="Avatar">
+          <div>
+            <strong id="userName">Zyntrix Employee</strong>
+            <span id="userRole">Employee</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="module-content profile-layout">
+
+      <!-- ── LEFT COLUMN ── -->
+      <div class="profile-left">
+
+        <!-- Avatar Card -->
+        <div class="section-panel avatar-card">
+          <div class="avatar-ring" id="avatarRing">
+            <img id="profileAvatar" src="https://i.pravatar.cc/200?img=12" alt="Profile photo">
+            <div class="avatar-overlay" onclick="document.getElementById('avatarInput').click()" title="Change photo">
+              <span>📷</span>
+            </div>
+          </div>
+          <input type="file" id="avatarInput" accept="image/*" hidden>
+          <h2 id="profileName" class="avatar-name">Zyntrix Employee</h2>
+          <p id="profileRole" class="avatar-role">Employee</p>
+          <div class="avatar-badge" id="profileStatus">
+            <span class="status-dot-online"></span> Active
+          </div>
+          <button class="btn-outline" onclick="document.getElementById('avatarInput').click()">Change Photo</button>
+        </div>
+
+        <!-- Attendance Stats -->
+        <div class="section-panel">
+          <h3 class="panel-heading">This Month</h3>
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <div class="mini-stat-icon" style="background:#145d39;color:#22e094;">▣</div>
+              <div>
+                <span class="mini-stat-label">Present</span>
+                <strong id="statPresent">—</strong>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-icon" style="background:#816913;color:#ffcf05;">◷</div>
+              <div>
+                <span class="mini-stat-label">Late</span>
+                <strong id="statLate">—</strong>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-icon" style="background:#6b1b1e;color:#ff5558;">✕</div>
+              <div>
+                <span class="mini-stat-label">Absent</span>
+                <strong id="statAbsent">—</strong>
+              </div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-icon" style="background:#1c2d6b;color:#4d9fff;">◑</div>
+              <div>
+                <span class="mini-stat-label">Leave</span>
+                <strong id="statLeave">—</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attendance ring -->
+          <div class="att-ring-wrap">
+            <svg class="att-ring" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#1a2333" stroke-width="8"/>
+              <circle id="attRingFill" cx="40" cy="40" r="32" fill="none" stroke="#22d3c8"
+                stroke-width="8" stroke-linecap="round" stroke-dasharray="201 201"
+                stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 0.9s ease"/>
+            </svg>
+            <div class="att-ring-label">
+              <strong id="attPct">0%</strong>
+              <span>Attendance</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Punches -->
+        <div class="section-panel">
+          <h3 class="panel-heading">Recent Punches</h3>
+          <div class="punch-log" id="punchLog">
+            <div class="punch-log-empty">Loading…</div>
+          </div>
+        </div>
+
+      </div><!-- /profile-left -->
+
+      <!-- ── RIGHT COLUMN ── -->
+      <div class="profile-right">
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" data-tab="personal">Personal Info</button>
+          <button class="tab" data-tab="work">Work Info</button>
+          <button class="tab" data-tab="security">Security</button>
+        </div>
+
+        <!-- ── TAB: Personal Info ── -->
+        <div class="tab-panel active" id="tab-personal">
+          <div class="section-panel">
+            <div class="panel-row">
+              <h3 class="panel-heading">Personal Information</h3>
+              <div id="personalSaveRow" class="save-row" style="display:none;">
+                <button class="btn-ghost" onclick="cancelEdit('personal')">Cancel</button>
+                <button class="btn-primary" onclick="savePersonal()">Save Changes</button>
+              </div>
+            </div>
+            <p class="toast-msg" id="personalToast"></p>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label>First Name</label>
+                <input type="text" id="f-firstName" placeholder="First name" oninput="onFormChange('personal')">
+              </div>
+              <div class="field-group">
+                <label>Last Name</label>
+                <input type="text" id="f-lastName" placeholder="Last name" oninput="onFormChange('personal')">
+              </div>
+              <div class="field-group">
+                <label>Email Address</label>
+                <input type="email" id="f-email" placeholder="Email" readonly class="input-readonly">
+              </div>
+              <div class="field-group">
+                <label>Phone Number</label>
+                <input type="tel" id="f-phone" placeholder="+91 00000 00000" oninput="onFormChange('personal')">
+              </div>
+              <div class="field-group">
+                <label>Date of Birth</label>
+                <input type="date" id="f-dob" oninput="onFormChange('personal')">
+              </div>
+              <div class="field-group">
+                <label>Gender</label>
+                <select id="f-gender" onchange="onFormChange('personal')">
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="prefer_not">Prefer not to say</option>
+                </select>
+              </div>
+              <div class="field-group span-2">
+                <label>Address</label>
+                <input type="text" id="f-address" placeholder="Street address" oninput="onFormChange('personal')">
+              </div>
+              <div class="field-group">
+                <label>City</label>
+                <input type="text" id="f-city" placeholder="City" oninput="onFormChange('personal')">
+              </div>
+              <div class="field-group">
+                <label>State / Province</label>
+                <input type="text" id="f-state" placeholder="State" oninput="onFormChange('personal')">
+              </div>
+              <div class="field-group span-2">
+                <label>Bio <span class="label-hint">(visible to team)</span></label>
+                <textarea id="f-bio" rows="3" placeholder="A short bio about yourself…" oninput="onFormChange('personal')"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emergency Contact -->
+          <div class="section-panel" style="margin-top:14px;">
+            <div class="panel-row">
+              <h3 class="panel-heading">Emergency Contact</h3>
+              <div id="emergSaveRow" class="save-row" style="display:none;">
+                <button class="btn-ghost" onclick="cancelEdit('emerg')">Cancel</button>
+                <button class="btn-primary" onclick="saveEmergency()">Save</button>
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field-group">
+                <label>Contact Name</label>
+                <input type="text" id="f-emergName" placeholder="Full name" oninput="onFormChange('emerg')">
+              </div>
+              <div class="field-group">
+                <label>Relationship</label>
+                <select id="f-emergRel" onchange="onFormChange('emerg')">
+                  <option value="">Select</option>
+                  <option>Parent</option>
+                  <option>Spouse</option>
+                  <option>Sibling</option>
+                  <option>Friend</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Phone Number</label>
+                <input type="tel" id="f-emergPhone" placeholder="+91 00000 00000" oninput="onFormChange('emerg')">
+              </div>
+              <div class="field-group">
+                <label>Alternate Phone</label>
+                <input type="tel" id="f-emergAlt" placeholder="Optional" oninput="onFormChange('emerg')">
+              </div>
+            </div>
+          </div>
+        </div><!-- /tab-personal -->
+
+        <!-- ── TAB: Work Info ── -->
+        <div class="tab-panel" id="tab-work">
+          <div class="section-panel">
+            <h3 class="panel-heading">Work Information</h3>
+
+            <div class="info-rows">
+              <div class="info-row">
+                <span class="info-icon">🪪</span>
+                <span class="info-label">Employee ID</span>
+                <span class="info-val" id="w-empId">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">🏢</span>
+                <span class="info-label">Department</span>
+                <span class="info-val" id="w-dept">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">🎯</span>
+                <span class="info-label">Role</span>
+                <span class="info-val" id="w-role">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">📅</span>
+                <span class="info-label">Joining Date</span>
+                <span class="info-val" id="w-joining">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">👤</span>
+                <span class="info-label">Reporting Manager</span>
+                <span class="info-val" id="w-manager">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">⏰</span>
+                <span class="info-label">Shift Timing</span>
+                <span class="info-val" id="w-shift">09:00 AM – 06:00 PM</span>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">📍</span>
+                <span class="info-label">Work Location</span>
+                <span class="info-val" id="w-location">On-site</span>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">💼</span>
+                <span class="info-label">Employment Type</span>
+                <span class="info-val" id="w-type">Full-time</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leave Balance -->
+          <div class="section-panel" style="margin-top:14px;">
+            <h3 class="panel-heading">Leave Balance</h3>
+            <div class="leave-grid" id="leaveGrid">
+              <div class="leave-card">
+                <div class="leave-label">Annual Leave</div>
+                <div class="leave-bar-wrap">
+                  <div class="leave-bar" style="width:70%;background:#22d3c8;"></div>
+                </div>
+                <div class="leave-nums"><span id="lb-annual">—</span> <small>days left</small></div>
+              </div>
+              <div class="leave-card">
+                <div class="leave-label">Sick Leave</div>
+                <div class="leave-bar-wrap">
+                  <div class="leave-bar" style="width:50%;background:#e3b608;"></div>
+                </div>
+                <div class="leave-nums"><span id="lb-sick">—</span> <small>days left</small></div>
+              </div>
+              <div class="leave-card">
+                <div class="leave-label">Casual Leave</div>
+                <div class="leave-bar-wrap">
+                  <div class="leave-bar" style="width:30%;background:#8d3df3;"></div>
+                </div>
+                <div class="leave-nums"><span id="lb-casual">—</span> <small>days left</small></div>
+              </div>
+              <div class="leave-card">
+                <div class="leave-label">Comp-off</div>
+                <div class="leave-bar-wrap">
+                  <div class="leave-bar" style="width:10%;background:#ea740c;"></div>
+                </div>
+                <div class="leave-nums"><span id="lb-compoff">—</span> <small>days left</small></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documents -->
+          <div class="section-panel" style="margin-top:14px;">
+            <div class="panel-row">
+              <h3 class="panel-heading">Documents on File</h3>
+            </div>
+            <div class="doc-list" id="docList">
+              <div class="doc-item">
+                <span class="doc-icon">📄</span>
+                <div>
+                  <strong>Offer Letter</strong>
+                  <span class="doc-sub">PDF · Uploaded on joining</span>
+                </div>
+                <span class="doc-badge doc-ok">Verified</span>
+              </div>
+              <div class="doc-item">
+                <span class="doc-icon">🪪</span>
+                <div>
+                  <strong>PAN Card</strong>
+                  <span class="doc-sub">Identity document</span>
+                </div>
+                <span class="doc-badge doc-ok">Verified</span>
+              </div>
+              <div class="doc-item">
+                <span class="doc-icon">📋</span>
+                <div>
+                  <strong>Aadhar Card</strong>
+                  <span class="doc-sub">Identity document</span>
+                </div>
+                <span class="doc-badge doc-pending">Pending</span>
+              </div>
+              <div class="doc-item">
+                <span class="doc-icon">🎓</span>
+                <div>
+                  <strong>Educational Certificate</strong>
+                  <span class="doc-sub">Graduation / Post-grad</span>
+                </div>
+                <span class="doc-badge doc-pending">Pending</span>
+              </div>
+            </div>
+          </div>
+        </div><!-- /tab-work -->
+
+        <!-- ── TAB: Security ── -->
+        <div class="tab-panel" id="tab-security">
+
+          <!-- Change Password -->
+          <div class="section-panel">
+            <h3 class="panel-heading">Change Password</h3>
+            <p class="toast-msg" id="pwToast"></p>
+            <div class="field-grid">
+              <div class="field-group span-2">
+                <label>Current Password</label>
+                <div class="pw-wrap">
+                  <input type="password" id="f-currentPw" placeholder="Enter current password" autocomplete="current-password">
+                  <button type="button" class="pw-eye" onclick="togglePw('f-currentPw',this)">👁</button>
+                </div>
+              </div>
+              <div class="field-group">
+                <label>New Password</label>
+                <div class="pw-wrap">
+                  <input type="password" id="f-newPw" placeholder="Min 8 characters" oninput="checkPwStrength()" autocomplete="new-password">
+                  <button type="button" class="pw-eye" onclick="togglePw('f-newPw',this)">👁</button>
+                </div>
+                <div class="pw-strength-wrap">
+                  <div class="pw-strength-bar">
+                    <div id="pwStrengthFill" class="pw-fill"></div>
+                  </div>
+                  <span id="pwStrengthLabel" class="pw-label"></span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Confirm New Password</label>
+                <div class="pw-wrap">
+                  <input type="password" id="f-confirmPw" placeholder="Re-enter new password" autocomplete="new-password">
+                  <button type="button" class="pw-eye" onclick="togglePw('f-confirmPw',this)">👁</button>
+                </div>
+              </div>
+            </div>
+            <div class="pw-rules">
+              <p id="rule-len"  class="rule">✕ At least 8 characters</p>
+              <p id="rule-upper" class="rule">✕ One uppercase letter</p>
+              <p id="rule-num"  class="rule">✕ One number</p>
+              <p id="rule-sym"  class="rule">✕ One special character</p>
+            </div>
+            <button class="btn-primary" style="margin-top:16px;" onclick="changePassword()">Update Password</button>
+          </div>
+
+          <!-- Active Sessions -->
+          <div class="section-panel" style="margin-top:14px;">
+            <div class="panel-row">
+              <h3 class="panel-heading">Active Sessions</h3>
+              <button class="btn-danger-sm" onclick="revokeAllSessions()">Revoke all</button>
+            </div>
+            <div class="session-list" id="sessionList">
+              <div class="session-item session-current">
+                <div class="session-icon">🖥</div>
+                <div class="session-info">
+                  <strong>Current device</strong>
+                  <span id="sessionBrowser">Browser · This device</span>
+                </div>
+                <span class="session-badge">Active now</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Two-Factor Auth -->
+          <div class="section-panel" style="margin-top:14px;">
+            <div class="panel-row">
+              <h3 class="panel-heading">Two-Factor Authentication</h3>
+              <label class="toggle-switch">
+                <input type="checkbox" id="twoFaToggle" onchange="toggle2FA(this)">
+                <span class="toggle-knob"></span>
+              </label>
+            </div>
+            <p class="panel-desc">Add an extra layer of security. When enabled, you'll be asked for a verification code each time you log in.</p>
+            <div id="twoFaSetup" style="display:none;margin-top:12px;">
+              <div class="twofa-info">
+                <span class="twofa-icon">📱</span>
+                <div>
+                  <strong>Authenticator App</strong>
+                  <p>Scan the QR code with Google Authenticator or Authy to enable 2FA.</p>
+                </div>
+              </div>
+              <div class="twofa-qr">QR code will appear here after backend integration</div>
+            </div>
+          </div>
+
+        </div><!-- /tab-security -->
+
+      </div><!-- /profile-right -->
+    </section>
+  </main>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script>
+requireAuth();
+requireModuleAccess("attendance");
+
+// ── Bootstrap user from localStorage ─────────────────────────────
+const user = getUser();
+let profileData = {};
+
+function fillUIFromUser(u) {
+  if (!u) return;
+  const name = u.name || "Zyntrix Employee";
+  const role = (u.role || "employee").replace(/_/g, " ");
+
+  document.getElementById("userName").innerText = name;
+  document.getElementById("userRole").innerText  = role;
+  document.getElementById("sideUserName").innerText  = name;
+  document.getElementById("sideUserEmail").innerText = u.email || "";
+  document.getElementById("profileName").innerText = name;
+  document.getElementById("profileRole").innerText = role;
+
+  const parts = name.split(" ");
+  document.getElementById("f-firstName").value = parts[0] || "";
+  document.getElementById("f-lastName").value  = parts.slice(1).join(" ") || "";
+  document.getElementById("f-email").value = u.email || "";
+  document.getElementById("w-role").textContent = role;
+  document.getElementById("w-empId").textContent = u._id ? ("#EMP-" + u._id.slice(-5).toUpperCase()) : "—";
+}
+
+fillUIFromUser(user);
+
+// ── TABS ──────────────────────────────────────────────────────────
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+  });
+});
+
+// ── AVATAR UPLOAD ─────────────────────────────────────────────────
+document.getElementById("avatarInput").addEventListener("change", function () {
+  const file = this.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) { showToast("personalToast", "Image must be under 3 MB", "err"); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    document.getElementById("profileAvatar").src = src;
+    document.getElementById("topAvatar").src = src;
+    document.getElementById("sideAvatar").src = src;
+    showToast("personalToast", "Photo updated (saved locally for now)", "ok");
+  };
+  reader.readAsDataURL(file);
+});
+
+// ── FORM CHANGE TRACKING ──────────────────────────────────────────
+function onFormChange(section) {
+  document.getElementById(section + "SaveRow").style.display = "flex";
+}
+
+function cancelEdit(section) {
+  document.getElementById(section + "SaveRow").style.display = "none";
+  fillUIFromUser(user); // Reset
+}
+
+// ── SAVE PERSONAL ─────────────────────────────────────────────────
+async function savePersonal() {
+  const firstName = document.getElementById("f-firstName").value.trim();
+  const lastName  = document.getElementById("f-lastName").value.trim();
+  if (!firstName) { showToast("personalToast", "First name is required", "err"); return; }
+
+  const payload = {
+    name:    [firstName, lastName].filter(Boolean).join(" "),
+    phone:   document.getElementById("f-phone").value.trim(),
+    dob:     document.getElementById("f-dob").value,
+    gender:  document.getElementById("f-gender").value,
+    address: document.getElementById("f-address").value.trim(),
+    city:    document.getElementById("f-city").value.trim(),
+    state:   document.getElementById("f-state").value.trim(),
+    bio:     document.getElementById("f-bio").value.trim()
+  };
+
+  const res = await apiRequest("/employee/profile", "PUT", payload);
+
+  if (res.error) {
+    showToast("personalToast", res.msg || "Save failed", "err");
+    return;
+  }
+
+  // Persist updated name locally
+  if (user) {
+    user.name = payload.name;
+    localStorage.setItem("user", JSON.stringify(user));
+    document.getElementById("userName").innerText      = payload.name;
+    document.getElementById("sideUserName").innerText  = payload.name;
+    document.getElementById("profileName").innerText   = payload.name;
+  }
+
+  document.getElementById("personalSaveRow").style.display = "none";
+  showToast("personalToast", "Personal info saved!", "ok");
+}
+
+// ── SAVE EMERGENCY ────────────────────────────────────────────────
+async function saveEmergency() {
+  const payload = {
+    emergencyContact: {
+      name:     document.getElementById("f-emergName").value.trim(),
+      relation: document.getElementById("f-emergRel").value,
+      phone:    document.getElementById("f-emergPhone").value.trim(),
+      altPhone: document.getElementById("f-emergAlt").value.trim()
+    }
+  };
+
+  const res = await apiRequest("/employee/profile", "PUT", payload);
+  if (res.error) { showToast("personalToast", res.msg || "Save failed", "err"); return; }
+
+  document.getElementById("emergSaveRow").style.display = "none";
+  showToast("personalToast", "Emergency contact saved!", "ok");
+}
+
+// ── PASSWORD CHANGE ───────────────────────────────────────────────
+function togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  inp.type = inp.type === "password" ? "text" : "password";
+  btn.textContent = inp.type === "password" ? "👁" : "🙈";
+}
+
+function checkPwStrength() {
+  const pw = document.getElementById("f-newPw").value;
+  const rules = {
+    "rule-len":   pw.length >= 8,
+    "rule-upper": /[A-Z]/.test(pw),
+    "rule-num":   /[0-9]/.test(pw),
+    "rule-sym":   /[^A-Za-z0-9]/.test(pw)
+  };
+  let score = 0;
+  Object.entries(rules).forEach(([id, ok]) => {
+    const el = document.getElementById(id);
+    el.classList.toggle("rule-ok", ok);
+    el.textContent = (ok ? "✓ " : "✕ ") + el.textContent.slice(2);
+    if (ok) score++;
+  });
+  const fill  = document.getElementById("pwStrengthFill");
+  const label = document.getElementById("pwStrengthLabel");
+  const pct   = (score / 4) * 100;
+  fill.style.width = pct + "%";
+  fill.style.background = score <= 1 ? "#c8292c" : score <= 2 ? "#e3b608" : score === 3 ? "#ea740c" : "#22d3c8";
+  label.textContent = ["", "Weak", "Fair", "Good", "Strong"][score];
+  label.style.color = fill.style.background;
+}
+
+async function changePassword() {
+  const cur  = document.getElementById("f-currentPw").value;
+  const nw   = document.getElementById("f-newPw").value;
+  const conf = document.getElementById("f-confirmPw").value;
+
+  if (!cur || !nw || !conf) { showToast("pwToast", "All fields are required", "err"); return; }
+  if (nw !== conf)           { showToast("pwToast", "Passwords do not match", "err"); return; }
+  if (nw.length < 8)         { showToast("pwToast", "Password must be at least 8 characters", "err"); return; }
+
+  const res = await apiRequest("/auth/change-password", "POST", { currentPassword: cur, newPassword: nw });
+  if (res.error) { showToast("pwToast", res.msg || "Failed", "err"); return; }
+
+  document.getElementById("f-currentPw").value = "";
+  document.getElementById("f-newPw").value     = "";
+  document.getElementById("f-confirmPw").value = "";
+  showToast("pwToast", "Password updated successfully!", "ok");
+}
+
+// ── 2FA TOGGLE ────────────────────────────────────────────────────
+function toggle2FA(cb) {
+  document.getElementById("twoFaSetup").style.display = cb.checked ? "block" : "none";
+}
+
+// ── REVOKE SESSIONS ───────────────────────────────────────────────
+async function revokeAllSessions() {
+  if (!confirm("This will log you out of all devices. Continue?")) return;
+  const res = await apiRequest("/auth/revoke-sessions", "POST");
+  if (res.error) { alert(res.msg || "Failed"); return; }
+  logout();
+}
+
+// ── LOAD PROFILE FROM API ─────────────────────────────────────────
+async function loadProfile() {
+  const res = await apiRequest("/employee/profile");
+  if (res.error) return;
+  const p = res.profile || res;
+  profileData = p;
+
+  // Personal fields
+  if (p.phone)   document.getElementById("f-phone").value = p.phone;
+  if (p.dob)     document.getElementById("f-dob").value = p.dob.slice(0, 10);
+  if (p.gender)  document.getElementById("f-gender").value = p.gender;
+  if (p.address) document.getElementById("f-address").value = p.address;
+  if (p.city)    document.getElementById("f-city").value = p.city;
+  if (p.state)   document.getElementById("f-state").value = p.state;
+  if (p.bio)     document.getElementById("f-bio").value = p.bio;
+
+  // Emergency
+  const ec = p.emergencyContact || {};
+  if (ec.name)     document.getElementById("f-emergName").value  = ec.name;
+  if (ec.relation) document.getElementById("f-emergRel").value   = ec.relation;
+  if (ec.phone)    document.getElementById("f-emergPhone").value = ec.phone;
+  if (ec.altPhone) document.getElementById("f-emergAlt").value   = ec.altPhone;
+
+  // Work info
+  if (p.department)     document.getElementById("w-dept").textContent     = p.department;
+  if (p.joiningDate)    document.getElementById("w-joining").textContent  = new Date(p.joiningDate).toLocaleDateString("en-IN", {day:"2-digit",month:"short",year:"numeric"});
+  if (p.reportingTo)    document.getElementById("w-manager").textContent  = p.reportingTo;
+  if (p.workLocation)   document.getElementById("w-location").textContent = p.workLocation;
+  if (p.employmentType) document.getElementById("w-type").textContent     = p.employmentType;
+}
+
+// ── LOAD ATTENDANCE STATS ─────────────────────────────────────────
+async function loadStats() {
+  const res = await apiRequest("/attendance");
+  if (res.error) return;
+
+  const records = res.attendance || res.records || [];
+  const now = new Date();
+  const monthRecords = records.filter(r => {
+    const d = new Date(r.date);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+
+  let present = 0, late = 0, absent = 0;
+  monthRecords.forEach(r => {
+    if (r.status === "present") present++;
+    else if (r.status === "late") late++;
+    else if (r.status === "absent") absent++;
+  });
+  const workDays = monthRecords.length || 1;
+  const pct = Math.round(((present + late) / workDays) * 100);
+
+  document.getElementById("statPresent").textContent = present;
+  document.getElementById("statLate").textContent    = late;
+  document.getElementById("statAbsent").textContent  = absent;
+  document.getElementById("statLeave").textContent   = "—";
+  document.getElementById("attPct").textContent      = pct + "%";
+
+  const circumference = 2 * Math.PI * 32; // 201.06
+  const offset = circumference - (pct / 100) * circumference;
+  document.getElementById("attRingFill").style.strokeDashoffset = offset;
+
+  // Recent punches (last 5)
+  const recent = records.slice(-5).reverse();
+  const log    = document.getElementById("punchLog");
+  if (!recent.length) { log.innerHTML = '<div class="punch-log-empty">No punches yet</div>'; return; }
+  log.innerHTML = recent.map(r => {
+    const d   = new Date(r.date).toLocaleDateString("en-IN", {day:"2-digit",month:"short"});
+    const pin = r.punchIn  ? new Date(r.punchIn).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) : "—";
+    const pout= r.punchOut ? new Date(r.punchOut).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) : "—";
+    const cls = r.status === "late" ? "punch-late" : r.status === "absent" ? "punch-absent" : "punch-ok";
+    return `<div class="punch-log-item">
+      <span class="punch-date">${d}</span>
+      <span class="punch-in">▲ ${pin}</span>
+      <span class="punch-out">▼ ${pout}</span>
+      <span class="punch-status ${cls}">${r.status || "—"}</span>
+    </div>`;
+  }).join("");
+}
+
+// ── BROWSER INFO ──────────────────────────────────────────────────
+function fillSessionInfo() {
+  const ua = navigator.userAgent;
+  let browser = "Browser";
+  if (/Chrome/.test(ua)) browser = "Chrome";
+  else if (/Firefox/.test(ua)) browser = "Firefox";
+  else if (/Safari/.test(ua)) browser = "Safari";
+  else if (/Edge/.test(ua)) browser = "Edge";
+  document.getElementById("sessionBrowser").textContent = browser + " · This device · " + (navigator.platform || "Unknown OS");
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function showToast(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = "toast-msg " + (type === "ok" ? "toast-ok" : "toast-err");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.textContent = ""; el.className = "toast-msg"; }, 4000);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+async function init() {
+  fillSessionInfo();
+  await Promise.all([loadProfile(), loadStats()]);
+}
+
+init();
+</script>
+</body>
+</html>

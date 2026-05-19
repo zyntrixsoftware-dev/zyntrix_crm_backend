@@ -473,9 +473,9 @@ document.querySelectorAll("[data-action]").forEach((link) => {
     const action = link.dataset.action;
 
     if (action === "profile") {
-      alert("Profile details are shown in the top-right and sidebar for now.");
+      window.location.href = "profile.html";
     } else if (action === "settings") {
-      alert("Settings are not available yet.");
+      window.location.href = "settings.html";
     } else {
       alert("This module is coming soon.");
     }

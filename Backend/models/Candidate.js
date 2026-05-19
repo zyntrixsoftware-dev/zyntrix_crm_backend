@@ -36,6 +36,10 @@ const candidateSchema = new mongoose.Schema({
   // ── Original row (so we don't lose any column the user mapped) ──
   raw: { type: mongoose.Schema.Types.Mixed, default: {} },
 
+  // ── Lifecycle email tracking (avoids double-sending) ──
+  applicationEmailSentAt: { type: Date, default: null },
+  rejectionEmailSentAt:   { type: Date, default: null },
+
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
 
 }, { timestamps: true });
