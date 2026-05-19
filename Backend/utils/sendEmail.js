@@ -15,7 +15,8 @@ const nodemailer = require("nodemailer");
  *   DEV_SKIP_EMAIL=true  — logs email to console instead of sending (local dev only)
  *                          ⚠️  Must be false or absent in Railway for real emails
  */
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, text, opts = {}) => {
+  // opts: { attachments?: [{ filename, content, contentType }], html? }
 
   // ── DEV / CONSOLE MODE ───────────────────────────────────────────────────
   if (process.env.DEV_SKIP_EMAIL === "true") {
@@ -23,6 +24,10 @@ const sendEmail = async (to, subject, text) => {
     console.log("\n────────────── [DEV EMAIL] ──────────────");
     console.log("To      :", to);
     console.log("Subject :", subject);
+    if (opts.attachments && opts.attachments.length) {
+      console.log("Attachments :",
+        opts.attachments.map(a => `${a.filename} (${a.content?.length || 0} bytes)`).join(", "));
+    }
     console.log("Body    :\n", text);
     console.log("─────────────────────────────────────────\n");
     return;
@@ -93,12 +98,16 @@ const sendEmail = async (to, subject, text) => {
   }
 
   // ── SEND ──────────────────────────────────────────────────────────────────
-  const info = await transporter.sendMail({
+  const mail = {
     from:    `"${senderName}" <${fromAddress}>`,
     to,
     subject,
     text
-  });
+  };
+  if (opts.html)        mail.html        = opts.html;
+  if (opts.attachments) mail.attachments = opts.attachments;
+
+  const info = await transporter.sendMail(mail);
 
   console.log("✅ Email sent → To:", to, "| MessageId:", info.messageId);
 };

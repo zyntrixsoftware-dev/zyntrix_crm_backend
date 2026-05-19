@@ -1,7 +1,8 @@
-const Interview   = require("../models/Interview");
-const OfferLetter = require("../models/OfferLetter");
-const Candidate   = require("../models/Candidate");
-const sendEmail   = require("../utils/sendEmail");
+const Interview        = require("../models/Interview");
+const OfferLetter      = require("../models/OfferLetter");
+const Candidate        = require("../models/Candidate");
+const sendEmail        = require("../utils/sendEmail");
+const generateOfferPDF = require("../utils/generateOfferPDF");
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -667,7 +668,57 @@ exports.updateOffer = async (req, res) => {
   }
 };
 
-// POST /api/hr/offers/:id/send — send offer letter via email
+// Build the short cover-note body that accompanies the PDF attachment.
+function buildCoverNote(offer) {
+  const isIntern = (offer.employeeType || "").toLowerCase() === "intern";
+  return [
+    `Dear ${offer.candidateName},`,
+    "",
+    isIntern
+      ? `Congratulations! Please find attached your Internship Offer Letter from Zyntrix Software Solutions for the role of ${offer.appliedFor}.`
+      : `Congratulations! Please find attached your Offer Letter from Zyntrix Software Solutions for the role of ${offer.appliedFor}.`,
+    "",
+    `Kindly review the letter, sign the relevant pages, and reply to this email with the signed copy along with the documents listed in the Annexure.`,
+    "",
+    `Should you have any questions, please contact us at ` +
+      (process.env.COMPANY_HR_EMAIL || "hr@zyntrixsoftware.com") + ".",
+    "",
+    "Warm regards,",
+    "HR Department",
+    process.env.COMPANY_NAME || "Zyntrix Software Solutions Pvt. Ltd."
+  ].join("\n");
+}
+
+// Build the offer data shape that generateOfferPDF / generateLetterBody both consume
+function offerToLetterData(offer) {
+  return {
+    candidateName:        offer.candidateName,
+    appliedFor:           offer.appliedFor,
+    department:           offer.department,
+    employeeType:         offer.employeeType,
+    offeredSalary:        offer.offeredSalary,
+    ctcCurrency:          offer.ctcCurrency,
+    joiningDate:          offer.joiningDate,
+    offerExpiryDate:      offer.offerExpiryDate,
+    location:             offer.location,
+    reportingTo:          offer.reportingTo,
+    additionalTerms:      offer.additionalTerms,
+    trainingStartDate:    offer.trainingStartDate,
+    trainingEndDate:      offer.trainingEndDate,
+    internshipEndDate:    offer.internshipEndDate,
+    hoursPerWeek:         offer.hoursPerWeek,
+    workingHoursPerDay:   offer.workingHoursPerDay,
+    acceptanceWindowDays: offer.acceptanceWindowDays,
+    noticePeriodDays:     offer.noticePeriodDays,
+    revenueTarget:        offer.revenueTarget
+  };
+}
+
+function safeFilename(s) {
+  return String(s || "candidate").replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 60);
+}
+
+// POST /api/hr/offers/:id/send — send offer letter via email (PDF attached)
 exports.sendOffer = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -677,10 +728,25 @@ exports.sendOffer = async (req, res) => {
     if (offer.status === "sent")
       return res.status(400).json({ msg: "Offer already sent" });
 
+    // Generate the PDF in memory using the same template + offer data
+    const pdfBuffer = await generateOfferPDF(
+      offerToLetterData(offer),
+      offer.templateKey || "default"
+    );
+
+    const filename = `Zyntrix_Offer_Letter_${safeFilename(offer.candidateName)}.pdf`;
+
     await sendEmail(
       offer.candidateEmail,
-      `Offer Letter — ${offer.appliedFor} | Zyntrix Software`,
-      offer.letterBody
+      `Offer Letter — ${offer.appliedFor} | Zyntrix Software Solutions`,
+      buildCoverNote(offer),
+      {
+        attachments: [{
+          filename,
+          content:     pdfBuffer,
+          contentType: "application/pdf"
+        }]
+      }
     );
 
     offer.status = "sent";
@@ -692,6 +758,208 @@ exports.sendOffer = async (req, res) => {
   } catch (err) {
     console.error("SEND OFFER ERROR:", err);
     return res.status(500).json({ msg: "Failed to send offer: " + err.message });
+  }
+};
+
+// GET /api/hr/offers/:id/pdf — download/preview the PDF version of an offer letter
+exports.downloadOfferPdf = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+    const offer = await OfferLetter.findById(req.params.id);
+    if (!offer) return res.status(404).json({ msg: "Offer not found" });
+
+    const pdfBuffer = await generateOfferPDF(
+      offerToLetterData(offer),
+      offer.templateKey || "default"
+    );
+    const filename = `Zyntrix_Offer_Letter_${safeFilename(offer.candidateName)}.pdf`;
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
+    return res.end(pdfBuffer);
+  } catch (err) {
+    console.error("DOWNLOAD OFFER PDF ERROR:", err);
+    return res.status(500).json({ msg: "Failed to render PDF: " + err.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BULK SEND — POST /api/hr/offers/bulk-send
+//
+// body: {
+//   interviewIds: [<id>, ...],         // candidates marked offered=true on the panel
+//   mode:         "perCandidate" | "shared",
+//   sharedTerms?: {                    // only used when mode === "shared"
+//     templateKey, employeeType, offeredSalary, ctcCurrency, joiningDate,
+//     offerExpiryDate, location, reportingTo, additionalTerms,
+//     trainingStartDate, trainingEndDate, internshipEndDate,
+//     hoursPerWeek, workingHoursPerDay, acceptanceWindowDays,
+//     noticePeriodDays, revenueTarget
+//   }
+// }
+//
+// Per-candidate mode:
+//   - Uses each interview's existing OfferLetter draft (if HR already saved one).
+//   - If no draft exists, falls back to safe defaults (employeeType "Full-time",
+//     salary 0) and reports the issue in `warnings` so HR can fix it.
+//
+// Shared mode:
+//   - Creates or updates each interview's OfferLetter with the supplied shared
+//     terms. HR's previously-edited letter body is overwritten in shared mode.
+//
+// Response: { sent: [...], failed: [{interviewId, reason}], warnings: [...] }
+// ─────────────────────────────────────────────────────────────────────────────
+exports.bulkSendOffers = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const { interviewIds, mode = "perCandidate", sharedTerms = {} } = req.body || {};
+    if (!Array.isArray(interviewIds) || interviewIds.length === 0)
+      return res.status(400).json({ msg: "interviewIds array is required" });
+    if (!["perCandidate", "shared"].includes(mode))
+      return res.status(400).json({ msg: 'mode must be "perCandidate" or "shared"' });
+    if (interviewIds.length > 200)
+      return res.status(400).json({ msg: "Up to 200 candidates per bulk send" });
+
+    const interviews = await Interview.find({ _id: { $in: interviewIds } });
+    const itvById    = new Map(interviews.map(i => [String(i._id), i]));
+
+    const sent     = [];
+    const failed   = [];
+    const warnings = [];
+
+    for (const id of interviewIds) {
+      const interview = itvById.get(String(id));
+      if (!interview) {
+        failed.push({ interviewId: id, reason: "Interview not found" });
+        continue;
+      }
+      if (!interview.offered) {
+        failed.push({ interviewId: id, reason: "Not marked Offered on the Interview Panel" });
+        continue;
+      }
+      if (!interview.candidateEmail) {
+        failed.push({ interviewId: id, reason: "Candidate has no email on file" });
+        continue;
+      }
+
+      try {
+        // ── Resolve / create the OfferLetter document ────────────────────
+        let offer = await OfferLetter.findOne({ interviewId: interview._id });
+
+        if (mode === "shared") {
+          // Apply shared terms (creates or overwrites)
+          const merged = {
+            interviewId:     interview._id,
+            candidateName:   interview.candidateName,
+            candidateEmail:  interview.candidateEmail,
+            appliedFor:      interview.appliedFor,
+            department:      interview.department,
+            templateKey:     OFFER_TEMPLATES[sharedTerms.templateKey] ? sharedTerms.templateKey : "default",
+            employeeType:    sharedTerms.employeeType    || "Full-time",
+            offeredSalary:   Number(sharedTerms.offeredSalary || 0),
+            ctcCurrency:     sharedTerms.ctcCurrency     || "INR",
+            joiningDate:     sharedTerms.joiningDate     || "",
+            offerExpiryDate: sharedTerms.offerExpiryDate || "",
+            location:        sharedTerms.location        || "",
+            reportingTo:     sharedTerms.reportingTo     || "",
+            additionalTerms: sharedTerms.additionalTerms || "",
+            trainingStartDate:    sharedTerms.trainingStartDate    || "",
+            trainingEndDate:      sharedTerms.trainingEndDate      || "",
+            internshipEndDate:    sharedTerms.internshipEndDate    || "",
+            hoursPerWeek:         sharedTerms.hoursPerWeek         || 40,
+            workingHoursPerDay:   sharedTerms.workingHoursPerDay   || 9,
+            acceptanceWindowDays: sharedTerms.acceptanceWindowDays || 2,
+            noticePeriodDays:     sharedTerms.noticePeriodDays     || 30,
+            revenueTarget:        sharedTerms.revenueTarget        || "",
+            bodyEdited:           false,
+            createdBy:            req.user.id
+          };
+          if (!merged.offeredSalary || !merged.joiningDate) {
+            failed.push({ interviewId: id, reason: "Shared mode needs offeredSalary and joiningDate" });
+            continue;
+          }
+          merged.letterBody = generateLetterBody(merged, merged.templateKey);
+          if (offer) {
+            Object.assign(offer, merged);
+            await offer.save();
+          } else {
+            offer = await OfferLetter.create({ ...merged, status: "draft" });
+            await Interview.findByIdAndUpdate(interview._id, { offerId: offer._id });
+          }
+        } else {
+          // perCandidate mode — must already have a saved offer with required terms
+          if (!offer) {
+            failed.push({
+              interviewId: id,
+              reason: "No saved offer draft. Open this candidate first and click Save, or use Shared mode."
+            });
+            continue;
+          }
+          if (!offer.offeredSalary || !offer.joiningDate) {
+            failed.push({
+              interviewId: id,
+              reason: "Draft is missing offeredSalary or joiningDate. Open the candidate to complete it."
+            });
+            continue;
+          }
+          // Ensure letterBody is fresh if HR never edited it
+          if (!offer.bodyEdited) {
+            offer.letterBody = generateLetterBody(offerToLetterData(offer), offer.templateKey || "default");
+            await offer.save();
+          }
+        }
+
+        if (offer.status === "sent") {
+          warnings.push({ interviewId: id, msg: "Offer was already sent earlier; skipped re-send" });
+          continue;
+        }
+
+        // ── Generate PDF + send ──────────────────────────────────────────
+        const pdfBuffer = await generateOfferPDF(
+          offerToLetterData(offer),
+          offer.templateKey || "default"
+        );
+        const filename = `Zyntrix_Offer_Letter_${safeFilename(offer.candidateName)}.pdf`;
+
+        await sendEmail(
+          offer.candidateEmail,
+          `Offer Letter — ${offer.appliedFor} | Zyntrix Software Solutions`,
+          buildCoverNote(offer),
+          {
+            attachments: [{
+              filename,
+              content:     pdfBuffer,
+              contentType: "application/pdf"
+            }]
+          }
+        );
+
+        offer.status = "sent";
+        offer.sentAt = new Date();
+        offer.sentBy = req.user.id;
+        await offer.save();
+
+        sent.push({
+          interviewId:    String(interview._id),
+          offerId:        String(offer._id),
+          candidateName:  offer.candidateName,
+          candidateEmail: offer.candidateEmail
+        });
+      } catch (sendErr) {
+        console.error("BULK SEND — failure for", id, ":", sendErr?.message);
+        failed.push({ interviewId: id, reason: sendErr?.message || "Send failed" });
+      }
+    }
+
+    return res.json({
+      msg:    `Sent ${sent.length} of ${interviewIds.length}` +
+              (failed.length ? `, ${failed.length} failed` : "") +
+              (warnings.length ? `, ${warnings.length} warning(s)` : ""),
+      sent, failed, warnings
+    });
+  } catch (err) {
+    console.error("BULK SEND OFFERS ERROR:", err);
+    return res.status(500).json({ msg: "Bulk send failed: " + err.message });
   }
 };
 

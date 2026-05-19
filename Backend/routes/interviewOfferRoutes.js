@@ -17,6 +17,8 @@ const {
   createOffer,
   updateOffer,
   sendOffer,
+  downloadOfferPdf,
+  bulkSendOffers,
   updateOfferStatus
 } = require("../controllers/interviewOfferController");
 
@@ -34,11 +36,14 @@ router.patch ("/interviews/:id/note",           auth, updateInterviewNote);
 router.patch ("/interviews/:id/offered",        auth, toggleOffered);
 
 // ── OFFER LETTER PANEL ────────────────────────────────────────────
-// IMPORTANT: /offers/templates and /offers/preview MUST come before /offers/:id
+// IMPORTANT: /offers/templates, /offers/preview, /offers/bulk-send MUST
+// come before /offers/:id  — otherwise Express treats them as IDs.
 router.get   ("/offers/templates",              auth, getOfferTemplates);
 router.post  ("/offers/preview",                auth, previewOffer);
+router.post  ("/offers/bulk-send",              auth, bulkSendOffers);
 router.get   ("/offers",                        auth, getOffers);
 router.get   ("/offers/:id",                    auth, getOffer);
+router.get   ("/offers/:id/pdf",                auth, downloadOfferPdf);
 router.post  ("/offers",                        auth, createOffer);
 router.put   ("/offers/:id",                    auth, updateOffer);
 router.post  ("/offers/:id/send",               auth, sendOffer);
