@@ -1,5 +1,6 @@
 const Candidate = require("../models/Candidate");
 const Interview = require("../models/Interview");
+const mongoose  = require("mongoose");
 const https     = require("https");
 
 function checkHrAccess(req, res) {
@@ -8,6 +9,18 @@ function checkHrAccess(req, res) {
     return false;
   }
   return true;
+}
+
+// Defensive: ensure the JWT-derived user id is something MongoDB can cast
+// to ObjectId. If not, we'd otherwise CastError inside deleteMany and surface
+// a useless "Internal server error" to the user.
+function requireValidUserId(req, res) {
+  const id = req.user?.id;
+  if (!id || !mongoose.isValidObjectId(id)) {
+    res.status(401).json({ msg: "Auth token user id is invalid — please log out and back in." });
+    return null;
+  }
+  return id;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -50,10 +63,17 @@ exports.getCandidates = async (req, res) => {
 exports.bulkImport = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
+    const userId = requireValidUserId(req, res);
+    if (!userId) return;
 
     const { candidates = [], importedFrom = "manual" } = req.body;
     if (!Array.isArray(candidates) || candidates.length === 0) {
       return res.status(400).json({ msg: "candidates array is required" });
+    }
+    // Hard cap: payload sanity check (Express body limit is 10kb in server.js,
+    // so 142 rows × 16 cols may bump up against this — see note below.)
+    if (candidates.length > 10000) {
+      return res.status(413).json({ msg: "Too many rows in one import (max 10,000)" });
     }
 
     const validSources = ["xlsx","csv","tsv","html","pdf","google_sheets","onedrive","manual"];
@@ -119,28 +139,44 @@ exports.bulkImport = async (req, res) => {
     });
 
     // ── insertMany with partial-success handling ──────────────────────────
-    // ordered:false continues past individual row failures.
-    // rawResult:true gives us the inserted-count even on BulkWriteError.
-    let insertedCount = 0;
+    // ordered:false continues past individual row failures. We avoid the
+    // `rawResult` option since it behaves differently across Mongoose major
+    // versions; instead we count the resolved array directly, and on
+    // BulkWriteError we compute insertedCount from writeErrors.
+    console.log(
+      `[BULK IMPORT] user=${req.user?.id} validDocs=${docs.length} ` +
+      `wipedCandidates=${wipedCandidates.deletedCount} wipedInterviews=${wipedInterviews.deletedCount}`
+    );
+
+    let insertedCount  = 0;
     const insertErrors = [];
+
     try {
-      const result = await Candidate.insertMany(docs, { ordered: false, rawResult: true });
-      insertedCount = result.insertedCount || (result.length || 0);
+      const inserted = await Candidate.insertMany(docs, { ordered: false });
+      insertedCount = Array.isArray(inserted) ? inserted.length : 0;
     } catch (bulkErr) {
-      // BulkWriteError: partial success. Pull the inserted count from the
-      // mongo-driver result if available, otherwise count what got through.
-      insertedCount = bulkErr?.result?.nInserted
-                   || bulkErr?.result?.result?.nInserted
-                   || (bulkErr?.insertedDocs?.length ?? 0);
-      const writeErrs = bulkErr?.writeErrors || bulkErr?.result?.result?.writeErrors || [];
-      writeErrs.slice(0, 5).forEach(e => insertErrors.push({
-        index: e.index ?? e.err?.index,
-        msg:   e.errmsg || e.err?.errmsg || String(e)
-      }));
-      console.error("BULK IMPORT — partial failure:",
-        bulkErr.message,
-        "inserted:", insertedCount,
-        "errors:",   insertErrors);
+      // Could be a BulkWriteError (some rows failed) or a real error.
+      // Log everything so Railway logs tell us exactly what went wrong.
+      console.error("[BULK IMPORT] insertMany error:", {
+        name:    bulkErr?.name,
+        message: bulkErr?.message,
+        code:    bulkErr?.code,
+        hasWriteErrors: !!(bulkErr?.writeErrors && bulkErr.writeErrors.length)
+      });
+
+      const writeErrs = Array.isArray(bulkErr?.writeErrors) ? bulkErr.writeErrors : [];
+      if (writeErrs.length) {
+        // Partial success: total - failed
+        insertedCount = Math.max(0, docs.length - writeErrs.length);
+        writeErrs.slice(0, 10).forEach(e => insertErrors.push({
+          index: e?.index ?? null,
+          msg:   e?.errmsg || e?.err?.errmsg || String(e)
+        }));
+      } else {
+        // Not a bulk-write error — re-throw so the outer catch can return
+        // a meaningful 500 with the real message (not just "Internal error").
+        throw bulkErr;
+      }
     }
 
     const skipped = (candidates.length - docs.length) + (docs.length - insertedCount);

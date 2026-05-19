@@ -62,7 +62,10 @@ app.options(/(.*)/, cors(corsOptions));
 app.use(cors(corsOptions));
 
 // ── BODY PARSER ──────────────────────────────────────────────────
-app.use(express.json({ limit: "10kb" }));
+// Default limit is generous enough for spreadsheet imports (Candidates page
+// posts the full 142-row × 16-column dataset including each row's raw payload).
+// Rate limiter below still protects against abuse.
+app.use(express.json({ limit: "25mb" }));
 
 // ── RATE LIMITERS ────────────────────────────────────────────────
 const authLimiter = rateLimit({
@@ -105,9 +108,30 @@ app.get("/", (req, res) => {
 });
 
 // ── GLOBAL ERROR HANDLER ─────────────────────────────────────────
+// Respect the error's own status code where possible so clients see
+// meaningful 4xx responses (body too large, bad JSON, etc.) instead of
+// a generic 500. Falls back to 500 for truly unexpected errors.
 app.use((err, req, res, next) => {
-  console.error("Unhandled error:", err.stack);
-  res.status(500).json({ msg: "Internal server error" });
+  const status = err.status || err.statusCode || 500;
+
+  // PayloadTooLargeError — body parser rejected the request
+  if (err.type === "entity.too.large" || status === 413) {
+    console.warn("Payload too large:", req.method, req.originalUrl, "limit=", err.limit, "received=", err.length);
+    return res.status(413).json({
+      msg: "Upload too large. Try fewer rows, or contact admin to raise the import limit."
+    });
+  }
+
+  // Malformed JSON
+  if (err.type === "entity.parse.failed") {
+    console.warn("Bad JSON body:", req.method, req.originalUrl, err.message);
+    return res.status(400).json({ msg: "Request body is not valid JSON." });
+  }
+
+  console.error("Unhandled error:", req.method, req.originalUrl, "—", err.stack || err);
+  res.status(status >= 400 && status < 600 ? status : 500).json({
+    msg: status >= 500 ? "Internal server error" : (err.message || "Request failed")
+  });
 });
 
 // ── START ─────────────────────────────────────────────────────────
