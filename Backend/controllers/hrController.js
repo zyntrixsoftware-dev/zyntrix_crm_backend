@@ -5,7 +5,7 @@ const XLSX         = require("xlsx");
 const { buildPhotoUrl, apiHostFromReq } = require("./employeeController");
 
 // Attach a small `photo` field (URL) to an employee object without dragging the
-// big legacy inline data URL across the wire. Works whether `e` is a Mongoose
+// legacy inline data URL across the wire. Works whether `e` is a Mongoose
 // document or a plain object (from .lean()/aggregation).
 function withPhotoUrl(e, host = "") {
   if (!e) return e;
@@ -134,8 +134,6 @@ exports.getEmployeeAttendance = async (req, res) => {
 
     const [year, monthNumber] = month.split("-").map(Number);
 
-    // ── Use pure string arithmetic to avoid local-timezone / UTC offset bugs ──
-    // e.g. on IST server: new Date(2026,4,1).toISOString() = "2026-04-30…"
     const pad2      = n => String(n).padStart(2, "0");
     const startStr  = `${year}-${pad2(monthNumber)}-01`;
     const nextYear  = monthNumber === 12 ? year + 1 : year;
@@ -159,7 +157,7 @@ exports.getEmployeeAttendance = async (req, res) => {
   }
 };
 
-// ── LIST ALL EMPLOYEES (with login accounts) ──────────────────────────────────
+// ── LIST ALL EMPLOYEES ────────────────────────────────────────────────────────
 exports.getEmployees = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -179,11 +177,11 @@ exports.getEmployees = async (req, res) => {
     }
 
     const employees = await User.find(query)
-      .select("-password -otpCode -otpExpiry -otpResetToken -photo")  // legacy inline data URL omitted; photoFileId stays
+      .select("-password -otpCode -otpExpiry -otpResetToken -photo")
       .populate("reportingTo", "name designation")
       .sort({ createdAt: -1 });
 
-    const host = apiHostFromReq(req);
+    const host   = apiHostFromReq(req);
     const shaped = employees.map(e => withPhotoUrl(e, host));
     return res.json({ employees: shaped, total: shaped.length });
   } catch (err) {
@@ -203,7 +201,6 @@ exports.getEmployee = async (req, res) => {
 
     if (!emp) return res.status(404).json({ msg: "Employee not found" });
 
-    // also get their attendance summary for current month (string arithmetic — no TZ offset bugs)
     const month    = new Date().toISOString().slice(0, 7);
     const [year, monthNum] = month.split("-").map(Number);
     const _pad      = n => String(n).padStart(2, "0");
@@ -229,7 +226,6 @@ exports.updateEmployee = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    // Fields HR is allowed to update (NOT password, NOT role to admin)
     const allowed = [
       "name","phone","department","designation","employeeType",
       "dateOfJoining","salary","reportingTo","employeeStatus",
@@ -253,7 +249,7 @@ exports.updateEmployee = async (req, res) => {
   }
 };
 
-// ── CREATE EMPLOYEE ACCOUNT (HR creates login + profile) ─────────────────────
+// ── CREATE EMPLOYEE ACCOUNT ───────────────────────────────────────────────────
 exports.createEmployee = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -304,10 +300,9 @@ exports.terminateEmployee = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    const { action } = req.body; // "terminate" | "delete"
+    const { action } = req.body;
 
     if (action === "delete") {
-      // Hard delete — only super_admin
       if (req.user.role !== "super_admin")
         return res.status(403).json({ msg: "Only super_admin can permanently delete employees" });
 
@@ -315,7 +310,6 @@ exports.terminateEmployee = async (req, res) => {
       return res.json({ msg: "Employee permanently deleted" });
     }
 
-    // Default: soft-terminate (keep account, mark as Terminated)
     const emp = await User.findOneAndUpdate(
       { _id: req.params.id, role: { $nin: ["super_admin"] } },
       { employeeStatus: "Terminated" },
@@ -330,7 +324,7 @@ exports.terminateEmployee = async (req, res) => {
   }
 };
 
-// ── LIST DEPARTMENTS (derived from employees) ─────────────────────────────────
+// ── LIST DEPARTMENTS ──────────────────────────────────────────────────────────
 exports.getDepartments = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -341,7 +335,7 @@ exports.getDepartments = async (req, res) => {
   }
 };
 
-// ── HRMS DASHBOARD (real data) ────────────────────────────────────────────────
+// ── HRMS DASHBOARD ────────────────────────────────────────────────────────────
 exports.getHrmsDashboard = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -393,9 +387,6 @@ exports.getHrmsDashboard = async (req, res) => {
 };
 
 // ── EXPORT ALL EMPLOYEES TO EXCEL ─────────────────────────────────────────────
-// GET /api/hr/employees/export  → streams an .xlsx of every employee.
-// Generated on demand, so it always reflects the latest data (including any
-// edits employees made to their own profiles).
 exports.exportEmployees = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
@@ -415,7 +406,7 @@ exports.exportEmployees = async (req, res) => {
       "Designation":      e.designation || "",
       "Employee Type":    e.employeeType || "",
       "Date of Joining":  e.dateOfJoining || "",
-      "Salary (₹)":       e.salary || 0,
+      "Salary":           e.salary || 0,
       "Status":           e.employeeStatus || "",
       "Reporting To":     e.reportingTo ? e.reportingTo.name : "",
       "Work Location":    e.workLocation || "",
@@ -428,10 +419,9 @@ exports.exportEmployees = async (req, res) => {
       "Notes":            e.profileNote || ""
     }));
 
-    // Ensure headers exist even when there are no employees yet.
     const header = [
       "Employee ID","Name","Email","Role","Phone","Department","Designation",
-      "Employee Type","Date of Joining","Salary (₹)","Status","Reporting To",
+      "Employee Type","Date of Joining","Salary","Status","Reporting To",
       "Work Location","Date of Birth","Gender","Address","City","State",
       "Emergency Contact","Notes"
     ];
@@ -439,24 +429,6 @@ exports.exportEmployees = async (req, res) => {
       ? XLSX.utils.json_to_sheet(rows, { header })
       : XLSX.utils.aoa_to_sheet([header]);
 
-    // Reasonable column widths
-    ws["!cols"] = header.map(h => ({ wch: Math.max(12, h.length + 2) }));
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Employees");
-
-    const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
-    const stamp  = new Date().toISOString().slice(0, 10);
-
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    res.setHeader("Content-Disposition", `attachment; filename="employees_${stamp}.xlsx"`);
-    return res.send(buffer);
-  } catch (err) {
-    console.error("EXPORT EMPLOYEES ERROR:", err);
-    return res.status(500).json({ msg: "Server error" });
-  }
-};
- Reasonable column widths
     ws["!cols"] = header.map(h => ({ wch: Math.max(12, h.length + 2) }));
 
     const wb = XLSX.utils.book_new();
