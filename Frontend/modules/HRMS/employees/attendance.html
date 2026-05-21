@@ -994,10 +994,24 @@ async function confirmEdit() {
   btn.textContent = isAbsent ? "Adding…" : "Saving…";
 
   // ── KEY FIX: send UTC ISO strings, not raw "HH:MM" strings ──
+  // 0:00 SPECIAL CASE:
+  //   The HTML <input type="time"> returns "" when the user clears the field
+  //   and "00:00" if they explicitly type zero. We treat BOTH as "clear this
+  //   punch" (the backend gets __CLEAR__ and sets the field to null) — this
+  //   way HR can blank out a punch without it becoming a literal midnight
+  //   time on the record.
   const payload = { userId, date };
-  if (newIn)  payload.punchIn  = toUTCISO(date, newIn);   // e.g. "2026-05-04T04:30:00.000Z"
-  if (newOut) payload.punchOut = toUTCISO(date, newOut);  // e.g. "2026-05-04T11:30:00.000Z"
-  if (note)   payload.note     = note;
+  function timeFieldToPayload(v) {
+    if (v === undefined || v === null)        return undefined;     // don't send
+    if (v === "")                              return "__CLEAR__";   // clear punch
+    if (v === "00:00" || v === "0:00")         return "__CLEAR__";   // 0:00 == clear
+    return toUTCISO(date, v);
+  }
+  const inPayload  = timeFieldToPayload(newIn);
+  const outPayload = timeFieldToPayload(newOut);
+  if (inPayload  !== undefined) payload.punchIn  = inPayload;
+  if (outPayload !== undefined) payload.punchOut = outPayload;
+  if (note) payload.note = note;
 
   const method = isAbsent ? "POST" : "PATCH";
   const res    = await apiRequest("/attendance/edit", method, payload);

@@ -397,6 +397,20 @@ async function refreshToday() {
   goToday();
 }
 
+// ── Punch windows (IST) ───────────────────────────────────────────
+// Mirrors the strict server-side check in Backend/controllers/attendanceController.js.
+// We compute current time in IST (regardless of the user's actual browser
+// timezone) so an employee on a laptop set to the wrong zone still sees the
+// correct window. The server is the source of truth — this is for UX.
+const PUNCH_IN_WINDOW  = { start:  9 * 60 + 50, end: 10 * 60 +  5, label: "9:50 AM – 10:05 AM" };
+const PUNCH_OUT_WINDOW = { start: 17 * 60,      end: 17 * 60 + 10, label: "5:00 PM – 5:10 PM"  };
+
+function _nowMinutesIST() {
+  const now = new Date();
+  const ist = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+  return ist.getUTCHours() * 60 + ist.getUTCMinutes();
+}
+
 function handlePunch() {
   if (!isSameDay(selectedDate, new Date())) {
     goToday();
@@ -408,9 +422,22 @@ function handlePunch() {
 
   if (!getShift(new Date()).workingDay) {
     alert("There is no scheduled shift today.");
-  } else if (!todayRecord || !todayRecord.punchIn) {
+    return;
+  }
+
+  const mins = _nowMinutesIST();
+
+  if (!todayRecord || !todayRecord.punchIn) {
+    if (mins < PUNCH_IN_WINDOW.start || mins > PUNCH_IN_WINDOW.end) {
+      alert(`Punch-in is only allowed between ${PUNCH_IN_WINDOW.label} IST.`);
+      return;
+    }
     punchIn();
   } else if (!todayRecord.punchOut) {
+    if (mins < PUNCH_OUT_WINDOW.start || mins > PUNCH_OUT_WINDOW.end) {
+      alert(`Punch-out is only allowed between ${PUNCH_OUT_WINDOW.label} IST.`);
+      return;
+    }
     punchOut();
   } else {
     alert("Already completed for today");
