@@ -159,16 +159,37 @@ function _initialsFrom(name) {
     .toUpperCase();
 }
 
+// CSS selectors for avatar <img> tags that don't have an explicit id. The
+// app's various page templates wrap the topbar avatar in <div class="top-profile">
+// and the sidebar avatar in <div class="user-pill"> / <div class="brand">, so
+// we walk those containers and pick the first <img> inside.
+const AVATAR_SELECTOR_PATHS = [
+  ".top-profile img",
+  ".user-pill img.avatar, .user-pill .avatar img",
+  ".sidebar .avatar img"
+];
+
+function _collectAvatarImgs() {
+  const set = new Set();
+  AVATAR_ELEMENT_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.tagName === "IMG") set.add(el);
+  });
+  AVATAR_SELECTOR_PATHS.forEach(sel => {
+    document.querySelectorAll(sel).forEach(img => {
+      if (img && img.tagName === "IMG") set.add(img);
+    });
+  });
+  return Array.from(set);
+}
+
 // Paint the topbar/sidebar avatars from whatever we already know locally.
 function renderUserAvatar() {
   const u = getUser();
   if (!u) return;
 
   if (u.photo) {
-    AVATAR_ELEMENT_IDS.forEach(id => {
-      const el = document.getElementById(id);
-      if (el && el.tagName === "IMG") el.src = u.photo;
-    });
+    _collectAvatarImgs().forEach(img => { img.src = u.photo; });
     // For text-avatar containers (initials), swap in an <img> if there's a photo.
     AVATAR_TEXT_IDS.forEach(id => {
       const el = document.getElementById(id);
