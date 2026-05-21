@@ -258,6 +258,7 @@ exports.servePhoto = async (req, res) => {
       if (!m) return res.status(404).end();
       res.setHeader("Content-Type", m[1]);
       res.setHeader("Cache-Control", "private, max-age=60");
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
       return res.end(Buffer.from(m[2], "base64"));
     }
 
@@ -269,6 +270,10 @@ exports.servePhoto = async (req, res) => {
     res.setHeader("Content-Type", file.contentType || user.photoMime || "image/jpeg");
     res.setHeader("Content-Length", file.length);
     res.setHeader("Cache-Control", "private, max-age=60");
+    // <img src="…"> on a different origin (e.g. zyntrixsoftware.com loading from
+    // *.onrender.com) is blocked by helmet's default CORP same-origin policy.
+    // Photos are non-sensitive employee avatars — opt them into cross-origin.
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
     const stream = gridfs.openDownloadStream(user.photoFileId);
     stream.on("error", () => { if (!res.headersSent) res.status(404).end(); });
