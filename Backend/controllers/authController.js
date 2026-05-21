@@ -249,3 +249,66 @@ exports.resetPassword = async (req, res) => {
 
 // ── LEGACY: keep old forgotPassword route working (redirects to sendOtp logic)
 exports.forgotPassword = exports.sendOtp;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SMTP TEST — GET /api/auth/_smtp-check?to=<email>
+// HR / super_admin only. Sends a small test message through the SAME sendEmail
+// pipeline candidate notifications use, and returns the result (success or
+// nodemailer error code) as JSON so we don't have to scrape Railway logs.
+//
+// Usage:
+//   curl -H "Authorization: Bearer <token>" \
+//     "https://<host>/api/auth/_smtp-check?to=you@gmail.com"
+// ─────────────────────────────────────────────────────────────────────────────
+exports.smtpCheck = async (req, res) => {
+  try {
+    if (!req.user || !["hr", "super_admin"].includes(req.user.role)) {
+      return res.status(403).json({ msg: "Access denied — hr/super_admin only" });
+    }
+
+    const to = (req.query.to || req.body?.to || "").trim();
+    if (!to || !to.includes("@")) {
+      return res.status(400).json({ msg: 'Provide a valid recipient as ?to=<email>' });
+    }
+
+    const env = {
+      EMAIL_USER:        process.env.EMAIL_USER     || "(unset)",
+      EMAIL_FROM:        process.env.EMAIL_FROM     || "(unset)",
+      EMAIL_HOST:        process.env.EMAIL_HOST     || "(unset)",
+      EMAIL_PORT:        process.env.EMAIL_PORT     || "(unset)",
+      EMAIL_PASS:        process.env.EMAIL_PASS     ? "(set, " + process.env.EMAIL_PASS.length + " chars)" : "(unset)",
+      DEV_SKIP_EMAIL:    process.env.DEV_SKIP_EMAIL || "(unset)",
+      ALLOWED_EMAIL_DOMAIN: process.env.ALLOWED_EMAIL_DOMAIN || "(unset)",
+      EMAIL_FROM_matches_EMAIL_USER:
+        (process.env.EMAIL_FROM || process.env.EMAIL_USER) === process.env.EMAIL_USER
+    };
+
+    try {
+      await sendEmail(
+        to,
+        "Zyntrix HRMS - SMTP test",
+        "This is a diagnostic test message from Zyntrix HRMS to verify outbound email delivery. " +
+        "If you received this, SMTP is configured correctly for this recipient."
+      );
+      return res.json({ ok: true, msg: "SMTP test send OK", to, env });
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        msg: "SMTP test FAILED — see fields below for the exact reason",
+        to,
+        env,
+        smtpError: {
+          name:     err.name,
+          message:  err.message,
+          code:     err.code,
+          response: err.response,
+          responseCode: err.responseCode,
+          command:  err.command
+        }
+      });
+    }
+  } catch (err) {
+    console.error("[smtpCheck] unexpected:", err);
+    return res.status(500).json({ msg: "Server error: " + err.message });
+  }
+};

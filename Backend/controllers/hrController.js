@@ -1,6 +1,7 @@
 const Attendance   = require("../models/attendance");
 const ShiftRequest = require("../models/ShiftRequest");
 const User         = require("../models/user");
+const XLSX         = require("xlsx");
 
 function getUTCDate() {
   return new Date().toISOString().slice(0, 10);
@@ -166,7 +167,7 @@ exports.getEmployees = async (req, res) => {
     }
 
     const employees = await User.find(query)
-      .select("-password -otpCode -otpExpiry -otpResetToken")
+      .select("-password -otpCode -otpExpiry -otpResetToken -photo")  // photo omitted here (heavy) — fetched per-employee
       .populate("reportingTo", "name designation")
       .sort({ createdAt: -1 });
 
@@ -373,6 +374,71 @@ exports.getHrmsDashboard = async (req, res) => {
     });
   } catch (err) {
     console.error("HRMS DASHBOARD ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── EXPORT ALL EMPLOYEES TO EXCEL ─────────────────────────────────────────────
+// GET /api/hr/employees/export  → streams an .xlsx of every employee.
+// Generated on demand, so it always reflects the latest data (including any
+// edits employees made to their own profiles).
+exports.exportEmployees = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const employees = await User.find({ role: { $nin: ["super_admin"] } })
+      .select("-password -otpCode -otpExpiry -otpResetToken -photo")
+      .populate("reportingTo", "name")
+      .sort({ name: 1 });
+
+    const rows = employees.map(e => ({
+      "Employee ID":      "EMP-" + String(e._id).slice(-5).toUpperCase(),
+      "Name":             e.name || "",
+      "Email":            e.email || "",
+      "Role":             e.role || "",
+      "Phone":            e.phone || "",
+      "Department":       e.department || "",
+      "Designation":      e.designation || "",
+      "Employee Type":    e.employeeType || "",
+      "Date of Joining":  e.dateOfJoining || "",
+      "Salary (₹)":       e.salary || 0,
+      "Status":           e.employeeStatus || "",
+      "Reporting To":     e.reportingTo ? e.reportingTo.name : "",
+      "Work Location":    e.workLocation || "",
+      "Date of Birth":    e.dob || "",
+      "Gender":           e.gender || "",
+      "Address":          e.address || "",
+      "City":             e.city || "",
+      "State":            e.state || "",
+      "Emergency Contact":e.emergencyContact || "",
+      "Notes":            e.profileNote || ""
+    }));
+
+    // Ensure headers exist even when there are no employees yet.
+    const header = [
+      "Employee ID","Name","Email","Role","Phone","Department","Designation",
+      "Employee Type","Date of Joining","Salary (₹)","Status","Reporting To",
+      "Work Location","Date of Birth","Gender","Address","City","State",
+      "Emergency Contact","Notes"
+    ];
+    const ws = rows.length
+      ? XLSX.utils.json_to_sheet(rows, { header })
+      : XLSX.utils.aoa_to_sheet([header]);
+
+    // Reasonable column widths
+    ws["!cols"] = header.map(h => ({ wch: Math.max(12, h.length + 2) }));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Employees");
+
+    const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+    const stamp  = new Date().toISOString().slice(0, 10);
+
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename="employees_${stamp}.xlsx"`);
+    return res.send(buffer);
+  } catch (err) {
+    console.error("EXPORT EMPLOYEES ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
   }
 };

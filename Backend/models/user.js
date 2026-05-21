@@ -35,8 +35,23 @@ const userSchema = new mongoose.Schema({
   reportingTo:    { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
   employeeStatus: { type: String, enum: ["Active","On Leave","Terminated","Resigned"], default: "Active" },
   address:        { type: String, default: "" },
-  emergencyContact: { type: String, default: "" },
+  emergencyContact: { type: String, default: "" },   // human-readable summary (used by HR list)
   profileNote:    { type: String, default: "" },
+  workLocation:   { type: String, default: "On-site" },
+
+  // ── EMPLOYEE SELF-SERVICE PROFILE (filled from the employee Profile page) ──
+  photo:          { type: String, default: "" },     // data URL (resized thumbnail) stored in DB
+  dob:            { type: String, default: "" },      // "YYYY-MM-DD"
+  gender:         { type: String, default: "" },
+  city:           { type: String, default: "" },
+  state:          { type: String, default: "" },
+  bio:            { type: String, default: "" },
+  emergencyDetails: {
+    name:     { type: String, default: "" },
+    relation: { type: String, default: "" },
+    phone:    { type: String, default: "" },
+    altPhone: { type: String, default: "" }
+  },
 
   // OTP-based password reset
   otpCode:       { type: String },

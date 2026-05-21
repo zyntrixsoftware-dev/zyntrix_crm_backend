@@ -424,10 +424,124 @@ function goToday() {
   updateUI();
 }
 
-function showActionMessage(action) {
-  const savedKey = `attendance_${action}_${getLocalDate()}`;
-  localStorage.setItem(savedKey, new Date().toISOString());
-  alert(`${action === "leave" ? "Leave request" : "Shift swap request"} saved locally for ${shortDate(new Date())}.`);
+// ── REQUEST MODALS (Leave + Shift Swap) ───────────────────────────
+function openReqModal(id) {
+  const m = document.getElementById(id);
+  if (m) m.classList.add("open");
+}
+function closeReqModal(id) {
+  const m = document.getElementById(id);
+  if (m) m.classList.remove("open");
+}
+
+function openLeaveModal() {
+  const today = getLocalDate();
+  document.getElementById("leaveFrom").value = today;
+  document.getElementById("leaveTo").value   = today;
+  document.getElementById("leaveReason").value = "";
+  document.getElementById("leaveErr").textContent = "";
+  openReqModal("leaveModal");
+}
+
+function openSwapModal() {
+  document.getElementById("swapDate").value = key(selectedDate) || getLocalDate();
+  document.getElementById("swapReason").value = "";
+  document.getElementById("swapErr").textContent = "";
+  openReqModal("swapModal");
+}
+
+async function submitLeave() {
+  const fromDate  = document.getElementById("leaveFrom").value;
+  const toDate    = document.getElementById("leaveTo").value;
+  const leaveType = document.getElementById("leaveType").value;
+  const reason    = document.getElementById("leaveReason").value.trim();
+  const err       = document.getElementById("leaveErr");
+  const btn       = document.getElementById("leaveSubmitBtn");
+
+  err.textContent = "";
+  if (!fromDate || !toDate)  { err.textContent = "Please choose both dates."; return; }
+  if (toDate < fromDate)     { err.textContent = "End date can't be before the start date."; return; }
+
+  btn.disabled = true; btn.textContent = "Submitting…";
+  const res = await apiRequest("/requests", "POST", {
+    type: "leave", leaveType, fromDate, toDate, reason
+  });
+  btn.disabled = false; btn.textContent = "Submit for Approval";
+
+  if (res.error) { err.textContent = res.msg || "Could not submit request."; return; }
+
+  closeReqModal("leaveModal");
+  alert("Leave request submitted — pending HR approval.");
+  await loadMyRequests();
+}
+
+async function submitSwap() {
+  const date     = document.getElementById("swapDate").value;
+  const fromSlot = document.getElementById("swapFrom").value;
+  const toSlot   = document.getElementById("swapTo").value;
+  const reason   = document.getElementById("swapReason").value.trim();
+  const err      = document.getElementById("swapErr");
+  const btn      = document.getElementById("swapSubmitBtn");
+
+  err.textContent = "";
+  if (!date)               { err.textContent = "Please choose the shift date."; return; }
+  if (!toSlot)             { err.textContent = "Please choose the requested shift."; return; }
+  if (fromSlot && fromSlot === toSlot) { err.textContent = "Requested shift is the same as the current one."; return; }
+
+  btn.disabled = true; btn.textContent = "Submitting…";
+  const res = await apiRequest("/requests", "POST", {
+    type: "shift_swap", date, fromSlot, toSlot, reason
+  });
+  btn.disabled = false; btn.textContent = "Submit for Approval";
+
+  if (res.error) { err.textContent = res.msg || "Could not submit request."; return; }
+
+  closeReqModal("swapModal");
+  alert("Shift change request submitted — pending HR approval.");
+  await loadMyRequests();
+}
+
+// ── MY REQUESTS LIST ──────────────────────────────────────────────
+async function loadMyRequests() {
+  const list = document.getElementById("myRequestsList");
+  if (!list) return;
+  const res = await apiRequest("/requests/my");
+  if (res.error || !Array.isArray(res)) {
+    list.innerHTML = '<div class="req-empty">Could not load your requests.</div>';
+    return;
+  }
+  renderMyRequests(res.slice(0, 6));
+}
+
+function renderMyRequests(requests) {
+  const list = document.getElementById("myRequestsList");
+  if (!list) return;
+  if (!requests.length) {
+    list.innerHTML = '<div class="req-empty">No requests yet. Use Quick Actions above.</div>';
+    return;
+  }
+  list.innerHTML = requests.map(r => {
+    const isLeave = r.type === "leave";
+    const icon    = isLeave ? "▣" : "↔";
+    const iconBg  = isLeave ? "background:rgba(167,139,250,.18);color:#a78bfa"
+                            : "background:rgba(234,116,12,.18);color:#ea740c";
+    const title   = isLeave ? `${r.leaveType || "Leave"}` : "Shift change";
+    let sub;
+    if (isLeave) {
+      sub = r.fromDate === r.toDate
+        ? shortDate(r.fromDate + "T00:00:00")
+        : `${shortDate(r.fromDate + "T00:00:00")} → ${shortDate(r.toDate + "T00:00:00")}`;
+    } else {
+      sub = `${shortDate(r.date + "T00:00:00")} · ${r.toSlot || ""}`;
+    }
+    const badgeCls = r.status === "approved" ? "req-approved"
+                   : r.status === "rejected" ? "req-rejected" : "req-pending";
+    return `<div class="req-item">
+      <div class="req-ico" style="${iconBg}">${icon}</div>
+      <div class="req-main"><strong>${title}</strong><span>${sub}</span></div>
+      <span class="req-badge ${badgeCls}">${r.status}</span>
+    </div>`;
+  }).join("");
 }
 
 document.getElementById("prev").onclick = () => {
@@ -464,8 +578,21 @@ missedPunchLink.addEventListener("click", (event) => {
   alert("Missed punch requests are not connected to the backend yet. Please contact HR for correction.");
 });
 
-requestLeaveBtn.addEventListener("click", () => showActionMessage("leave"));
-swapShiftBtn.addEventListener("click", () => showActionMessage("swap"));
+requestLeaveBtn.addEventListener("click", openLeaveModal);
+swapShiftBtn.addEventListener("click", openSwapModal);
+
+const refreshRequestsLink = document.getElementById("refreshRequests");
+if (refreshRequestsLink) {
+  refreshRequestsLink.addEventListener("click", (e) => { e.preventDefault(); loadMyRequests(); });
+}
+
+// Close request modals on overlay click or Escape
+document.querySelectorAll(".zx-overlay").forEach(ov => {
+  ov.addEventListener("click", (e) => { if (e.target === ov) ov.classList.remove("open"); });
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") document.querySelectorAll(".zx-overlay.open").forEach(ov => ov.classList.remove("open"));
+});
 
 document.querySelectorAll("[data-action]").forEach((link) => {
   link.addEventListener("click", (event) => {
@@ -487,6 +614,7 @@ async function init() {
   render(currentDate);
   updateUI();
   updateClock();
+  loadMyRequests();
 }
 
 setInterval(updateClock, 1000);

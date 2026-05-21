@@ -209,6 +209,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <div class="nav-label">Operations</div>
     <a class="nav-item" href="../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
     <a class="nav-item" href="shift-requests.html"><span class="nav-icon">🔄</span> Shift Requests</a>
+    <a class="nav-item" href="requests.html"><span class="nav-icon">📨</span> Leave &amp; Requests</a>
     <a class="nav-item" href="../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations</a>
     <a class="nav-item" href="../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
@@ -235,6 +236,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <span>🔍</span>
       <input type="text" id="search-input" placeholder="Search by name, email, role…" oninput="debounceSearch()">
     </div>
+    <button class="topbar-btn" id="export-btn" onclick="exportToExcel()">⬇ Export Excel</button>
     <button class="topbar-btn primary" onclick="openCreateModal()">＋ Add Employee</button>
   </div>
 
@@ -582,7 +584,12 @@ async function viewProfile(id) {
 
   // header
   const initials = (emp.name || "?").split(" ").map(w => w[0]).slice(0,2).join("").toUpperCase();
-  document.getElementById("panel-avatar").textContent = initials;
+  const panelAvatar = document.getElementById("panel-avatar");
+  if (emp.photo) {
+    panelAvatar.innerHTML = `<img src="${emp.photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`;
+  } else {
+    panelAvatar.textContent = initials;
+  }
   document.getElementById("panel-name").textContent   = emp.name;
   document.getElementById("panel-role").textContent   = emp.designation || emp.role;
 
@@ -750,6 +757,43 @@ async function confirmTerminate() {
   pendingTermId = null;
   await loadEmployees();
   await loadDashboardKPIs();
+}
+
+// ── EXPORT TO EXCEL ───────────────────────────────────────────────
+// The export endpoint streams a binary .xlsx (needs the auth header), so we
+// fetch it directly and trigger a browser download instead of using apiRequest.
+async function exportToExcel() {
+  const btn = document.getElementById("export-btn");
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Exporting…";
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(API_BASE + "/hr/employees/export", {
+      headers: { ...(token && { Authorization: "Bearer " + token }) }
+    });
+    if (!res.ok) {
+      let msg = "Export failed";
+      try { msg = (await res.json()).msg || msg; } catch {}
+      showToast(msg, "err");
+      return;
+    }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url;
+    a.download = `employees_${new Date().toISOString().slice(0,10)}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast("Excel exported ✓", "ok");
+  } catch (err) {
+    showToast("Could not export: " + err.message, "err");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
 }
 
 // ── SEARCH + FILTERS ──────────────────────────────────────────────

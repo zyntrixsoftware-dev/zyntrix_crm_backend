@@ -15,6 +15,8 @@ const payrollRoutes    = require("./routes/payrollRoutes");
 const importRoutes          = require("./routes/importRoutes");
 const interviewOfferRoutes  = require("./routes/interviewOfferRoutes");
 const candidateRoutes       = require("./routes/candidateRoutes");
+const employeeRoutes        = require("./routes/employeeRoutes");
+const requestRoutes         = require("./routes/requestRoutes");
 
 const app = express();
 
@@ -32,6 +34,8 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,               // set in Railway env vars
   "https://zyntrixsoftware.com",
   "https://www.zyntrixsoftware.com",
+  // Render backend
+  "https://zyntrix-crm-backend.onrender.com",
   // Railway backend talking to itself (health checks etc)
   "https://zyntrixcrmbackend-production.up.railway.app",
   "https://zyntrixbackend-production-d32c.up.railway.app",
@@ -89,7 +93,9 @@ app.use("/api/auth/", authLimiter);
 
 // ── ROUTES ───────────────────────────────────────────────────────
 app.use("/api/auth",       authRoutes);
+app.use("/api/employee",   employeeRoutes);         // employee self-service profile
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/requests",   requestRoutes);          // leave / shift-swap requests (employee side)
 app.use("/api/hr",         hrRoutes);
 app.use("/api/shifts",     shiftRoutes);
 app.use("/api/payroll",    payrollRoutes);

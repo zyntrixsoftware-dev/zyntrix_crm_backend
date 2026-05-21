@@ -5,6 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Attendance</title>
 <link rel="stylesheet" href="../assets/css/attendance.css">
+<style>
+/* ── Quick-action request modals + My Requests panel ─────────────── */
+.zx-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+.zx-overlay.open{opacity:1;pointer-events:all}
+.zx-modal{background:#0f1b2d;border:1px solid rgba(255,255,255,.14);border-radius:14px;width:440px;max-width:92vw;max-height:90vh;overflow-y:auto;color:#e2e8f0;font-family:inherit}
+.zx-modal h3{margin:0;font-size:16px;font-weight:600}
+.zx-modal-hd{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.zx-modal-close{background:none;border:none;color:#64748b;font-size:22px;line-height:1;cursor:pointer}
+.zx-modal-close:hover{color:#e2e8f0}
+.zx-modal-body{padding:18px 20px}
+.zx-fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.zx-fg label{font-size:12px;font-weight:500;color:#94a3b8}
+.zx-fg input,.zx-fg select,.zx-fg textarea{background:#16263b;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;font-family:inherit;outline:none;width:100%}
+.zx-fg input:focus,.zx-fg select:focus,.zx-fg textarea:focus{border-color:#22d3c8}
+.zx-fg textarea{resize:vertical;min-height:64px}
+.zx-fg select option{background:#0f1b2d}
+.zx-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.zx-modal-ft{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.zx-btn{padding:9px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#e2e8f0;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;transition:all .15s}
+.zx-btn:hover{background:rgba(255,255,255,.06)}
+.zx-btn.primary{background:#22d3c8;border-color:#22d3c8;color:#06231f}
+.zx-btn.primary:hover{filter:brightness(1.08)}
+.zx-btn:disabled{opacity:.5;cursor:not-allowed}
+.zx-err{color:#ff7a7d;font-size:12px;margin-top:4px;min-height:14px}
+/* My Requests list */
+.req-list{display:flex;flex-direction:column;gap:8px}
+.req-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:rgba(255,255,255,.02)}
+.req-ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.req-main{flex:1;min-width:0}
+.req-main strong{display:block;font-size:12.5px;font-weight:600}
+.req-main span{font-size:11px;color:#94a3b8}
+.req-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.req-pending{background:rgba(245,158,11,.16);color:#f59e0b}
+.req-approved{background:rgba(34,197,94,.16);color:#22c55e}
+.req-rejected{background:rgba(244,63,94,.16);color:#f43f5e}
+.req-empty{font-size:12px;color:#64748b;padding:6px 2px}
+</style>
 </head>
 
 <body>
@@ -198,9 +235,100 @@
             <button id="swapShiftBtn" type="button"><span class="orange">↔</span>Swap Shift<i>›</i></button>
           </div>
         </section>
+
+        <section class="panel">
+          <div class="panel-title-row">
+            <h3>My Requests</h3>
+            <a id="refreshRequests" href="#">Refresh</a>
+          </div>
+          <p class="panel-copy">Leave &amp; shift requests you've submitted. HR approval shows here once reviewed.</p>
+          <div id="myRequestsList" class="req-list">
+            <div class="req-empty">Loading…</div>
+          </div>
+        </section>
       </aside>
     </section>
   </main>
+</div>
+
+<!-- ── REQUEST LEAVE MODAL ─────────────────────────────────────────── -->
+<div class="zx-overlay" id="leaveModal">
+  <div class="zx-modal" role="dialog" aria-modal="true">
+    <div class="zx-modal-hd">
+      <h3>Request Leave</h3>
+      <button class="zx-modal-close" type="button" onclick="closeReqModal('leaveModal')">×</button>
+    </div>
+    <div class="zx-modal-body">
+      <div class="zx-fg">
+        <label>Leave Type</label>
+        <select id="leaveType">
+          <option>Annual Leave</option>
+          <option>Sick Leave</option>
+          <option>Casual Leave</option>
+          <option>Comp-off</option>
+          <option>Unpaid Leave</option>
+        </select>
+      </div>
+      <div class="zx-grid2">
+        <div class="zx-fg"><label>From</label><input type="date" id="leaveFrom"></div>
+        <div class="zx-fg"><label>To</label><input type="date" id="leaveTo"></div>
+      </div>
+      <div class="zx-fg">
+        <label>Reason</label>
+        <textarea id="leaveReason" placeholder="Briefly describe your reason…"></textarea>
+      </div>
+      <div class="zx-err" id="leaveErr"></div>
+    </div>
+    <div class="zx-modal-ft">
+      <button class="zx-btn" type="button" onclick="closeReqModal('leaveModal')">Cancel</button>
+      <button class="zx-btn primary" id="leaveSubmitBtn" type="button" onclick="submitLeave()">Submit for Approval</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SWAP SHIFT MODAL ────────────────────────────────────────────── -->
+<div class="zx-overlay" id="swapModal">
+  <div class="zx-modal" role="dialog" aria-modal="true">
+    <div class="zx-modal-hd">
+      <h3>Swap / Change Shift</h3>
+      <button class="zx-modal-close" type="button" onclick="closeReqModal('swapModal')">×</button>
+    </div>
+    <div class="zx-modal-body">
+      <div class="zx-fg">
+        <label>Shift Date</label>
+        <input type="date" id="swapDate">
+      </div>
+      <div class="zx-grid2">
+        <div class="zx-fg">
+          <label>Current Shift</label>
+          <select id="swapFrom">
+            <option value="09:00-18:00">09:00 – 18:00</option>
+            <option value="10:00-19:00">10:00 – 19:00</option>
+            <option value="12:00-21:00">12:00 – 21:00</option>
+            <option value="">Off / None</option>
+          </select>
+        </div>
+        <div class="zx-fg">
+          <label>Requested Shift</label>
+          <select id="swapTo">
+            <option value="09:00-18:00">09:00 – 18:00</option>
+            <option value="10:00-19:00">10:00 – 19:00</option>
+            <option value="12:00-21:00">12:00 – 21:00</option>
+            <option value="14:00-23:00">14:00 – 23:00</option>
+          </select>
+        </div>
+      </div>
+      <div class="zx-fg">
+        <label>Reason</label>
+        <textarea id="swapReason" placeholder="Why do you need this change?"></textarea>
+      </div>
+      <div class="zx-err" id="swapErr"></div>
+    </div>
+    <div class="zx-modal-ft">
+      <button class="zx-btn" type="button" onclick="closeReqModal('swapModal')">Cancel</button>
+      <button class="zx-btn primary" id="swapSubmitBtn" type="button" onclick="submitSwap()">Submit for Approval</button>
+    </div>
+  </div>
 </div>
 
 <script src="../assets/js/api.js"></script>
@@ -212,10 +340,11 @@ requireModuleAccess("attendance");
 
 const user = JSON.parse(localStorage.getItem("user"));
 if (user) {
-  userName.innerText = user.name || "Zyntrix Employee";
-  sideUserName.innerText = user.name || "Zyntrix Employee";
-  sideUserEmail.innerText = user.email || "employee@zyntrix.com";
-  userRole.innerText = user.role ? user.role.replace("_", " ") : "Employee";
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+  set("userName", user.name || "Zyntrix Employee");
+  set("sideUserName", user.name || "Zyntrix Employee");
+  set("sideUserEmail", user.email || "employee@zyntrix.com");
+  set("userRole", user.role ? user.role.replace("_", " ") : "Employee");
 }
 
 </script>
