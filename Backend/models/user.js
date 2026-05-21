@@ -55,6 +55,15 @@ const userSchema = new mongoose.Schema({
     altPhone: { type: String, default: "" }
   },
 
+  // ── EMPLOYEE APP SETTINGS (self-service Settings page) ──────────
+  // Free-form object holding the user's preferences (notifications,
+  // appearance, attendance prefs, privacy, language, integrations).
+  settings: { type: mongoose.Schema.Types.Mixed, default: {} },
+
+  // Account-level activation. Set to false when the employee self-deactivates
+  // from Settings → Danger Zone. Login is blocked while this is false.
+  active: { type: Boolean, default: true },
+
   // OTP-based password reset
   otpCode:       { type: String },
   otpExpiry:     { type: Date },

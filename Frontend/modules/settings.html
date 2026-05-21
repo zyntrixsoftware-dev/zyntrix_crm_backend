@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="../assets/css/attendance.css">
 <link rel="stylesheet" href="../assets/css/module-pages.css">
 <link rel="stylesheet" href="../assets/css/profile-settings.css">
+<link rel="stylesheet" href="../assets/css/theme.css">
+<script src="../assets/js/appearance.js"></script>
+<!-- SheetJS — used by the "Export Now" (Excel) integration to build .xlsx client-side -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -158,15 +162,6 @@
               <label class="toggle-switch"><input type="checkbox" id="n-miss-email" checked><span class="toggle-knob"></span></label>
               <label class="toggle-switch"><input type="checkbox" id="n-miss-app"   checked><span class="toggle-knob"></span></label>
               <label class="toggle-switch"><input type="checkbox" id="n-miss-sms"        ><span class="toggle-knob"></span></label>
-            </div>
-            <div class="notif-row">
-              <div>
-                <strong>Payslip Available</strong>
-                <p>When monthly payslip is generated</p>
-              </div>
-              <label class="toggle-switch"><input type="checkbox" id="n-pay-email" checked><span class="toggle-knob"></span></label>
-              <label class="toggle-switch"><input type="checkbox" id="n-pay-app"   checked><span class="toggle-knob"></span></label>
-              <label class="toggle-switch"><input type="checkbox" id="n-pay-sms"   checked><span class="toggle-knob"></span></label>
             </div>
             <div class="notif-row">
               <div>
@@ -638,10 +633,12 @@ const user = getUser();
 if (user) {
   const name = user.name || "Zyntrix Employee";
   const role = (user.role || "employee").replace(/_/g, " ");
-  document.getElementById("userName").innerText      = name;
-  document.getElementById("userRole").innerText      = role;
-  document.getElementById("sideUserName").innerText  = name;
-  document.getElementById("sideUserEmail").innerText = user.email || "";
+  // Null-safe: not every element exists on this page (e.g. no sidebar user block).
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+  setText("userName",      name);
+  setText("userRole",      role);
+  setText("sideUserName",  name);
+  setText("sideUserEmail", user.email || "");
 }
 
 // ── Settings Navigation ───────────────────────────────────────────
@@ -666,8 +663,36 @@ document.querySelectorAll(".theme-card").forEach(card => {
   card.addEventListener("click", () => {
     document.querySelectorAll(".theme-card").forEach(c => c.classList.remove("active"));
     card.classList.add("active");
+    const radio = card.querySelector('input[name="theme"]');
+    if (radio) radio.checked = true;
+    applyAppearanceLive();
   });
 });
+
+// ── Density + compact-sidebar apply instantly ─────────────────────
+document.querySelectorAll('input[name="density"]').forEach(r =>
+  r.addEventListener("change", applyAppearanceLive));
+document.getElementById("s-compactSidebar")
+  ?.addEventListener("change", applyAppearanceLive);
+
+// Reads the current appearance choices from the form and applies them live
+// (and persists to localStorage so the choice carries across pages).
+function currentAppearanceFromUI() {
+  return {
+    theme:          document.querySelector('input[name="theme"]:checked')?.value || "dark",
+    density:        document.querySelector('input[name="density"]:checked')?.value || "default",
+    calView:        val("s-calView"),
+    weekStart:      val("s-weekStart"),
+    compactSidebar: chk("s-compactSidebar")
+  };
+}
+function applyAppearanceLive() {
+  const a = currentAppearanceFromUI();
+  const stored = loadLocalSettings();
+  stored.appearance = { ...(stored.appearance || {}), ...a };
+  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(stored));
+  if (window.ZyntrixAppearance) window.ZyntrixAppearance.apply(a);
+}
 
 // ── Save settings (reads UI, persists to localStorage + API) ──────
 async function saveSettings(section) {
@@ -680,7 +705,6 @@ async function saveSettings(section) {
       leave:   { email: chk("n-leave-email"), app: chk("n-leave-app"), sms: chk("n-leave-sms") },
       shift:   { email: chk("n-shift-email"), app: chk("n-shift-app"), sms: chk("n-shift-sms") },
       missed:  { email: chk("n-miss-email"),  app: chk("n-miss-app"),  sms: chk("n-miss-sms")  },
-      payslip: { email: chk("n-pay-email"),   app: chk("n-pay-app"),   sms: chk("n-pay-sms")   },
       holiday: { email: chk("n-hol-email"),   app: chk("n-hol-app"),   sms: chk("n-hol-sms")   },
       perf:    { email: chk("n-perf-email"),  app: chk("n-perf-app"),  sms: chk("n-perf-sms")  },
       punchBefore: val("s-punchBefore"),
@@ -731,6 +755,11 @@ async function saveSettings(section) {
   const merged = { ...stored, ...patch };
   localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
 
+  // Reflect appearance changes immediately on this page
+  if (patch.appearance && window.ZyntrixAppearance) {
+    window.ZyntrixAppearance.apply(patch.appearance);
+  }
+
   // Try to persist to server
   const res = await apiRequest("/employee/settings", "PUT", patch);
   if (res.error) {
@@ -752,7 +781,7 @@ function applySettings(s) {
   // Notifications
   if (s.notifications) {
     const n = s.notifications;
-    const map = { punch:"n-punch",leave:"n-leave",shift:"n-shift",missed:"n-miss",payslip:"n-pay",holiday:"n-hol",perf:"n-perf" };
+    const map = { punch:"n-punch",leave:"n-leave",shift:"n-shift",missed:"n-miss",holiday:"n-hol",perf:"n-perf" };
     Object.entries(map).forEach(([key, prefix]) => {
       if (n[key]) {
         setChk(prefix + "-email", n[key].email);
@@ -770,6 +799,17 @@ function applySettings(s) {
     if (a.compactSidebar !== undefined) setChk("s-compactSidebar", a.compactSidebar);
     if (a.calView)   setVal("s-calView",   a.calView);
     if (a.weekStart) setVal("s-weekStart", a.weekStart);
+    if (a.theme) {
+      document.querySelectorAll('input[name="theme"]').forEach(r => { r.checked = (r.value === a.theme); });
+      document.querySelectorAll('.theme-card').forEach(c => {
+        const rv = c.querySelector('input[name="theme"]')?.value;
+        c.classList.toggle('active', rv === a.theme);
+      });
+    }
+    if (a.density) {
+      document.querySelectorAll('input[name="density"]').forEach(r => { r.checked = (r.value === a.density); });
+    }
+    if (window.ZyntrixAppearance) window.ZyntrixAppearance.apply(a);
   }
 
   // Attendance
@@ -827,9 +867,53 @@ function toggleIntegration(name, btn) {
   }
 }
 
-function exportExcel() {
-  showToast("settingsToast", "Requesting export… check your email shortly.", "ok");
-  apiRequest("/attendance/export", "POST");
+async function exportExcel() {
+  if (typeof XLSX === "undefined") {
+    showToast("settingsToast", "Excel library still loading — try again in a moment.", "warn");
+    return;
+  }
+  showToast("settingsToast", "Building your Excel export…", "ok");
+  const res = await apiRequest("/employee/data-export", "POST");
+  if (res.error || !res.export) {
+    showToast("settingsToast", res.msg || "Export failed", "err");
+    return;
+  }
+  buildAndDownloadXlsx(res.export);
+  showToast("settingsToast", "Excel file downloaded.", "ok");
+}
+
+// Builds a multi-sheet .xlsx (Profile / Attendance / Requests) from the
+// data-export payload and triggers a download.
+function buildAndDownloadXlsx(data) {
+  const wb = XLSX.utils.book_new();
+
+  const p = data.profile || {};
+  const profileRows = Object.entries(p)
+    .filter(([k]) => !["__v", "settings"].includes(k))
+    .map(([k, v]) => ({ Field: k, Value: (v != null && typeof v === "object") ? JSON.stringify(v) : v }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(profileRows.length ? profileRows : [{ Field: "", Value: "" }]), "Profile");
+
+  const att = (data.attendance || []).map(a => ({
+    Date:        a.date || "",
+    "Punch In":  a.punchIn  ? new Date(a.punchIn).toLocaleString()  : "",
+    "Punch Out": a.punchOut ? new Date(a.punchOut).toLocaleString() : ""
+  }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(att.length ? att : [{ Date: "", "Punch In": "", "Punch Out": "" }]), "Attendance");
+
+  const reqs = (data.requests || []).map(r => ({
+    Type:         r.type || "",
+    "Leave Type": r.leaveType || "",
+    Duration:     r.dayType || "",
+    From:         r.fromDate || r.date || "",
+    To:           r.toDate || "",
+    Slot:         r.halfDaySlot || r.toSlot || "",
+    Status:       r.status || "",
+    Reason:       r.reason || "",
+    Submitted:    r.createdAt ? new Date(r.createdAt).toLocaleString() : ""
+  }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(reqs.length ? reqs : [{ Type: "" }]), "Requests");
+
+  XLSX.writeFile(wb, `zyntrix-my-data-${dateStamp()}.xlsx`);
 }
 
 // ── Danger Zone ───────────────────────────────────────────────────
@@ -858,9 +942,33 @@ async function deactivateAccount() {
   logout();
 }
 
-function requestDataExport() {
-  showToast("settingsToast", "Data export request submitted. You'll receive an email within 48 hours.", "ok");
-  apiRequest("/employee/data-export", "POST");
+async function requestDataExport() {
+  showToast("settingsToast", "Preparing your data export…", "ok");
+  const res = await apiRequest("/employee/data-export", "POST");
+  if (res.error || !res.export) {
+    showToast("settingsToast", res.msg || "Export failed", "err");
+    return;
+  }
+  downloadBlob(
+    new Blob([JSON.stringify(res.export, null, 2)], { type: "application/json" }),
+    `zyntrix-my-data-${dateStamp()}.json`
+  );
+  showToast("settingsToast", "Your data was downloaded as a JSON file.", "ok");
+}
+
+// ── Download helpers ──────────────────────────────────────────────
+function dateStamp() {
+  return new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+}
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────

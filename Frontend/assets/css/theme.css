@@ -1,0 +1,69 @@
+/* ════════════════════════════════════════════════════════════════════
+   Zyntrix — employee appearance overrides
+   Driven by attributes set on <html> by appearance.js:
+     data-theme           = "dark" | "light"      (resolved; "system" → either)
+     data-density         = "compact" | "default" | "comfortable"
+     data-compact-sidebar = "true"   | (absent)
+   The base (dark) palette lives in attendance.css :root. For light mode we
+   re-declare the same CSS variables so every var()-driven surface flips, then
+   patch the handful of hardcoded colours that aren't variable-based.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── LIGHT THEME — palette overrides ─────────────────────────────── */
+html[data-theme="light"] {
+  --page: #eef2f7;
+  --sidebar: #ffffff;
+  --panel: #ffffff;
+  --panel-2: #f4f8fc;
+  --muted-panel: #eef2f7;
+  --border: #d4dcea;
+  --border-soft: #e3e9f2;
+  --text: #0f1d33;
+  --muted: #4a5973;
+  --faint: #7b8499;
+  --teal: #0d9488;
+  --cyan: #0e90bd;
+  --blue: #1d56b6;
+  --blue-soft: #b9cdf0;
+  --red: #c8292c;
+  --yellow: #b07d08;
+  --purple: #7c3aed;
+  --orange: #cf640a;
+}
+
+/* ── LIGHT THEME — patch hardcoded (non-variable) surfaces ───────── */
+html[data-theme="light"] body { background: var(--page); color: var(--text); }
+html[data-theme="light"] .sidebar { background: #ffffff; }
+html[data-theme="light"] .topbar  { background: #f7fafd; }
+html[data-theme="light"] .brand strong { color: #0d9488; }
+html[data-theme="light"] .nav-icon { color: #5a6883; }
+html[data-theme="light"] .side-nav a { color: var(--text); }
+html[data-theme="light"] .side-nav a.active { background: #e6eef9; }
+html[data-theme="light"] .active .nav-icon { color: var(--teal); }
+html[data-theme="light"] .snav-item:hover,
+html[data-theme="light"] .snav-item.active { background: #e6eef9; }
+html[data-theme="light"] .btn-ghost:hover  { background: #e6eef9; }
+html[data-theme="light"] .toggle-knob { background: #c2cbdb; }
+html[data-theme="light"] .integration-item,
+html[data-theme="light"] .danger-item { background: var(--panel-2); }
+html[data-theme="light"] .section-panel { box-shadow: 0 8px 22px rgba(15, 29, 51, 0.08); }
+
+/* ── DISPLAY DENSITY ─────────────────────────────────────────────── */
+html[data-density="compact"] .module-content { padding: 12px 18px 18px; gap: 12px; }
+html[data-density="compact"] .subsection      { margin-bottom: 14px; }
+html[data-density="compact"] .notif-row        { padding: 8px 12px; }
+html[data-density="compact"] .setting-row      { padding: 8px 0; }
+html[data-density="compact"] .settings-panel-hd { margin-bottom: 14px; }
+
+html[data-density="comfortable"] .module-content { padding: 30px 34px 40px; gap: 26px; }
+html[data-density="comfortable"] .subsection      { margin-bottom: 36px; }
+html[data-density="comfortable"] .notif-row        { padding: 20px 16px; }
+html[data-density="comfortable"] .setting-row      { padding: 20px 0; }
+html[data-density="comfortable"] .settings-panel-hd { margin-bottom: 32px; }
+
+/* ── COMPACT SIDEBAR ─────────────────────────────────────────────── */
+html[data-compact-sidebar="true"] .app { grid-template-columns: 86px minmax(0, 1fr); }
+html[data-compact-sidebar="true"] .brand { justify-content: center; padding: 0; }
+html[data-compact-sidebar="true"] .brand div:not(.brand-mark) { display: none; }
+html[data-compact-sidebar="true"] .side-nav a { font-size: 0; justify-content: center; padding: 0; gap: 0; }
+html[data-compact-sidebar="true"] .nav-icon { font-size: 22px; }

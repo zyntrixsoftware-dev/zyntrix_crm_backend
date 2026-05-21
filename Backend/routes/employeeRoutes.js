@@ -6,7 +6,11 @@ const {
   updateMyProfile,
   uploadMyPhoto,
   servePhoto,
-  deleteMyPhoto
+  deleteMyPhoto,
+  getMySettings,
+  updateMySettings,
+  deactivateAccount,
+  requestDataExport
 } = require("../controllers/employeeController");
 const auth = require("../middleware/authMiddleware");
 
@@ -33,5 +37,13 @@ router.delete("/photo", auth, deleteMyPhoto);
 // Auth-optional so img tags work without custom headers; the URL needs to
 // know the userId, which is only available to logged-in views.
 router.get("/photo/:userId", servePhoto);
+
+// ── App settings (self-service Settings page) ──────────────────────────────
+router.get("/settings", auth, getMySettings);
+router.put("/settings", auth, updateMySettings);
+
+// ── Account actions (Settings → Danger Zone / Privacy) ─────────────────────
+router.post("/deactivate",  auth, deactivateAccount);
+router.post("/data-export", auth, requestDataExport);
 
 module.exports = router;

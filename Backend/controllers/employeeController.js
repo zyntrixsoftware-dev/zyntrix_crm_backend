@@ -311,3 +311,114 @@ exports.deleteMyPhoto = async (req, res) => {
 exports.revokeSessions = async (req, res) => {
   return res.json({ msg: "All sessions revoked. Please log in again." });
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EMPLOYEE APP SETTINGS  (notifications / appearance / attendance prefs /
+// privacy / language / integrations). Stored as a free-form object on the user.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Recursively merge `patch` into `base` (objects merge, scalars/arrays replace).
+function deepMerge(base, patch) {
+  const out = (base && typeof base === "object" && !Array.isArray(base)) ? { ...base } : {};
+  if (!patch || typeof patch !== "object" || Array.isArray(patch)) return patch;
+  for (const [k, v] of Object.entries(patch)) {
+    if (v && typeof v === "object" && !Array.isArray(v) &&
+        out[k] && typeof out[k] === "object" && !Array.isArray(out[k])) {
+      out[k] = deepMerge(out[k], v);
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
+// ── GET /api/employee/settings ───────────────────────────────────────────────
+exports.getMySettings = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("settings");
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    return res.json({ settings: user.settings || {} });
+  } catch (err) {
+    console.error("GET MY SETTINGS ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── PUT /api/employee/settings ───────────────────────────────────────────────
+// Body is a partial settings patch (e.g. { appearance: {...} }). We deep-merge
+// it into the stored settings so each section can be saved independently.
+exports.updateMySettings = async (req, res) => {
+  try {
+    const patch = req.body || {};
+    if (typeof patch !== "object" || Array.isArray(patch)) {
+      return res.status(400).json({ msg: "Settings payload must be an object" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    user.settings = deepMerge(user.settings || {}, patch);
+    user.markModified("settings");   // required for Mixed-type fields
+    await user.save();
+
+    return res.json({ msg: "Settings saved", settings: user.settings });
+  } catch (err) {
+    console.error("UPDATE MY SETTINGS ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── POST /api/employee/deactivate ────────────────────────────────────────────
+// Self-service account deactivation (Settings → Danger Zone). Login is blocked
+// while `active` is false; HR can flip it back on.
+exports.deactivateAccount = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    user.active = false;
+    if (user.employeeStatus && user.employeeStatus !== "Terminated") {
+      user.employeeStatus = "On Leave";
+    }
+    await user.save();
+
+    return res.json({ msg: "Account deactivated. Contact HR to reactivate." });
+  } catch (err) {
+    console.error("DEACTIVATE ACCOUNT ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ── POST /api/employee/data-export ───────────────────────────────────────────
+// Compiles a copy of the employee's own data (profile, settings, attendance,
+// leave/shift requests) and returns it so the client can download it.
+exports.requestDataExport = async (req, res) => {
+  try {
+    const Attendance      = require("../models/attendance");
+    const EmployeeRequest = require("../models/EmployeeRequest");
+
+    const user = await User.findById(req.user.id)
+      .select("-password -otpCode -otpExpiry -otpResetToken -otpVerified")
+      .lean();
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    const [attendance, requests] = await Promise.all([
+      Attendance.find({ userId: req.user.id }).sort({ date: -1 }).lean(),
+      EmployeeRequest.find({ userId: req.user.id }).sort({ createdAt: -1 }).lean()
+    ]);
+
+    return res.json({
+      msg: "Data export ready",
+      export: {
+        exportedAt: new Date().toISOString(),
+        profile:    user,
+        settings:   user.settings || {},
+        attendance,
+        requests
+      }
+    });
+  } catch (err) {
+    console.error("DATA EXPORT ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};

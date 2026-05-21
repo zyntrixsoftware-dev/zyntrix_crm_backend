@@ -46,6 +46,11 @@ exports.login = async (req, res) => {
       return res.status(400).json({ msg: "Invalid email or password" });
     }
 
+    // Blocked while the employee has self-deactivated their account.
+    if (user.active === false) {
+      return res.status(403).json({ msg: "Your account is deactivated. Please contact HR to reactivate it." });
+    }
+
     if (!process.env.JWT_SECRET) {
       return res.status(500).json({ msg: "Server configuration error" });
     }
