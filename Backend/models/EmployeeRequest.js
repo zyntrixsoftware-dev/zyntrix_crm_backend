@@ -28,6 +28,12 @@ const employeeRequestSchema = new mongoose.Schema(
     fromDate:  { type: String, default: "" },    // "YYYY-MM-DD"
     toDate:    { type: String, default: "" },    // "YYYY-MM-DD"
 
+    // Leave duration — "full" (default, multi-day range) or "half" (single day, half-day slot)
+    dayType:     { type: String, enum: ["full", "half"], default: "full" },
+    // For half-day leave: the chosen slot. One of:
+    //   "10:00-13:00" (10:00 AM – 1:00 PM)  or  "14:00-17:00" (2:00 PM – 5:00 PM)
+    halfDaySlot: { type: String, default: "" },
+
     // Shift-swap fields
     date:      { type: String, default: "" },    // the shift date to change "YYYY-MM-DD"
     fromSlot:  { type: String, default: "" },    // current slot, e.g. "09:00-18:00"

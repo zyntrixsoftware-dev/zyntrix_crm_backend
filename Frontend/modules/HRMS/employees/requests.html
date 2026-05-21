@@ -307,8 +307,17 @@ function switchTab(tab) {
 function typeLabel(t)  { return t === "leave" ? "Leave" : "Shift change"; }
 function typeBadge(t)  { return t === "leave" ? "b-purple" : "b-blue"; }
 
+function halfSlotLabel(slot) {
+  if (slot === "10:00-13:00") return "10:00 AM – 1:00 PM";
+  if (slot === "14:00-17:00") return "2:00 PM – 5:00 PM";
+  return slot || "Half day";
+}
+
 function detailText(r) {
   if (r.type === "leave") {
+    if (r.dayType === "half") {
+      return `${esc(r.leaveType || "Leave")} · Half day · ${fmt(r.fromDate)} (${esc(halfSlotLabel(r.halfDaySlot))})`;
+    }
     const range = r.fromDate === r.toDate ? fmt(r.fromDate) : `${fmt(r.fromDate)} → ${fmt(r.toDate)}`;
     return `${esc(r.leaveType || "Leave")} · ${range}`;
   }
@@ -401,10 +410,18 @@ function openDetail(id) {
   const reviewedBy = r.reviewedBy?.name || "—";
   const reviewedAt = r.reviewedAt ? new Date(r.reviewedAt).toLocaleString() : "—";
 
-  const specific = r.type === "leave"
+  const leaveDetail = r.dayType === "half"
     ? `<div class="info-row"><span class="info-key">Leave type</span><span class="info-val">${esc(r.leaveType || "—")}</span></div>
+       <div class="info-row"><span class="info-key">Duration</span><span class="info-val">Half day</span></div>
+       <div class="info-row"><span class="info-key">Date</span><span class="info-val">${fmtLong(r.fromDate)}</span></div>
+       <div class="info-row"><span class="info-key">Slot</span><span class="info-val">${esc(halfSlotLabel(r.halfDaySlot))}</span></div>`
+    : `<div class="info-row"><span class="info-key">Leave type</span><span class="info-val">${esc(r.leaveType || "—")}</span></div>
+       <div class="info-row"><span class="info-key">Duration</span><span class="info-val">Full day</span></div>
        <div class="info-row"><span class="info-key">From</span><span class="info-val">${fmtLong(r.fromDate)}</span></div>
-       <div class="info-row"><span class="info-key">To</span><span class="info-val">${fmtLong(r.toDate)}</span></div>`
+       <div class="info-row"><span class="info-key">To</span><span class="info-val">${fmtLong(r.toDate)}</span></div>`;
+
+  const specific = r.type === "leave"
+    ? leaveDetail
     : `<div class="info-row"><span class="info-key">Shift date</span><span class="info-val">${fmtLong(r.date)}</span></div>
        <div class="info-row"><span class="info-key">Current shift</span><span class="info-val" style="font-family:var(--mono)">${esc(r.fromSlot || "—")}</span></div>
        <div class="info-row"><span class="info-key">Requested shift</span><span class="info-val" style="font-family:var(--mono)">${esc(r.toSlot || "—")}</span></div>`;

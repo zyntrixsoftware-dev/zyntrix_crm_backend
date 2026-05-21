@@ -465,9 +465,20 @@ function openLeaveModal() {
   const today = getLocalDate();
   document.getElementById("leaveFrom").value = today;
   document.getElementById("leaveTo").value   = today;
+  document.getElementById("leaveHalfDate").value = today;
+  document.getElementById("leaveHalfSlot").value = "10:00-13:00";
+  document.getElementById("leaveDayType").value  = "full";
   document.getElementById("leaveReason").value = "";
   document.getElementById("leaveErr").textContent = "";
+  onLeaveDayTypeChange();
   openReqModal("leaveModal");
+}
+
+// Toggle between full-day (date range) and half-day (single date + slot) fields.
+function onLeaveDayTypeChange() {
+  const isHalf = document.getElementById("leaveDayType").value === "half";
+  document.getElementById("leaveFullDayFields").style.display = isHalf ? "none" : "";
+  document.getElementById("leaveHalfDayFields").style.display = isHalf ? "" : "none";
 }
 
 function openSwapModal() {
@@ -478,21 +489,37 @@ function openSwapModal() {
 }
 
 async function submitLeave() {
-  const fromDate  = document.getElementById("leaveFrom").value;
-  const toDate    = document.getElementById("leaveTo").value;
   const leaveType = document.getElementById("leaveType").value;
+  const dayType   = document.getElementById("leaveDayType").value;
   const reason    = document.getElementById("leaveReason").value.trim();
   const err       = document.getElementById("leaveErr");
   const btn       = document.getElementById("leaveSubmitBtn");
 
   err.textContent = "";
-  if (!fromDate || !toDate)  { err.textContent = "Please choose both dates."; return; }
-  if (toDate < fromDate)     { err.textContent = "End date can't be before the start date."; return; }
+
+  let payload;
+  if (dayType === "half") {
+    const halfDate = document.getElementById("leaveHalfDate").value;
+    const slot     = document.getElementById("leaveHalfSlot").value;
+    if (!halfDate) { err.textContent = "Please choose a date for your half-day leave."; return; }
+    if (!["10:00-13:00", "14:00-17:00"].includes(slot)) {
+      err.textContent = "Please choose a half-day slot.";
+      return;
+    }
+    payload = {
+      type: "leave", leaveType, dayType: "half",
+      fromDate: halfDate, toDate: halfDate, halfDaySlot: slot, reason
+    };
+  } else {
+    const fromDate = document.getElementById("leaveFrom").value;
+    const toDate   = document.getElementById("leaveTo").value;
+    if (!fromDate || !toDate) { err.textContent = "Please choose both dates."; return; }
+    if (toDate < fromDate)    { err.textContent = "End date can't be before the start date."; return; }
+    payload = { type: "leave", leaveType, dayType: "full", fromDate, toDate, reason };
+  }
 
   btn.disabled = true; btn.textContent = "Submitting…";
-  const res = await apiRequest("/requests", "POST", {
-    type: "leave", leaveType, fromDate, toDate, reason
-  });
+  const res = await apiRequest("/requests", "POST", payload);
   btn.disabled = false; btn.textContent = "Submit for Approval";
 
   if (res.error) { err.textContent = res.msg || "Could not submit request."; return; }
@@ -540,6 +567,13 @@ async function loadMyRequests() {
   renderMyRequests(res.slice(0, 6));
 }
 
+// Human-readable label for a half-day leave slot value.
+function halfSlotLabel(slot) {
+  if (slot === "10:00-13:00") return "10:00 AM – 1:00 PM";
+  if (slot === "14:00-17:00") return "2:00 PM – 5:00 PM";
+  return slot || "Half day";
+}
+
 function renderMyRequests(requests) {
   const list = document.getElementById("myRequestsList");
   if (!list) return;
@@ -552,12 +586,19 @@ function renderMyRequests(requests) {
     const icon    = isLeave ? "▣" : "↔";
     const iconBg  = isLeave ? "background:rgba(167,139,250,.18);color:#a78bfa"
                             : "background:rgba(234,116,12,.18);color:#ea740c";
-    const title   = isLeave ? `${r.leaveType || "Leave"}` : "Shift change";
+    const isHalf  = isLeave && r.dayType === "half";
+    const title   = isLeave
+      ? `${r.leaveType || "Leave"}${isHalf ? " · Half day" : ""}`
+      : "Shift change";
     let sub;
     if (isLeave) {
-      sub = r.fromDate === r.toDate
-        ? shortDate(r.fromDate + "T00:00:00")
-        : `${shortDate(r.fromDate + "T00:00:00")} → ${shortDate(r.toDate + "T00:00:00")}`;
+      if (isHalf) {
+        sub = `${shortDate(r.fromDate + "T00:00:00")} · ${halfSlotLabel(r.halfDaySlot)}`;
+      } else {
+        sub = r.fromDate === r.toDate
+          ? shortDate(r.fromDate + "T00:00:00")
+          : `${shortDate(r.fromDate + "T00:00:00")} → ${shortDate(r.toDate + "T00:00:00")}`;
+      }
     } else {
       sub = `${shortDate(r.date + "T00:00:00")} · ${r.toSlot || ""}`;
     }

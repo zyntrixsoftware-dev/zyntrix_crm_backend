@@ -26,20 +26,57 @@ exports.createRequest = async (req, res) => {
     const doc = { userId: req.user.id, type, status: "pending" };
 
     if (type === "leave") {
-      const { leaveType = "", fromDate, toDate, reason = "" } = req.body;
-      if (!fromDate || !toDate) {
-        return res.status(400).json({ msg: "fromDate and toDate are required" });
+      const {
+        leaveType = "",
+        fromDate,
+        toDate,
+        reason = "",
+        dayType = "full",
+        halfDaySlot = ""
+      } = req.body;
+
+      if (!["full", "half"].includes(dayType)) {
+        return res.status(400).json({ msg: "dayType must be 'full' or 'half'" });
       }
-      if (!DATE_RE.test(fromDate) || !DATE_RE.test(toDate)) {
-        return res.status(400).json({ msg: "Dates must be in YYYY-MM-DD format" });
+
+      if (dayType === "half") {
+        // Half-day leave is always a single date with a required time slot.
+        if (!fromDate) {
+          return res.status(400).json({ msg: "A date is required for half-day leave" });
+        }
+        if (!DATE_RE.test(fromDate)) {
+          return res.status(400).json({ msg: "Date must be in YYYY-MM-DD format" });
+        }
+        const ALLOWED_SLOTS = ["10:00-13:00", "14:00-17:00"];
+        if (!ALLOWED_SLOTS.includes(halfDaySlot)) {
+          return res.status(400).json({
+            msg: "Half-day leave requires a slot of '10:00-13:00' (10:00 AM–1:00 PM) or '14:00-17:00' (2:00 PM–5:00 PM)"
+          });
+        }
+        doc.leaveType   = String(leaveType).slice(0, 50);
+        doc.dayType     = "half";
+        doc.halfDaySlot = halfDaySlot;
+        doc.fromDate    = fromDate;   // single day → from === to
+        doc.toDate      = fromDate;
+        doc.reason      = String(reason).slice(0, 500);
+      } else {
+        // Full-day leave — original multi-day range behaviour.
+        if (!fromDate || !toDate) {
+          return res.status(400).json({ msg: "fromDate and toDate are required" });
+        }
+        if (!DATE_RE.test(fromDate) || !DATE_RE.test(toDate)) {
+          return res.status(400).json({ msg: "Dates must be in YYYY-MM-DD format" });
+        }
+        if (toDate < fromDate) {
+          return res.status(400).json({ msg: "toDate cannot be before fromDate" });
+        }
+        doc.leaveType   = String(leaveType).slice(0, 50);
+        doc.dayType     = "full";
+        doc.halfDaySlot = "";
+        doc.fromDate    = fromDate;
+        doc.toDate      = toDate;
+        doc.reason      = String(reason).slice(0, 500);
       }
-      if (toDate < fromDate) {
-        return res.status(400).json({ msg: "toDate cannot be before fromDate" });
-      }
-      doc.leaveType = String(leaveType).slice(0, 50);
-      doc.fromDate  = fromDate;
-      doc.toDate    = toDate;
-      doc.reason    = String(reason).slice(0, 500);
     }
 
     if (type === "shift_swap") {

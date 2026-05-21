@@ -60,6 +60,7 @@
         <a class="active" href="attendance.html"><span class="nav-icon">▣</span>Schedule</a>
         <a href="timecard.html"><span class="nav-icon">◷</span>Timecard</a>
         <a href="find-shifts.html"><span class="nav-icon">⌕</span>Find Shifts</a>
+        <a href="workstation.html"><span class="nav-icon">▦</span>Workstation</a>
         <a href="profile.html"><span class="nav-icon">♙</span>Profile</a>
         <a href="settings.html"><span class="nav-icon">⚙</span>Settings</a>
 
@@ -259,20 +260,44 @@
       <button class="zx-modal-close" type="button" onclick="closeReqModal('leaveModal')">×</button>
     </div>
     <div class="zx-modal-body">
-      <div class="zx-fg">
-        <label>Leave Type</label>
-        <select id="leaveType">
-          <option>Annual Leave</option>
-          <option>Sick Leave</option>
-          <option>Casual Leave</option>
-          <option>Comp-off</option>
-          <option>Unpaid Leave</option>
-        </select>
-      </div>
       <div class="zx-grid2">
+        <div class="zx-fg">
+          <label>Leave Type</label>
+          <select id="leaveType">
+            <option>Annual Leave</option>
+            <option>Sick Leave</option>
+            <option>Casual Leave</option>
+            <option>Comp-off</option>
+            <option>Unpaid Leave</option>
+          </select>
+        </div>
+        <div class="zx-fg">
+          <label>Duration</label>
+          <select id="leaveDayType" onchange="onLeaveDayTypeChange()">
+            <option value="full">Full Day</option>
+            <option value="half">Half Day</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- FULL DAY → date range -->
+      <div class="zx-grid2" id="leaveFullDayFields">
         <div class="zx-fg"><label>From</label><input type="date" id="leaveFrom"></div>
         <div class="zx-fg"><label>To</label><input type="date" id="leaveTo"></div>
       </div>
+
+      <!-- HALF DAY → single date + required slot -->
+      <div class="zx-grid2" id="leaveHalfDayFields" style="display:none">
+        <div class="zx-fg"><label>Date</label><input type="date" id="leaveHalfDate"></div>
+        <div class="zx-fg">
+          <label>Half-Day Slot</label>
+          <select id="leaveHalfSlot">
+            <option value="10:00-13:00">10:00 AM – 1:00 PM</option>
+            <option value="14:00-17:00">2:00 PM – 5:00 PM</option>
+          </select>
+        </div>
+      </div>
+
       <div class="zx-fg">
         <label>Reason</label>
         <textarea id="leaveReason" placeholder="Briefly describe your reason…"></textarea>

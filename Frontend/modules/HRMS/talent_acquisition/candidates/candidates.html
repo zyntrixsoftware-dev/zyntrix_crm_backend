@@ -808,6 +808,69 @@ function guessHeader(guesses, headers) {
   return "";
 }
 
+// ── EXPORT EXISTING CANDIDATES TO EXCEL ───────────────────────────────
+// Builds a worksheet containing the OVERALL information for every candidate:
+// all standard fields, interview/offer status, email-tracking timestamps, and
+// every original column captured at import time (the `raw` object). Triggers a
+// browser download of an .xlsx backup. Throws on failure so the caller can
+// decide whether to continue with the destructive import.
+function exportCandidatesToExcel(list) {
+  if (typeof XLSX === "undefined") throw new Error("Excel library not loaded");
+  if (!Array.isArray(list) || list.length === 0) return false;
+
+  // Collect every original imported column across all candidates (first-seen order)
+  const rawKeys = [];
+  const seen    = new Set();
+  list.forEach(c => {
+    const raw = c && c.raw && typeof c.raw === "object" ? c.raw : {};
+    Object.keys(raw).forEach(k => { if (!seen.has(k)) { seen.add(k); rawKeys.push(k); } });
+  });
+
+  const fmtDate = d => d ? new Date(d).toLocaleString() : "";
+
+  const rows = list.map(c => {
+    const itv = c.interviewId && typeof c.interviewId === "object" ? c.interviewId : null;
+    const row = {
+      "Name":                   c.name        || "",
+      "Email":                  c.email       || "",
+      "Phone":                  c.phone       || "",
+      "Applied For":            c.appliedFor  || "",
+      "Department":             c.department  || "",
+      "Status":                 c.status      || "",
+      "Source":                 c.importedFrom|| "",
+      "Import Batch":           c.importBatchId || "",
+      "Resume URL":             c.resumeUrl   || "",
+      "Interview Status":       itv ? (itv.overallStatus || "") : "",
+      "Offer Sent":             itv && itv.offered ? "Yes" : "",
+      "Application Email Sent": fmtDate(c.applicationEmailSentAt),
+      "Rejection Email Sent":   fmtDate(c.rejectionEmailSentAt),
+      "Created At":             fmtDate(c.createdAt),
+      "Updated At":             fmtDate(c.updatedAt)
+    };
+    const raw = c && c.raw && typeof c.raw === "object" ? c.raw : {};
+    rawKeys.forEach(k => {
+      let v = raw[k];
+      if (v != null && typeof v === "object") v = JSON.stringify(v);
+      row["Imported: " + k] = v == null ? "" : v;
+    });
+    return row;
+  });
+
+  const headers = [
+    "Name","Email","Phone","Applied For","Department","Status","Source",
+    "Import Batch","Resume URL","Interview Status","Offer Sent",
+    "Application Email Sent","Rejection Email Sent","Created At","Updated At",
+    ...rawKeys.map(k => "Imported: " + k)
+  ];
+
+  const ws = XLSX.utils.json_to_sheet(rows, { header: headers });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Candidates");
+  const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  XLSX.writeFile(wb, `candidates-backup-${ts}.xlsx`);
+  return true;
+}
+
 async function commitImport() {
   const mapping = {};
   for (const f of FIELDS) {
@@ -836,7 +899,8 @@ async function commitImport() {
   // Show the user the impact before we wipe their existing data.
   const existingCount  = candidates.length;
   const pendingItvNote = existingCount > 0
-    ? `\n\nThis will REMOVE all ${existingCount} existing candidate(s) and any pending interviews in the Interview Panel.`
+    ? `\n\nThis will REMOVE all ${existingCount} existing candidate(s) and any pending interviews in the Interview Panel.` +
+      `\nThe current candidates will first be exported to an Excel (.xlsx) backup file.`
     : "";
   const ok = confirm(
     `Import ${payload.length} new candidates?` + pendingItvNote +
@@ -845,6 +909,27 @@ async function commitImport() {
   if (!ok) {
     setSync("idle", "Import cancelled");
     return;
+  }
+
+  // ── EXPORT OLD CANDIDATES FIRST ──────────────────────────────────────
+  // A new import REPLACES the entire roster, so we back up every existing
+  // candidate (with all their info + original imported columns) to an Excel
+  // file BEFORE wiping them. Only once the backup has been generated do we
+  // proceed with the import.
+  if (existingCount > 0) {
+    try {
+      setSync("loading", `Exporting ${existingCount} existing candidate(s) to Excel backup…`);
+      exportCandidatesToExcel(candidates);
+    } catch (e) {
+      const proceed = confirm(
+        `Could not export the existing candidates to Excel (${e.message || "unknown error"}).\n\n` +
+        `Import anyway? The existing roster will be permanently replaced WITHOUT a backup.`
+      );
+      if (!proceed) {
+        setSync("idle", "Import cancelled — backup export failed");
+        return;
+      }
+    }
   }
 
   setSync("loading", `Replacing roster with ${payload.length} candidates…`);
