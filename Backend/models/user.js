@@ -30,18 +30,20 @@ const userSchema = new mongoose.Schema({
   department:     { type: String, default: "" },
   designation:    { type: String, default: "" },
   employeeType:   { type: String, enum: ["Full-time","Part-time","Contract","Intern"], default: "Full-time" },
-  dateOfJoining:  { type: String, default: "" },   // "YYYY-MM-DD"
+  dateOfJoining:  { type: String, default: "" },
   salary:         { type: Number, default: 0 },
   reportingTo:    { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
   employeeStatus: { type: String, enum: ["Active","On Leave","Terminated","Resigned"], default: "Active" },
   address:        { type: String, default: "" },
-  emergencyContact: { type: String, default: "" },   // human-readable summary (used by HR list)
+  emergencyContact: { type: String, default: "" },
   profileNote:    { type: String, default: "" },
   workLocation:   { type: String, default: "On-site" },
 
-  // ── EMPLOYEE SELF-SERVICE PROFILE (filled from the employee Profile page) ──
-  photo:          { type: String, default: "" },     // data URL (resized thumbnail) stored in DB
-  dob:            { type: String, default: "" },      // "YYYY-MM-DD"
+  // ── EMPLOYEE SELF-SERVICE PROFILE ───────────────────────────────
+  photo:          { type: String, default: "" },
+  photoFileId:    { type: mongoose.Schema.Types.ObjectId, default: null },
+  photoMime:      { type: String, default: "" },
+  dob:            { type: String, default: "" },
   gender:         { type: String, default: "" },
   city:           { type: String, default: "" },
   state:          { type: String, default: "" },

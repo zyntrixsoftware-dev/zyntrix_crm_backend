@@ -2,6 +2,18 @@ const Attendance   = require("../models/attendance");
 const ShiftRequest = require("../models/ShiftRequest");
 const User         = require("../models/user");
 const XLSX         = require("xlsx");
+const { buildPhotoUrl, apiHostFromReq } = require("./employeeController");
+
+// Attach a small `photo` field (URL) to an employee object without dragging the
+// big legacy inline data URL across the wire. Works whether `e` is a Mongoose
+// document or a plain object (from .lean()/aggregation).
+function withPhotoUrl(e, host = "") {
+  if (!e) return e;
+  const obj = typeof e.toObject === "function" ? e.toObject() : { ...e };
+  obj.photo    = buildPhotoUrl(obj, host);
+  obj.photoUrl = obj.photo;
+  return obj;
+}
 
 function getUTCDate() {
   return new Date().toISOString().slice(0, 10);
@@ -167,11 +179,13 @@ exports.getEmployees = async (req, res) => {
     }
 
     const employees = await User.find(query)
-      .select("-password -otpCode -otpExpiry -otpResetToken -photo")  // photo omitted here (heavy) — fetched per-employee
+      .select("-password -otpCode -otpExpiry -otpResetToken -photo")  // legacy inline data URL omitted; photoFileId stays
       .populate("reportingTo", "name designation")
       .sort({ createdAt: -1 });
 
-    return res.json({ employees, total: employees.length });
+    const host = apiHostFromReq(req);
+    const shaped = employees.map(e => withPhotoUrl(e, host));
+    return res.json({ employees: shaped, total: shaped.length });
   } catch (err) {
     console.error("GET EMPLOYEES ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
@@ -203,7 +217,7 @@ exports.getEmployee = async (req, res) => {
       date: { $gte: startStr, $lt: endStr }
     }).sort({ date: 1 });
 
-    return res.json({ employee: emp, attendance });
+    return res.json({ employee: withPhotoUrl(emp, apiHostFromReq(req)), attendance });
   } catch (err) {
     console.error("GET EMPLOYEE ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
@@ -232,7 +246,7 @@ exports.updateEmployee = async (req, res) => {
     ).select("-password -otpCode -otpExpiry -otpResetToken");
 
     if (!emp) return res.status(404).json({ msg: "Employee not found" });
-    return res.json({ msg: "Updated", employee: emp });
+    return res.json({ msg: "Updated", employee: withPhotoUrl(emp, apiHostFromReq(req)) });
   } catch (err) {
     console.error("UPDATE EMPLOYEE ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
@@ -426,6 +440,23 @@ exports.exportEmployees = async (req, res) => {
       : XLSX.utils.aoa_to_sheet([header]);
 
     // Reasonable column widths
+    ws["!cols"] = header.map(h => ({ wch: Math.max(12, h.length + 2) }));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Employees");
+
+    const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+    const stamp  = new Date().toISOString().slice(0, 10);
+
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename="employees_${stamp}.xlsx"`);
+    return res.send(buffer);
+  } catch (err) {
+    console.error("EXPORT EMPLOYEES ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+ Reasonable column widths
     ws["!cols"] = header.map(h => ({ wch: Math.max(12, h.length + 2) }));
 
     const wb = XLSX.utils.book_new();

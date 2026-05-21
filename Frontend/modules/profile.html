@@ -537,6 +537,16 @@ function resizeImage(file, max = 400) {
   });
 }
 
+// Convert a (resized) data URL back to a Blob so we can POST it as multipart.
+function dataUrlToBlob(dataUrl) {
+  const [header, base64] = dataUrl.split(",");
+  const mime = (header.match(/data:([^;]+)/) || [, "image/jpeg"])[1];
+  const bytes = atob(base64);
+  const arr = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
 document.getElementById("avatarInput").addEventListener("change", async function () {
   const file = this.files[0];
   if (!file) return;
@@ -545,17 +555,41 @@ document.getElementById("avatarInput").addEventListener("change", async function
 
   showToast("personalToast", "Uploading photo…", "ok");
   try {
+    // Resize on the client so we don't send a 5 MB original to the server.
     const dataUrl = await resizeImage(file, 400);
     setAvatarEverywhere(dataUrl);   // optimistic preview
 
-    const res = await apiRequest("/employee/profile", "PUT", { photo: dataUrl });
-    if (res.error) { showToast("personalToast", res.msg || "Could not save photo", "err"); return; }
+    const blob = dataUrlToBlob(dataUrl);
+    const fd   = new FormData();
+    fd.append("photo", blob, "profile.jpg");
 
-    // keep a copy on the local user object for instant display elsewhere
-    if (user) { user.photo = dataUrl; localStorage.setItem("user", JSON.stringify(user)); }
+    const token = localStorage.getItem("token");
+    const resp = await fetch(API_BASE + "/employee/photo", {
+      method:  "POST",
+      headers: { ...(token && { Authorization: "Bearer " + token }) },
+      body:    fd
+    });
+    const data = await resp.json().catch(() => ({}));
+
+    if (!resp.ok) {
+      showToast("personalToast", data.msg || "Could not save photo", "err");
+      return;
+    }
+
+    // Server returns the canonical photo URL — use it so we know the bytes
+    // really made it to MongoDB. Add a cache-buster so old <img> caches refresh.
+    const fresh = (data.photoUrl || "") + (data.photoUrl ? (data.photoUrl.includes("?") ? "&" : "?") + "t=" + Date.now() : "");
+    if (fresh) setAvatarEverywhere(fresh);
+
+    // Keep a copy on the local user object for instant display elsewhere
+    if (user) { user.photo = data.photoUrl || ""; localStorage.setItem("user", JSON.stringify(user)); }
+
+    // Re-pull the canonical profile so every other field stays in sync too.
+    await loadProfile();
+
     showToast("personalToast", "Photo updated and saved ✓", "ok");
   } catch (err) {
-    showToast("personalToast", err.message || "Could not process image", "err");
+    showToast("personalToast", err.message || "Could not upload photo", "err");
   } finally {
     this.value = "";   // allow re-selecting the same file
   }
@@ -600,12 +634,18 @@ async function savePersonal() {
     user.name = payload.name;
     localStorage.setItem("user", JSON.stringify(user));
     document.getElementById("userName").innerText      = payload.name;
-    document.getElementById("sideUserName").innerText  = payload.name;
+    const sideName = document.getElementById("sideUserName"); if (sideName) sideName.innerText = payload.name;
     document.getElementById("profileName").innerText   = payload.name;
   }
 
   document.getElementById("personalSaveRow").style.display = "none";
   showToast("personalToast", "Personal info saved!", "ok");
+
+  // Re-pull the canonical profile from the server so the page reflects
+  // exactly what's stored in MongoDB (this is the "auto-refresh on save"
+  // behaviour that keeps the UI in sync with the database).
+  if (res.profile) renderProfile(res.profile);
+  else await loadProfile();
 }
 
 // ── SAVE EMERGENCY ────────────────────────────────────────────────
@@ -624,6 +664,9 @@ async function saveEmergency() {
 
   document.getElementById("emergSaveRow").style.display = "none";
   showToast("personalToast", "Emergency contact saved!", "ok");
+
+  if (res.profile) renderProfile(res.profile);
+  else await loadProfile();
 }
 
 // ── PASSWORD CHANGE ───────────────────────────────────────────────
@@ -689,15 +732,35 @@ async function revokeAllSessions() {
   logout();
 }
 
-// ── LOAD PROFILE FROM API ─────────────────────────────────────────
-async function loadProfile() {
-  const res = await apiRequest("/employee/profile");
-  if (res.error) return;
-  const p = res.profile || res;
+// ── RENDER PROFILE INTO THE PAGE ──────────────────────────────────
+// Pure render — no fetching — so we can re-use it from loadProfile() AND
+// from save handlers that already have a fresh profile object.
+function renderProfile(p) {
+  if (!p) return;
   profileData = p;
 
-  // Photo
-  if (p.photo) setAvatarEverywhere(p.photo);
+  // Name + role in topbar / avatar card
+  if (p.name) {
+    setText("userName",     p.name);
+    setText("profileName",  p.name);
+    const parts = p.name.split(" ");
+    setVal("f-firstName", parts[0] || "");
+    setVal("f-lastName",  parts.slice(1).join(" ") || "");
+  }
+  if (p.role)   setText("profileRole", String(p.role).replace(/_/g, " "));
+  if (p.email)  setVal("f-email", p.email);
+
+  // Employee ID for work tab
+  const wEmp = document.getElementById("w-empId");
+  if (wEmp && p._id) wEmp.textContent = "#EMP-" + String(p._id).slice(-5).toUpperCase();
+
+  // Photo — server tells us where the bytes live (GridFS URL or legacy data URL).
+  // Append a cache-buster so the browser fetches the fresh blob right after a save.
+  if (p.photo) {
+    const bust = p.photo.includes("?") ? `&t=${Date.now()}` : `?t=${Date.now()}`;
+    const src  = /^data:/.test(p.photo) ? p.photo : p.photo + bust;
+    setAvatarEverywhere(src);
+  }
 
   // Personal fields
   setVal("f-phone",   p.phone   || "");
@@ -708,14 +771,14 @@ async function loadProfile() {
   setVal("f-state",   p.state   || "");
   setVal("f-bio",     p.bio     || "");
 
-  // Emergency
+  // Emergency contact
   const ec = p.emergencyContact || {};
   setVal("f-emergName",  ec.name     || "");
   setVal("f-emergRel",   ec.relation || "");
   setVal("f-emergPhone", ec.phone    || "");
   setVal("f-emergAlt",   ec.altPhone || "");
 
-  // Work info (read-only)
+  // Work info (read-only, populated by HR through HRMS)
   const setTxt = (id, v) => { const el = document.getElementById(id); if (el && v) el.textContent = v; };
   setTxt("w-dept", p.department);
   if (p.designation) setTxt("w-role", p.designation);
@@ -729,6 +792,13 @@ async function loadProfile() {
     const badge = document.getElementById("profileStatus");
     if (badge) badge.innerHTML = `<span class="status-dot-online"></span> ${p.employeeStatus}`;
   }
+}
+
+// ── LOAD PROFILE FROM API ─────────────────────────────────────────
+async function loadProfile() {
+  const res = await apiRequest("/employee/profile");
+  if (res.error) return;
+  renderProfile(res.profile || res);
 }
 
 // ── LOAD ATTENDANCE STATS ─────────────────────────────────────────
@@ -804,7 +874,8 @@ function fillSessionInfo() {
   else if (/Firefox/.test(ua)) browser = "Firefox";
   else if (/Safari/.test(ua)) browser = "Safari";
   else if (/Edge/.test(ua)) browser = "Edge";
-  document.getElementById("sessionBrowser").textContent = browser + " · This device · " + (navigator.platform || "Unknown OS");
+  const sb = document.getElementById("sessionBrowser");
+  if (sb) sb.textContent = browser + " · This device · " + (navigator.platform || "Unknown OS");
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────

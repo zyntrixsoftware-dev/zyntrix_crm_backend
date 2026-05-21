@@ -1,5 +1,6 @@
 const User   = require("../models/user");
 const bcrypt = require("bcryptjs");
+const gridfs = require("../utils/gridfs");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EMPLOYEE SELF-SERVICE PROFILE
@@ -11,10 +12,35 @@ const bcrypt = require("bcryptjs");
 // Employees can only edit personal fields (name, contact, photo, etc.).
 // Job/comp fields (salary, department, designation, role, status) remain
 // HR-controlled and are returned read-only.
+//
+// Profile photos are stored as binary blobs in MongoDB's GridFS (bucket
+// "employee_files") — see Backend/utils/gridfs.js. The User document only
+// holds a pointer (photoFileId) plus the MIME type. Photos are served via
+// GET /api/employee/photo/:userId so any <img> tag can simply use that URL.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Build an absolute URL the frontend can drop into <img src="…">.
+// We return an absolute URL so it works even when the frontend and the API
+// live on different origins (localhost:5500 vs localhost:5000 in dev, and
+// frontend.com vs api.backend.com in prod).
+function apiHostFromReq(req) {
+  if (!req) return "";
+  const proto = (req.headers && req.headers["x-forwarded-proto"]) || req.protocol || "http";
+  const host  = req.get ? req.get("host") : (req.headers && req.headers.host);
+  return host ? `${proto}://${host}` : "";
+}
+
+function buildPhotoUrl(u, host = "") {
+  if (u.photoFileId) {
+    const path = `/api/employee/photo/${u._id}?v=${String(u.photoFileId).slice(-6)}`;
+    return host ? host + path : path;
+  }
+  if (u.photo) return u.photo;   // legacy inline data URL — self-contained
+  return "";
+}
+
 // Build the shape the Profile page (Frontend/modules/profile.html) expects.
-function shapeProfile(u) {
+function shapeProfile(u, host = "") {
   return {
     _id:            u._id,
     name:           u.name,
@@ -29,7 +55,9 @@ function shapeProfile(u) {
     city:           u.city || "",
     state:          u.state || "",
     bio:            u.bio || "",
-    photo:          u.photo || "",
+    photo:          buildPhotoUrl(u, host),
+    photoUrl:       buildPhotoUrl(u, host),
+    hasPhoto:       !!(u.photoFileId || u.photo),
     emergencyContact: {
       name:     u.emergencyDetails?.name     || "",
       relation: u.emergencyDetails?.relation || "",
@@ -59,7 +87,7 @@ exports.getMyProfile = async (req, res) => {
 
     if (!user) return res.status(404).json({ msg: "Profile not found" });
 
-    return res.json({ profile: shapeProfile(user) });
+    return res.json({ profile: shapeProfile(user, apiHostFromReq(req)) });
   } catch (err) {
     console.error("GET MY PROFILE ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
@@ -75,7 +103,6 @@ exports.updateMyProfile = async (req, res) => {
 
     const b = req.body || {};
 
-    // Simple string fields the employee owns
     const simple = ["name", "phone", "dob", "gender", "address", "city", "state", "bio"];
     simple.forEach(f => {
       if (b[f] !== undefined && b[f] !== null) user[f] = String(b[f]).slice(0, 2000);
@@ -85,20 +112,28 @@ exports.updateMyProfile = async (req, res) => {
       return res.status(400).json({ msg: "Name cannot be empty" });
     }
 
-    // Photo (data URL) — keep payloads sane. ~1.4 MB of base64 ≈ 1 MB image.
+    // NOTE: photo uploads go through POST /api/employee/photo (GridFS).
+    // We still accept photo: "" here as a "clear my photo" signal for older
+    // clients, and keep the legacy data-URL path for backwards compatibility.
     if (b.photo !== undefined) {
       const photo = String(b.photo || "");
-      if (photo && !/^data:image\/(png|jpe?g|webp|gif);base64,/.test(photo)) {
-        return res.status(400).json({ msg: "Photo must be a valid image" });
+      if (photo === "") {
+        if (user.photoFileId) {
+          try { await gridfs.deleteFile(user.photoFileId); } catch (_) {}
+        }
+        user.photoFileId = null;
+        user.photoMime   = "";
+        user.photo       = "";
+      } else if (/^data:image\/(png|jpe?g|webp|gif);base64,/.test(photo)) {
+        if (photo.length > 2_500_000) {
+          return res.status(400).json({ msg: "Photo is too large — please use a smaller image" });
+        }
+        user.photo = photo;
+      } else {
+        return res.status(400).json({ msg: "Photo must be a valid image (use the upload endpoint)" });
       }
-      if (photo.length > 2_500_000) {
-        return res.status(400).json({ msg: "Photo is too large — please use a smaller image" });
-      }
-      user.photo = photo;
     }
 
-    // Emergency contact (object). We store the structured version AND keep the
-    // legacy string field in sync so the HR employee list still shows it.
     if (b.emergencyContact && typeof b.emergencyContact === "object") {
       const ec = b.emergencyContact;
       user.emergencyDetails = {
@@ -118,7 +153,7 @@ exports.updateMyProfile = async (req, res) => {
       .select("-password -otpCode -otpExpiry -otpResetToken")
       .populate("reportingTo", "name designation");
 
-    return res.json({ msg: "Profile saved", profile: shapeProfile(fresh) });
+    return res.json({ msg: "Profile saved", profile: shapeProfile(fresh, apiHostFromReq(req)) });
   } catch (err) {
     console.error("UPDATE MY PROFILE ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
@@ -154,6 +189,113 @@ exports.changePassword = async (req, res) => {
     return res.json({ msg: "Password updated successfully" });
   } catch (err) {
     console.error("CHANGE PASSWORD ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROFILE PHOTO (GridFS-backed)
+// ─────────────────────────────────────────────────────────────────────────────
+
+exports.buildPhotoUrl  = buildPhotoUrl;
+exports.apiHostFromReq = apiHostFromReq;
+
+// POST /api/employee/photo
+// multipart/form-data with a single field "photo".
+// Stores the file in GridFS, points the user document at it, and returns the
+// new public URL the frontend can use immediately.
+exports.uploadMyPhoto = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
+
+    const { mimetype, buffer, originalname, size } = req.file;
+
+    if (!/^image\/(png|jpe?g|webp|gif)$/i.test(mimetype)) {
+      return res.status(400).json({ msg: "Only PNG, JPG, WebP or GIF images are allowed" });
+    }
+    if (size > 8 * 1024 * 1024) {
+      return res.status(400).json({ msg: "Image must be under 8 MB" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ msg: "Profile not found" });
+
+    if (user.photoFileId) {
+      try { await gridfs.deleteFile(user.photoFileId); } catch (_) {}
+    }
+
+    const fileId = await gridfs.uploadBuffer(
+      buffer,
+      originalname || `profile-${user._id}.jpg`,
+      mimetype,
+      { userId: String(user._id), kind: "profile-photo" }
+    );
+
+    user.photoFileId = fileId;
+    user.photoMime   = mimetype;
+    user.photo       = "";
+    await user.save();
+
+    return res.json({
+      msg:      "Photo uploaded",
+      photoUrl: buildPhotoUrl(user, apiHostFromReq(req))
+    });
+  } catch (err) {
+    console.error("UPLOAD MY PHOTO ERROR:", err);
+    return res.status(500).json({ msg: "Could not upload photo" });
+  }
+};
+
+// GET /api/employee/photo/:userId — streams the bytes from GridFS.
+exports.servePhoto = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("photoFileId photo photoMime");
+    if (!user) return res.status(404).end();
+
+    // Legacy inline data URL — peel apart and serve as binary
+    if (!user.photoFileId && user.photo && /^data:image\//.test(user.photo)) {
+      const m = user.photo.match(/^data:(image\/[^;]+);base64,(.+)$/);
+      if (!m) return res.status(404).end();
+      res.setHeader("Content-Type", m[1]);
+      res.setHeader("Cache-Control", "private, max-age=60");
+      return res.end(Buffer.from(m[2], "base64"));
+    }
+
+    if (!user.photoFileId) return res.status(404).end();
+
+    const file = await gridfs.findFile(user.photoFileId);
+    if (!file) return res.status(404).end();
+
+    res.setHeader("Content-Type", file.contentType || user.photoMime || "image/jpeg");
+    res.setHeader("Content-Length", file.length);
+    res.setHeader("Cache-Control", "private, max-age=60");
+
+    const stream = gridfs.openDownloadStream(user.photoFileId);
+    stream.on("error", () => { if (!res.headersSent) res.status(404).end(); });
+    stream.pipe(res);
+  } catch (err) {
+    console.error("SERVE PHOTO ERROR:", err);
+    if (!res.headersSent) res.status(500).end();
+  }
+};
+
+// DELETE /api/employee/photo
+exports.deleteMyPhoto = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ msg: "Profile not found" });
+
+    if (user.photoFileId) {
+      try { await gridfs.deleteFile(user.photoFileId); } catch (_) {}
+    }
+    user.photoFileId = null;
+    user.photoMime   = "";
+    user.photo       = "";
+    await user.save();
+
+    return res.json({ msg: "Photo removed" });
+  } catch (err) {
+    console.error("DELETE MY PHOTO ERROR:", err);
     return res.status(500).json({ msg: "Server error" });
   }
 };
