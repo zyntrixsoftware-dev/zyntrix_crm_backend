@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRMS — Payroll</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:    #0d1b2a;
+  --navy2:   #132236;
+  --navy3:   #1a2d42;
+  --navy4:   #203350;
+  --navy5:   #263d5e;
+  --accent:  #4f9cf9;
+  --accent2: #3b82f6;
+  --accent-dim: rgba(59,130,246,0.12);
+  --teal:    #2dd4bf;
+  --amber:   #f59e0b;
+  --rose:    #f43f5e;
+  --green:   #22c55e;
+  --purple:  #a78bfa;
+  --text:    #e2e8f0;
+  --text2:   #94a3b8;
+  --text3:   #64748b;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --card:    #132236;
+  --radius:  12px;
+  --sidebar: 248px;
+  --font:    'DM Sans', sans-serif;
+  --mono:    'DM Mono', monospace;
+}
+html, body { height: 100%; background: var(--navy); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.6; overflow: hidden; }
+
+/* LAYOUT */
+.shell   { display: flex; height: 100vh; }
+.sidebar { width: var(--sidebar); min-width: var(--sidebar); background: var(--navy2); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
+.main    { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar  { height: 62px; min-height: 62px; background: var(--navy2); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 14px; }
+.content { flex: 1; overflow-y: auto; padding: 24px; background: var(--navy); }
+
+/* SIDEBAR */
+.brand { padding: 20px 18px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #3b82f6, #6366f1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.brand-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+.brand-ver  { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 1px; }
+.nav-section { padding: 14px 10px 6px; }
+.nav-label   { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; padding: 0 8px 8px; }
+.nav-item    { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--text2); font-size: 13px; text-decoration: none; transition: all 0.15s; margin-bottom: 1px; position: relative; }
+.nav-item:hover  { background: var(--accent-dim); color: var(--text); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--accent2); border-radius: 0 3px 3px 0; }
+.nav-icon  { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; background: var(--rose); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px; line-height: 1.2; }
+.sidebar-footer { margin-top: auto; padding: 14px 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.user-pill   { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.user-pill:hover { background: var(--border); }
+.avatar      { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+.user-info   { flex: 1; min-width: 0; }
+.user-name   { font-size: 13px; font-weight: 500; color: var(--text); }
+.user-role   { font-size: 11px; color: var(--text3); }
+
+/* TOPBAR */
+.page-title { font-size: 16px; font-weight: 600; color: var(--text); flex: 1; }
+.search-box { display: flex; align-items: center; gap: 8px; background: var(--navy3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 14px; color: var(--text2); font-size: 13px; min-width: 220px; }
+.search-box input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; font-family: var(--font); width: 100%; }
+.search-box input::placeholder { color: var(--text3); }
+.topbar-btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.topbar-btn:hover { background: var(--navy3); }
+.topbar-btn.primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.topbar-btn.primary:hover { background: var(--accent); }
+.notif-wrap { position: relative; }
+.notif-dot  { position: absolute; top: 6px; right: 14px; width: 7px; height: 7px; background: var(--rose); border-radius: 50%; border: 2px solid var(--navy2); }
+
+/* CARDS */
+.grid { display: grid; gap: 16px; }
+.g4   { grid-template-columns: repeat(4,1fr); }
+.g3   { grid-template-columns: repeat(3,1fr); }
+.g2   { grid-template-columns: repeat(2,1fr); }
+.g21  { grid-template-columns: 2fr 1fr; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.card-sm { padding: 16px; }
+.card-hd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.card-sub   { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* KPI */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+.kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.kpi-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 12px; }
+.kpi-val  { font-size: 24px; font-weight: 700; line-height: 1; letter-spacing: -0.5px; }
+.kpi-label { font-size: 12px; color: var(--text3); margin-top: 5px; }
+.kpi-change { font-size: 11px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.up { color: var(--green); }
+.dn { color: var(--rose); }
+
+/* BADGE */
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-green  { background: rgba(34,197,94,0.12);  color: var(--green); }
+.badge-amber  { background: rgba(245,158,11,0.12); color: var(--amber); }
+.badge-rose   { background: rgba(244,63,94,0.12);  color: var(--rose); }
+.badge-blue   { background: rgba(79,156,249,0.12); color: var(--accent); }
+.badge-purple { background: rgba(167,139,250,0.12);color: var(--purple); }
+.badge-gray   { background: rgba(100,116,139,0.12);color: var(--text3); }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; padding: 0 14px 10px; white-space: nowrap; }
+td { padding: 12px 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text2); vertical-align: middle; }
+tr:first-child td { border-top: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.td-name { font-weight: 500; color: var(--text); }
+.td-mono { font-family: var(--mono); font-size: 12px; color: var(--teal); }
+
+/* PAYSLIP */
+.payslip-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.payslip-row:last-child { border-bottom: none; }
+.payslip-label { font-size: 13px; color: var(--text2); }
+.payslip-val   { font-size: 13px; font-weight: 500; color: var(--text); font-family: var(--mono); }
+.payslip-deduct { color: var(--rose); }
+.payslip-total  { background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(99,102,241,0.08)); border: 1px solid rgba(79,156,249,0.25); border-radius: 10px; padding: 16px 18px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; }
+.section-label  { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin: 16px 0 8px; }
+
+/* PROGRESS */
+.progress-bar  { height: 6px; background: var(--navy3); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+/* TABS */
+.tabs { display: flex; gap: 2px; background: var(--navy3); padding: 4px; border-radius: 10px; margin-bottom: 20px; width: fit-content; }
+.tab  { padding: 7px 18px; border-radius: 7px; cursor: pointer; font-size: 13px; color: var(--text2); transition: all 0.15s; }
+.tab.active { background: var(--navy2); color: var(--text); font-weight: 500; }
+.tab:hover:not(.active) { color: var(--text); }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 100; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--navy2); border: 1px solid var(--border2); border-radius: 16px; width: 540px; max-width: 92vw; max-height: 88vh; overflow-y: auto; }
+.modal-head { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 16px; font-weight: 600; }
+.modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 20px; padding: 4px 8px; border-radius: 6px; }
+.modal-close:hover { background: var(--border); color: var(--text); }
+.modal-body { padding: 24px; }
+.modal-foot { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+.form-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+label { font-size: 12px; font-weight: 500; color: var(--text2); }
+input, select, textarea { background: var(--navy3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; width: 100%; transition: border 0.15s; }
+input:focus, select:focus { border-color: var(--accent2); }
+select option { background: var(--navy3); }
+.btn { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.btn:hover { background: var(--navy3); }
+.btn-primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.btn-primary:hover { background: var(--accent); }
+.btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+
+/* SEP */
+.sep { height: 1px; background: var(--border); margin: 14px 0; }
+
+/* ALERT */
+.alert { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 10px; margin-bottom: 20px; }
+.alert-info { background: rgba(59,130,246,0.08); border: 1px solid rgba(79,156,249,0.2); }
+
+/* SCROLL */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js?v=3"></script>
+</head>
+<body>
+<!-- Standalone Payroll System: only HR / Sales / super_admin (logged in) may view. -->
+<script>requireAuth(); requireModuleAccess("payroll");</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var u = (typeof getUser === "function") ? getUser() : null;
+    if (!u) return;
+    var nm = u.name || "User";
+    var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+    set("pv-name", nm);
+    set("pv-role", (u.role || "").replace(/_/g, " ") || "User");
+    set("pv-av", nm.slice(0, 2).toUpperCase());
+  });
+  function exitPayroll(e) {
+    if (e) e.preventDefault();
+    var u = (typeof getUser === "function") ? getUser() : null;
+    if (typeof redirectByRole === "function" && u) redirectByRole(u.role);
+    else window.history.back();
+  }
+</script>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">💰</div>
+    <div>
+      <div class="brand-name">Payroll System</div>
+      <div class="brand-ver">Zyntrix · secure</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Payroll</div>
+    <a href="payroll.html" class="nav-item active"><span class="nav-icon">💰</span> Payroll Dashboard</a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar" id="pv-av">U</div>
+      <div class="user-info">
+        <div class="user-name" id="pv-name">User</div>
+        <div class="user-role" id="pv-role">—</div>
+      </div>
+    </div>
+    <a href="#" onclick="exitPayroll(event)" class="nav-item" style="margin-top:10px;"><span class="nav-icon">↩</span> Exit to CRM</a>
+    <button onclick="logout()" title="Logout" style="margin-top:8px;width:100%;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:7px 10px;border-radius:6px;letter-spacing:0.3px;">⏻ Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">Payroll</div>
+    <div class="search-box">
+      <span style="color:var(--text3);">🔍</span>
+      <input placeholder="Search employees, payslips…">
+    </div>
+    <div class="notif-wrap">
+      <button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button>
+      <span class="notif-dot"></span>
+    </div>
+    <button class="topbar-btn primary" onclick="openModal('run-payroll-modal')">▶ Run May Payroll</button>
+  </div>
+
+  <div class="content">
+
+    <div class="alert alert-info">
+      <span style="font-size:20px;">💡</span>
+      <div>
+        <div style="font-weight:500;font-size:13px;color:var(--text);">April 2025 payroll processed successfully — ₹1.42 Cr disbursed to 247 employees</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">May payroll cycle opens on May 20. Review exceptions before processing.</div>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(34,197,94,0.1);">💵</div>
+        <div class="kpi-val" style="color:var(--green);">₹1.42Cr</div>
+        <div class="kpi-label">April Payroll Total</div>
+        <div class="kpi-change up">▲ 2.2% vs March</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(79,156,249,0.1);">👥</div>
+        <div class="kpi-val" style="color:var(--accent);">247</div>
+        <div class="kpi-label">Employees Paid</div>
+        <div class="kpi-change up">▲ 8 new this cycle</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(245,158,11,0.1);">📈</div>
+        <div class="kpi-val" style="color:var(--amber);">₹57,490</div>
+        <div class="kpi-label">Avg. Gross Salary</div>
+        <div class="kpi-change up">▲ ₹890 vs last month</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(244,63,94,0.1);">🏦</div>
+        <div class="kpi-val" style="color:var(--rose);">₹18.4L</div>
+        <div class="kpi-label">Total Deductions</div>
+        <div class="kpi-change" style="color:var(--text3);">PF + ESI + TDS</div>
+      </div>
+    </div>
+
+    <!-- Payroll trend + Payslip -->
+    <div class="grid g21" style="margin-bottom:16px;">
+      <div class="card">
+        <div class="card-hd">
+          <div>
+            <div class="card-title">Payroll Trend</div>
+            <div class="card-sub">Monthly gross payroll — last 6 months</div>
+          </div>
+          <select style="width:auto;padding:5px 10px;font-size:12px;">
+            <option>All Departments</option>
+            <option>Engineering</option>
+            <option>Product</option>
+            <option>Sales</option>
+          </select>
+        </div>
+        <div style="position:relative;height:240px;">
+          <canvas id="payrollTrendChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <div>
+            <div class="card-title">Dept. Cost Split</div>
+            <div class="card-sub">April 2025</div>
+          </div>
+        </div>
+        <div style="position:relative;height:240px;">
+          <canvas id="deptCostChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payslip preview + deduction breakdown -->
+    <div class="grid g2" style="margin-bottom:16px;">
+      <div class="card">
+        <div class="card-hd">
+          <div>
+            <div class="card-title">Payslip — Priya Sharma</div>
+            <div class="card-sub">April 2025 · EMP-00214</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="badge badge-green">Processed ✓</span>
+            <button class="btn btn-sm">📥 PDF</button>
+          </div>
+        </div>
+
+        <div class="section-label">Earnings</div>
+        <div class="payslip-row"><span class="payslip-label">Basic Salary</span><span class="payslip-val">₹58,333</span></div>
+        <div class="payslip-row"><span class="payslip-label">House Rent Allowance</span><span class="payslip-val">₹23,333</span></div>
+        <div class="payslip-row"><span class="payslip-label">Special Allowance</span><span class="payslip-val">₹20,500</span></div>
+        <div class="payslip-row"><span class="payslip-label">Performance Bonus</span><span class="payslip-val">₹8,000</span></div>
+        <div class="payslip-row" style="border-bottom:none;"><span class="payslip-label" style="color:var(--text);font-weight:600;">Gross Earnings</span><span class="payslip-val" style="color:var(--text);">₹1,10,166</span></div>
+
+        <div class="section-label">Deductions</div>
+        <div class="payslip-row"><span class="payslip-label">PF — Employee (12%)</span><span class="payslip-val payslip-deduct">−₹6,999</span></div>
+        <div class="payslip-row"><span class="payslip-label">ESI (0.75%)</span><span class="payslip-val payslip-deduct">−₹1,313</span></div>
+        <div class="payslip-row"><span class="payslip-label">Professional Tax</span><span class="payslip-val payslip-deduct">−₹200</span></div>
+        <div class="payslip-row"><span class="payslip-label">TDS — Income Tax</span><span class="payslip-val payslip-deduct">−₹9,500</span></div>
+        <div class="payslip-total">
+          <div>
+            <div style="font-size:12px;color:var(--text2);">Net Take Home</div>
+            <div style="font-size:26px;font-weight:700;color:var(--green);font-family:var(--mono);">₹92,154</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:12px;color:var(--text2);">Annual CTC</div>
+            <div style="font-size:18px;font-weight:600;color:var(--text);font-family:var(--mono);">₹14,00,000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">Deduction Breakdown</div>
+          <span class="badge badge-blue">April 2025</span>
+        </div>
+        <div style="position:relative;height:180px;margin-bottom:16px;">
+          <canvas id="deductChart"></canvas>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#4f9cf9;"></div><span style="color:var(--text2);">TDS / Income Tax</span></div>
+            <span style="font-weight:500;font-family:var(--mono);">₹9.8L</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#a78bfa;"></div><span style="color:var(--text2);">PF — Employee</span></div>
+            <span style="font-weight:500;font-family:var(--mono);">₹5.2L</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#2dd4bf;"></div><span style="color:var(--text2);">ESI</span></div>
+            <span style="font-weight:500;font-family:var(--mono);">₹2.4L</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;"></div><span style="color:var(--text2);">Professional Tax</span></div>
+            <span style="font-weight:500;font-family:var(--mono);">₹1.0L</span>
+          </div>
+          <div class="sep"></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
+            <span style="color:var(--text);">Total Deductions</span>
+            <span style="font-family:var(--mono);color:var(--rose);">₹18.4L</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payroll Register -->
+    <div class="card">
+      <div class="card-hd">
+        <div>
+          <div class="card-title">Payroll Register — April 2025</div>
+          <div class="card-sub">247 employees · All departments</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-sm">📥 Export CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('run-payroll-modal')">▶ Run May Payroll</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this)">All</div>
+        <div class="tab" onclick="switchTab(this)">Engineering</div>
+        <div class="tab" onclick="switchTab(this)">Product</div>
+        <div class="tab" onclick="switchTab(this)">Sales</div>
+        <div class="tab" onclick="switchTab(this)">Operations</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Emp ID</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Gross Pay</th>
+            <th>Deductions</th>
+            <th>Net Pay</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;">PS</div>
+                <div class="td-name">Priya Sharma</div>
+              </div>
+            </td>
+            <td><span class="td-mono">EMP-00214</span></td>
+            <td>Engineering</td>
+            <td style="font-size:12px;color:var(--text3);">Sr. Engineer</td>
+            <td><span class="td-mono" style="color:var(--text);">₹1,10,166</span></td>
+            <td><span class="td-mono" style="color:var(--rose);">₹18,012</span></td>
+            <td><span class="td-mono" style="color:var(--green);">₹92,154</span></td>
+            <td><span class="badge badge-green">Paid</span></td>
+            <td><button class="btn btn-sm" onclick="openModal('payslip-modal')">Payslip</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#6366f1,#a78bfa);">KS</div>
+                <div class="td-name">Kiran Shah</div>
+              </div>
+            </td>
+            <td><span class="td-mono">EMP-00108</span></td>
+            <td>Engineering</td>
+            <td style="font-size:12px;color:var(--text3);">Tech Lead</td>
+            <td><span class="td-mono" style="color:var(--text);">₹1,85,000</span></td>
+            <td><span class="td-mono" style="color:var(--rose);">₹32,400</span></td>
+            <td><span class="td-mono" style="color:var(--green);">₹1,52,600</span></td>
+            <td><span class="badge badge-green">Paid</span></td>
+            <td><button class="btn btn-sm">Payslip</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#0ea5e9,#2dd4bf);">SD</div>
+                <div class="td-name">Sanjay Das</div>
+              </div>
+            </td>
+            <td><span class="td-mono">EMP-00132</span></td>
+            <td>Product</td>
+            <td style="font-size:12px;color:var(--text3);">Product Manager</td>
+            <td><span class="td-mono" style="color:var(--text);">₹1,25,000</span></td>
+            <td><span class="td-mono" style="color:var(--rose);">₹22,100</span></td>
+            <td><span class="td-mono" style="color:var(--green);">₹1,02,900</span></td>
+            <td><span class="badge badge-green">Paid</span></td>
+            <td><button class="btn btn-sm">Payslip</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#f97316);">PV</div>
+                <div class="td-name">Pooja Verma</div>
+              </div>
+            </td>
+            <td><span class="td-mono">EMP-00178</span></td>
+            <td>Sales</td>
+            <td style="font-size:12px;color:var(--text3);">Sales Lead</td>
+            <td><span class="td-mono" style="color:var(--text);">₹72,000</span></td>
+            <td><span class="td-mono" style="color:var(--rose);">₹11,200</span></td>
+            <td><span class="td-mono" style="color:var(--amber);">₹60,800</span></td>
+            <td><span class="badge badge-amber">Processing</span></td>
+            <td><button class="btn btn-sm">Review</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#10b981,#059669);">RK</div>
+                <div class="td-name">Ravi Kumar</div>
+              </div>
+            </td>
+            <td><span class="td-mono">EMP-00155</span></td>
+            <td>Operations</td>
+            <td style="font-size:12px;color:var(--text3);">Ops Manager</td>
+            <td><span class="td-mono" style="color:var(--text);">₹98,000</span></td>
+            <td><span class="td-mono" style="color:var(--rose);">₹17,640</span></td>
+            <td><span class="td-mono" style="color:var(--green);">₹80,360</span></td>
+            <td><span class="badge badge-green">Paid</span></td>
+            <td><button class="btn btn-sm">Payslip</button></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#f43f5e,#ec4899);">RG</div>
+                <div class="td-name">Rahul Gupta</div>
+              </div>
+            </td>
+            <td><span class="td-mono">EMP-00187</span></td>
+            <td>Engineering</td>
+            <td style="font-size:12px;color:var(--text3);">Backend Dev</td>
+            <td><span class="td-mono" style="color:var(--text);">₹82,000</span></td>
+            <td><span class="td-mono" style="color:var(--rose);">₹14,760</span></td>
+            <td><span class="td-mono" style="color:var(--rose);">₹64,040</span></td>
+            <td><span class="badge badge-rose">Dispute</span></td>
+            <td><button class="btn btn-sm" style="color:var(--rose);border-color:rgba(244,63,94,0.3);">Resolve</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border);margin-top:4px;">
+        <span style="font-size:12px;color:var(--text3);">Showing 6 of 247 employees</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm">← Prev</button>
+          <button class="btn btn-sm" style="background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);">1</button>
+          <button class="btn btn-sm">2</button>
+          <button class="btn btn-sm">3</button>
+          <button class="btn btn-sm">Next →</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="notif-modal" onclick="closeModal('notif-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><div class="modal-title">🔔 Notifications</div><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.15);border-radius:8px;display:flex;gap:12px;">
+          <span style="font-size:18px;">⚠️</span>
+          <div><div style="font-weight:500;font-size:13px;">Payroll dispute — EMP-00187 (Rahul Gupta)</div><div style="font-size:12px;color:var(--text3);">₹3,200 mismatch flagged in April salary</div></div>
+        </div>
+        <div style="padding:12px;background:var(--navy3);border-radius:8px;display:flex;gap:12px;">
+          <span style="font-size:18px;">📅</span>
+          <div><div style="font-weight:500;font-size:13px;">May payroll cycle opens on May 20</div><div style="font-size:12px;color:var(--text3);">Review attendance data before processing</div></div>
+        </div>
+        <div style="padding:12px;background:var(--navy3);border-radius:8px;display:flex;gap:12px;">
+          <span style="font-size:18px;">✅</span>
+          <div><div style="font-weight:500;font-size:13px;">April payroll disbursed successfully</div><div style="font-size:12px;color:var(--text3);">₹1.42 Cr paid to 247 employees on May 1</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="run-payroll-modal" onclick="closeModal('run-payroll-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><div class="modal-title">▶ Run May 2025 Payroll</div><button class="modal-close" onclick="closeModal('run-payroll-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:14px;margin-bottom:20px;font-size:13px;color:var(--text2);">
+        <strong style="color:var(--green);">Pre-run checklist:</strong> All attendance data synced ✓ · 8 new employees added ✓ · 1 dispute pending ⚠
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Payroll Month</label><select><option>May 2025</option><option>June 2025</option></select></div>
+        <div class="form-group"><label>Payment Date</label><input type="date" value="2025-06-01"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Department</label><select><option>All Departments</option><option>Engineering</option><option>Product</option><option>Sales</option></select></div>
+        <div class="form-group"><label>Include Bonuses</label><select><option>Yes — include performance bonuses</option><option>No — skip bonuses</option></select></div>
+      </div>
+      <div class="form-group"><label>Notes / Remarks</label><textarea placeholder="Any special instructions for this payroll cycle…" style="min-height:70px;"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('run-payroll-modal')">Cancel</button>
+      <button class="btn btn-primary">▶ Process Payroll</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="payslip-modal" onclick="closeModal('payslip-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><div class="modal-title">📄 Payslip — Priya Sharma</div><button class="modal-close" onclick="closeModal('payslip-modal')">×</button></div>
+    <div class="modal-body">
+      <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:12px;color:var(--text3);">
+        <span>Employee ID: <strong style="color:var(--text);">EMP-00214</strong></span>
+        <span>Period: <strong style="color:var(--text);">April 2025</strong></span>
+        <span class="badge badge-green">Processed</span>
+      </div>
+      <div class="payslip-row"><span class="payslip-label">Basic Salary</span><span class="payslip-val">₹58,333</span></div>
+      <div class="payslip-row"><span class="payslip-label">HRA</span><span class="payslip-val">₹23,333</span></div>
+      <div class="payslip-row"><span class="payslip-label">Special Allowance</span><span class="payslip-val">₹20,500</span></div>
+      <div class="payslip-row"><span class="payslip-label">Performance Bonus</span><span class="payslip-val">₹8,000</span></div>
+      <div class="sep"></div>
+      <div class="payslip-row"><span class="payslip-label">PF Deduction</span><span class="payslip-val payslip-deduct">−₹6,999</span></div>
+      <div class="payslip-row"><span class="payslip-label">ESI</span><span class="payslip-val payslip-deduct">−₹1,313</span></div>
+      <div class="payslip-row"><span class="payslip-label">Professional Tax</span><span class="payslip-val payslip-deduct">−₹200</span></div>
+      <div class="payslip-row"><span class="payslip-label">TDS</span><span class="payslip-val payslip-deduct">−₹9,500</span></div>
+      <div class="payslip-total" style="margin-top:16px;">
+        <div><div style="font-size:12px;color:var(--text2);">Net Take Home</div><div style="font-size:24px;font-weight:700;color:var(--green);font-family:var(--mono);">₹92,154</div></div>
+        <div style="text-align:right;"><div style="font-size:12px;color:var(--text2);">Annual CTC</div><div style="font-size:16px;font-weight:600;font-family:var(--mono);">₹14,00,000</div></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeModal('payslip-modal')">Close</button><button class="btn btn-primary">📥 Download PDF</button></div>
+  </div>
+</div>
+
+<script>
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function switchTab(el) {
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const tip = { backgroundColor:'#1e2f45', titleColor:'#e2e8f0', bodyColor:'#94a3b8', borderColor:'#243550', borderWidth:1 };
+const gridX = { color:'rgba(255,255,255,0.05)' };
+const tickStyle = { color:'#64748b', font:{size:11} };
+
+// Payroll trend
+new Chart(document.getElementById('payrollTrendChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
+    datasets: [
+      { label: 'Gross Payroll (₹Cr)', data: [1.28,1.31,1.34,1.36,1.39,1.42], backgroundColor: 'rgba(79,156,249,0.55)', borderColor: '#4f9cf9', borderWidth: 1, borderRadius: 6, yAxisID: 'y' },
+      { label: 'Net Payroll (₹Cr)',   data: [1.10,1.12,1.15,1.17,1.19,1.22], backgroundColor: 'rgba(34,197,94,0.45)',  borderColor: '#22c55e', borderWidth: 1, borderRadius: 6, yAxisID: 'y', type: 'line', tension: 0.4, fill: false, pointRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true, labels: { color:'#94a3b8', font:{size:11}, boxWidth:10, padding:12 } }, tooltip: tip },
+    scales: {
+      x: { grid: gridX, ticks: tickStyle },
+      y: { grid: gridX, ticks: { ...tickStyle, callback: v => '₹'+v+'Cr' } }
+    }
+  }
+});
+
+// Dept cost donut
+new Chart(document.getElementById('deptCostChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Engineering', 'Product', 'Sales', 'Operations', 'HR/Admin'],
+    datasets: [{ data: [48,18,22,8,4], backgroundColor: ['#4f9cf9','#a78bfa','#2dd4bf','#f59e0b','#f43f5e'], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '68%',
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { color:'#94a3b8', font:{size:11}, boxWidth:10, padding:10 } },
+      tooltip: { ...tip, callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` } }
+    }
+  }
+});
+
+// Deduction donut
+new Chart(document.getElementById('deductChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['TDS', 'PF', 'ESI', 'Prof. Tax'],
+    datasets: [{ data: [9.8,5.2,2.4,1.0], backgroundColor: ['#4f9cf9','#a78bfa','#2dd4bf','#f59e0b'], borderWidth: 0, hoverOffset: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '65%',
+    plugins: { legend: { display: false }, tooltip: { ...tip, callbacks: { label: ctx => ` ${ctx.label}: ₹${ctx.parsed}L` } } }
+  }
+});
+</script>
+</body>
+</html>

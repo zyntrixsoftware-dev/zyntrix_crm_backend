@@ -134,7 +134,7 @@ exports.getMyPayrollHistory = async (req, res) => {
 
 exports.getPayrollRecords = async (req, res) => {
   try {
-    if (!["hr", "super_admin"].includes(req.user.role)) {
+    if (!["hr", "sales", "super_admin"].includes(req.user.role)) {
       return res.status(403).json({ msg: "Access denied" });
     }
 
@@ -155,7 +155,7 @@ exports.getPayrollRecords = async (req, res) => {
 
 exports.updatePayrollStatus = async (req, res) => {
   try {
-    if (!["hr", "super_admin"].includes(req.user.role)) {
+    if (!["hr", "sales", "super_admin"].includes(req.user.role)) {
       return res.status(403).json({ msg: "Access denied" });
     }
 

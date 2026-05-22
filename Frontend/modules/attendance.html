@@ -41,6 +41,17 @@
 .req-approved{background:rgba(34,197,94,.16);color:#22c55e}
 .req-rejected{background:rgba(244,63,94,.16);color:#f43f5e}
 .req-empty{font-size:12px;color:#64748b;padding:6px 2px}
+/* ── Standing / streak card ─────────────────────────────────── */
+.streak-hero{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(34,211,200,.16),rgba(59,130,246,.10));border:1px solid rgba(34,211,200,.28);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.streak-flame{font-size:30px;line-height:1}
+.streak-hero>div strong{display:block;font-size:30px;font-weight:700;color:#e2e8f0;line-height:1.05}
+.streak-hero>div span{font-size:12px;color:#94a3b8}
+.streak-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.streak-badges:empty{display:none}
+.streak-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#cbd5e1}
+.streak-badge.gold{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.35);color:#f59e0b}
+.streak-badge.green{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.35);color:#22c55e}
+.streak-badge.teal{background:rgba(34,211,200,.15);border-color:rgba(34,211,200,.35);color:#22d3c8}
 </style>
 <link rel="stylesheet" href="../assets/css/theme.css">
 <script src="../assets/js/appearance.js"></script>
@@ -192,31 +203,40 @@
 
       <aside class="right-column">
         <section class="panel summary-panel">
-          <h3>Today's Summary</h3>
+          <h3>Your Standing</h3>
+
+          <div class="streak-hero">
+            <div class="streak-flame" id="streakFlame">🔥</div>
+            <div>
+              <strong id="streakDays">0</strong>
+              <span id="streakLabel">day on-time streak</span>
+            </div>
+          </div>
+
+          <div class="streak-badges" id="streakBadges"></div>
 
           <div class="summary-item">
-            <div class="summary-icon green">◷</div>
+            <div class="summary-icon green">✓</div>
             <div>
-              <span>Working Hours</span>
-              <strong id="todayHours">00:00</strong>
-              <small>/ 8:00 hrs</small>
+              <span>Days present this month</span>
+              <strong id="monthPresent">0 / 0</strong>
+            </div>
+          </div>
+
+          <div class="summary-item">
+            <div class="summary-icon yellow">★</div>
+            <div>
+              <span>Punctuality this month</span>
+              <strong id="monthPunctuality">—</strong>
             </div>
           </div>
 
           <div class="summary-item">
             <div class="summary-icon blue">▣</div>
             <div>
-              <span>Attendance Status</span>
+              <span>Today</span>
               <strong id="todayStatus">Scheduled</strong>
-              <small id="todayDate">Today</small>
-            </div>
-          </div>
-
-          <div class="summary-item">
-            <div class="summary-icon yellow">◷</div>
-            <div>
-              <strong>On Time</strong>
-              <small id="expectedTime">Expected in 09:00 AM</small>
+              <small id="todayStanding">Shift starts 09:00 AM</small>
             </div>
           </div>
         </section>

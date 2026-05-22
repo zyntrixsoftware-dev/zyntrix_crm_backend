@@ -5,15 +5,20 @@ const monthYear = document.getElementById("monthYear");
 const punchInfo = document.getElementById("punchInfo");
 const punchCount = document.getElementById("punchCount");
 const summary = document.getElementById("summary");
-const todayHours = document.getElementById("todayHours");
 const statusEl = document.getElementById("status");
 const todayStatus = document.getElementById("todayStatus");
+// Standing / streak card elements
+const streakDays = document.getElementById("streakDays");
+const streakLabel = document.getElementById("streakLabel");
+const streakFlame = document.getElementById("streakFlame");
+const streakBadges = document.getElementById("streakBadges");
+const monthPresent = document.getElementById("monthPresent");
+const monthPunctuality = document.getElementById("monthPunctuality");
+const todayStanding = document.getElementById("todayStanding");
 const punchBtn = document.getElementById("punchBtn");
 const shiftDate = document.getElementById("shiftDate");
-const todayDate = document.getElementById("todayDate");
 const startTime = document.getElementById("startTime");
 const endTime = document.getElementById("endTime");
-const expectedTime = document.getElementById("expectedTime");
 const searchInput = document.getElementById("searchInput");
 const topClock = document.getElementById("topClock");
 const notificationButton = document.getElementById("notificationButton");
@@ -236,35 +241,111 @@ function updateSelectedShift() {
   }
 
   punchCount.textContent = rec.punchOut ? "2" : "1";
-  punchInfo.innerHTML = `
-    Punch In: ${formatTime(rec.punchIn)}${rec.punchOut ? `<br>Punch Out: ${formatTime(rec.punchOut)}` : ""}
-  `;
+  // Punch timestamps are intentionally hidden (company policy): we show punch
+  // STATUS only, so worked hours can't be reconstructed from in/out times.
+  punchInfo.innerHTML = rec.punchOut ? "Punched in &amp; out ✓" : "Punched in ✓";
 
+  // Shift Details "Total Hours" always reflects the SCHEDULED shift length,
+  // never the actual worked duration.
+  summary.textContent = shift.totalLabel;
   if (rec.punchIn && rec.punchOut) {
-    summary.textContent = calc(rec.punchIn, rec.punchOut);
     punchBtn.innerText = isTodaySelected ? "Completed" : "View Today";
   } else {
-    summary.textContent = calc(rec.punchIn, new Date());
     punchBtn.innerText = isTodaySelected ? "Punch Out" : "View Today";
   }
 }
 
+function isWorkingDay(date) {
+  return date.getDay() !== 0;   // Sunday is the only off day (matches getShift)
+}
+
+// On time = punched in at or before the shift start (09:00) on that date.
+function punchedOnTime(rec, date) {
+  return !!(rec && rec.punchIn) && new Date(rec.punchIn) <= getShiftDateTime(date, SHIFT_START);
+}
+
+// Computes punctuality-based stats only — never any worked-hours duration.
+function computeStanding() {
+  const now = new Date();
+  const todayKey = getLocalDate();
+  const shiftEndToday = getShiftDateTime(now, SHIFT_END);
+
+  // ── On-time streak: walk backwards from today ──
+  let streak = 0;
+  const cursor = stripTime(now);
+  for (let i = 0; i < 200; i++) {
+    if (isWorkingDay(cursor)) {
+      const k = key(cursor);
+      const rec = getRecord(k);
+      const isToday = k === todayKey;
+      if (rec && rec.punchIn) {
+        if (punchedOnTime(rec, cursor)) streak++;
+        else break;                       // a late punch breaks the streak
+      } else if (!isToday) {
+        break;                            // a past working day with no punch breaks it
+      }                                   // today, not punched yet → neither count nor break
+    }
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  // ── This month: present & punctuality ──
+  const y = now.getFullYear(), m = now.getMonth();
+  let working = 0, present = 0, onTime = 0;
+  for (let d = 1; d <= now.getDate(); d++) {
+    const dd = new Date(y, m, d);
+    if (!isWorkingDay(dd)) continue;
+    const k = key(dd);
+    const rec = getRecord(k);
+    const isToday = k === todayKey;
+    // Don't count today against the employee before the shift is over / they've punched.
+    if (isToday && !(rec && rec.punchIn) && now < shiftEndToday) continue;
+    working++;
+    if (rec && rec.punchIn) {
+      present++;
+      if (punchedOnTime(rec, dd)) onTime++;
+    }
+  }
+  const punctuality = present > 0 ? Math.round((onTime / present) * 100) : null;
+
+  return { streak, working, present, onTime, punctuality };
+}
+
 function updateTodaySummary() {
-  const today = new Date();
+  const now = new Date();
   const todayKey = getLocalDate();
   const rec = getRecord(todayKey);
-  const status = getStatusForDate(today, rec);
+  const status = getStatusForDate(now, rec);
+  const s = computeStanding();
 
-  todayDate.textContent = shortDate(today);
+  // Hero on-time streak
+  if (streakDays)  streakDays.textContent  = s.streak;
+  if (streakLabel) streakLabel.textContent = (s.streak === 1 ? "day" : "days") + " on-time streak";
+  if (streakFlame) streakFlame.style.opacity = s.streak > 0 ? "1" : "0.35";
+
+  // This-month stats (attendance + punctuality, no hours)
+  if (monthPresent)     monthPresent.textContent     = `${s.present} / ${s.working} days`;
+  if (monthPunctuality) monthPunctuality.textContent = s.punctuality === null ? "—" : `${s.punctuality}%`;
+
+  // Recognition badges
+  if (streakBadges) {
+    const badges = [];
+    if (s.working > 0 && s.present === s.working) badges.push('<span class="streak-badge gold">🏅 Perfect attendance</span>');
+    if (s.streak >= 10) badges.push(`<span class="streak-badge teal">⚡ ${s.streak}-day streak</span>`);
+    if (s.present >= 3 && s.punctuality !== null && s.punctuality >= 90) badges.push('<span class="streak-badge green">⭐ Punctual Pro</span>');
+    if (!badges.length) badges.push('<span class="streak-badge">👍 Keep it going</span>');
+    streakBadges.innerHTML = badges.join("");
+  }
+
+  // Today's status + a punctuality-oriented standing message (never hours)
   todayStatus.textContent = status;
-  expectedTime.textContent = "Expected in 09:00 AM";
-
-  if (rec?.punchIn && rec?.punchOut) {
-    todayHours.textContent = calc(rec.punchIn, rec.punchOut);
-  } else if (rec?.punchIn) {
-    todayHours.textContent = calc(rec.punchIn, new Date());
-  } else {
-    todayHours.textContent = "00:00";
+  if (todayStanding) {
+    let msg;
+    if (!isWorkingDay(now))                            msg = "Rest day — enjoy!";
+    else if (rec && rec.punchIn && punchedOnTime(rec, now)) msg = "On time today ✓";
+    else if (rec && rec.punchIn)                       msg = "Punched in";
+    else if (now < getShiftDateTime(now, SHIFT_START)) msg = "Shift starts 09:00 AM";
+    else                                               msg = "Not punched in yet";
+    todayStanding.textContent = msg;
   }
 }
 

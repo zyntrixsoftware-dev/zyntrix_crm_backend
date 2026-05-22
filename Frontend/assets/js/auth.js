@@ -1,8 +1,8 @@
 // ── ROLE → MODULE PERMISSIONS ─────────────────────────────────────────────────
 const ROLE_MODULES = {
-  super_admin: ["admin", "hr", "sales", "marketing", "lms", "attendance"],
-  hr:          ["hr"],
-  sales:       ["sales"],
+  super_admin: ["admin", "hr", "sales", "marketing", "lms", "attendance", "payroll"],
+  hr:          ["hr", "payroll"],
+  sales:       ["sales", "payroll"],
   marketing:   ["marketing"],
   lms:         ["lms"],
   employee:    ["attendance"]

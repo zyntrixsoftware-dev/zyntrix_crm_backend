@@ -4,10 +4,9 @@ const tableBody = document.getElementById("timecardBody");
 const dateFilter = document.querySelector("input[type='date']");
 const statusFilter = document.querySelector("select");
 
-// summary cards (Overtime card was removed from the template — index shifted)
-const totalHoursEl = document.querySelectorAll(".summary-box h2")[0];
-const overtimeEl   = null;   // overtime is no longer tracked / displayed
-const daysWorkedEl = document.querySelectorAll(".summary-box h2")[1];
+// summary cards: [0] = Punctuality, [1] = Days Worked (hours card removed by policy)
+const punctualityEl = document.querySelectorAll(".summary-box h2")[0];
+const daysWorkedEl  = document.querySelectorAll(".summary-box h2")[1];
 
 // ================= STATE =================
 let records = [];
@@ -41,7 +40,7 @@ function renderTable(data) {
   if (!data.length) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align:center;">No records found</td>
+        <td colspan="2" style="text-align:center;">No records found</td>
       </tr>
     `;
     return;
@@ -51,27 +50,13 @@ function renderTable(data) {
 
     const tr = document.createElement("tr");
 
-    const date = formatDate(rec.date);
-
-    const inTime = rec.punchIn
-      ? formatTime(rec.punchIn)
-      : "-";
-
-    const outTime = rec.punchOut
-      ? formatTime(rec.punchOut)
-      : "-";
-
-    const hours = (rec.punchIn && rec.punchOut)
-      ? calculateHours(rec.punchIn, rec.punchOut)
-      : "-";
-
+    const date   = formatDate(rec.date);
     const status = getStatus(rec);
 
+    // Punch in/out times and worked-hours are intentionally not displayed
+    // (company policy). Only the date and attendance status are shown.
     tr.innerHTML = `
       <td>${date}</td>
-      <td>${inTime}</td>
-      <td>${outTime}</td>
-      <td class="hours">${hours}</td>
       <td>${getBadge(status)}</td>
     `;
 
@@ -82,21 +67,23 @@ function renderTable(data) {
 // ================= SUMMARY =================
 function updateSummary(data) {
 
-  let totalMinutes = 0;
-  let workedDays = 0;
+  let present    = 0;   // days the employee punched in
+  let onTime     = 0;   // of those, days with "present" (on-time) status
+  let workedDays = 0;   // days with a full punch in + out
 
   data.forEach(rec => {
-    if (rec.punchIn && rec.punchOut) {
-      // Cap each day at 8 hours — no overtime is counted toward total either.
-      const minutes = Math.min(getMinutes(rec.punchIn, rec.punchOut), 480);
-      totalMinutes += minutes;
-      workedDays++;
+    if (rec.punchIn) {
+      present++;
+      if (getStatus(rec) === "present") onTime++;
     }
+    if (rec.punchIn && rec.punchOut) workedDays++;
   });
 
-  if (totalHoursEl) totalHoursEl.textContent = formatHours(totalMinutes);
-  if (daysWorkedEl) daysWorkedEl.textContent = workedDays;
-  // overtimeEl removed — overtime is no longer tracked.
+  // Punctuality % — derived from status, not from any worked-hours value.
+  const punctuality = present > 0 ? Math.round((onTime / present) * 100) + "%" : "—";
+
+  if (punctualityEl) punctualityEl.textContent = punctuality;
+  if (daysWorkedEl)  daysWorkedEl.textContent  = workedDays;
 }
 
 // ================= FILTER =================
