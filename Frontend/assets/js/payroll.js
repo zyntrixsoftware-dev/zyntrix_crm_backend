@@ -24,12 +24,12 @@ function setDefaultMonth() {
   payrollMonth.value = new Date().toISOString().slice(0, 7);
 }
 
+// Overtime rows/fields removed: company policy no longer tracks overtime.
 function renderBreakdown(payroll) {
   salaryBreakdown.innerHTML = `
     <tr><td>Basic Pay</td><td>${money(payroll.basicPay)}</td></tr>
     <tr><td>HRA</td><td>${money(payroll.hra)}</td></tr>
     <tr><td>Bonus</td><td>${money(payroll.bonus)}</td></tr>
-    <tr><td>Overtime Pay</td><td>${money(payroll.overtimePay)}</td></tr>
     <tr><td>Tax</td><td>- ${money(payroll.tax)}</td></tr>
     <tr><td>Penalties</td><td>- ${money(payroll.penalties)}</td></tr>
     <tr><td>Total Deductions</td><td>- ${money(payroll.deductions)}</td></tr>
@@ -37,11 +37,11 @@ function renderBreakdown(payroll) {
 }
 
 function renderSummary(payroll) {
-  totalHours.textContent = hoursFromMinutes(payroll.totalWorkedMinutes);
-  overtimeHours.textContent = hoursFromMinutes(payroll.overtimeMinutes);
-  grossPay.textContent = money(payroll.grossPay);
-  netPay.textContent = money(payroll.netPay);
-  paymentStatus.textContent = `Payment Status: ${payroll.paymentStatus.toUpperCase()}`;
+  if (totalHours)     totalHours.textContent = hoursFromMinutes(payroll.totalWorkedMinutes);
+  if (overtimeHours)  overtimeHours.style.display = "none";   // overtime row hidden
+  if (grossPay)       grossPay.textContent = money(payroll.grossPay);
+  if (netPay)         netPay.textContent = money(payroll.netPay);
+  if (paymentStatus)  paymentStatus.textContent = `Payment Status: ${payroll.paymentStatus.toUpperCase()}`;
   renderBreakdown(payroll);
 }
 
@@ -53,12 +53,12 @@ function renderHistory(rows) {
     return;
   }
 
+  // Overtime column removed: company policy no longer tracks overtime.
   rows.forEach((item) => {
     payrollHistory.innerHTML += `
       <tr>
         <td>${item.month}</td>
         <td>${hoursFromMinutes(item.totalWorkedMinutes)}</td>
-        <td>${hoursFromMinutes(item.overtimeMinutes)}</td>
         <td>${money(item.netPay)}</td>
         <td>${item.paymentStatus}</td>
       </tr>
@@ -105,11 +105,9 @@ function downloadPayslip() {
     `Month: ${currentPayroll.month}`,
     "",
     `Total Hours: ${hoursFromMinutes(currentPayroll.totalWorkedMinutes)}`,
-    `Overtime Hours: ${hoursFromMinutes(currentPayroll.overtimeMinutes)}`,
     `Basic Pay: ${money(currentPayroll.basicPay)}`,
     `HRA: ${money(currentPayroll.hra)}`,
     `Bonus: ${money(currentPayroll.bonus)}`,
-    `Overtime Pay: ${money(currentPayroll.overtimePay)}`,
     `Gross Pay: ${money(currentPayroll.grossPay)}`,
     `Tax: ${money(currentPayroll.tax)}`,
     `Penalties: ${money(currentPayroll.penalties)}`,

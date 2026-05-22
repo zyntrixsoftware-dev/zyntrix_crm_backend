@@ -377,27 +377,7 @@
             </div>
           </div>
 
-          <div class="subsection">
-            <h3>Overtime</h3>
-            <div class="setting-row">
-              <div>
-                <strong>Opt-in for overtime tracking</strong>
-                <p>Record hours beyond standard shift in the Timecard</p>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="s-overtime">
-                <span class="toggle-knob"></span>
-              </label>
-            </div>
-            <div class="field-group" style="margin-top:10px;">
-              <label>Overtime threshold (hours beyond shift)</label>
-              <select id="s-otThreshold">
-                <option value="0.5">30 minutes</option>
-                <option value="1" selected>1 hour</option>
-                <option value="2">2 hours</option>
-              </select>
-            </div>
-          </div>
+          <!-- Overtime preferences removed: company policy no longer tracks overtime. -->
 
           <button class="btn-primary" onclick="saveSettings('attendance')">Save Attendance Preferences</button>
         </div>
@@ -728,9 +708,8 @@ async function saveSettings(section) {
       shiftEnd:     val("s-shiftEnd"),
       breakDur:     val("s-breakDur"),
       wfhDays:      parseInt(val("s-wfhDays")),
-      wfhDaysList:  wfhDays,
-      overtime:     chk("s-overtime"),
-      otThreshold:  parseFloat(val("s-otThreshold"))
+      wfhDaysList:  wfhDays
+      // Overtime preferences removed: company policy no longer tracks overtime.
     };
   } else if (section === "privacy") {
     patch.privacy = {
@@ -818,7 +797,6 @@ function applySettings(s) {
     setChk("s-punchConfirm", at.punchConfirm);
     setChk("s-punchTimer",   at.punchTimer);
     setChk("s-autoRemind",   at.autoRemind);
-    setChk("s-overtime",     at.overtime);
     if (at.shiftStart)  setVal("s-shiftStart",  at.shiftStart);
     if (at.shiftEnd)    setVal("s-shiftEnd",     at.shiftEnd);
     if (at.breakDur)    setVal("s-breakDur",     at.breakDur);
@@ -828,7 +806,7 @@ function applySettings(s) {
         btn.classList.toggle("day-selected", at.wfhDaysList.includes(btn.dataset.day));
       });
     }
-    if (at.otThreshold) setVal("s-otThreshold", String(at.otThreshold));
+    // Overtime preferences removed: company policy no longer tracks overtime.
   }
 
   // Privacy

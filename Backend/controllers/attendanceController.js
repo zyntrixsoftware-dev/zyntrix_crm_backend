@@ -30,7 +30,8 @@ function todayDateIST() {
 const PUNCH_IN_START  =  9 * 60 + 50;   // 09:50
 const PUNCH_IN_END    = 10 * 60 +  5;   // 10:05
 const PUNCH_OUT_START = 17 * 60;        // 17:00
-const PUNCH_OUT_END   = 17 * 60 + 10;   // 17:10
+const PUNCH_OUT_END   = 18 * 60;        // 18:00 (employees can stay until 6 PM)
+const PUNCH_OUT_CAP   = 17 * 60;        // recorded punch-out is always exactly 17:00
 
 function formatHM(mins) {
   const h = Math.floor(mins / 60);
@@ -107,7 +108,19 @@ exports.punchOut = async (req, res) => {
       return res.status(400).json({ msg: "Already punched out for today" });
     }
 
-    record.punchOut = new Date();
+    // Stored punch-out is *always* the official end of shift (5:00 PM IST),
+    // never the wall-clock time the employee actually clicked. This eliminates
+    // overtime — working hours are capped at the standard shift length even
+    // when an employee chooses to stay until 6 PM.
+    const now = new Date();
+    const istNow = new Date(now.getTime() + IST_OFFSET_MS);
+    const cap = new Date(Date.UTC(
+      istNow.getUTCFullYear(),
+      istNow.getUTCMonth(),
+      istNow.getUTCDate(),
+      17, 0, 0   // 17:00 IST
+    ) - IST_OFFSET_MS);   // shift back to UTC for storage
+    record.punchOut = cap;
     await record.save();
 
     return res.json(record);

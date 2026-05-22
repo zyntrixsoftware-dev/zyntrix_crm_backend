@@ -403,7 +403,7 @@ async function refreshToday() {
 // timezone) so an employee on a laptop set to the wrong zone still sees the
 // correct window. The server is the source of truth — this is for UX.
 const PUNCH_IN_WINDOW  = { start:  9 * 60 + 50, end: 10 * 60 +  5, label: "9:50 AM – 10:05 AM" };
-const PUNCH_OUT_WINDOW = { start: 17 * 60,      end: 17 * 60 + 10, label: "5:00 PM – 5:10 PM"  };
+const PUNCH_OUT_WINDOW = { start: 17 * 60,      end: 18 * 60,      label: "5:00 PM – 6:00 PM"  };
 
 function _nowMinutesIST() {
   const now = new Date();

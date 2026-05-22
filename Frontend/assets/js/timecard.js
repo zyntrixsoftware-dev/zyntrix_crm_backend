@@ -4,10 +4,10 @@ const tableBody = document.getElementById("timecardBody");
 const dateFilter = document.querySelector("input[type='date']");
 const statusFilter = document.querySelector("select");
 
-// summary cards
+// summary cards (Overtime card was removed from the template — index shifted)
 const totalHoursEl = document.querySelectorAll(".summary-box h2")[0];
-const overtimeEl = document.querySelectorAll(".summary-box h2")[1];
-const daysWorkedEl = document.querySelectorAll(".summary-box h2")[2];
+const overtimeEl   = null;   // overtime is no longer tracked / displayed
+const daysWorkedEl = document.querySelectorAll(".summary-box h2")[1];
 
 // ================= STATE =================
 let records = [];
@@ -83,28 +83,20 @@ function renderTable(data) {
 function updateSummary(data) {
 
   let totalMinutes = 0;
-  let overtimeMinutes = 0;
   let workedDays = 0;
 
   data.forEach(rec => {
-
     if (rec.punchIn && rec.punchOut) {
-
-      const minutes = getMinutes(rec.punchIn, rec.punchOut);
-
+      // Cap each day at 8 hours — no overtime is counted toward total either.
+      const minutes = Math.min(getMinutes(rec.punchIn, rec.punchOut), 480);
       totalMinutes += minutes;
       workedDays++;
-
-      if (minutes > 480) {
-        overtimeMinutes += (minutes - 480);
-      }
     }
-
   });
 
-  totalHoursEl.textContent = formatHours(totalMinutes);
-  overtimeEl.textContent = formatHours(overtimeMinutes);
-  daysWorkedEl.textContent = workedDays;
+  if (totalHoursEl) totalHoursEl.textContent = formatHours(totalMinutes);
+  if (daysWorkedEl) daysWorkedEl.textContent = workedDays;
+  // overtimeEl removed — overtime is no longer tracked.
 }
 
 // ================= FILTER =================
