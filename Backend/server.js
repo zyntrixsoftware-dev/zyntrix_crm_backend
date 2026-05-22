@@ -17,6 +17,7 @@ const interviewOfferRoutes  = require("./routes/interviewOfferRoutes");
 const candidateRoutes       = require("./routes/candidateRoutes");
 const employeeRoutes        = require("./routes/employeeRoutes");
 const requestRoutes         = require("./routes/requestRoutes");
+const offboardingRoutes     = require("./routes/offboardingRoutes");
 
 const app = express();
 
@@ -102,6 +103,7 @@ app.use("/api/payroll",    payrollRoutes);
 app.use("/api/import",     importRoutes);
 app.use("/api/hr",         interviewOfferRoutes);   // interview + offer letter panel
 app.use("/api/hr",         candidateRoutes);        // candidate import + shortlist
+app.use("/api/hr",         offboardingRoutes);      // employee offboarding / separation
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────
 app.get("/", (req, res) => {

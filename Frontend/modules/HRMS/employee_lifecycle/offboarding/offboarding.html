@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRMS — Offboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d1b2a;--navy2:#132236;--navy3:#1a2d42;--navy4:#203350;--navy5:#263d5e;
+  --accent:#4f9cf9;--accent2:#3b82f6;--accent-dim:rgba(59,130,246,0.12);
+  --teal:#2dd4bf;--amber:#f59e0b;--rose:#f43f5e;--green:#22c55e;--purple:#a78bfa;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --card:#132236;--radius:12px;--sidebar:248px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
+.content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
+.brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:15px;font-weight:600;color:var(--text)}
+.brand-ver{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.nav-section{padding:14px 10px 6px}
+.nav-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-item:hover{background:var(--accent-dim);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent2);border-radius:0 3px 3px 0}
+.nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
+.nav-divider{height:1px;background:var(--border);margin:8px 10px}
+.sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
+.user-pill:hover{background:var(--border)}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.page-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
+.breadcrumb{font-size:12px;color:var(--text3)}
+.breadcrumb span{color:var(--text2)}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;min-width:200px}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%}
+.search-box input::placeholder{color:var(--text3)}
+.topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.topbar-btn:hover{background:var(--navy3)}
+.topbar-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.topbar-btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card-sm{padding:16px}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.toolbar select{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;font-family:var(--font);outline:none}
+.toolbar select option{background:var(--navy2)}
+.spacer{flex:1}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-green{background:rgba(34,197,94,0.13);color:var(--green)}
+.b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
+.b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}
+.b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
+.b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
+.b-teal{background:rgba(45,212,191,0.13);color:var(--teal)}
+.b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px}
+td{padding:12px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
+tr:first-child td{border-top:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-main{font-weight:500;color:var(--text)}
+.td-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.empty-state{text-align:center;color:var(--text3);padding:40px 0}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:660px;max-width:94vw;max-height:90vh;overflow-y:auto}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--navy2);z-index:2}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:22px 24px}
+.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:10px;align-items:center;position:sticky;bottom:0;background:var(--navy2)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+label{font-size:12px;font-weight:500;color:var(--text2)}
+input,select,textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
+select option{background:var(--navy2)}
+textarea{resize:vertical;min-height:70px}
+.btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.btn:hover{background:var(--navy3)}
+.btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.btn.success{background:var(--green);border-color:var(--green);color:#06231f}
+.btn.danger{background:transparent;border-color:rgba(244,63,94,.4);color:var(--rose)}
+.btn.danger:hover{background:rgba(244,63,94,.12)}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
+.prog-bar{height:6px;background:var(--navy4);border-radius:3px;overflow:hidden;width:120px}
+.prog-fill{height:100%;border-radius:3px;background:var(--accent2);transition:width .4s}
+.sec-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sec-label:first-child{margin-top:0}
+.chk-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.chk-row:last-child{border-bottom:none}
+.chk-row input[type=checkbox]{width:16px;height:16px;flex-shrink:0;accent-color:var(--accent2);cursor:pointer}
+.chk-row .chk-label{flex:1}
+.chk-row .chk-label.done{color:var(--text);text-decoration:line-through;opacity:.7}
+.chk-row .chk-dept{font-size:10px;color:var(--text3);background:var(--navy4);padding:2px 7px;border-radius:5px;flex-shrink:0}
+.asset-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.asset-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent2)}
+.asset-row .asset-name{flex:1}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;font-size:13px}
+.info-grid .k{color:var(--text3);font-size:11px}
+.info-grid .v{color:var(--text);font-weight:500}
+.preview{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7}
+.preview b{color:var(--text)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy4);border:1px solid var(--border2);color:var(--text);padding:11px 20px;border-radius:10px;font-size:13px;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+<script src="../../../../assets/js/api.js"></script>
+<script src="../../../../assets/js/auth.js?v=3"></script>
+</head>
+<body>
+<script>requireAuth(); requireModuleAccess("hr");</script>
+<div class="shell">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">👥</div>
+    <div><div class="brand-name">HRMS Pro</div><div class="brand-ver">v2.5 · 2025</div></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="../../dashboard/hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Employees</div>
+    <a class="nav-item" href="../../employees/employees.html"><span class="nav-icon">👥</span> All Employees</a>
+    <a class="nav-item" href="../../employees/attendance.html"><span class="nav-icon">📅</span> Attendance</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Talent Acquisition</div>
+    <a class="nav-item" href="../../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
+    <a class="nav-item" href="../../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates</a>
+    <a class="nav-item" href="../../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Employee Lifecycle</div>
+    <a class="nav-item" href="../offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
+    <a class="nav-item" href="../onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
+    <a class="nav-item" href="../orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
+    <a class="nav-item" href="../deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
+    <a class="nav-item active" href="../offboarding/offboarding.html"><span class="nav-icon">🚪</span> Offboarding</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-label">Operations</div>
+    <a class="nav-item" href="../../operations/payroll.html"><span class="nav-icon">💰</span> Payroll</a>
+    <a class="nav-item" href="../../employees/shift-requests.html"><span class="nav-icon">🔄</span> Shift Requests</a>
+    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations</a>
+    <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar" id="sb-av">HR</div>
+      <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--text);" id="sb-name">HR</div><div style="font-size:11px;color:var(--text3);">HR Manager</div></div>
+      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;white-space:nowrap;">⏻ Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Offboarding</div>
+      <div class="breadcrumb">HRMS Pro <span>›</span> Employee Lifecycle <span>›</span> Offboarding</div>
+    </div>
+    <div class="search-box"><span>🔍</span><input type="text" id="ob-search" placeholder="Search employee…" oninput="loadCases()"></div>
+    <button class="topbar-btn primary" onclick="openInitiate()">＋ Initiate Offboarding</button>
+  </div>
+
+  <div class="content">
+    <!-- KPI -->
+    <div class="grid g4" style="margin-bottom:20px;">
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--amber);" id="kpi-inprogress">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">In Progress</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--purple);" id="kpi-pending">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Pending Clearance</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--rose);" id="kpi-lwd">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Last Working Day ≤ 14d</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;">
+        <div style="font-size:26px;font-weight:600;color:var(--green);" id="kpi-completed">0</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Completed</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <select id="filter-status" onchange="loadCases()">
+          <option value="">All statuses</option>
+          <option value="initiated">Initiated</option>
+          <option value="in_progress">In progress</option>
+          <option value="cleared">Cleared</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <select id="filter-type" onchange="loadCases()">
+          <option value="">All separation types</option>
+          <option value="resignation">Resignation</option>
+          <option value="termination_cause">Termination (cause)</option>
+          <option value="layoff">Layoff / Redundancy</option>
+          <option value="contract_end">Contract / Internship end</option>
+          <option value="retirement">Retirement</option>
+          <option value="absconding">Absconding</option>
+          <option value="compassionate">Compassionate / Medical</option>
+        </select>
+        <div class="spacer"></div>
+        <span id="sync-msg" style="font-size:12px;color:var(--text3);"></span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th><th>Type</th><th>Last Working Day</th><th>Clearance</th><th>Status</th><th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ob-tbody">
+          <tr><td colspan="6" class="empty-state">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════ INITIATE MODAL ════════ -->
+<div class="overlay" id="initiate-modal">
+  <div class="modal" style="width:560px;">
+    <div class="modal-hd">
+      <div class="modal-title">Initiate Offboarding</div>
+      <button class="modal-close" onclick="closeModal('initiate-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label>Employee *</label>
+        <select id="in-employee"><option value="">Select employee…</option></select>
+      </div>
+      <div class="fg">
+        <label>Separation type *</label>
+        <select id="in-type" onchange="renderTypePreview()">
+          <option value="resignation">Resignation (voluntary)</option>
+          <option value="termination_cause">Termination — for cause</option>
+          <option value="layoff">Layoff / Redundancy</option>
+          <option value="contract_end">Contract / Internship end</option>
+          <option value="retirement">Retirement</option>
+          <option value="absconding">Absconding / No-show</option>
+          <option value="compassionate">Compassionate / Medical</option>
+        </select>
+      </div>
+      <div class="preview" id="type-preview"></div>
+      <div class="frow">
+        <div class="fg" style="margin:0;"><label>Notice date</label><input type="date" id="in-notice"></div>
+        <div class="fg" style="margin:0;"><label>Last working day</label><input type="date" id="in-lwd"></div>
+      </div>
+      <div class="fg" style="margin-bottom:0;">
+        <label>Reason / notes</label>
+        <textarea id="in-reason" placeholder="Context for this separation…"></textarea>
+      </div>
+    </div>
+    <div class="modal-ft" style="justify-content:flex-end;">
+      <button class="btn" onclick="closeModal('initiate-modal')">Cancel</button>
+      <button class="btn primary" id="in-submit" onclick="submitInitiate()">Create Case</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ DETAIL MODAL ════════ -->
+<div class="overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="dt-title">Offboarding</div>
+      <button class="modal-close" onclick="closeModal('detail-modal')">×</button>
+    </div>
+    <div class="modal-body" id="dt-body"></div>
+    <div class="modal-ft">
+      <button class="btn danger" id="dt-cancel" onclick="cancelCase()">Cancel case</button>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" onclick="saveDetail()">Save</button>
+        <button class="btn success" id="dt-complete" onclick="completeCase()">Mark Complete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════════════
+let cases = [];
+let employees = [];
+let currentCase = null;       // the case open in the detail modal
+let detailAssets = [];        // working copy of assets for the detail modal
+
+const TYPE_LABEL = {
+  resignation:       "Resignation",
+  termination_cause: "Termination (cause)",
+  layoff:            "Layoff / Redundancy",
+  contract_end:      "Contract / Internship end",
+  retirement:        "Retirement",
+  absconding:        "Absconding",
+  compassionate:     "Compassionate / Medical"
+};
+const TYPE_BADGE = {
+  resignation:"b-blue", termination_cause:"b-rose", layoff:"b-amber",
+  contract_end:"b-teal", retirement:"b-purple", absconding:"b-rose", compassionate:"b-gray"
+};
+// Mirror of the backend templates — used only for the "what this seeds" preview.
+const TYPE_HINT = {
+  resignation:       { cut:"on last working day", rehire:"eligible",     extra:"Adds relieving letter + experience certificate tasks." },
+  termination_cause: { cut:"immediately",         rehire:"not eligible", extra:"Adds misconduct documentation + legal sign-off. Case is restricted." },
+  layoff:            { cut:"on last working day", rehire:"eligible",     extra:"Adds severance + outplacement + relieving documents." },
+  contract_end:      { cut:"on last working day", rehire:"eligible",     extra:"Lighter checklist; adds experience certificate." },
+  retirement:        { cut:"on last working day", rehire:"not eligible", extra:"Adds gratuity, service certificate + alumni network." },
+  absconding:        { cut:"immediately",         rehire:"not eligible", extra:"Adds absconding notice; settlement withheld. Case is restricted." },
+  compassionate:     { cut:"immediately",         rehire:"not eligible", extra:"Settlement coordinated with nominee/family. Case is restricted." }
+};
+const STATUS_BADGE = {
+  initiated:"b-gray", in_progress:"b-amber", cleared:"b-teal", completed:"b-green", cancelled:"b-rose"
+};
+const STATUS_LABEL = {
+  initiated:"Initiated", in_progress:"In progress", cleared:"Cleared", completed:"Completed", cancelled:"Cancelled"
+};
+
+// ════════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════════
+window.addEventListener("DOMContentLoaded", () => {
+  const u = (typeof getUser === "function") ? getUser() : null;
+  if (u) {
+    document.getElementById("sb-name").textContent = u.name || "HR";
+    document.getElementById("sb-av").textContent   = (u.name || "HR").slice(0,2).toUpperCase();
+  }
+  loadEmployees();
+  loadCases();
+});
+
+async function loadEmployees() {
+  const res = await apiRequest("/hr/employees");
+  employees = (res && res.employees) ? res.employees : [];
+  const sel = document.getElementById("in-employee");
+  sel.innerHTML = `<option value="">Select employee…</option>` +
+    employees
+      .filter(e => e.employeeStatus !== "Terminated" && e.employeeStatus !== "Resigned")
+      .map(e => `<option value="${e._id}">${esc(e.name)} — ${esc(e.designation || e.department || e.email || "")}</option>`)
+      .join("");
+}
+
+async function loadCases() {
+  const status = document.getElementById("filter-status").value;
+  const type   = document.getElementById("filter-type").value;
+  const search = document.getElementById("ob-search").value.trim();
+  let url = "/hr/offboardings?";
+  if (status) url += "status=" + encodeURIComponent(status) + "&";
+  if (type)   url += "type="   + encodeURIComponent(type) + "&";
+  if (search) url += "search=" + encodeURIComponent(search);
+
+  setSync("Loading…");
+  const res = await apiRequest(url);
+  if (res.error) { setSync(res.msg || "Failed to load"); return; }
+  cases = res.offboardings || [];
+  renderKpis(res.kpis || {});
+  renderTable();
+  setSync(`${cases.length} case${cases.length === 1 ? "" : "s"}`);
+}
+
+function renderKpis(k) {
+  document.getElementById("kpi-inprogress").textContent = k.inProgress ?? 0;
+  document.getElementById("kpi-pending").textContent    = k.pendingClearance ?? 0;
+  document.getElementById("kpi-lwd").textContent        = k.upcomingLwd ?? 0;
+  document.getElementById("kpi-completed").textContent  = k.completed ?? 0;
+}
+
+function renderTable() {
+  const tb = document.getElementById("ob-tbody");
+  if (!cases.length) {
+    tb.innerHTML = `<tr><td colspan="6" class="empty-state">No offboarding cases yet — click <b>＋ Initiate Offboarding</b>.</td></tr>`;
+    return;
+  }
+  tb.innerHTML = cases.map(c => {
+    const total = (c.checklist || []).length;
+    const done  = (c.checklist || []).filter(i => i.done).length;
+    const pct   = total ? Math.round(done / total * 100) : 0;
+    const canComplete = !["completed", "cancelled"].includes(c.status);
+    return `<tr>
+      <td><div class="td-main">${esc(c.employeeName || "—")}</div><div class="td-sub">${esc(c.department || "")}${c.visibility === "restricted" ? ' · 🔒 restricted' : ''}</div></td>
+      <td><span class="badge ${TYPE_BADGE[c.separationType] || 'b-gray'}">${TYPE_LABEL[c.separationType] || c.separationType}</span></td>
+      <td>${c.lastWorkingDay ? fmtDate(c.lastWorkingDay) : '<span style="color:var(--text3)">—</span>'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
+          <span style="font-size:11px;color:var(--text3);">${done}/${total}</span>
+        </div>
+      </td>
+      <td><span class="badge ${STATUS_BADGE[c.status] || 'b-gray'}">${STATUS_LABEL[c.status] || c.status}</span></td>
+      <td style="text-align:right;white-space:nowrap;">
+        <button class="btn btn-sm" onclick="openDetail('${c._id}')">View</button>
+        ${canComplete ? `<button class="btn btn-sm success" onclick="completeCase('${c._id}')">Complete</button>` : ''}
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  INITIATE
+// ════════════════════════════════════════════════════════════════════
+function openInitiate() {
+  document.getElementById("in-employee").value = "";
+  document.getElementById("in-type").value = "resignation";
+  document.getElementById("in-notice").value = "";
+  document.getElementById("in-lwd").value = "";
+  document.getElementById("in-reason").value = "";
+  renderTypePreview();
+  openModal("initiate-modal");
+}
+
+function renderTypePreview() {
+  const t = document.getElementById("in-type").value;
+  const h = TYPE_HINT[t] || {};
+  document.getElementById("type-preview").innerHTML =
+    `Access is revoked <b>${h.cut || "on last working day"}</b> · Rehire: <b>${h.rehire || "—"}</b><br>${esc(h.extra || "")}`;
+}
+
+async function submitInitiate() {
+  const userId = document.getElementById("in-employee").value;
+  const separationType = document.getElementById("in-type").value;
+  if (!userId) { toast("Please select an employee."); return; }
+
+  const btn = document.getElementById("in-submit");
+  btn.disabled = true; btn.textContent = "Creating…";
+  const res = await apiRequest("/hr/offboardings", "POST", {
+    userId,
+    separationType,
+    reason:         document.getElementById("in-reason").value.trim(),
+    noticeDate:     document.getElementById("in-notice").value,
+    lastWorkingDay: document.getElementById("in-lwd").value
+  });
+  btn.disabled = false; btn.textContent = "Create Case";
+
+  if (res.error) { toast(res.msg || "Could not create case"); return; }
+  closeModal("initiate-modal");
+  toast("Offboarding case created.");
+  await loadCases();
+  if (res.offboarding && res.offboarding._id) openDetail(res.offboarding._id);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  DETAIL
+// ════════════════════════════════════════════════════════════════════
+async function openDetail(id) {
+  const res = await apiRequest("/hr/offboardings/" + id);
+  if (res.error || !res.offboarding) { toast(res.msg || "Could not load case"); return; }
+  currentCase = res.offboarding;
+  detailAssets = (currentCase.assets || []).map(a => ({ name:a.name, returned:a.returned, note:a.note || "" }));
+  renderDetail();
+  openModal("detail-modal");
+}
+
+function renderDetail() {
+  const c = currentCase;
+  const isClosed = ["completed", "cancelled"].includes(c.status);
+  document.getElementById("dt-title").textContent = `${c.employeeName} · ${TYPE_LABEL[c.separationType] || c.separationType}`;
+
+  const total = (c.checklist || []).length;
+  const done  = (c.checklist || []).filter(i => i.done).length;
+
+  const checklistHtml = (c.checklist || []).map(i => `
+    <div class="chk-row">
+      <input type="checkbox" ${i.done ? "checked" : ""} ${isClosed ? "disabled" : ""}
+             onchange="toggleChecklist('${i._id}', this.checked)">
+      <span class="chk-label ${i.done ? "done" : ""}">${esc(i.label)}</span>
+      <span class="chk-dept">${esc(i.dept || "")}</span>
+    </div>`).join("");
+
+  const assetsHtml = detailAssets.map((a, idx) => `
+    <div class="asset-row">
+      <input type="checkbox" ${a.returned ? "checked" : ""} ${isClosed ? "disabled" : ""} onchange="toggleAsset(${idx}, this.checked)">
+      <span class="asset-name ${a.returned ? "" : ""}">${esc(a.name)}</span>
+      <span class="badge ${a.returned ? "b-green" : "b-amber"}">${a.returned ? "Returned" : "Pending"}</span>
+    </div>`).join("") || `<div style="color:var(--text3);font-size:12px;padding:6px 0;">No assets tracked yet.</div>`;
+
+  const e = c.exitInterview || {};
+  const s = c.settlement || {};
+  const d = c.documents || {};
+
+  document.getElementById("dt-body").innerHTML = `
+    <div class="sec-label">Separation</div>
+    <div class="info-grid" style="margin-bottom:6px;">
+      <div><div class="k">Employee</div><div class="v">${esc(c.employeeName)}</div></div>
+      <div><div class="k">Email</div><div class="v" style="font-family:var(--mono);font-size:12px;">${esc(c.employeeEmail || "")}</div></div>
+      <div><div class="k">Type</div><div class="v">${TYPE_LABEL[c.separationType] || c.separationType}</div></div>
+      <div><div class="k">Status</div><div class="v"><span class="badge ${STATUS_BADGE[c.status]}">${STATUS_LABEL[c.status]}</span></div></div>
+      <div><div class="k">Access cutoff</div><div class="v">${c.accessCutoff === "immediate" ? "Immediate" : "Last working day"}</div></div>
+      <div><div class="k">Rehire eligible</div><div class="v">${c.rehireEligible ? "Yes" : "No"}</div></div>
+    </div>
+    <div class="frow" style="margin-top:14px;">
+      <div class="fg" style="margin:0;"><label>Notice date</label><input type="date" id="dt-notice" value="${c.noticeDate || ""}" ${isClosed ? "disabled" : ""}></div>
+      <div class="fg" style="margin:0;"><label>Last working day</label><input type="date" id="dt-lwd" value="${c.lastWorkingDay || ""}" ${isClosed ? "disabled" : ""}></div>
+    </div>
+    <div class="fg"><label>Reason / notes</label><textarea id="dt-reason" ${isClosed ? "disabled" : ""}>${esc(c.reason || "")}</textarea></div>
+
+    <div class="sec-label">Clearance checklist — ${done}/${total} done</div>
+    ${checklistHtml}
+
+    <div class="sec-label">Company assets</div>
+    <div id="dt-assets">${assetsHtml}</div>
+    ${isClosed ? "" : `<div style="display:flex;gap:8px;margin-top:10px;">
+      <input type="text" id="dt-new-asset" placeholder="e.g. Laptop — Dell XPS 13" style="flex:1;">
+      <button class="btn btn-sm" onclick="addAsset()">Add</button>
+    </div>`}
+
+    <div class="sec-label">Exit interview</div>
+    <div class="frow">
+      <div class="fg" style="margin:0;"><label>Scheduled for</label><input type="date" id="dt-ei-date" value="${e.scheduledFor || ""}" ${isClosed ? "disabled" : ""}></div>
+      <div class="fg" style="margin:0;"><label>Rating (1–5)</label>
+        <select id="dt-ei-rating" ${isClosed ? "disabled" : ""}>
+          ${[["","—"],["1","1"],["2","2"],["3","3"],["4","4"],["5","5"]].map(([v,l]) => `<option value="${v}" ${String(e.rating ?? "") === v ? "selected" : ""}>${l}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label><input type="checkbox" id="dt-ei-done" ${e.completed ? "checked" : ""} ${isClosed ? "disabled" : ""} style="width:auto;display:inline;margin-right:6px;">Exit interview completed</label></div>
+    <div class="fg"><label>Reason for leaving</label><input type="text" id="dt-ei-reason" value="${esc(e.reasonForLeaving || "")}" ${isClosed ? "disabled" : ""}></div>
+    <div class="fg"><label>Feedback</label><textarea id="dt-ei-feedback" ${isClosed ? "disabled" : ""}>${esc(e.feedback || "")}</textarea></div>
+
+    <div class="sec-label">Full &amp; final settlement</div>
+    <div class="frow">
+      <div class="fg" style="margin:0;"><label>Status</label>
+        <select id="dt-set-status" ${isClosed ? "disabled" : ""}>
+          ${[["pending","Pending"],["processing","Processing"],["paid","Paid"],["withheld","Withheld"]].map(([v,l]) => `<option value="${v}" ${s.status === v ? "selected" : ""}>${l}</option>`).join("")}
+        </select>
+      </div>
+      <div class="fg" style="margin:0;"><label><input type="checkbox" id="dt-set-leave" ${s.leaveEncashment ? "checked" : ""} ${isClosed ? "disabled" : ""} style="width:auto;display:inline;margin-right:6px;">Leave encashment</label></div>
+    </div>
+
+    <div class="sec-label">Documents</div>
+    <div class="fg" style="margin:0;">
+      <label><input type="checkbox" id="dt-doc-relieving" ${d.relievingLetter ? "checked" : ""} ${isClosed ? "disabled" : ""} style="width:auto;display:inline;margin-right:6px;">Relieving letter issued</label>
+      <label><input type="checkbox" id="dt-doc-experience" ${d.experienceCertificate ? "checked" : ""} ${isClosed ? "disabled" : ""} style="width:auto;display:inline;margin-right:6px;">Experience / service certificate issued</label>
+      <label><input type="checkbox" id="dt-doc-nodues" ${d.noDuesCertificate ? "checked" : ""} ${isClosed ? "disabled" : ""} style="width:auto;display:inline;margin-right:6px;">No-dues certificate issued</label>
+    </div>
+  `;
+
+  // Toggle footer buttons based on state
+  document.getElementById("dt-complete").style.display = isClosed ? "none" : "";
+  document.getElementById("dt-cancel").style.display   = isClosed ? "none" : "";
+}
+
+async function toggleChecklist(itemId, done) {
+  if (!currentCase) return;
+  const res = await apiRequest(`/hr/offboardings/${currentCase._id}/checklist/${itemId}`, "PATCH", { done });
+  if (res.error) { toast(res.msg || "Update failed"); return; }
+  currentCase = res.offboarding;
+  renderDetail();
+  // keep the background table progress in sync
+  const i = cases.findIndex(x => x._id === currentCase._id);
+  if (i >= 0) { cases[i] = currentCase; renderTable(); }
+}
+
+function addAsset() {
+  const inp = document.getElementById("dt-new-asset");
+  const name = (inp.value || "").trim();
+  if (!name) return;
+  detailAssets.push({ name, returned: false, note: "" });
+  inp.value = "";
+  renderDetail();
+}
+function toggleAsset(idx, returned) {
+  if (detailAssets[idx]) detailAssets[idx].returned = returned;
+}
+
+async function saveDetail() {
+  if (!currentCase) return;
+  const ratingVal = document.getElementById("dt-ei-rating").value;
+  const payload = {
+    noticeDate:     document.getElementById("dt-notice").value,
+    lastWorkingDay: document.getElementById("dt-lwd").value,
+    reason:         document.getElementById("dt-reason").value,
+    assets:         detailAssets,
+    exitInterview: {
+      scheduledFor:     document.getElementById("dt-ei-date").value,
+      completed:        document.getElementById("dt-ei-done").checked,
+      reasonForLeaving: document.getElementById("dt-ei-reason").value,
+      rating:           ratingVal === "" ? null : Number(ratingVal),
+      feedback:         document.getElementById("dt-ei-feedback").value
+    },
+    settlement: {
+      status:          document.getElementById("dt-set-status").value,
+      leaveEncashment: document.getElementById("dt-set-leave").checked
+    },
+    documents: {
+      relievingLetter:       document.getElementById("dt-doc-relieving").checked,
+      experienceCertificate: document.getElementById("dt-doc-experience").checked,
+      noDuesCertificate:     document.getElementById("dt-doc-nodues").checked
+    }
+  };
+  const res = await apiRequest("/hr/offboardings/" + currentCase._id, "PATCH", payload);
+  if (res.error) { toast(res.msg || "Save failed"); return; }
+  currentCase = res.offboarding;
+  toast("Saved.");
+  await loadCases();
+  renderDetail();
+}
+
+async function completeCase(id) {
+  const caseId = id || (currentCase && currentCase._id);
+  if (!caseId) return;
+  const c = id ? cases.find(x => x._id === id) : currentCase;
+  const name = c ? c.employeeName : "this employee";
+  if (!confirm(`Complete offboarding for ${name}?\n\nThis revokes their login access and updates their employee status. This cannot be undone.`)) return;
+  const res = await apiRequest(`/hr/offboardings/${caseId}/complete`, "POST");
+  if (res.error) { toast(res.msg || "Could not complete"); return; }
+  toast(res.msg || "Completed.");
+  closeModal("detail-modal");
+  await loadCases();
+}
+
+async function cancelCase() {
+  if (!currentCase) return;
+  if (!confirm("Cancel this offboarding case? The employee remains active.")) return;
+  const res = await apiRequest(`/hr/offboardings/${currentCase._id}/cancel`, "POST");
+  if (res.error) { toast(res.msg || "Could not cancel"); return; }
+  toast("Case cancelled.");
+  closeModal("detail-modal");
+  await loadCases();
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  UTILITIES
+// ════════════════════════════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add("open"); }
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+function setSync(msg){ document.getElementById("sync-msg").textContent = msg; }
+function fmtDate(d){ return d ? new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" }) : "—"; }
+function esc(s){ return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+let _toastT;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => t.classList.remove("show"), 3000);
+}
+</script>
+</body>
+</html>
