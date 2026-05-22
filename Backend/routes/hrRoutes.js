@@ -9,6 +9,7 @@ const {
   createEmployee,
   updateEmployee,
   terminateEmployee,
+  reactivateEmployee,
   getDepartments,
   getHrmsDashboard,
   exportEmployees
@@ -41,5 +42,6 @@ router.post("/employees",                    auth, createEmployee);
 router.get("/employees/:id",                 auth, getEmployee);     // ← after named routes
 router.put("/employees/:id",                 auth, updateEmployee);
 router.patch("/employees/:id/terminate",     auth, terminateEmployee);
+router.patch("/employees/:id/reactivate",    auth, reactivateEmployee);
 
 module.exports = router;

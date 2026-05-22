@@ -555,11 +555,15 @@ function renderTable(employees) {
       <td>${esc(emp.designation) || '<span style="color:var(--text3)">—</span>'}</td>
       <td><span class="badge ${typeClass(emp.employeeType)}">${esc(emp.employeeType) || "Full-time"}</span></td>
       <td style="color:var(--text2);font-size:12px">${joined}</td>
-      <td><span class="badge ${statusClass(emp.employeeStatus)}">${esc(emp.employeeStatus) || "Active"}</span></td>
+      <td>
+        <span class="badge ${statusClass(emp.employeeStatus)}">${esc(emp.employeeStatus) || "Active"}</span>
+        ${emp.active === false ? '<span class="badge b-rose" style="margin-left:4px">🔒 Deactivated</span>' : ''}
+      </td>
       <td>
         <div class="btn-row-inline">
           <button class="btn-sm primary" onclick="viewProfile('${emp._id}')">View</button>
           <button class="btn-sm" onclick="openEditModal('${emp._id}')">Edit</button>
+          ${emp.active === false ? `<button class="btn-sm" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green)" onclick="reactivateEmployee('${emp._id}','${esc(emp.name)}')">↺ Reactivate</button>` : ''}
           <button class="btn-sm danger" onclick="openTermModal('${emp._id}','${esc(emp.name)}')">✕</button>
         </div>
       </td>
@@ -756,6 +760,16 @@ async function confirmTerminate() {
   closeModal("term-modal");
   showToast(action === "delete" ? "Employee deleted" : "Employee terminated", "ok");
   pendingTermId = null;
+  await loadEmployees();
+  await loadDashboardKPIs();
+}
+
+// ── REACTIVATE a deactivated account ──────────────────────────────
+async function reactivateEmployee(id, name) {
+  if (!confirm(`Reactivate ${name}'s account?\n\nThis restores their login access and sets their status back to Active.`)) return;
+  const res = await apiRequest(`/hr/employees/${id}/reactivate`, "PATCH");
+  if (res.error) { showToast(res.msg || "Could not reactivate", "err"); return; }
+  showToast("Account reactivated", "ok");
   await loadEmployees();
   await loadDashboardKPIs();
 }

@@ -324,6 +324,28 @@ exports.terminateEmployee = async (req, res) => {
   }
 };
 
+// ── PATCH /api/hr/employees/:id/reactivate ───────────────────────────────────
+// Re-enables a deactivated account (self-deactivated from Settings, or
+// deactivated by completing an offboarding case). Restores login access and
+// sets the employee status back to Active.
+exports.reactivateEmployee = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const emp = await User.findOneAndUpdate(
+      { _id: req.params.id, role: { $nin: ["super_admin"] } },
+      { active: true, employeeStatus: "Active" },
+      { new: true }
+    ).select("-password -otpCode -otpExpiry -otpResetToken");
+
+    if (!emp) return res.status(404).json({ msg: "Employee not found" });
+    return res.json({ msg: "Account reactivated", employee: withPhotoUrl(emp, apiHostFromReq(req)) });
+  } catch (err) {
+    console.error("REACTIVATE EMPLOYEE ERROR:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
 // ── LIST DEPARTMENTS ──────────────────────────────────────────────────────────
 exports.getDepartments = async (req, res) => {
   try {
