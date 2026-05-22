@@ -5,7 +5,8 @@ const MODULES = {
   sales:      { name: "Sales",      file: "modules/sales_system/dashboard.html" },
   marketing:  { name: "Marketing",  file: "modules/marketing.html" },
   lms:        { name: "LMS",        file: "modules/lms.html" },
-  attendance: { name: "Attendance", file: "modules/attendance.html" }
+  attendance: { name: "Attendance", file: "modules/attendance.html" },
+  payroll:    { name: "Payroll",    file: "modules/payroll_system/payroll.html" }
 };
 
 // FIX: was calling getSession() which doesn't exist — now uses getUser() from auth.js
