@@ -10,33 +10,29 @@ const {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sync a shortlist action back to the Google Sheet via the GAS web app.
+// Uses native fetch (Node 18+) which follows GAS redirects automatically.
 // Fire-and-forget — a Sheet sync failure never blocks the HR action.
 // ─────────────────────────────────────────────────────────────────────────────
 function syncShortlistToSheet(email, shortlisted) {
   const gasUrl = process.env.GAS_WEBAPP_URL;
-  if (!gasUrl) return; // not configured — skip silently
+  if (!gasUrl) {
+    console.warn("[GAS sync] GAS_WEBAPP_URL not set — skipping sheet sync");
+    return;
+  }
 
   const payload = JSON.stringify({ action: "updateCandidate", email, shortlisted });
 
-  try {
-    const url  = new URL(gasUrl);
-    const opts = {
-      hostname: url.hostname,
-      path    : url.pathname + url.search,
-      method  : "POST",
-      headers : { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) }
-    };
-
-    const req = https.request(opts, (res) => {
-      res.resume(); // drain so the socket closes
-      console.log("[GAS sync] shortlist →", email, "| HTTP", res.statusCode);
-    });
-    req.on("error", (err) => console.warn("[GAS sync] failed →", email, "|", err.message));
-    req.write(payload);
-    req.end();
-  } catch (err) {
-    console.warn("[GAS sync] setup error →", err.message);
-  }
+  // Intentionally NOT awaited — fire and forget
+  fetch(gasUrl, {
+    method : "POST",
+    headers: { "Content-Type": "application/json" },
+    body   : payload,
+    redirect: "follow",   // follow GAS's 302 redirect automatically
+  })
+    .then(res => res.text().then(body => {
+      console.log("[GAS sync] shortlist →", email, "| HTTP", res.status, "|", body.slice(0, 120));
+    }))
+    .catch(err => console.warn("[GAS sync] failed →", email, "|", err.message));
 }
 
 function checkHrAccess(req, res) {
