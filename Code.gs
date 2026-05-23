@@ -480,16 +480,17 @@ function doPost(e) {
       // ── FIX: Write Resume Shortlisted (col N) correctly ──────────────────
       sheet.getRange(targetRow, COL.SHORTLISTED + 1).setValue(!!data.shortlisted);
 
-      // ── FIX: Don't let a resume-shortlist action overwrite Interview Status ─
-      // Only update col O (Interview Shortlisted) when:
-      //   a) We are NOT doing a fresh resume-shortlist (i.e. shortlisted was already true), OR
-      //   b) The stage being sent is a real interview stage (not "Shortlisted" itself)
-      // When HR first shortlists a resume, preserve the existing col O value ("Applied").
-      const isNewShortlist   = (!!data.shortlisted && !wasShortlisted);
-      const existingStage    = existingRow[COL.INTERVIEW_STATUS] || "Applied";
-      const incomingStage    = data.stage || "Applied";
-      const stageToWrite     = isNewShortlist ? existingStage : incomingStage;
-      sheet.getRange(targetRow, COL.INTERVIEW_STATUS + 1).setValue(stageToWrite);
+      // ── FIX: Resume Shortlist must ONLY touch col N — never col O ──────────
+      // Col O (Interview Shortlisted) is only updated when HR explicitly sets
+      // an interview stage AFTER the resume shortlist has already been done.
+      // On a fresh resume-shortlist, leave col O exactly as it is (empty).
+      const isNewShortlist = (!!data.shortlisted && !wasShortlisted);
+      if (!isNewShortlist) {
+        // HR is updating an already-shortlisted candidate's interview stage
+        const stageToWrite = data.stage || existingRow[COL.INTERVIEW_STATUS] || "";
+        sheet.getRange(targetRow, COL.INTERVIEW_STATUS + 1).setValue(stageToWrite);
+      }
+      // If isNewShortlist === true, we do NOT write to col O at all.
 
       sheet.getRange(targetRow, COL.OFFERED + 1).setValue(data.offered || data.hrNotes || "");
 
@@ -539,7 +540,7 @@ function doPost(e) {
       data.source         || "",
       data.declaration    || "",
       "",       // Col N: Resume shortlisted — starts empty
-      "Applied", // Col O: Interview Shortlisted — starts as "Applied"
+      "",       // Col O: Interview Shortlisted — starts empty (HR sets this later)
       "",       // Col P: Offered
     ];
 

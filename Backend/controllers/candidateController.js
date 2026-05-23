@@ -8,6 +8,37 @@ const {
   notifyRejected
 } = require("../utils/candidateEmails");
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Sync a shortlist action back to the Google Sheet via the GAS web app.
+// Fire-and-forget — a Sheet sync failure never blocks the HR action.
+// ─────────────────────────────────────────────────────────────────────────────
+function syncShortlistToSheet(email, shortlisted) {
+  const gasUrl = process.env.GAS_WEBAPP_URL;
+  if (!gasUrl) return; // not configured — skip silently
+
+  const payload = JSON.stringify({ action: "updateCandidate", email, shortlisted });
+
+  try {
+    const url  = new URL(gasUrl);
+    const opts = {
+      hostname: url.hostname,
+      path    : url.pathname + url.search,
+      method  : "POST",
+      headers : { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) }
+    };
+
+    const req = https.request(opts, (res) => {
+      res.resume(); // drain so the socket closes
+      console.log("[GAS sync] shortlist →", email, "| HTTP", res.statusCode);
+    });
+    req.on("error", (err) => console.warn("[GAS sync] failed →", email, "|", err.message));
+    req.write(payload);
+    req.end();
+  } catch (err) {
+    console.warn("[GAS sync] setup error →", err.message);
+  }
+}
+
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
     res.status(403).json({ msg: "Access denied" });
@@ -269,6 +300,10 @@ exports.shortlistCandidate = async (req, res) => {
     candidate.status      = "shortlisted";
     candidate.interviewId = interview._id;
     await candidate.save();
+
+    // Sync resume-shortlisted flag (col N = TRUE) back to Google Sheet.
+    // Fire-and-forget — sheet sync failure never blocks the shortlist action.
+    syncShortlistToSheet(candidate.email, true);
 
     // Notify candidate they were shortlisted (await so a network slowness shows
     // up in the response, but a failure does NOT block the shortlist action).
