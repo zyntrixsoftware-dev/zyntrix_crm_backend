@@ -1,12 +1,26 @@
 // ── ROLE → MODULE PERMISSIONS ─────────────────────────────────────────────────
+// Payroll is NOT a role-based module — it is restricted to two dedicated login
+// accounts (see PAYROLL_EMAILS + requirePayrollAccess below).
 const ROLE_MODULES = {
-  super_admin: ["admin", "hr", "sales", "marketing", "lms", "attendance", "payroll"],
-  hr:          ["hr", "payroll"],
-  sales:       ["sales", "payroll"],
+  super_admin: ["admin", "hr", "sales", "marketing", "lms", "attendance"],
+  hr:          ["hr"],
+  sales:       ["sales"],
+  payroll:     ["payroll"],
   marketing:   ["marketing"],
   lms:         ["lms"],
   employee:    ["attendance"]
 };
+
+// ── PAYROLL SECTION ACCESS (account-based) ────────────────────────────────────
+// Only these two accounts can see the Payroll section. Everyone else — including
+// super_admin and all hr/sales users — is blocked.
+const PAYROLL_EMAILS = [
+  "salespay@zyntrixsoftware.com",
+  "hrpay@zyntrixsoftware.com"
+];
+function isPayrollUser(user) {
+  return !!user && PAYROLL_EMAILS.includes(String(user.email || "").trim().toLowerCase());
+}
 
 // ── SESSION HELPERS ───────────────────────────────────────────────────────────
 function setSession(data) {
@@ -42,6 +56,15 @@ window.logout = function () {
 // ── ROLE REDIRECT AFTER LOGIN ─────────────────────────────────────────────────
 function redirectByRole(role) {
   const base = window.location.origin;
+
+  // Dedicated payroll logins go straight to the payroll section — it is their
+  // only area. This takes priority over role-based routing.
+  const u = getUser();
+  if (isPayrollUser(u) || role === "payroll") {
+    window.location.href = base + "/crm/modules/payroll_system/payroll.html";
+    return;
+  }
+
   switch (role) {
     case "super_admin":
       window.location.href = base + "/crm/modules/admin.html";
@@ -111,6 +134,18 @@ function requireModuleAccess(module) {
   const allowed = ROLE_MODULES[user.role] || [];
   if (!allowed.includes(module)) {
     alert("Access denied");
+    redirectByRole(user.role);
+  }
+}
+
+// ── PAYROLL SECTION GUARD (account-based) ─────────────────────────────────────
+// Gate the payroll section by email — only the two authorized payroll accounts
+// may view it. Used in place of requireModuleAccess on the payroll page.
+function requirePayrollAccess() {
+  const user = getUser();
+  if (!user) return;
+  if (!isPayrollUser(user)) {
+    alert("Access denied — the payroll section is restricted to authorized payroll accounts.");
     redirectByRole(user.role);
   }
 }

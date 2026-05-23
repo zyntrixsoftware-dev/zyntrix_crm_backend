@@ -173,7 +173,7 @@ select option { background: var(--navy3); }
 </head>
 <body>
 <!-- Standalone Payroll System: only HR / Sales / super_admin (logged in) may view. -->
-<script>requireAuth(); requireModuleAccess("payroll");</script>
+<script>requireAuth(); requirePayrollAccess();</script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var u = (typeof getUser === "function") ? getUser() : null;

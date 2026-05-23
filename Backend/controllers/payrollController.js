@@ -1,6 +1,17 @@
 const Attendance    = require("../models/attendance");
 const PayrollRecord = require("../models/PayrollRecord");
 
+// ── Payroll section access ───────────────────────────────────────────────────
+// The payroll module is restricted to two dedicated accounts (by email), not by
+// role. The email is carried in the JWT (see authController login).
+const PAYROLL_EMAILS = [
+  "salespay@zyntrixsoftware.com",
+  "hrpay@zyntrixsoftware.com"
+];
+function isPayrollUser(req) {
+  return PAYROLL_EMAILS.includes(String(req.user?.email || "").trim().toLowerCase());
+}
+
 // ── Rates from environment (configurable per deployment) ─────────────────────
 const HOURLY_RATE              = parseFloat(process.env.HOURLY_RATE              || 200);
 const HRA_PERCENT              = parseFloat(process.env.HRA_PERCENT              || 0.20);
@@ -134,8 +145,8 @@ exports.getMyPayrollHistory = async (req, res) => {
 
 exports.getPayrollRecords = async (req, res) => {
   try {
-    if (!["hr", "sales", "super_admin"].includes(req.user.role)) {
-      return res.status(403).json({ msg: "Access denied" });
+    if (!isPayrollUser(req)) {
+      return res.status(403).json({ msg: "Access denied — payroll is restricted to authorized payroll accounts" });
     }
 
     const query = {};
@@ -155,8 +166,8 @@ exports.getPayrollRecords = async (req, res) => {
 
 exports.updatePayrollStatus = async (req, res) => {
   try {
-    if (!["hr", "sales", "super_admin"].includes(req.user.role)) {
-      return res.status(403).json({ msg: "Access denied" });
+    if (!isPayrollUser(req)) {
+      return res.status(403).json({ msg: "Access denied — payroll is restricted to authorized payroll accounts" });
     }
 
     const { status } = req.body;
