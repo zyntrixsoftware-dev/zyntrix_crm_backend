@@ -40,7 +40,7 @@ function renderTable(data) {
   if (!data.length) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="2" style="text-align:center;">No records found</td>
+        <td colspan="4" style="text-align:center;">No records found</td>
       </tr>
     `;
     return;
@@ -50,13 +50,17 @@ function renderTable(data) {
 
     const tr = document.createElement("tr");
 
-    const date   = formatDate(rec.date);
-    const status = getStatus(rec);
+    const date    = formatDate(rec.date);
+    const inTime  = rec.punchIn  ? formatTime(rec.punchIn)  : "-";
+    const outTime = rec.punchOut ? formatTime(rec.punchOut) : "-";
+    const status  = getStatus(rec);
 
-    // Punch in/out times and worked-hours are intentionally not displayed
-    // (company policy). Only the date and attendance status are shown.
+    // Punch In / Punch Out / Status are shown; only the worked-hours column is
+    // omitted (company policy — no hours-worked total).
     tr.innerHTML = `
       <td>${date}</td>
+      <td>${inTime}</td>
+      <td>${outTime}</td>
       <td>${getBadge(status)}</td>
     `;
 

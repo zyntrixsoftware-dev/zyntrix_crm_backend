@@ -259,9 +259,11 @@ function isWorkingDay(date) {
   return date.getDay() !== 0;   // Sunday is the only off day (matches getShift)
 }
 
-// On time = punched in at or before the shift start (09:00) on that date.
-function punchedOnTime(rec, date) {
-  return !!(rec && rec.punchIn) && new Date(rec.punchIn) <= getShiftDateTime(date, SHIFT_START);
+// On time = punched in before 10:00 AM. The punch-in window opens at 9:50 AM,
+// so an on-time punch lands at 9:50–9:59; punching from 10:00 onward is late.
+// This matches the Timecard "present vs late" rule (late once the hour hits 10).
+function punchedOnTime(rec) {
+  return !!(rec && rec.punchIn) && new Date(rec.punchIn).getHours() < 10;
 }
 
 // Computes punctuality-based stats only — never any worked-hours duration.
@@ -448,7 +450,11 @@ function updateClock() {
     second: "2-digit"
   });
 
-  if (isSameDay(selectedDate, now)) updateUI();
+  // Standing & Notifications are "today" cards — keep them live on every tick,
+  // regardless of which calendar day is currently selected.
+  updateTodaySummary();
+  renderNotifications();
+  if (isSameDay(selectedDate, now)) updateSelectedShift();
 }
 
 async function punchIn() {
@@ -767,4 +773,15 @@ async function init() {
 }
 
 setInterval(updateClock, 1000);
+
+// Live data sync: re-pull attendance from the server every 60s so the Standing
+// card and Notifications reflect new punches / HR changes without a reload.
+setInterval(async () => {
+  await loadAttendance();
+  render(currentDate);
+  updateTodaySummary();
+  renderNotifications();
+  if (isSameDay(selectedDate, new Date())) updateSelectedShift();
+}, 60000);
+
 init();
