@@ -483,7 +483,7 @@ function renderTable() {
       <td>${stPill}</td>
       <td><div class="row-actions">
         ${canShort
-          ? `<button class="btn-sm success" onclick="shortlist('${c._id}')">⭐ Shortlist</button>
+          ? `<button class="btn-sm success" onclick="shortlist('${c._id}')">⭐ Resume Shortlist</button>
              <button class="btn-sm danger"  onclick="reject('${c._id}')">✖ Reject</button>`
           : interviewLink}
         <button class="btn-sm" onclick="viewDetails('${c._id}')" title="View all imported columns">👁 Details${rawCount(c) ? ` <span style="background:var(--accent-dim);color:var(--accent);padding:1px 6px;border-radius:10px;font-size:10px;margin-left:2px;">${rawCount(c)}</span>` : ""}</button>
@@ -527,10 +527,10 @@ function sourcePill(s) {
 //  ACTIONS — shortlist / reject / delete
 // ════════════════════════════════════════════════════════════════════
 async function shortlist(id) {
-  setSync("loading","Shortlisting…");
+  setSync("loading","Shortlisting resume…");
   const res = await apiRequest(`/hr/candidates/${id}/shortlist`, "POST");
   if (res.error) return setSync("err", res.msg);
-  setSync("ok", `Shortlisted — moved to Interview Panel`);
+  setSync("ok", `Resume Shortlisted — candidate notified to prepare for interview`);
   await loadCandidates();
 }
 async function reject(id) {

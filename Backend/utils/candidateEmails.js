@@ -69,20 +69,29 @@ async function notifyApplicationReceived(candidate) {
   return safeSend(candidate.email, subject, body);
 }
 
-// 2. SHORTLISTED -------------------------------------------------------------
+// 2. RESUME SHORTLISTED -------------------------------------------------------
+// Sent when HR clicks "Resume Shortlist" on the Candidates page.
+// Wording: resume shortlisted → prepare for interview → best of luck.
 async function notifyShortlisted(interview) {
   const role = interview.appliedFor || "your applied role";
-  const subject = `You have been Shortlisted - ${role} | ${COMPANY_NAME}`;
+  const subject = `Your Resume Has Been Shortlisted - ${role} | ${COMPANY_NAME}`;
   const body = [
     `Dear ${interview.candidateName || "Candidate"},`,
     "",
-    `Congratulations! We are pleased to inform you that you have been SHORTLISTED ` +
-    `for the position of ${role} at ${COMPANY_NAME}.`,
+    `Congratulations! We are excited to inform you that your resume has been ` +
+    `SHORTLISTED for the position of ${role} at ${COMPANY_NAME}.`,
     "",
-    "Our interview process consists of 3 rounds, each 50 minutes long. Our team will " +
-    "reach out shortly with scheduling details for Round 1.",
+    "You have successfully cleared the first stage of our selection process. " +
+    "Our HR team will be in touch with you shortly to schedule your interview.",
     "",
-    "Please keep an eye on your email and phone for scheduling communication.",
+    "In the meantime, we encourage you to:",
+    "  • Review the role requirements carefully",
+    `  • Research ${COMPANY_NAME} and our work`,
+    "  • Brush up on your technical and domain skills",
+    "",
+    "Prepare well for the interview — Best of Luck! 🍀",
+    "",
+    "Please keep your phone reachable and check your email regularly.",
     signOff()
   ].join("\n");
   return safeSend(interview.candidateEmail, subject, body);
