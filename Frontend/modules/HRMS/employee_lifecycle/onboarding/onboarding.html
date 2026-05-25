@@ -56,6 +56,7 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
 .b-teal{background:rgba(45,212,191,0.13);color:var(--teal)}
 .b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
+.b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
 table{width:100%;border-collapse:collapse}
 th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px}
 td{padding:12px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
@@ -68,27 +69,67 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
 .btn.primary:hover{opacity:.9}
 .btn.success{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.35);color:var(--green)}
+.btn.success:hover{background:rgba(34,197,94,0.25)}
+.btn.danger{background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.3);color:var(--rose)}
 .btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
 .prog-bar{height:5px;background:var(--navy4);border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;border-radius:3px;transition:width .5s}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
 .overlay.open{display:flex}
-.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:680px;max-width:95vw;max-height:92vh;overflow-y:auto}
+/* Wide modal for candidate detail */
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:860px;max-width:96vw;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column}
 .modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--navy2);z-index:1}
 .modal-title{font-size:15px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1;padding:0 4px}
 .modal-close:hover{color:var(--text)}
-.modal-body{padding:24px}
+.modal-body{padding:24px;flex:1}
 .modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;bottom:0;background:var(--navy2)}
+/* Info grid */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.info-cell{padding:11px 15px;border-bottom:1px solid var(--border)}
+.info-cell:nth-last-child(-n+2){border-bottom:none}
+.info-cell:nth-child(odd){border-right:1px solid var(--border)}
+.info-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.info-value{font-size:13px;font-weight:500;color:var(--text)}
+/* Section header inside modal */
+.sec-hd{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-hd::after{content:'';flex:1;height:1px;background:var(--border)}
 /* Document row */
-.doc-item{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:10px;border:1px solid var(--border);background:var(--navy3);margin-bottom:8px;transition:border .2s}
+.doc-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--navy3);margin-bottom:7px;transition:border .2s}
 .doc-item.has-file{border-color:rgba(34,197,94,0.25);background:rgba(34,197,94,0.04)}
-.doc-item.not-submitted{opacity:.6}
-.doc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.doc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .doc-dot.yes{background:var(--green)}
 .doc-dot.no{background:var(--text3)}
 .doc-label{flex:1;font-size:13px;font-weight:500;color:var(--text)}
-.doc-optional{font-size:10px;color:var(--text3);font-weight:400;margin-left:5px}
+.doc-optional{font-size:10px;color:var(--text3);font-weight:400;margin-left:4px}
+.doc-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+/* Checklist */
+.chk-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--navy3);margin-bottom:6px;cursor:pointer;transition:all .15s;user-select:none}
+.chk-item:hover{border-color:var(--border2)}
+.chk-item.done{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.2)}
+.chk-box{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-size:11px;font-weight:700}
+.chk-item.done .chk-box{background:var(--green);border-color:var(--green);color:#fff}
+.chk-text{flex:1;font-size:13px;color:var(--text2)}
+.chk-item.done .chk-text{color:var(--text3);text-decoration:line-through}
+.chk-dept{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--navy4);color:var(--text3)}
+.chk-done-at{font-size:10px;color:var(--text3);margin-left:4px}
+/* Notes */
+.note-item{background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:11px 14px;margin-bottom:8px}
+.note-text{font-size:13px;color:var(--text2);line-height:1.6}
+.note-meta{font-size:11px;color:var(--text3);margin-top:5px}
+/* Status stepper */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:4px}
+.step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;top:12px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.step.done::after{background:var(--green)}
+.step-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border2);background:var(--navy3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;z-index:1;transition:all .2s}
+.step.done .step-dot{background:var(--green);border-color:var(--green);color:#fff}
+.step.active .step-dot{border-color:var(--accent2);background:var(--accent-dim);color:var(--accent)}
+.step-label{font-size:9px;color:var(--text3);margin-top:5px;text-align:center;white-space:nowrap}
+.step.active .step-label{color:var(--accent)}
+.step.done .step-label{color:var(--green)}
+/* Complete banner */
+.complete-banner{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
@@ -191,7 +232,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div>
-          <div style="font-size:14px;font-weight:600;">Candidate Documents</div>
+          <div style="font-size:14px;font-weight:600;">Onboarding Candidates</div>
           <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="ob-count">Loading…</div>
         </div>
       </div>
@@ -208,12 +249,13 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <table id="ob-table" style="display:none;">
         <thead>
           <tr>
-            <th>Candidate name</th>
+            <th>Candidate</th>
             <th>Position</th>
+            <th>Joining Date</th>
             <th>Form Submitted</th>
             <th>Documents</th>
             <th>Status</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="ob-tbody"></tbody>
@@ -223,25 +265,49 @@ tr:hover td{background:rgba(255,255,255,.02)}
 </div>
 </div>
 
-<!-- ══ DOCUMENT DETAIL MODAL ════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CANDIDATE DETAIL MODAL
+══════════════════════════════════════════════════════════════════════════ -->
 <div class="overlay" id="doc-modal" onclick="closeModal('doc-modal')">
   <div class="modal" onclick="event.stopPropagation()">
+
+    <!-- Header -->
     <div class="modal-hd">
-      <div>
-        <div class="modal-title" id="dm-name">Candidate Documents</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="dm-meta"></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div id="dm-avatar" style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;">?</div>
+        <div>
+          <div class="modal-title" id="dm-name">Candidate Profile</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:1px;" id="dm-meta"></div>
+        </div>
       </div>
-      <button class="modal-close" onclick="closeModal('doc-modal')">×</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="badge" id="dm-status-badge">—</span>
+        <button class="modal-close" onclick="closeModal('doc-modal')">×</button>
+      </div>
     </div>
 
-    <div class="modal-body" id="dm-body">Loading…</div>
+    <!-- Body (tabs) -->
+    <div style="border-bottom:1px solid var(--border);display:flex;padding:0 24px;background:var(--navy2);position:sticky;top:62px;z-index:1;">
+      <button class="tab-btn active" onclick="switchTab('info')" id="tab-info" style="padding:10px 16px;background:none;border:none;color:var(--accent);font-size:13px;font-family:var(--font);font-weight:500;cursor:pointer;border-bottom:2px solid var(--accent2);margin-bottom:-1px;">👤 Candidate Info</button>
+      <button class="tab-btn" onclick="switchTab('docs')" id="tab-docs" style="padding:10px 16px;background:none;border:none;color:var(--text3);font-size:13px;font-family:var(--font);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;">📄 Documents <span id="tab-docs-count" style="font-size:10px;padding:1px 6px;border-radius:10px;background:var(--navy4);margin-left:4px;"></span></button>
+      <button class="tab-btn" onclick="switchTab('checklists')" id="tab-checklists" style="padding:10px 16px;background:none;border:none;color:var(--text3);font-size:13px;font-family:var(--font);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;">✅ Checklists</button>
+      <button class="tab-btn" onclick="switchTab('notes')" id="tab-notes" style="padding:10px 16px;background:none;border:none;color:var(--text3);font-size:13px;font-family:var(--font);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;">📝 Notes <span id="tab-notes-count" style="font-size:10px;padding:1px 6px;border-radius:10px;background:var(--navy4);margin-left:4px;"></span></button>
+    </div>
 
+    <div class="modal-body" id="dm-body">
+      <div style="text-align:center;padding:50px;color:var(--text3);"><span class="spin" style="font-size:24px;">⏳</span><div style="margin-top:10px;">Loading…</div></div>
+    </div>
+
+    <!-- Footer -->
     <div class="modal-ft">
       <div style="font-size:12px;color:var(--text3);" id="dm-submit-date"></div>
-      <div style="display:flex;gap:10px;">
-        <button class="btn" onclick="closeModal('doc-modal')">Close</button>
-        <button class="btn success" id="dm-complete-btn" onclick="markComplete()" style="display:none;">
-          ✅ Mark as Completely Submitted
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <button class="btn btn-sm" onclick="closeModal('doc-modal')">Close</button>
+        <button class="btn btn-sm success" id="dm-complete-btn" onclick="markComplete()" style="display:none;font-size:13px;">
+          ✅ Mark as Complete
+        </button>
+        <button class="btn btn-sm primary" id="dm-onboard-btn" onclick="markOnboarded()" style="display:none;font-size:13px;">
+          🎉 Mark as Onboarded
         </button>
       </div>
     </div>
@@ -253,33 +319,42 @@ tr:hover td{background:rgba(255,255,255,.02)}
 const API = window.API_BASE || "";
 
 const DOC_CONFIG = [
-  { key: "tenthMarksheet",     label: "10th / SSC Marksheet",                     required: true  },
-  { key: "twelfthMarksheet",   label: "12th / HSC Marksheet",                     required: true  },
-  { key: "graduationCert",     label: "Graduation Certificate & Marksheet",       required: true  },
-  { key: "postGraduationCert", label: "Post Graduation Certificate",              required: false },
-  { key: "passportPhoto",      label: "Passport Size Photograph",                 required: true  },
-  { key: "governmentId",       label: "Government ID (PAN / Voter ID / DL)",      required: true  },
-  { key: "bankDetails",        label: "Bank Account Details",                      required: true  },
-  { key: "acceptanceLetter",   label: "Acceptance Letter",                         required: true  }
+  { key: "tenthMarksheet",     label: "10th / SSC Marksheet",                   required: true  },
+  { key: "twelfthMarksheet",   label: "12th / HSC Marksheet",                   required: true  },
+  { key: "graduationCert",     label: "Graduation Certificate & Marksheet",     required: true  },
+  { key: "postGraduationCert", label: "Post Graduation Certificate",            required: false },
+  { key: "passportPhoto",      label: "Passport Size Photograph",               required: true  },
+  { key: "governmentId",       label: "Government ID (PAN / Voter ID / DL)",    required: true  },
+  { key: "bankDetails",        label: "Bank Account Details",                   required: true  },
+  { key: "acceptanceLetter",   label: "Acceptance / Offer Confirmation Letter", required: true  }
 ];
 
-const MANDATORY_KEYS = DOC_CONFIG.filter(d => d.required).map(d => d.key);
+const MANDATORY_KEYS  = DOC_CONFIG.filter(d => d.required).map(d => d.key);
+const ONBOARDING_STEPS = [
+  { key: "offer_sent",        label: "Offer Sent"     },
+  { key: "docs_pending",      label: "Docs Pending"   },
+  { key: "docs_submitted",    label: "Submitted"      },
+  { key: "docs_verified",     label: "Verified"       },
+  { key: "joining_scheduled", label: "Joining Set"    },
+  { key: "onboarded",         label: "Onboarded"      }
+];
 
 const STATUS_MAP = {
-  offer_sent:        { label: "Offer Sent",        cls: "b-blue"  },
-  docs_pending:      { label: "Docs Pending",       cls: "b-amber" },
-  docs_submitted:    { label: "Docs Submitted",     cls: "b-teal"  },
-  docs_verified:     { label: "Docs Verified ✓",   cls: "b-green" },
-  joining_scheduled: { label: "Joining Scheduled",  cls: "b-green" },
-  onboarded:         { label: "Onboarded ✓",        cls: "b-green" }
+  offer_sent:        { label: "Offer Sent",       cls: "b-blue"   },
+  docs_pending:      { label: "Docs Pending",     cls: "b-amber"  },
+  docs_submitted:    { label: "Docs Submitted",   cls: "b-teal"   },
+  docs_verified:     { label: "Docs Verified ✓", cls: "b-green"  },
+  joining_scheduled: { label: "Joining Scheduled",cls: "b-green"  },
+  onboarded:         { label: "Onboarded ✓",      cls: "b-purple" }
 };
 
 const COLORS = ["#3b82f6","#a78bfa","#2dd4bf","#f59e0b","#22c55e","#f43f5e","#6366f1"];
 
 // ── STATE ────────────────────────────────────────────────────────────────────
-let ALL_OB      = [];
-let activeObId  = null;
-let activeOb    = null;
+let ALL_OB     = [];
+let activeObId = null;
+let activeOb   = null;
+let activeTab  = "info";
 
 // ── SIDEBAR ──────────────────────────────────────────────────────────────────
 (function(){
@@ -355,18 +430,22 @@ function renderTable(data) {
   table.style.display = "table";
 
   document.getElementById("ob-tbody").innerHTML = data.map((ob, i) => {
-    const docs     = ob.documents || {};
-    const total    = DOC_CONFIG.length;
-    const submitted = DOC_CONFIG.filter(d => docs[d.key]?.submitted).length;
-    const pct      = Math.round(submitted / total * 100);
-    const color    = COLORS[i % COLORS.length];
-    const init     = (ob.candidateName||"?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
-    const sl       = STATUS_MAP[ob.onboardingStatus] || { label: ob.onboardingStatus, cls:"b-gray" };
-    const formDate = ob.formSubmittedAt
+    const docs           = ob.documents || {};
+    const total          = DOC_CONFIG.length;
+    const submitted      = DOC_CONFIG.filter(d => docs[d.key]?.submitted).length;
+    const pct            = Math.round(submitted / total * 100);
+    const color          = COLORS[i % COLORS.length];
+    const init           = (ob.candidateName||"?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+    const sl             = STATUS_MAP[ob.onboardingStatus] || { label: ob.onboardingStatus, cls:"b-gray" };
+    const formDate       = ob.formSubmittedAt
       ? new Date(ob.formSubmittedAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})
       : null;
+    const joiningFmt     = ob.joiningDate
+      ? new Date(ob.joiningDate + "T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})
+      : "—";
     const allMandatoryDone = MANDATORY_KEYS.every(k => docs[k]?.submitted);
-    const isComplete = ["docs_verified","joining_scheduled","onboarded"].includes(ob.onboardingStatus);
+    const isComplete       = ["docs_verified","joining_scheduled","onboarded"].includes(ob.onboardingStatus);
+    const isOnboarded      = ob.onboardingStatus === "onboarded";
     const pctColor = isComplete ? "var(--green)" : pct>=70 ? "var(--teal)" : pct>=40 ? "var(--accent2)" : "var(--amber)";
 
     return `<tr>
@@ -374,14 +453,18 @@ function renderTable(data) {
         <div style="display:flex;align-items:center;gap:9px;">
           <div style="width:32px;height:32px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${init}</div>
           <div>
-            <div class="td-main">${ob.candidateName||"—"}</div>
-            <div class="td-sub">${ob.candidateEmail||""}</div>
+            <div class="td-main">${esc(ob.candidateName||"—")}</div>
+            <div class="td-sub">${esc(ob.candidateEmail||"")}</div>
           </div>
         </div>
       </td>
       <td>
-        <div style="font-size:13px;color:var(--text2);">${ob.position||"—"}</div>
-        <div class="td-sub">${ob.employeeType||""}</div>
+        <div style="font-size:13px;color:var(--text2);">${esc(ob.position||"—")}</div>
+        <div class="td-sub">${esc(ob.employeeType||"")}</div>
+      </td>
+      <td>
+        <div style="font-size:13px;color:var(--text2);">${joiningFmt}</div>
+        ${ob.department ? `<div class="td-sub">${esc(ob.department)}</div>` : ""}
       </td>
       <td>
         ${formDate
@@ -390,17 +473,20 @@ function renderTable(data) {
       </td>
       <td>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-          <div class="prog-bar" style="width:100px;"><div class="prog-fill" style="width:${pct}%;background:${pctColor};"></div></div>
+          <div class="prog-bar" style="width:90px;"><div class="prog-fill" style="width:${pct}%;background:${pctColor};"></div></div>
           <span style="font-size:11px;color:var(--text3);font-family:var(--mono);">${submitted}/${total}</span>
         </div>
-        ${isComplete ? '<span class="badge b-green" style="font-size:10px;">All Submitted ✓</span>' : ""}
+        ${isComplete ? '<span class="badge b-green" style="font-size:10px;">✓ Verified</span>' : ""}
       </td>
       <td><span class="badge ${sl.cls}">${sl.label}</span></td>
       <td>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-sm" onclick="openDocs('${ob._id}')">📄 View Docs</button>
+          <button class="btn btn-sm" onclick="openDocs('${ob._id}')">📋 View Details</button>
           ${!isComplete && allMandatoryDone
             ? `<button class="btn btn-sm success" onclick="quickComplete('${ob._id}')">✅ Mark Complete</button>`
+            : ""}
+          ${isComplete && !isOnboarded
+            ? `<button class="btn btn-sm primary" onclick="quickOnboard('${ob._id}')">🎉 Mark Onboarded</button>`
             : ""}
         </div>
       </td>
@@ -408,116 +494,453 @@ function renderTable(data) {
   }).join("");
 }
 
-// ── QUICK MARK COMPLETE (from table row) ─────────────────────────────────────
+// ── QUICK ACTIONS (from table) ────────────────────────────────────────────────
 async function quickComplete(id) {
-  if (!confirm("Mark all documents as submitted and set status to Docs Verified?")) return;
+  if (!confirm("Mark all documents as verified and set status to Docs Verified?")) return;
   try {
     await apiFetch(`/api/hr/onboarding/${id}/status`, {
       method:"PATCH", body:JSON.stringify({ status:"docs_verified" })
     });
-    toast("✅ Marked as completely submitted!");
+    toast("✅ Marked as Docs Verified!");
     await loadOnboardings();
   } catch(err) { toast("❌ " + err.message, true); }
 }
 
-// ── DOCUMENT DETAIL MODAL ────────────────────────────────────────────────────
+async function quickOnboard(id) {
+  if (!confirm("Mark this candidate as fully Onboarded?")) return;
+  try {
+    await apiFetch(`/api/hr/onboarding/${id}/status`, {
+      method:"PATCH", body:JSON.stringify({ status:"onboarded" })
+    });
+    toast("🎉 Candidate marked as Onboarded!");
+    await loadOnboardings();
+  } catch(err) { toast("❌ " + err.message, true); }
+}
+
+// ── OPEN DETAIL MODAL ─────────────────────────────────────────────────────────
 async function openDocs(id) {
   activeObId = id;
   activeOb   = null;
+  activeTab  = "info";
   openModal("doc-modal");
   document.getElementById("dm-body").innerHTML =
-    '<div style="text-align:center;padding:40px;color:var(--text3);"><span class="spin" style="font-size:22px;">⏳</span><div style="margin-top:10px;">Loading…</div></div>';
+    '<div style="text-align:center;padding:50px;color:var(--text3);"><span class="spin" style="font-size:24px;">⏳</span><div style="margin-top:12px;">Loading candidate data…</div></div>';
   document.getElementById("dm-complete-btn").style.display = "none";
+  document.getElementById("dm-onboard-btn").style.display  = "none";
+  document.getElementById("dm-status-badge").textContent   = "—";
+  document.getElementById("dm-status-badge").className     = "badge b-gray";
   try {
     const { onboarding } = await apiFetch(`/api/hr/onboarding/${id}`);
     activeOb = onboarding;
-    renderDocModal(onboarding);
+    renderModal(onboarding);
   } catch(err) {
     document.getElementById("dm-body").innerHTML =
-      `<div style="color:var(--rose);padding:20px;">Error: ${err.message}</div>`;
+      `<div style="color:var(--rose);padding:20px;">❌ Error: ${esc(err.message)}</div>`;
   }
 }
 
-function renderDocModal(ob) {
-  document.getElementById("dm-name").textContent =
-    (ob.candidateName||"Candidate") + " — Uploaded Documents";
-  document.getElementById("dm-meta").textContent =
-    (ob.position||"") + (ob.employeeType ? " · " + ob.employeeType : "");
+// ── RENDER MODAL ──────────────────────────────────────────────────────────────
+function renderModal(ob) {
+  const name = ob.candidateName || "Candidate";
+  const init = name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+  const sl   = STATUS_MAP[ob.onboardingStatus] || { label: ob.onboardingStatus, cls: "b-gray" };
 
-  const docs = ob.documents || {};
-  const submitDate = ob.formSubmittedAt
+  // Header
+  document.getElementById("dm-avatar").textContent = init;
+  document.getElementById("dm-name").textContent   = name;
+  document.getElementById("dm-meta").textContent   = [ob.position, ob.department].filter(Boolean).join(" · ");
+  document.getElementById("dm-status-badge").textContent = sl.label;
+  document.getElementById("dm-status-badge").className   = "badge " + sl.cls;
+
+  // Submit date footer
+  document.getElementById("dm-submit-date").textContent = ob.formSubmittedAt
     ? "Form submitted: " + new Date(ob.formSubmittedAt).toLocaleString("en-IN",
         {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})
-    : "Form not yet submitted";
-  document.getElementById("dm-submit-date").textContent = submitDate;
+    : "📋 Awaiting form submission";
 
-  // Show "Mark Complete" button if not already complete
-  const isComplete = ["docs_verified","joining_scheduled","onboarded"].includes(ob.onboardingStatus);
-  const mandatoryDone = MANDATORY_KEYS.every(k => docs[k]?.submitted);
-  const btn = document.getElementById("dm-complete-btn");
-  btn.style.display = (mandatoryDone && !isComplete) ? "flex" : "none";
+  // Action buttons
+  const docs = ob.documents || {};
+  const allMandatory  = MANDATORY_KEYS.every(k => docs[k]?.submitted);
+  const isComplete    = ["docs_verified","joining_scheduled","onboarded"].includes(ob.onboardingStatus);
+  const isOnboarded   = ob.onboardingStatus === "onboarded";
+  document.getElementById("dm-complete-btn").style.display = (allMandatory && !isComplete) ? "inline-flex" : "none";
+  document.getElementById("dm-onboard-btn").style.display  = (isComplete && !isOnboarded)  ? "inline-flex" : "none";
 
-  // Count
+  // Tab counts
+  const submittedCount = DOC_CONFIG.filter(d => docs[d.key]?.submitted).length;
+  document.getElementById("tab-docs-count").textContent   = submittedCount + "/" + DOC_CONFIG.length;
+  document.getElementById("tab-notes-count").textContent  = (ob.hrNotes||[]).length;
+
+  // Reset tabs
+  document.querySelectorAll(".tab-btn").forEach(b => {
+    b.style.color = "var(--text3)";
+    b.style.borderBottomColor = "transparent";
+  });
+  const activeTabBtn = document.getElementById("tab-" + activeTab);
+  if (activeTabBtn) { activeTabBtn.style.color="var(--accent)"; activeTabBtn.style.borderBottomColor="var(--accent2)"; }
+
+  renderTab(ob, activeTab);
+}
+
+// ── TAB SWITCHER ──────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(b => {
+    b.style.color = "var(--text3)";
+    b.style.borderBottomColor = "transparent";
+  });
+  const btn = document.getElementById("tab-" + tab);
+  if (btn) { btn.style.color="var(--accent)"; btn.style.borderBottomColor="var(--accent2)"; }
+  if (activeOb) renderTab(activeOb, tab);
+}
+
+function renderTab(ob, tab) {
+  if      (tab === "info")       renderInfoTab(ob);
+  else if (tab === "docs")       renderDocsTab(ob);
+  else if (tab === "checklists") renderChecklistsTab(ob);
+  else if (tab === "notes")      renderNotesTab(ob);
+}
+
+// ── TAB 1: CANDIDATE INFO ─────────────────────────────────────────────────────
+function renderInfoTab(ob) {
+  const docs   = ob.documents || {};
+  const stepIdx = ONBOARDING_STEPS.findIndex(s => s.key === ob.onboardingStatus);
+
+  // Status stepper
+  const stepperHtml = `
+    <div class="stepper" style="margin-bottom:20px;">
+      ${ONBOARDING_STEPS.map((s, i) => {
+        const done   = i < stepIdx;
+        const active = i === stepIdx;
+        return `<div class="step ${done?"done":active?"active":""}">
+          <div class="step-dot">${done ? "✓" : String(i+1)}</div>
+          <div class="step-label">${s.label}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+
+  // Complete / onboarded banner
+  const isOnboarded = ob.onboardingStatus === "onboarded";
+  const isVerified  = ["docs_verified","joining_scheduled","onboarded"].includes(ob.onboardingStatus);
+  let bannerHtml = "";
+  if (isOnboarded) {
+    bannerHtml = `<div class="complete-banner">
+      <span style="font-size:22px;">🎉</span>
+      <div>
+        <div style="font-weight:600;color:var(--green);font-size:14px;">Onboarding Complete</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">This candidate has been fully onboarded as an employee${ob.onboardedAt ? " on " + new Date(ob.onboardedAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : ""}.</div>
+      </div>
+    </div>`;
+  } else if (isVerified) {
+    bannerHtml = `<div class="complete-banner">
+      <span style="font-size:22px;">✅</span>
+      <div>
+        <div style="font-weight:600;color:var(--green);font-size:14px;">Documents Verified</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">All mandatory documents have been submitted and verified. Ready to onboard.</div>
+      </div>
+    </div>`;
+  }
+
+  // Personal info
+  const salary = ob.offeredSalary ? (ob.ctcCurrency||"INR") + " " + Number(ob.offeredSalary).toLocaleString("en-IN") + " / year" : "—";
+  const joining = ob.joiningDate
+    ? new Date(ob.joiningDate + "T00:00:00").toLocaleDateString("en-IN",{weekday:"long",day:"2-digit",month:"long",year:"numeric"})
+    : "—";
+
+  const infoRows = [
+    ["Full Name",        esc(ob.candidateName||"—")],
+    ["Email",            ob.candidateEmail ? `<a href="mailto:${esc(ob.candidateEmail)}" style="color:var(--accent);">${esc(ob.candidateEmail)}</a>` : "—"],
+    ["Phone",            esc(ob.phone||"—")],
+    ["Position",         esc(ob.position||"—")],
+    ["Department",       esc(ob.department||"—")],
+    ["Employee Type",    esc(ob.employeeType||"Full-time")],
+    ["Work Location",    esc(ob.location||"—")],
+    ["Reporting To",     esc(ob.reportingTo||"—")],
+    ["Offered Salary",   salary],
+    ["Joining Date",     joining],
+  ];
+
+  // Doc summary quick view
+  const totalDocs     = DOC_CONFIG.length;
+  const submittedDocs = DOC_CONFIG.filter(d => docs[d.key]?.submitted).length;
+  const pct           = Math.round(submittedDocs / totalDocs * 100);
+  const mandatoryLeft = MANDATORY_KEYS.filter(k => !docs[k]?.submitted);
+  const pctColor      = isVerified ? "var(--green)" : pct>=70 ? "var(--teal)" : pct>=40 ? "var(--accent2)" : "var(--amber)";
+
+  document.getElementById("dm-body").innerHTML = `
+    ${bannerHtml}
+    ${stepperHtml}
+
+    <div class="sec-hd">👤 Candidate Information</div>
+    <div class="info-grid">
+      ${infoRows.map(([label, val]) => `
+        <div class="info-cell">
+          <div class="info-label">${label}</div>
+          <div class="info-value">${val}</div>
+        </div>`).join("")}
+    </div>
+
+    <div class="sec-hd">📄 Document Summary</div>
+    <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px 18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:500;">Upload Progress</div>
+        <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--text);">${submittedDocs} / ${totalDocs} files</div>
+      </div>
+      <div class="prog-bar" style="height:8px;margin-bottom:8px;">
+        <div class="prog-fill" style="width:${pct}%;background:${pctColor};"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);">
+        <span>${pct}% uploaded</span>
+        ${mandatoryLeft.length
+          ? `<span style="color:var(--amber);">⚠ ${mandatoryLeft.length} mandatory doc${mandatoryLeft.length>1?"s":""} pending</span>`
+          : `<span style="color:var(--green);">✓ All mandatory docs received</span>`}
+      </div>
+      ${mandatoryLeft.length ? `
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
+          ${mandatoryLeft.map(k => {
+            const cfg = DOC_CONFIG.find(d=>d.key===k);
+            return `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.2);">${cfg?cfg.label:k}</span>`;
+          }).join("")}
+        </div>` : ""}
+    </div>
+
+    <div class="sec-hd">🔄 Update Status</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <select id="status-select" style="background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;flex:1;min-width:200px;">
+        ${ONBOARDING_STEPS.map(s =>
+          `<option value="${s.key}" ${ob.onboardingStatus===s.key?"selected":""}>${s.label}</option>`
+        ).join("")}
+      </select>
+      <button class="btn btn-sm primary" onclick="updateStatus()">Update Status</button>
+    </div>
+  `;
+}
+
+// ── TAB 2: DOCUMENTS ──────────────────────────────────────────────────────────
+function renderDocsTab(ob) {
+  const docs           = ob.documents || {};
   const submittedCount = DOC_CONFIG.filter(d => docs[d.key]?.submitted).length;
   const totalCount     = DOC_CONFIG.length;
+  const isComplete     = ["docs_verified","joining_scheduled","onboarded"].includes(ob.onboardingStatus);
+  const pct            = Math.round(submittedCount / totalCount * 100);
+  const pctColor       = isComplete ? "var(--green)" : pct>=70 ? "var(--teal)" : pct>=40 ? "var(--accent2)" : "var(--amber)";
 
-  // Progress bar
-  const pct = Math.round(submittedCount / totalCount * 100);
   const progressHtml = `
-    <div style="margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
-        <span style="color:var(--text2);font-weight:500;">Documents Uploaded</span>
-        <span style="color:var(--text);font-weight:600;font-family:var(--mono);">${submittedCount} / ${totalCount}</span>
+    <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:500;">Documents Uploaded</span>
+        <span style="font-size:13px;font-weight:600;font-family:var(--mono);">${submittedCount} / ${totalCount}</span>
       </div>
       <div class="prog-bar" style="height:8px;">
-        <div class="prog-fill" style="width:${pct}%;background:${isComplete?"var(--green)":pct===100?"var(--teal)":"var(--accent2)"}"></div>
+        <div class="prog-fill" style="width:${pct}%;background:${pctColor};"></div>
       </div>
       <div style="font-size:11px;color:var(--text3);margin-top:5px;">${pct}% complete
-        ${isComplete ? ' · <span style="color:var(--green);">✓ Marked as completed</span>' : ""}
+        ${isComplete ? ' · <span style="color:var(--green);">✓ All documents verified</span>' : ''}
       </div>
     </div>`;
 
-  // Document list
   const docsHtml = DOC_CONFIG.map(d => {
-    const doc = docs[d.key] || {};
+    const doc     = docs[d.key] || {};
     const hasFile = !!doc.url;
-    const cls = hasFile ? "has-file" : "not-submitted";
+    const verified= !!doc.verifiedAt;
+    const cls     = hasFile ? "has-file" : "";
+    const verifiedBadge = verified
+      ? `<span class="badge b-green" style="font-size:10px;">✓ Verified</span>`
+      : hasFile
+        ? `<button class="btn btn-sm" onclick="verifyDoc('${d.key}')" style="font-size:11px;color:var(--teal);border-color:rgba(45,212,191,0.3);padding:3px 10px;">Verify</button>`
+        : "";
+
     return `
       <div class="doc-item ${cls}">
         <div class="doc-dot ${hasFile?"yes":"no"}"></div>
         <div class="doc-label">
-          ${d.label}
-          ${!d.required ? '<span class="doc-optional">(optional)</span>' : ""}
+          ${esc(d.label)}
+          ${!d.required ? '<span class="doc-optional">(optional)</span>' : '<span style="font-size:10px;color:var(--rose);margin-left:3px;">*</span>'}
         </div>
-        ${hasFile
-          ? `<a href="${doc.url}" target="_blank" class="btn btn-sm" style="font-size:12px;color:var(--green);border-color:rgba(34,197,94,0.3);flex-shrink:0;">🔗 View File</a>`
-          : `<span style="font-size:12px;color:var(--text3);">Not uploaded</span>`}
+        <div class="doc-actions">
+          ${verifiedBadge}
+          ${hasFile
+            ? `<a href="${esc(doc.url)}" target="_blank" class="btn btn-sm" style="font-size:12px;color:var(--green);border-color:rgba(34,197,94,0.3);padding:4px 11px;">🔗 View</a>`
+            : `<span style="font-size:12px;color:var(--text3);">Not uploaded</span>`}
+        </div>
       </div>`;
   }).join("");
 
-  document.getElementById("dm-body").innerHTML = progressHtml + docsHtml;
+  document.getElementById("dm-body").innerHTML = progressHtml + `
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;"><span style="color:var(--rose);">*</span> Mandatory document</div>
+    ${docsHtml}`;
 }
 
-// "Mark as Completely Submitted" button in modal
+// ── TAB 3: CHECKLISTS ─────────────────────────────────────────────────────────
+function renderChecklistsTab(ob) {
+  const itItems = ob.itChecklist  || [];
+  const hrItems = ob.hrChecklist  || [];
+
+  function chkHtml(items, dept) {
+    if (!items.length) return `<div style="color:var(--text3);font-size:13px;padding:10px 0;">No items</div>`;
+    return items.map(item => {
+      const doneAt = item.doneAt
+        ? new Date(item.doneAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short"})
+        : "";
+      return `
+        <div class="chk-item ${item.done?"done":""}" onclick="toggleChecklist('${item._id}',${item.done})">
+          <div class="chk-box">${item.done ? "✓" : ""}</div>
+          <div class="chk-text">${esc(item.label||"")}</div>
+          <span class="chk-dept">${esc(item.dept||dept)}</span>
+          ${doneAt ? `<span class="chk-done-at">${doneAt}</span>` : ""}
+        </div>`;
+    }).join("");
+  }
+
+  const itDone = itItems.filter(i=>i.done).length;
+  const hrDone = hrItems.filter(i=>i.done).length;
+
+  document.getElementById("dm-body").innerHTML = `
+    <div class="sec-hd">💻 IT Setup Checklist
+      <span class="badge b-blue" style="font-size:10px;margin-left:6px;">${itDone}/${itItems.length} done</span>
+    </div>
+    ${chkHtml(itItems, "IT")}
+
+    <div class="sec-hd" style="margin-top:20px;">🏢 HR / Admin Checklist
+      <span class="badge b-purple" style="font-size:10px;margin-left:6px;">${hrDone}/${hrItems.length} done</span>
+    </div>
+    ${chkHtml(hrItems, "HR")}
+  `;
+}
+
+// ── TAB 4: NOTES ──────────────────────────────────────────────────────────────
+function renderNotesTab(ob) {
+  const notes = ob.hrNotes || [];
+  const notesList = notes.length
+    ? notes.map(n => `
+        <div class="note-item">
+          <div class="note-text">${esc(n.text||"")}</div>
+          <div class="note-meta">
+            ${n.addedBy?.name ? esc(n.addedBy.name) + " · " : ""}
+            ${n.addedAt ? new Date(n.addedAt).toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}) : ""}
+          </div>
+        </div>`).join("")
+    : `<div style="color:var(--text3);font-size:13px;padding:10px 0 16px;">No notes yet. Add the first note below.</div>`;
+
+  document.getElementById("dm-body").innerHTML = `
+    <div class="sec-hd">📝 HR Notes</div>
+    <div id="notes-list">${notesList}</div>
+
+    <div style="margin-top:16px;">
+      <textarea id="note-input" rows="3" placeholder="Add a note about this candidate's onboarding…"
+        style="width:100%;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:12px;resize:vertical;outline:none;line-height:1.6;"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button class="btn btn-sm primary" onclick="addNote()">Add Note</button>
+      </div>
+    </div>
+  `;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+
 async function markComplete() {
   if (!activeObId) return;
+  if (!confirm("Mark all documents as verified and set status to Docs Verified?")) return;
   try {
     await apiFetch(`/api/hr/onboarding/${activeObId}/status`, {
       method:"PATCH", body:JSON.stringify({ status:"docs_verified" })
     });
-    toast("✅ Marked as completely submitted!");
-    closeModal("doc-modal");
+    toast("✅ Marked as Docs Verified!");
+    const { onboarding } = await apiFetch(`/api/hr/onboarding/${activeObId}`);
+    activeOb = onboarding;
+    renderModal(onboarding);
     await loadOnboardings();
+  } catch(err) { toast("❌ " + err.message, true); }
+}
+
+async function markOnboarded() {
+  if (!activeObId) return;
+  if (!confirm("Mark this candidate as fully Onboarded? This completes the process.")) return;
+  try {
+    await apiFetch(`/api/hr/onboarding/${activeObId}/status`, {
+      method:"PATCH", body:JSON.stringify({ status:"onboarded" })
+    });
+    toast("🎉 Candidate marked as Onboarded!");
+    const { onboarding } = await apiFetch(`/api/hr/onboarding/${activeObId}`);
+    activeOb = onboarding;
+    renderModal(onboarding);
+    await loadOnboardings();
+  } catch(err) { toast("❌ " + err.message, true); }
+}
+
+async function updateStatus() {
+  const sel = document.getElementById("status-select");
+  if (!sel || !activeObId) return;
+  const status = sel.value;
+  try {
+    await apiFetch(`/api/hr/onboarding/${activeObId}/status`, {
+      method:"PATCH", body:JSON.stringify({ status })
+    });
+    toast("✅ Status updated to: " + STATUS_MAP[status]?.label || status);
+    const { onboarding } = await apiFetch(`/api/hr/onboarding/${activeObId}`);
+    activeOb = onboarding;
+    renderModal(onboarding);
+    await loadOnboardings();
+  } catch(err) { toast("❌ " + err.message, true); }
+}
+
+async function verifyDoc(docKey) {
+  if (!activeObId) return;
+  try {
+    await apiFetch(`/api/hr/onboarding/${activeObId}/documents/${docKey}/verify`, { method:"PATCH" });
+    toast("✅ Document verified!");
+    const { onboarding } = await apiFetch(`/api/hr/onboarding/${activeObId}`);
+    activeOb = onboarding;
+    renderModal(onboarding);
+    await loadOnboardings();
+  } catch(err) { toast("❌ " + err.message, true); }
+}
+
+async function toggleChecklist(itemId, isDone) {
+  if (!activeObId) return;
+  try {
+    await apiFetch(`/api/hr/onboarding/${activeObId}/checklist/${itemId}`, {
+      method:"PATCH", body:JSON.stringify({ done: !isDone })
+    });
+    const { onboarding } = await apiFetch(`/api/hr/onboarding/${activeObId}`);
+    activeOb = onboarding;
+    renderTab(onboarding, "checklists");
+    // update counts
+    const itDone = (onboarding.itChecklist||[]).filter(i=>i.done).length;
+    const hrDone = (onboarding.hrChecklist||[]).filter(i=>i.done).length;
+  } catch(err) { toast("❌ " + err.message, true); }
+}
+
+async function addNote() {
+  const inp = document.getElementById("note-input");
+  const text = (inp?.value||"").trim();
+  if (!text) return;
+  if (!activeObId) return;
+  try {
+    await apiFetch(`/api/hr/onboarding/${activeObId}/notes`, {
+      method:"POST", body:JSON.stringify({ text })
+    });
+    inp.value = "";
+    toast("📝 Note added!");
+    const { onboarding } = await apiFetch(`/api/hr/onboarding/${activeObId}`);
+    activeOb = onboarding;
+    document.getElementById("tab-notes-count").textContent = (onboarding.hrNotes||[]).length;
+    renderTab(onboarding, "notes");
   } catch(err) { toast("❌ " + err.message, true); }
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function openModal(id)  { document.getElementById(id).classList.add("open"); }
 function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
 document.addEventListener("keydown", e => {
   if (e.key === "Escape")
     document.querySelectorAll(".overlay.open").forEach(m => m.classList.remove("open"));
 });
+
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
 
 function toast(msg, isErr) {
   let t = document.getElementById("ob-toast");
@@ -527,7 +950,7 @@ function toast(msg, isErr) {
     t.style.cssText = "position:fixed;bottom:24px;right:24px;background:var(--navy3);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:11px 20px;border-radius:10px;font-size:13px;z-index:9999;transition:opacity .3s;box-shadow:0 4px 20px rgba(0,0,0,.4);";
     document.body.appendChild(t);
   }
-  t.style.borderColor = isErr ? "rgba(244,63,94,0.4)" : "rgba(255,255,255,.1)";
+  t.style.borderColor = isErr ? "rgba(244,63,94,0.4)" : "rgba(34,197,94,0.3)";
   t.textContent = msg;
   t.style.opacity = "1";
   clearTimeout(t._to);
