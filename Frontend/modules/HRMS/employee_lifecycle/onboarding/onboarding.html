@@ -205,8 +205,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <option value="onboarded">Onboarded</option>
     </select>
     <div id="sync-status" style="font-size:11px;color:var(--text3);display:none;align-items:center;gap:5px;"></div>
+    <div id="sheet-indicator" style="display:none;font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid rgba(45,212,191,0.3);color:var(--teal);background:rgba(45,212,191,0.08);">🔗 Sheet Connected</div>
     <button class="topbar-btn" onclick="loadOnboardings()" title="Refresh">🔄 Refresh</button>
-    <button class="topbar-btn" onclick="openSheetSettings()" title="Google Sheet Settings" style="color:var(--teal);border-color:rgba(45,212,191,0.3);">⚙️ Sheet Setup</button>
+    <button class="topbar-btn" onclick="openSheetSettings()" title="Google Sheet Settings" id="sheet-setup-btn" style="color:var(--teal);border-color:rgba(45,212,191,0.3);">⚙️ Sheet Setup</button>
   </div>
 
   <div class="content">
@@ -243,11 +244,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <span class="spin" style="font-size:24px;">⏳</span>
         <div style="margin-top:10px;font-size:13px;">Loading records…</div>
       </div>
-      <div id="ob-empty" style="display:none;padding:50px;text-align:center;color:var(--text3);">
+      <div id="ob-empty" style="display:none;padding:40px;text-align:center;color:var(--text3);">
         <div style="font-size:36px;margin-bottom:12px;">📋</div>
         <div style="font-size:14px;font-weight:500;color:var(--text2);" id="ob-empty-title">No onboarding records yet</div>
-        <div style="font-size:13px;margin-top:6px;" id="ob-empty-sub">Connect your Google Form responses sheet to automatically pull data.</div>
-        <button class="btn primary" onclick="openSheetSettings()" style="margin-top:16px;">⚙️ Connect Google Sheet</button>
+        <div style="font-size:13px;margin-top:6px;" id="ob-empty-sub">Connect your Google Form responses sheet to automatically pull candidate data.</div>
+        <div id="ob-empty-connect-banner" style="display:none;margin-top:20px;background:rgba(45,212,191,0.06);border:1px solid rgba(45,212,191,0.2);border-radius:12px;padding:20px 24px;max-width:480px;margin-left:auto;margin-right:auto;text-align:left;">
+          <div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:8px;">🔗 Connect Google Sheet — Get live candidate data</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:14px;">Once connected, every time HR opens this page the system will automatically pull the latest form responses and create onboarding records — no manual uploads needed.</div>
+          <button class="btn primary" onclick="openSheetSettings()">⚙️ Connect Google Sheet Now</button>
+        </div>
+        <button class="btn primary" id="ob-empty-connect-btn" onclick="openSheetSettings()" style="margin-top:16px;display:none;">⚙️ Connect Google Sheet</button>
       </div>
       <table id="ob-table" style="display:none;">
         <thead>
@@ -301,16 +307,28 @@ tr:hover td{background:rgba(255,255,255,.02)}
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;">
             <div style="width:22px;height:22px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</div>
-            <div style="font-size:12px;color:var(--text2);">Click <strong style="color:var(--text);">Share</strong> → <strong style="color:var(--text);">Change to anyone with the link</strong> → set to <strong style="color:var(--text);">Viewer</strong></div>
+            <div style="font-size:12px;color:var(--text2);">Click <strong style="color:var(--text);">File → Share → Publish to web</strong></div>
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;">
             <div style="width:22px;height:22px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</div>
-            <div style="font-size:12px;color:var(--text2);">Copy the spreadsheet URL from the address bar and paste it above</div>
+            <div style="font-size:12px;color:var(--text2);">In the popup, select <strong style="color:var(--text);">Sheet1</strong> (or your responses tab) and choose <strong style="color:var(--text);">Comma-separated values (.csv)</strong>, then click <strong style="color:var(--text);">Publish</strong> and confirm</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">4</div>
+            <div style="font-size:12px;color:var(--text2);">Go back to the address bar, copy the <strong style="color:var(--text);">full spreadsheet URL</strong> (the regular edit URL is fine — e.g. <span style="font-family:var(--mono);font-size:11px;color:var(--text3);">docs.google.com/spreadsheets/d/…</span>) and paste it above</div>
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;">
             <div style="width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">✓</div>
-            <div style="font-size:12px;color:var(--text2);">Click <strong style="color:var(--text);">Save &amp; Sync Now</strong> — the onboarding page will pull data automatically from now on</div>
+            <div style="font-size:12px;color:var(--text2);">Click <strong style="color:var(--text);">Save &amp; Sync Now</strong> — candidates will appear automatically and data will refresh on every page load</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Important note -->
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:10px 14px;margin-bottom:4px;display:flex;gap:8px;align-items:flex-start;">
+        <span style="font-size:14px;flex-shrink:0;">⚠️</span>
+        <div style="font-size:12px;color:var(--amber);">
+          <strong>Important:</strong> You must use <strong>Publish to web</strong> (not just "Share → anyone with link"). Only published sheets can be read by the server without requiring a Google login.
         </div>
       </div>
 
@@ -1097,36 +1115,60 @@ async function saveSheetUrl() {
     alert("URL must start with https://docs.google.com/"); return;
   }
   localStorage.setItem(SHEET_URL_KEY, url);
+  updateSheetIndicator();
   closeModal("sheet-settings-modal");
   toast("⚙️ Sheet URL saved — syncing now…");
 
   // Sync immediately then reload the table
-  await syncSheet(url, false);
+  const ok = await syncSheet(url, false);
+  if (!ok) {
+    toast("⚠️ Sync failed — did you publish the sheet to the web? (File → Share → Publish to web → CSV)", true);
+  }
   await loadOnboardings();
 }
 
 function disconnectSheet() {
   if (!confirm("Disconnect this Google Sheet? Auto-sync will stop. Existing records are kept.")) return;
   localStorage.removeItem(SHEET_URL_KEY);
+  updateSheetIndicator();
   closeModal("sheet-settings-modal");
   toast("Sheet disconnected");
   clearSyncStatus();
 }
 
+// ── SHEET INDICATOR ───────────────────────────────────────────────────────────
+function updateSheetIndicator() {
+  const sheetUrl  = localStorage.getItem(SHEET_URL_KEY);
+  const indicator = document.getElementById("sheet-indicator");
+  const setupBtn  = document.getElementById("sheet-setup-btn");
+  if (sheetUrl) {
+    if (indicator) indicator.style.display = "flex";
+    if (setupBtn)  setupBtn.textContent = "⚙️ Sheet Setup ✓";
+  } else {
+    if (indicator) indicator.style.display = "none";
+    if (setupBtn)  setupBtn.textContent = "⚙️ Connect Sheet";
+  }
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
   const sheetUrl = localStorage.getItem(SHEET_URL_KEY);
+  updateSheetIndicator();
+
   if (sheetUrl) {
     // Sync silently in background, then load — gives seamless "always fresh" feel
-    setSyncStatus("🔄 Syncing…", "var(--text3)");
+    setSyncStatus("🔄 Syncing from Google Sheet…", "var(--teal)");
     await syncSheet(sheetUrl, false);
   }
   await loadOnboardings();
 
-  // Update empty state if no sheet connected
+  // Update empty state based on whether a sheet is connected
   if (!sheetUrl) {
+    const banner = document.getElementById("ob-empty-connect-banner");
+    if (banner) banner.style.display = "block";
+    // If empty after load, make the "no sheet" message clearer
     const subEl = document.getElementById("ob-empty-sub");
-    if (subEl) subEl.textContent = "Connect your Google Form responses sheet to automatically pull data.";
+    if (subEl) subEl.textContent = "No candidate submissions found. Connect your Google Form responses sheet to pull live data automatically.";
   }
 }
 

@@ -328,26 +328,40 @@ exports.syncFromSheet = async (req, res) => {
       return res.status(400).json({ msg: "A valid Google Sheets URL is required" });
     }
 
-    // Normalise the URL to force a CSV export
-    let csvUrl = sheetUrl;
-    // If user pasted the edit/view URL, convert to export URL
-    if (!csvUrl.includes("output=csv") && !csvUrl.includes("format=csv")) {
-      const match = csvUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (!match) return res.status(400).json({ msg: "Could not extract spreadsheet ID from URL" });
-      const sheetId = match[1];
-      csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
-    }
+    // ── Extract spreadsheet ID from any Google Sheets URL format ─────────────
+    const idMatch = sheetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (!idMatch) return res.status(400).json({ msg: "Could not extract spreadsheet ID from the URL" });
+    const sheetId = idMatch[1];
+
+    // ── Always use the /pub?output=csv URL ────────────────────────────────────
+    // IMPORTANT: /export?format=csv requires a Google login even on "shared" sheets.
+    // Only /pub?output=csv (Publish to web) is truly public and works server-side.
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=0`;
 
     // Fetch the CSV (Node 18+ built-in fetch)
     let csvText;
     try {
-      const resp = await fetch(csvUrl, { headers: { "User-Agent": "ZyntrixCRM/1.0" } });
+      const resp = await fetch(csvUrl, {
+        headers: { "User-Agent": "ZyntrixCRM/1.0" },
+        redirect: "follow"
+      });
+
       if (!resp.ok) throw new Error(`Google returned HTTP ${resp.status}`);
+
       csvText = await resp.text();
+
+      // Detect if Google returned a login wall (HTML) instead of CSV data
+      const ct = resp.headers.get("content-type") || "";
+      if (ct.includes("text/html") || csvText.trimStart().startsWith("<!DOCTYPE") || csvText.trimStart().startsWith("<html")) {
+        return res.status(403).json({
+          msg: "Google returned a login page instead of data. Your sheet must be published to the web.",
+          fix: "In Google Sheets: File → Share → Publish to web → choose Sheet1 → CSV → Publish. Then paste the spreadsheet URL again."
+        });
+      }
     } catch (fetchErr) {
       return res.status(502).json({
-        msg: "Could not fetch the Google Sheet. Make sure it is shared as 'Anyone with the link can view'.",
-        detail: fetchErr.message
+        msg: "Could not fetch the Google Sheet. " + fetchErr.message,
+        fix: "Make sure the sheet is published: File → Share → Publish to web → CSV → Publish."
       });
     }
 
