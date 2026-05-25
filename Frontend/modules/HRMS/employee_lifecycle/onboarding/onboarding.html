@@ -204,7 +204,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <option value="joining_scheduled">Joining Scheduled</option>
       <option value="onboarded">Onboarded</option>
     </select>
+    <div id="sync-status" style="font-size:11px;color:var(--text3);display:none;align-items:center;gap:5px;"></div>
     <button class="topbar-btn" onclick="loadOnboardings()" title="Refresh">🔄 Refresh</button>
+    <button class="topbar-btn" onclick="openSheetSettings()" title="Google Sheet Settings" style="color:var(--teal);border-color:rgba(45,212,191,0.3);">⚙️ Sheet Setup</button>
   </div>
 
   <div class="content">
@@ -243,8 +245,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
       <div id="ob-empty" style="display:none;padding:50px;text-align:center;color:var(--text3);">
         <div style="font-size:36px;margin-bottom:12px;">📋</div>
-        <div style="font-size:14px;font-weight:500;color:var(--text2);">No onboarding records yet</div>
-        <div style="font-size:13px;margin-top:6px;">Records appear automatically when an offer letter is sent.</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text2);" id="ob-empty-title">No onboarding records yet</div>
+        <div style="font-size:13px;margin-top:6px;" id="ob-empty-sub">Connect your Google Form responses sheet to automatically pull data.</div>
+        <button class="btn primary" onclick="openSheetSettings()" style="margin-top:16px;">⚙️ Connect Google Sheet</button>
       </div>
       <table id="ob-table" style="display:none;">
         <thead>
@@ -263,6 +266,67 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
 </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     GOOGLE SHEET SETTINGS MODAL
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="overlay" id="sheet-settings-modal" onclick="closeModal('sheet-settings-modal')">
+  <div class="modal" style="width:600px;" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">⚙️ Google Sheet Connection</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Connect your Google Form responses sheet — data will sync automatically on every page load</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('sheet-settings-modal')">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- URL input -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">Google Sheet URL</div>
+        <input type="url" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/…"
+          style="width:100%;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:10px 14px;outline:none;">
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;">Paste the URL of your Google Form responses spreadsheet (any format — edit URL, share URL, or export URL).</div>
+      </div>
+
+      <!-- How-to steps -->
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px;">📋 How to set this up (one time only)</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</div>
+            <div style="font-size:12px;color:var(--text2);">Open your <strong style="color:var(--text);">Google Form responses sheet</strong> (the Sheet linked to your form)</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</div>
+            <div style="font-size:12px;color:var(--text2);">Click <strong style="color:var(--text);">Share</strong> → <strong style="color:var(--text);">Change to anyone with the link</strong> → set to <strong style="color:var(--text);">Viewer</strong></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</div>
+            <div style="font-size:12px;color:var(--text2);">Copy the spreadsheet URL from the address bar and paste it above</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">✓</div>
+            <div style="font-size:12px;color:var(--text2);">Click <strong style="color:var(--text);">Save &amp; Sync Now</strong> — the onboarding page will pull data automatically from now on</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current status -->
+      <div id="sheet-current-status" style="display:none;padding:10px 14px;border-radius:8px;font-size:12px;"></div>
+
+    </div>
+
+    <div class="modal-ft">
+      <button class="btn btn-sm danger" id="sheet-disconnect-btn" onclick="disconnectSheet()" style="display:none;">✕ Disconnect</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="btn btn-sm" onclick="closeModal('sheet-settings-modal')">Cancel</button>
+        <button class="btn btn-sm primary" onclick="saveSheetUrl()">💾 Save &amp; Sync Now</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
@@ -958,8 +1022,115 @@ function toast(msg, isErr) {
   t._to = setTimeout(() => t.style.opacity="0", 3500);
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// GOOGLE SHEET AUTO-SYNC
+// ══════════════════════════════════════════════════════════════════════════════
+
+const SHEET_URL_KEY = "ob_sheet_url";  // localStorage key
+
+// ── Show sync status in topbar ────────────────────────────────────────────────
+function setSyncStatus(msg, color) {
+  const el = document.getElementById("sync-status");
+  if (!el) return;
+  el.style.display = "flex";
+  el.style.color   = color || "var(--text3)";
+  el.textContent   = msg;
+}
+function clearSyncStatus() {
+  const el = document.getElementById("sync-status");
+  if (el) el.style.display = "none";
+}
+
+// ── Auto-sync from Google Sheet ───────────────────────────────────────────────
+async function syncSheet(sheetUrl, silent) {
+  if (!sheetUrl) return false;
+  if (!silent) setSyncStatus("🔄 Syncing from Google Sheet…", "var(--teal)");
+  try {
+    const result = await apiFetch("/hr/onboarding/sync-sheet", {
+      method: "POST",
+      body: JSON.stringify({ sheetUrl })
+    });
+    if (!silent) {
+      const msg = result.synced > 0
+        ? `✅ Synced ${result.synced} record${result.synced !== 1 ? "s" : ""} from sheet`
+        : "✅ Sheet up to date";
+      setSyncStatus(msg, "var(--green)");
+      setTimeout(clearSyncStatus, 4000);
+    }
+    return true;
+  } catch (err) {
+    setSyncStatus("⚠ Sheet sync failed — check Sheet Setup", "var(--amber)");
+    setTimeout(clearSyncStatus, 6000);
+    console.warn("Sheet sync error:", err.message);
+    return false;
+  }
+}
+
+// ── Settings modal helpers ────────────────────────────────────────────────────
+function openSheetSettings() {
+  const saved = localStorage.getItem(SHEET_URL_KEY) || "";
+  const inp   = document.getElementById("sheet-url-input");
+  if (inp) inp.value = saved;
+
+  const statusEl  = document.getElementById("sheet-current-status");
+  const disconnEl = document.getElementById("sheet-disconnect-btn");
+  if (saved) {
+    statusEl.style.display    = "block";
+    statusEl.style.background = "rgba(34,197,94,0.08)";
+    statusEl.style.border     = "1px solid rgba(34,197,94,0.25)";
+    statusEl.style.color      = "var(--green)";
+    statusEl.textContent      = "✅ Connected — syncs automatically on every page load";
+    disconnEl.style.display   = "inline-flex";
+  } else {
+    statusEl.style.display    = "none";
+    disconnEl.style.display   = "none";
+  }
+  // Open the modal directly (no wrapper needed)
+  document.getElementById("sheet-settings-modal").classList.add("open");
+}
+
+async function saveSheetUrl() {
+  const inp = document.getElementById("sheet-url-input");
+  const url = (inp?.value || "").trim();
+  if (!url) { alert("Please paste your Google Sheet URL first"); return; }
+  if (!url.startsWith("https://docs.google.com/")) {
+    alert("URL must start with https://docs.google.com/"); return;
+  }
+  localStorage.setItem(SHEET_URL_KEY, url);
+  closeModal("sheet-settings-modal");
+  toast("⚙️ Sheet URL saved — syncing now…");
+
+  // Sync immediately then reload the table
+  await syncSheet(url, false);
+  await loadOnboardings();
+}
+
+function disconnectSheet() {
+  if (!confirm("Disconnect this Google Sheet? Auto-sync will stop. Existing records are kept.")) return;
+  localStorage.removeItem(SHEET_URL_KEY);
+  closeModal("sheet-settings-modal");
+  toast("Sheet disconnected");
+  clearSyncStatus();
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
-loadOnboardings();
+async function init() {
+  const sheetUrl = localStorage.getItem(SHEET_URL_KEY);
+  if (sheetUrl) {
+    // Sync silently in background, then load — gives seamless "always fresh" feel
+    setSyncStatus("🔄 Syncing…", "var(--text3)");
+    await syncSheet(sheetUrl, false);
+  }
+  await loadOnboardings();
+
+  // Update empty state if no sheet connected
+  if (!sheetUrl) {
+    const subEl = document.getElementById("ob-empty-sub");
+    if (subEl) subEl.textContent = "Connect your Google Form responses sheet to automatically pull data.";
+  }
+}
+
+init();
 </script>
 </body>
 </html>

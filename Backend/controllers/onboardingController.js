@@ -310,6 +310,267 @@ exports.addNote = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// SYNC FROM GOOGLE SHEET — POST /api/hr/onboarding/sync-sheet
+//
+// Fetches a Google Sheets "Published CSV" (or shared export) URL from the
+// request body, parses the rows, and upserts Onboarding records into MongoDB.
+// Called automatically by the frontend on every page load when a sheet URL
+// has been configured — no manual import needed.
+//
+// Expected body: { sheetUrl: "https://docs.google.com/spreadsheets/d/…" }
+// ─────────────────────────────────────────────────────────────────────────────
+exports.syncFromSheet = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const { sheetUrl } = req.body;
+    if (!sheetUrl || !sheetUrl.startsWith("https://docs.google.com/")) {
+      return res.status(400).json({ msg: "A valid Google Sheets URL is required" });
+    }
+
+    // Normalise the URL to force a CSV export
+    let csvUrl = sheetUrl;
+    // If user pasted the edit/view URL, convert to export URL
+    if (!csvUrl.includes("output=csv") && !csvUrl.includes("format=csv")) {
+      const match = csvUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (!match) return res.status(400).json({ msg: "Could not extract spreadsheet ID from URL" });
+      const sheetId = match[1];
+      csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
+    }
+
+    // Fetch the CSV (Node 18+ built-in fetch)
+    let csvText;
+    try {
+      const resp = await fetch(csvUrl, { headers: { "User-Agent": "ZyntrixCRM/1.0" } });
+      if (!resp.ok) throw new Error(`Google returned HTTP ${resp.status}`);
+      csvText = await resp.text();
+    } catch (fetchErr) {
+      return res.status(502).json({
+        msg: "Could not fetch the Google Sheet. Make sure it is shared as 'Anyone with the link can view'.",
+        detail: fetchErr.message
+      });
+    }
+
+    // ── CSV parser (handles quoted fields) ───────────────────────────────────
+    function splitLine(line) {
+      const cols = []; let cur = "", inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; continue; }
+        if (ch === ',' && !inQ) { cols.push(cur); cur = ""; continue; }
+        cur += ch;
+      }
+      cols.push(cur);
+      return cols.map(c => c.trim());
+    }
+
+    const lines = csvText.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) return res.json({ ok: true, synced: 0, msg: "Sheet appears empty" });
+
+    const headers = splitLine(lines[0]);
+
+    // ── Column detection ──────────────────────────────────────────────────────
+    function findCol(...kws) {
+      return headers.find(h => kws.some(k => h.toLowerCase().trim().includes(k)));
+    }
+    function docCol(h) {
+      const lh = h.toLowerCase().trim();
+      if (lh.includes("10th") || lh.includes("ssc"))                  return "tenthMarksheet";
+      if (lh.includes("12th") || lh.includes("hsc"))                  return "twelfthMarksheet";
+      if (lh.includes("post") && lh.includes("grad"))                 return "postGraduationCert";
+      if (lh.includes("grad") || lh.includes("degree"))               return "graduationCert";
+      if (lh.includes("passport"))                                     return "passportPhoto";
+      if (lh.includes("government")||lh.includes("pan")||
+          lh.includes("voter")    ||lh.includes("driving")||
+          lh.includes("govt"))                                         return "governmentId";
+      if (lh.includes("bank")||lh.includes("passbook")||
+          lh.includes("account"))                                      return "bankDetails";
+      if (lh.includes("accept")||lh.includes("confirmation"))         return "acceptanceLetter";
+      return null;
+    }
+
+    const emailCol     = findCol("email");
+    const nameCol      = findCol("full name", "name");
+    const positionCol  = findCol("position", "applied for", "role");
+    const timestampCol = findCol("timestamp", "submitted", "date");
+
+    if (!emailCol) return res.status(400).json({ msg: "No email column found in sheet" });
+
+    const docColMap = {};   // docKey → header
+    headers.forEach(h => { const k = docCol(h); if (k) docColMap[k] = h; });
+
+    const DOC_KEYS = [
+      "tenthMarksheet","twelfthMarksheet","graduationCert","postGraduationCert",
+      "passportPhoto","governmentId","bankDetails","acceptanceLetter"
+    ];
+
+    let synced = 0, skipped = 0;
+
+    for (const line of lines.slice(1)) {
+      const cols = splitLine(line);
+      const row  = {};
+      headers.forEach((h, i) => { row[h] = (cols[i] || "").trim(); });
+
+      const email = (row[emailCol] || "").trim().toLowerCase();
+      if (!email) { skipped++; continue; }
+
+      try {
+        let ob = await Onboarding.findOne({ candidateEmail: email });
+        const isNew = !ob;
+
+        if (!ob) {
+          ob = new Onboarding({
+            candidateEmail:   email,
+            candidateName:    nameCol     ? String(row[nameCol]     || "").trim() : "",
+            position:         positionCol ? String(row[positionCol] || "").trim() : "",
+            onboardingStatus: "docs_submitted"
+          });
+        } else {
+          if (!ob.candidateName && nameCol     && row[nameCol])     ob.candidateName = row[nameCol].trim();
+          if (!ob.position      && positionCol && row[positionCol]) ob.position      = row[positionCol].trim();
+        }
+
+        DOC_KEYS.forEach(key => {
+          const col = docColMap[key];
+          if (!col) return;
+          const url = (row[col] || "").trim();
+          if (url && !ob.documents[key]?.url) {
+            ob.documents[key] = { url, submitted: true };
+          }
+        });
+
+        if (timestampCol && row[timestampCol]) {
+          const parsed = new Date(row[timestampCol]);
+          if (!isNaN(parsed) && !ob.formSubmittedAt) ob.formSubmittedAt = parsed;
+        }
+
+        if (["offer_sent","docs_pending"].includes(ob.onboardingStatus)) {
+          ob.onboardingStatus = "docs_submitted";
+        }
+
+        await ob.save();
+        synced++;
+      } catch (rowErr) {
+        console.error("[syncFromSheet] row error for", email, rowErr.message);
+        skipped++;
+      }
+    }
+
+    console.log(`[syncFromSheet] synced=${synced} skipped=${skipped}`);
+    return res.json({ ok: true, synced, skipped });
+  } catch (err) {
+    console.error("SYNC FROM SHEET ERROR:", err);
+    return res.status(500).json({ msg: "Server error: " + err.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MANUAL IMPORT — POST /api/hr/onboarding/import
+//
+// Lets HR import existing Google Form responses (from a CSV) directly into
+// MongoDB without going through the GAS webhook pipeline.
+//
+// Expected body:
+// {
+//   candidates: [
+//     {
+//       candidateEmail:  "...",
+//       candidateName:   "...",
+//       position:        "...",
+//       submittedAt:     "5/25/2026 14:56:17",   // optional, raw timestamp string
+//       documents: {
+//         tenthMarksheet:     "https://...",
+//         twelfthMarksheet:   "https://...",
+//         graduationCert:     "https://...",
+//         postGraduationCert: "https://...",
+//         passportPhoto:      "https://...",
+//         governmentId:       "https://...",
+//         bankDetails:        "https://...",
+//         acceptanceLetter:   "https://..."
+//       }
+//     },
+//     ...
+//   ]
+// }
+// ─────────────────────────────────────────────────────────────────────────────
+exports.manualImport = async (req, res) => {
+  try {
+    if (!checkHrAccess(req, res)) return;
+
+    const { candidates } = req.body;
+    if (!Array.isArray(candidates) || !candidates.length) {
+      return res.status(400).json({ msg: "candidates array is required" });
+    }
+
+    const DOC_KEYS = [
+      "tenthMarksheet", "twelfthMarksheet", "graduationCert",
+      "postGraduationCert", "passportPhoto", "governmentId",
+      "bankDetails", "acceptanceLetter"
+    ];
+
+    const results = [];
+
+    for (const c of candidates) {
+      const email = String(c.candidateEmail || "").trim().toLowerCase();
+      if (!email) {
+        results.push({ email: "unknown", status: "skipped", reason: "no email" });
+        continue;
+      }
+
+      try {
+        let ob = await Onboarding.findOne({ candidateEmail: email });
+        const isNew = !ob;
+
+        if (!ob) {
+          ob = new Onboarding({
+            candidateEmail:   email,
+            candidateName:    String(c.candidateName || "").trim(),
+            position:         String(c.position      || "").trim(),
+            onboardingStatus: "docs_submitted",
+            createdBy:        req.user.id
+          });
+        } else {
+          // Update name/position only if blank on existing record
+          if (!ob.candidateName && c.candidateName) ob.candidateName = String(c.candidateName).trim();
+          if (!ob.position      && c.position)      ob.position      = String(c.position).trim();
+        }
+
+        // Map document URLs
+        const docs = c.documents || {};
+        DOC_KEYS.forEach(key => {
+          const url = String(docs[key] || "").trim();
+          if (url) ob.documents[key] = { url, submitted: true };
+        });
+
+        // Set form submission timestamp
+        if (c.submittedAt) {
+          const parsed = new Date(c.submittedAt);
+          if (!isNaN(parsed)) ob.formSubmittedAt = parsed;
+        }
+
+        // Auto-advance status if still in early stages
+        if (["offer_sent", "docs_pending"].includes(ob.onboardingStatus)) {
+          ob.onboardingStatus = "docs_submitted";
+        }
+
+        await ob.save();
+        results.push({ email, status: isNew ? "created" : "updated", id: ob._id });
+      } catch (e) {
+        console.error("IMPORT ROW ERROR:", e);
+        results.push({ email, status: "error", reason: e.message });
+      }
+    }
+
+    const imported = results.filter(r => r.status !== "error" && r.status !== "skipped").length;
+    console.log(`[Onboarding manualImport] imported ${imported}/${candidates.length} records`);
+    return res.json({ ok: true, results, imported, total: candidates.length });
+  } catch (err) {
+    console.error("MANUAL IMPORT ERROR:", err);
+    return res.status(500).json({ msg: "Server error: " + err.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // UPDATE DETAILS — PATCH /api/hr/onboarding/:id
 // Allows HR to update joining date, buddy, notes, location, reportingTo.
 // ─────────────────────────────────────────────────────────────────────────────

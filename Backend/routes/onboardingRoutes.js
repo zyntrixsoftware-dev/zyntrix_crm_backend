@@ -4,6 +4,8 @@ const auth    = require("../middleware/authMiddleware");
 const {
   formWebhook,
   createOnboarding,
+  syncFromSheet,
+  manualImport,
   getOnboardings,
   getOnboarding,
   updateStatus,
@@ -21,6 +23,8 @@ router.post("/onboarding/webhook", formWebhook);
 router.use(auth);
 
 router.post  ("/onboarding",                              createOnboarding);
+router.post  ("/onboarding/sync-sheet",                   syncFromSheet);
+router.post  ("/onboarding/import",                       manualImport);
 router.get   ("/onboarding",                              getOnboardings);
 router.get   ("/onboarding/:id",                          getOnboarding);
 router.patch ("/onboarding/:id",                          updateOnboarding);
