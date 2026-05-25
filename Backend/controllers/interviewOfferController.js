@@ -1,6 +1,7 @@
 const Interview        = require("../models/Interview");
 const OfferLetter      = require("../models/OfferLetter");
 const Candidate        = require("../models/Candidate");
+const Onboarding       = require("../models/Onboarding");
 const sendEmail        = require("../utils/sendEmail");
 const generateOfferPDF = require("../utils/generateOfferPDF");
 const {
@@ -9,6 +10,34 @@ const {
   notifyMarkedForOffer,
   notifyOfferLetter
 } = require("../utils/candidateEmails");
+
+// ── Helper: auto-create Onboarding record after offer is sent ─────────────────
+async function _bootstrapOnboarding(offer, userId) {
+  try {
+    const exists = await Onboarding.findOne({ offerId: offer._id });
+    if (exists) return;  // already created
+    await Onboarding.create({
+      candidateEmail: offer.candidateEmail,
+      candidateName:  offer.candidateName,
+      position:       offer.appliedFor,
+      department:     offer.department,
+      offerId:        offer._id,
+      interviewId:    offer.interviewId,
+      joiningDate:    offer.joiningDate,
+      employeeType:   offer.employeeType,
+      location:       offer.location,
+      reportingTo:    offer.reportingTo,
+      offeredSalary:  offer.offeredSalary,
+      ctcCurrency:    offer.ctcCurrency,
+      onboardingStatus: "offer_sent",
+      createdBy:      userId
+    });
+    console.log("[Onboarding] record created for:", offer.candidateEmail);
+  } catch (err) {
+    // Non-blocking — a failed onboarding bootstrap never fails the offer send
+    console.error("[Onboarding] bootstrap failed:", err.message);
+  }
+}
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -803,6 +832,9 @@ exports.sendOffer = async (req, res) => {
     offer.sentBy = req.user.id;
     await offer.save();
 
+    // Auto-create the onboarding record (fire-and-forget)
+    _bootstrapOnboarding(offer, req.user.id);
+
     return res.json({ msg: `Offer letter sent to ${offer.candidateEmail} via Apps Script`, offer });
   } catch (err) {
     console.error("SEND OFFER ERROR:", err);
@@ -987,6 +1019,9 @@ exports.bulkSendOffers = async (req, res) => {
         offer.sentAt = new Date();
         offer.sentBy = req.user.id;
         await offer.save();
+
+        // Auto-create onboarding record (fire-and-forget)
+        _bootstrapOnboarding(offer, req.user.id);
 
         sent.push({
           interviewId:    String(interview._id),

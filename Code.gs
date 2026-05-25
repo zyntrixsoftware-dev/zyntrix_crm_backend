@@ -34,6 +34,19 @@ const C_GRAY_BORDER   = "#E5E7EB";
 // ── LOGO — Hosted on Google Drive ───────────────────────────
 const LOGO_URL = "https://drive.google.com/uc?export=view&id=1UegVZ6a_6DepJSzudlO16aTn7DdYaza0";
 
+// ── ONBOARDING DOCUMENT FORM ────────────────────────────────
+// Set this to your Google Form URL after you create it.
+// Candidates click this link in the offer letter email to upload their docs.
+// Example: "https://forms.gle/XXXXXXXXXXXXXXXXX"
+const ONBOARDING_FORM_URL = PropertiesService.getScriptProperties().getProperty("ONBOARDING_FORM_URL") || "";
+
+// ── BACKEND WEBHOOK ─────────────────────────────────────────
+// Your deployed backend URL for the onboarding form webhook.
+// Set in Apps Script: Project Settings → Script Properties → BACKEND_URL
+// Example: "https://zyntrix-crm-backend.onrender.com"
+const BACKEND_URL            = PropertiesService.getScriptProperties().getProperty("BACKEND_URL") || "";
+const ONBOARDING_WEBHOOK_SECRET = PropertiesService.getScriptProperties().getProperty("ONBOARDING_WEBHOOK_SECRET") || "";
+
 // Column indices — 0-based (row array positions)
 const COL = {
   TIMESTAMP          : 0,   // A
@@ -803,11 +816,25 @@ function _sendOfferLetterEmail(c, attachment) {
 
         '<div style="background:' + C_LIME_LIGHT + ';border-left:4px solid ' + C_LIME + ';border-radius:6px;padding:18px;margin-bottom:24px;">' +
           '<p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:' + C_GRAY_DARK + ';">Next Steps</p>' +
-          '<p style="margin:0;font-size:14px;color:' + C_GRAY_MID + ';line-height:1.8;">' +
+          '<p style="margin:0 0 14px;font-size:14px;color:' + C_GRAY_MID + ';line-height:1.8;">' +
             'Please review the offer letter carefully. To accept, reply to this email with your signed ' +
             'confirmation. If you have any questions about the terms, compensation, or joining date, our HR ' +
             'team will be glad to assist.' +
           '</p>' +
+          (ONBOARDING_FORM_URL
+            ? '<p style="margin:0 0 10px;font-size:14px;font-weight:bold;color:' + C_GRAY_DARK + ';">📋 Submit Your Onboarding Documents</p>' +
+              '<p style="margin:0 0 14px;font-size:13px;color:' + C_GRAY_MID + ';line-height:1.7;">' +
+                'Please upload all required documents (certificates, ID proof, bank details, etc.) using the secure link below. ' +
+                'Your onboarding can only proceed after all mandatory documents are verified.' +
+              '</p>' +
+              '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0;">' +
+                '<tr><td style="border-radius:8px;background:#0A0A0A;">' +
+                  '<a href="' + ONBOARDING_FORM_URL + '" target="_blank" ' +
+                     'style="display:inline-block;padding:13px 28px;color:#AAFF00;font-size:14px;font-weight:bold;' +
+                            'text-decoration:none;letter-spacing:0.3px;">Upload Documents →</a>' +
+                '</td></tr>' +
+              '</table>'
+            : '') +
         '</div>' +
 
         '<div style="background:#F9F9F9;border:1px solid ' + C_GRAY_BORDER + ';border-radius:8px;padding:16px;margin:20px 0;">' +
@@ -966,6 +993,103 @@ function _jsonOut(obj) {
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+// ════════════════════════════════════════════════════════════
+//  ONBOARDING FORM SUBMIT TRIGGER
+//
+//  Called automatically when a candidate submits the Google Form.
+//  You must install this trigger once:
+//    1. Open Apps Script → Triggers (alarm icon)
+//    2. Add trigger → Function: onFormSubmit
+//       Event source: From spreadsheet (or From form if form-bound)
+//       Event type: On form submit
+//
+//  OR run installFormTrigger() once from the Apps Script editor.
+//
+//  Required Script Properties (Project Settings → Script Properties):
+//    BACKEND_URL               — e.g. https://zyntrix-crm-backend.onrender.com
+//    ONBOARDING_WEBHOOK_SECRET — same value as backend env var
+//    ONBOARDING_FORM_URL       — Google Form URL (for the offer email button)
+//
+//  Google Form field titles must EXACTLY match the names in FORM_FIELD_MAP below.
+// ════════════════════════════════════════════════════════════
+
+// Map Google Form question titles → document keys the backend expects.
+// Adjust these titles to exactly match your Form questions.
+// Keys must match your Google Form question titles exactly (spaces are trimmed automatically).
+var FORM_FIELD_MAP = {
+  "Email Address"                               : "candidateEmail",
+  "Full Name"                                   : "candidateName",
+  "Position Applied For"                        : "position",
+  "10th / SSC Marksheet"                        : "tenthMarksheet",
+  "12th / HSC Marksheet"                        : "twelfthMarksheet",
+  "Graduation Certificate & Marksheet"          : "graduationCert",
+  "Post Graduation Certificate (if applicable)" : "postGraduationCert",
+  "Passport Size Photograph"                    : "passportPhoto",
+  "Government ID — PAN Card / Voter ID / DL"    : "governmentId",
+  "Bank Account Details (passbook / statement)" : "bankDetails",
+  "Acceptance letter"                           : "acceptanceLetter"
+};
+
+function onFormSubmit(e) {
+  try {
+    if (!BACKEND_URL) {
+      console.warn("onFormSubmit: BACKEND_URL not set in Script Properties — skipping webhook");
+      return;
+    }
+
+    var itemResponses = e.response.getItemResponses();
+    var payload = { secret: ONBOARDING_WEBHOOK_SECRET, documents: {},
+                    submittedAt: new Date().toISOString() };
+
+    itemResponses.forEach(function(ir) {
+      var title = ir.getItem().getTitle().trim();  // trim whitespace from question titles
+      var value = ir.getResponse();
+
+      // File upload responses return an array of Drive file IDs
+      if (Array.isArray(value)) {
+        var urls = value.map(function(id) {
+          return "https://drive.google.com/file/d/" + id + "/view?usp=sharing";
+        });
+        value = urls.join(", ");
+      }
+
+      var key = FORM_FIELD_MAP[title];
+      if (!key) return;   // unknown field — skip
+
+      if (key === "candidateEmail" || key === "candidateName" || key === "position") {
+        payload[key] = String(value || "").trim();
+      } else {
+        payload.documents[key] = String(value || "").trim();
+      }
+    });
+
+    if (!payload.candidateEmail) {
+      console.error("onFormSubmit: no candidateEmail in response — aborting webhook");
+      return;
+    }
+
+    var webhookUrl = BACKEND_URL.replace(/\/$/, "") + "/api/hr/onboarding/webhook";
+    var options = {
+      method      : "post",
+      contentType : "application/json",
+      payload     : JSON.stringify(payload),
+      muteHttpExceptions: true,
+      followRedirects   : true
+    };
+
+    var response = UrlFetchApp.fetch(webhookUrl, options);
+    console.log("onFormSubmit webhook →", payload.candidateEmail,
+                "| HTTP", response.getResponseCode(),
+                "|", response.getContentText().slice(0, 120));
+  } catch (err) {
+    console.error("onFormSubmit error: " + err);
+  }
+}
+
+// NOTE: To install the onFormSubmit trigger, use the Apps Script UI:
+//   Triggers (⏰ icon) → Add Trigger → onFormSubmit → From spreadsheet → On form submit
+// Do NOT run a function to install it — the UI method requires no extra permissions.
 
 // ════════════════════════════════════════════════════════════
 //  SPREADSHEET onEdit TRIGGER
