@@ -338,12 +338,13 @@ exports.syncFromSheet = async (req, res) => {
     // If the user pastes a URL that already contains gid=XXXX we honour it;
     // otherwise we omit the gid so Google returns the first published sheet.
     const gidMatch = sheetUrl.match(/[?&]gid=(\d+)/);
-    const gidParam  = gidMatch ? `&gid=${gidMatch[1]}` : "";
+    // single=true is required when targeting a specific tab — without it Google
+    // ignores the gid parameter and returns the first sheet (or a 403).
+    const gidParam  = gidMatch ? `&gid=${gidMatch[1]}&single=true` : "";
 
     // ── Always use the /pub?output=csv URL ────────────────────────────────────
     // IMPORTANT: /export?format=csv requires a Google login even on "shared" sheets.
     // Only /pub?output=csv (Publish to web) is truly public and works server-side.
-    // DO NOT hardcode gid=0 — Form Responses sheets usually have a different gid.
     const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv${gidParam}`;
 
     // Fetch the CSV (Node 18+ built-in fetch)
