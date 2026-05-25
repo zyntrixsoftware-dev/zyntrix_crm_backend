@@ -294,7 +294,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">Google Sheet URL</div>
         <input type="url" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/…"
           style="width:100%;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:10px 14px;outline:none;">
-        <div style="font-size:11px;color:var(--text3);margin-top:6px;">Paste the URL of your Google Form responses spreadsheet (any format — edit URL, share URL, or export URL).</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;">Paste the regular spreadsheet URL <em>or</em> the published CSV link from the "Publish to web" dialog — either works.</div>
       </div>
 
       <!-- How-to steps -->
@@ -1111,8 +1111,8 @@ async function saveSheetUrl() {
   const inp = document.getElementById("sheet-url-input");
   const url = (inp?.value || "").trim();
   if (!url) { alert("Please paste your Google Sheet URL first"); return; }
-  if (!url.startsWith("https://docs.google.com/")) {
-    alert("URL must start with https://docs.google.com/"); return;
+  if (!url.includes("docs.google.com/spreadsheets")) {
+    alert("Please paste a Google Sheets URL (docs.google.com/spreadsheets/…)"); return;
   }
   localStorage.setItem(SHEET_URL_KEY, url);
   updateSheetIndicator();
