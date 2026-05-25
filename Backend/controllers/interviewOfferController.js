@@ -6,7 +6,8 @@ const generateOfferPDF = require("../utils/generateOfferPDF");
 const {
   notifyRoundQualified,
   notifyRoundNotQualified,
-  notifyMarkedForOffer
+  notifyMarkedForOffer,
+  notifyOfferLetter
 } = require("../utils/candidateEmails");
 
 function checkHrAccess(req, res) {
@@ -779,25 +780,30 @@ exports.sendOffer = async (req, res) => {
 
     const filename = `Zyntrix_Offer_Letter_${safeFilename(offer.candidateName)}.pdf`;
 
-    await sendEmail(
-      offer.candidateEmail,
-      `Offer Letter — ${offer.appliedFor} | Zyntrix Software Solutions`,
-      buildCoverNote(offer),
-      {
-        attachments: [{
-          filename,
-          content:     pdfBuffer,
-          contentType: "application/pdf"
-        }]
-      }
-    );
+    // Send the offer letter through the Google Apps Script web app (Gmail),
+    // which records OFFERED=TRUE in the Sheet and emails the PDF. SMTP is
+    // intentionally NOT used for offer letters.
+    const result = await notifyOfferLetter({
+      email         : offer.candidateEmail,
+      fullName      : offer.candidateName,
+      position      : offer.appliedFor,
+      offerPdfBase64: pdfBuffer.toString("base64"),
+      offerPdfName  : filename
+    });
+
+    if (!result.sent) {
+      return res.status(502).json({
+        msg: "Offer letter could not be sent — the Apps Script email service is unavailable " +
+             "(check GAS_WEBAPP_URL). SMTP is disabled for offer letters."
+      });
+    }
 
     offer.status = "sent";
     offer.sentAt = new Date();
     offer.sentBy = req.user.id;
     await offer.save();
 
-    return res.json({ msg: `Offer letter sent to ${offer.candidateEmail}`, offer });
+    return res.json({ msg: `Offer letter sent to ${offer.candidateEmail} via Apps Script`, offer });
   } catch (err) {
     console.error("SEND OFFER ERROR:", err);
     return res.status(500).json({ msg: "Failed to send offer: " + err.message });
@@ -964,18 +970,18 @@ exports.bulkSendOffers = async (req, res) => {
         );
         const filename = `Zyntrix_Offer_Letter_${safeFilename(offer.candidateName)}.pdf`;
 
-        await sendEmail(
-          offer.candidateEmail,
-          `Offer Letter — ${offer.appliedFor} | Zyntrix Software Solutions`,
-          buildCoverNote(offer),
-          {
-            attachments: [{
-              filename,
-              content:     pdfBuffer,
-              contentType: "application/pdf"
-            }]
-          }
-        );
+        // Send via the Google Apps Script web app (Gmail) — no SMTP.
+        const result = await notifyOfferLetter({
+          email         : offer.candidateEmail,
+          fullName      : offer.candidateName,
+          position      : offer.appliedFor,
+          offerPdfBase64: pdfBuffer.toString("base64"),
+          offerPdfName  : filename
+        });
+        if (!result.sent) {
+          failed.push({ interviewId: id, reason: "Apps Script email service unavailable (GAS_WEBAPP_URL)" });
+          continue;
+        }
 
         offer.status = "sent";
         offer.sentAt = new Date();

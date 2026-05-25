@@ -31,7 +31,7 @@ const C_GRAY_MID      = "#444444";   // body text
 const C_GRAY_LIGHT    = "#888888";   // subdued text
 const C_GRAY_BORDER   = "#E5E7EB";
 
-// ── LOGO — Hosted on Google Drive ───────────────────────────
+// ── LOGO — Real Zyntrix logo (PNG, 150x150, base64 encoded) ─────
 const LOGO_URL = "https://drive.google.com/uc?export=view&id=1UegVZ6a_6DepJSzudlO16aTn7DdYaza0";
 
 // Column indices — 0-based (row array positions)
@@ -72,13 +72,11 @@ function doPost(e) {
   try {
     const data = _parseBody(e);
 
-    if (data.action === "updateCandidate")          return _handleShortlist(data);
-    if (data.action === "sendRoundQualified")       return _handleRoundQualified(data);
-    if (data.action === "sendRoundNotQualified")    return _handleRoundNotQualified(data);
-    if (data.action === "sendOffered")              return _handleOffered(data);
-    if (data.action === "sendOfferLetter")          return _handleSendOfferLetter(data);
-    if (data.action === "sendApplicationReceived")  return _handleSendApplicationReceived(data);
-    if (data.action === "sendRejected")             return _handleSendRejected(data);
+    if (data.action === "updateCandidate")       return _handleShortlist(data);
+    if (data.action === "sendRoundQualified")    return _handleRoundQualified(data);
+    if (data.action === "sendRoundNotQualified") return _handleRoundNotQualified(data);
+    if (data.action === "sendOffered")           return _handleOffered(data);
+    if (data.action === "sendOfferLetter")       return _handleSendOfferLetter(data);
 
     return _handleApplication(data);
 
@@ -266,7 +264,7 @@ function _handleOffered(data) {
 //      fullName      : "Asha Rao",
 //      position      : "Software Engineer",
 //      phone         : "9999999999",              // optional
-//      hrName        : "Arjun Rao",               // optional -> Column Q
+//      hrName        : "Arjun Rao",               // optional → Column Q
 //      offerPdfBase64: "<base64 of the offer PDF>",
 //      offerPdfName  : "Zyntrix_Offer_Letter_Asha_Rao.pdf"  // optional
 //    }
@@ -301,7 +299,7 @@ function _handleSendOfferLetter(data) {
 
   const sheetRow = rowIndex + 1;
 
-  // STEP 1: mark OFFERED (Column P) = TRUE in the Sheet
+  // ── STEP 1: record in the Sheet first — mark OFFERED (Column P) = TRUE ──
   sheet.getRange(sheetRow, COL.OFFERED + 1).setValue(true);
   if (data.hrName) {
     sheet.getRange(sheetRow, COL.HR_NAME + 1).setValue(String(data.hrName).trim());
@@ -316,7 +314,7 @@ function _handleSendOfferLetter(data) {
     phone    : String(row[COL.PHONE]     || data.phone    || "").trim(),
   };
 
-  // STEP 2: build the PDF attachment blob if base64 data was provided
+  // ── STEP 2: email the offer letter, with the PDF attached if provided ──
   let attachment = null;
   if (data.offerPdfBase64) {
     try {
@@ -328,7 +326,6 @@ function _handleSendOfferLetter(data) {
     }
   }
 
-  // STEP 3: email the offer letter with the PDF attached
   let emailed = false;
   if (candidate.email) {
     try {
@@ -341,44 +338,6 @@ function _handleSendOfferLetter(data) {
   }
 
   return _jsonOut({ ok: true, row: sheetRow, offered: true, emailed: emailed });
-}
-
-// ════════════════════════════════════════════════════════════
-//  HANDLER 7 — Application Received (called from HRMS import)
-// ════════════════════════════════════════════════════════════
-function _handleSendApplicationReceived(data) {
-  const email = String(data.email || "").trim().toLowerCase();
-  if (!email) return _jsonOut({ ok: false, error: "email required" });
-  try {
-    _sendApplicationConfirmation({
-      email   : email,
-      fullName: String(data.fullName || "Candidate").trim(),
-      position: String(data.position || "the role").trim(),
-    });
-  } catch (err) {
-    console.error("_handleSendApplicationReceived error: " + err);
-    return _jsonOut({ ok: false, error: String(err) });
-  }
-  return _jsonOut({ ok: true });
-}
-
-// ════════════════════════════════════════════════════════════
-//  HANDLER 8 — Rejected
-// ════════════════════════════════════════════════════════════
-function _handleSendRejected(data) {
-  const email = String(data.email || "").trim().toLowerCase();
-  if (!email) return _jsonOut({ ok: false, error: "email required" });
-  try {
-    _sendRejectedEmail({
-      email   : email,
-      fullName: String(data.fullName || "Candidate").trim(),
-      position: String(data.position || "the role").trim(),
-    });
-  } catch (err) {
-    console.error("_handleSendRejected error: " + err);
-    return _jsonOut({ ok: false, error: String(err) });
-  }
-  return _jsonOut({ ok: true });
 }
 
 // ════════════════════════════════════════════════════════════
@@ -870,56 +829,6 @@ function _journeyStepActive(num, title, subtitle) {
 }
 
 // ════════════════════════════════════════════════════════════
-//  EMAIL 7 — Rejected
-// ════════════════════════════════════════════════════════════
-function _sendRejectedEmail(c) {
-  const subject = "Update on your Application - " + c.position + " | " + COMPANY_NAME;
-
-  const body =
-    '<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;border:1px solid ' + C_GRAY_BORDER + ';border-radius:12px;overflow:hidden;">' +
-      _emailHeader("Talent Acquisition Team") +
-
-      '<div style="background:' + C_GRAY_DARK + ';padding:12px 32px;text-align:center;">' +
-        '<span style="color:' + C_WHITE + ';font-size:14px;font-weight:bold;letter-spacing:0.5px;">UPDATE ON YOUR APPLICATION</span>' +
-      '</div>' +
-
-      '<div style="padding:32px;background:' + C_WHITE + ';">' +
-        '<p style="font-size:17px;color:' + C_GRAY_DARK + ';margin:0 0 12px;">Dear <strong>' + c.fullName + '</strong>,</p>' +
-
-        '<p style="font-size:14px;color:' + C_GRAY_MID + ';line-height:1.75;margin:0 0 18px;">' +
-          'Thank you for your interest in joining <strong>' + COMPANY_NAME + '</strong> and for taking the time to apply for the position of <strong>' + c.position + '</strong>.' +
-        '</p>' +
-
-        '<div style="background:#FFF8F8;border-left:4px solid #E5534B;border-radius:6px;padding:16px 18px;margin-bottom:20px;">' +
-          '<p style="margin:0;font-size:14px;color:' + C_GRAY_DARK + ';line-height:1.75;">' +
-            'After careful review of your profile, we regret to inform you that we are <strong>unable to move forward</strong> with your application at this time. ' +
-            'This decision was not easy, and we appreciate the time and effort you invested in the process.' +
-          '</p>' +
-        '</div>' +
-
-        '<p style="font-size:14px;color:' + C_GRAY_MID + ';line-height:1.75;margin:0 0 20px;">' +
-          'We will keep your profile on file and reach out if a suitable opportunity arises in the future. ' +
-          'We truly appreciate your interest in ' + COMPANY_NAME + ' and wish you all the very best in your career journey.' +
-        '</p>' +
-
-        '<p style="font-size:13px;color:' + C_GRAY_LIGHT + ';">For any queries, write to us at ' +
-          '<a href="mailto:' + HR_EMAIL + '" style="color:' + C_GRAY_DARK + ';font-weight:600;">' + HR_EMAIL + '</a></p>' +
-
-        '<p style="margin-top:24px;font-size:14px;color:' + C_GRAY_MID + ';">Regards,<br>' +
-          '<strong>' + COMPANY_NAME + ' — HR and Talent Acquisition Team</strong></p>' +
-      '</div>' +
-      _emailFooter() +
-    '</div>';
-
-  GmailApp.sendEmail(c.email, subject, "", {
-    htmlBody: body,
-    from    : HR_EMAIL,
-    replyTo : HR_EMAIL,
-    name    : COMPANY_NAME + " - Talent Acquisition",
-  });
-}
-
-// ════════════════════════════════════════════════════════════
 //  DRIVE — Upload resume PDF, return shareable link
 // ════════════════════════════════════════════════════════════
 function _uploadResume(base64Data, fileName) {
@@ -1026,8 +935,8 @@ function onShortlistEdit(e) {
 //  5. Triggers > onShortlistEdit > From spreadsheet > On edit
 //  6. Set GAS_WEBAPP_URL in Render env vars to the /exec URL
 //
-//  OFFER LETTER: the CRM "Send Offer" action POSTs
+//  OFFER LETTER (new): the CRM "Send Offer" action should POST
 //    { action:"sendOfferLetter", email, fullName, position,
 //      phone?, hrName?, offerPdfBase64, offerPdfName }
-//  -> marks Column P (OFFERED)=TRUE and emails the PDF.
+//  → this marks Column P (OFFERED)=TRUE and emails the PDF offer.
 // ════════════════════════════════════════════════════════════
