@@ -13,14 +13,24 @@ const {
 // Uses native fetch (Node 18+) which follows GAS redirects automatically.
 // Fire-and-forget — a Sheet sync failure never blocks the HR action.
 // ─────────────────────────────────────────────────────────────────────────────
-function syncShortlistToSheet(email, shortlisted) {
+function syncShortlistToSheet(candidate) {
   const gasUrl = process.env.GAS_WEBAPP_URL;
   if (!gasUrl) {
     console.warn("[GAS sync] GAS_WEBAPP_URL not set — skipping sheet sync");
     return;
   }
 
-  const payload = JSON.stringify({ action: "updateCandidate", email, shortlisted });
+  // Send the candidate's identity too, so the Apps Script can locate the row by
+  // email (and append it if missing) before flipping Column O to TRUE + emailing.
+  const payload = JSON.stringify({
+    action      : "updateCandidate",
+    shortlisted : true,
+    email       : candidate.email      || "",
+    fullName    : candidate.name       || "",
+    position    : candidate.appliedFor || "",
+    phone       : candidate.phone      || "",
+    secret      : process.env.GAS_WEBAPP_SECRET || undefined
+  });
 
   // Intentionally NOT awaited — fire and forget
   fetch(gasUrl, {
@@ -30,9 +40,9 @@ function syncShortlistToSheet(email, shortlisted) {
     redirect: "follow",   // follow GAS's 302 redirect automatically
   })
     .then(res => res.text().then(body => {
-      console.log("[GAS sync] shortlist →", email, "| HTTP", res.status, "|", body.slice(0, 120));
+      console.log("[GAS sync] shortlist →", candidate.email, "| HTTP", res.status, "|", body.slice(0, 120));
     }))
-    .catch(err => console.warn("[GAS sync] failed →", email, "|", err.message));
+    .catch(err => console.warn("[GAS sync] failed →", candidate.email, "|", err.message));
 }
 
 function checkHrAccess(req, res) {
@@ -297,16 +307,21 @@ exports.shortlistCandidate = async (req, res) => {
     candidate.interviewId = interview._id;
     await candidate.save();
 
-    // Sync resume-shortlisted flag (col N = TRUE) back to Google Sheet.
+    // Sync resume-shortlisted flag (Column O = TRUE) back to the Google Sheet.
     // Fire-and-forget — sheet sync failure never blocks the shortlist action.
-    syncShortlistToSheet(candidate.email, true);
+    syncShortlistToSheet(candidate);
 
-    // Notify candidate they were shortlisted (await so a network slowness shows
-    // up in the response, but a failure does NOT block the shortlist action).
-    const emailResult = await notifyShortlisted(interview);
-    if (emailResult.sent) {
-      interview.shortlistEmailSentAt = new Date();
-      await interview.save();
+    // Email: when the Google Sheet web app is configured, the Apps Script sends
+    // the shortlist email (your polished template) right after it flips Column O,
+    // so we skip the CRM's own email here to avoid double-sending. If the web app
+    // isn't configured, the CRM sends its built-in shortlist email as a fallback.
+    let emailResult = { sent: false, reason: "handled_by_google_sheet" };
+    if (!process.env.GAS_WEBAPP_URL) {
+      emailResult = await notifyShortlisted(interview);
+      if (emailResult.sent) {
+        interview.shortlistEmailSentAt = new Date();
+        await interview.save();
+      }
     }
 
     return res.status(201).json({
@@ -384,6 +399,98 @@ exports.deleteCandidate = async (req, res) => {
 // Server-side fetch to avoid browser CORS. Returns the raw CSV/text so the
 // browser can parse it client-side with the same parser used for files.
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// PUBLIC JOB APPLICATION — no auth required
+// POST /api/apply
+//
+// Accepts the same JSON body that the GAS web app used to receive:
+//   { fullName, email, phone, position, qualifications, experience,
+//     stateAddress, edtech, availability, source, declaration,
+//     resumeBase64 (optional), resumeName (optional) }
+//
+// Saves to MongoDB, syncs to Google Sheet, and sends confirmation email.
+// ─────────────────────────────────────────────────────────────────────────────
+exports.applyForJob = async (req, res) => {
+  try {
+    const d = req.body || {};
+    const name  = (d.fullName  || d.name  || "").trim();
+    const email = (d.email     || "").trim().toLowerCase();
+    const phone = (d.phone     || "").trim();
+    const role  = (d.position  || d.appliedFor || "").trim();
+
+    if (!name || !email) {
+      return res.status(400).json({ success: false, error: "Name and email are required." });
+    }
+
+    // Save candidate to MongoDB
+    const candidate = await Candidate.create({
+      name,
+      email,
+      phone,
+      appliedFor:   role,
+      department:   d.department || "",
+      importedFrom: "manual",
+      raw: {
+        qualifications : d.qualifications || "",
+        experience     : d.experience     || "",
+        stateAddress   : d.stateAddress   || "",
+        edtech         : d.edtech         || "",
+        availability   : d.availability   || "",
+        source         : d.source         || "",
+        declaration    : d.declaration    || "",
+        timestamp      : d.timestamp      || new Date().toISOString(),
+      }
+    });
+
+    // Sync new application to Google Sheet (fire-and-forget)
+    syncNewApplicationToSheet(d, candidate.email);
+
+    // Send application-received email (fire-and-forget — never block the response)
+    notifyApplicationReceived(candidate).catch(err =>
+      console.warn("[apply] confirmation email failed:", err.message)
+    );
+
+    return res.status(201).json({ success: true, status: "success" });
+  } catch (err) {
+    console.error("APPLY ERROR:", err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Sends the new-application row to the Google Sheet via GAS doPost (fire-and-forget)
+function syncNewApplicationToSheet(d, email) {
+  const gasUrl = process.env.GAS_WEBAPP_URL;
+  if (!gasUrl) return;
+
+  const payload = JSON.stringify({
+    timestamp      : d.timestamp      || new Date().toISOString(),
+    position       : d.position       || d.appliedFor || "",
+    fullName       : d.fullName       || d.name       || "",
+    email          : email,
+    phone          : d.phone          || "",
+    qualifications : d.qualifications || "",
+    experience     : d.experience     || "",
+    stateAddress   : d.stateAddress   || "",
+    edtech         : d.edtech         || "",
+    availability   : d.availability   || "",
+    source         : d.source         || "",
+    declaration    : d.declaration    || "",
+    resumeBase64   : d.resumeBase64   || undefined,
+    resumeName     : d.resumeName     || undefined,
+  });
+
+  fetch(gasUrl, {
+    method  : "POST",
+    headers : { "Content-Type": "application/json" },
+    body    : payload,
+    redirect: "follow",
+  })
+    .then(r => r.text().then(b =>
+      console.log("[GAS apply sync] HTTP", r.status, "|", b.slice(0, 80))
+    ))
+    .catch(err => console.warn("[GAS apply sync] failed:", err.message));
+}
+
 exports.importFromLink = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;

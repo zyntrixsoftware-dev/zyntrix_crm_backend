@@ -1,567 +1,806 @@
 // ============================================================
-//  Google Apps Script — Job Application Form Backend
-//  Company : Zyntrix Software Solution
-//  Includes: Form submission, CRM update, Automated Emails
-//  Fixed   : Email failures isolated — form submission always succeeds
-//  Fixed   : Shortlist button now writes to Resume Shortlisted (col N)
-//            and does NOT overwrite Interview Shortlisted (col O)
-//  Fixed   : sendShortlistEmail wording — resume shortlisted + best of luck
+//  Google Apps Script — Zyntrix Software Solution
+//  Handles:
+//    1. Job application form submissions (stores to Sheet + Drive + email)
+//    2. HRMS "Resume Shortlist" button (marks col N + emails candidate)
 // ============================================================
 
+// ── CONFIG ──────────────────────────────────────────────────
 const SHEET_ID        = "11aTN-lg6PWMGlB5OzNCoWtGIuqcjbh0Ctffg7Z0d8vs";
 const SHEET_NAME      = "Sheet1";
-const DRIVE_FOLDER_ID = "1nzBrmizR4ZXKs8EliDT2SVn9eHMricOR";
+const RESUME_FOLDER   = "Zyntrix_Resumes";   // Drive folder for uploaded PDFs
 
 const COMPANY_NAME    = "Zyntrix Software Solution";
-const COMPANY_EMAIL   = "noreply@zyntrixsoftware.com";
 const HR_EMAIL        = "hr@zyntrixsoftware.com";
 const WEBSITE_URL     = "https://zyntrixsoftware.com";
 const LINKEDIN_URL    = "https://www.linkedin.com/company/zyntrix-software-solutions-pvt-ltd";
 const YOUTUBE_URL     = "https://www.youtube.com/@zyntrixsoftware";
 const INSTAGRAM_URL   = "https://www.instagram.com/zyntrixsoftware";
-const LOGO_BASE64     = "data:image/png;base64,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";
 
-
-// Column indices (0-based)
+// Column indices — 0-based (row array positions)
 const COL = {
-  TIMESTAMP        : 0,
-  POSITION         : 1,
-  FULL_NAME        : 2,
-  EMAIL            : 3,
-  PHONE            : 4,
-  QUALIFICATIONS   : 5,
-  EXPERIENCE       : 6,
-  LOCATION         : 7,
-  EDTECH           : 8,
-  AVAILABILITY     : 9,
-  RESUME_LINK      : 10,
-  SOURCE           : 11,
-  DECLARATION      : 12,
-  SHORTLISTED      : 13,  // Column N — "Resume shortlisted"
-  INTERVIEW_STATUS : 14,  // Column O — "Interview Shortlisted"
-  OFFERED          : 15,
+  TIMESTAMP          : 0,   // A
+  POSITION           : 1,   // B
+  FULL_NAME          : 2,   // C
+  EMAIL              : 3,   // D
+  PHONE              : 4,   // E
+  QUALIFICATIONS     : 5,   // F
+  EXPERIENCE         : 6,   // G
+  STATE_ADDRESS      : 7,   // H
+  EDTECH             : 8,   // I
+  AVAILABILITY       : 9,   // J
+  CV_LINK            : 10,  // K
+  SOURCE             : 11,  // L
+  DECLARATION        : 12,  // M
+  RESUME_SHORTLISTED : 13,  // N  ← HR marks this TRUE
+  INTERVIEW_STATUS   : 14,  // O
+  OFFERED            : 15,  // P
+  HR_NAME            : 16,  // Q
+  EMAIL_SENT_FLAG    : 17,  // R  ← duplicate-send guard
 };
 
-const HEADERS = [
-  "Timestamp", "Position Applying For", "Full Name", "Email Address",
-  "Phone number", "Qualifications", "Experience", "State/Province|address",
-  "Have you ever worked in an Edtech company ?",
-  "Are you available for immediate joining and willing to do WFH do you have WIFI connection ?",
-  "CV/Resume", "Where did you hear about this opportunity?", "Declaration",
-  "Resume shortlisted", "Interview Shortlisted", "Offered",
-];
-
+const TOTAL_COLS = 18;
 
 // ════════════════════════════════════════════════════════════
-//  HELPERS
+//  HEALTH CHECK  (GET)
 // ════════════════════════════════════════════════════════════
-
-function getSheet() {
-  return SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
+function doGet() {
+  return _jsonOut({ ok: true, service: COMPANY_NAME + " — Application API", status: "running" });
 }
 
-function ensureHeaders(sheet) {
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(HEADERS);
-    sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight("bold");
+// ════════════════════════════════════════════════════════════
+//  MAIN ENTRY POINT  (POST)
+// ════════════════════════════════════════════════════════════
+function doPost(e) {
+  try {
+    const data = _parseBody(e);
+
+    // HRMS shortlist button → update col N + email candidate
+    if (data.action === "updateCandidate")       return _handleShortlist(data);
+
+    // HRMS Interview Panel round result emails
+    if (data.action === "sendRoundQualified")    return _handleRoundQualified(data);
+    if (data.action === "sendRoundNotQualified") return _handleRoundNotQualified(data);
+    if (data.action === "sendOffered")           return _handleOffered(data);
+
+    // Default → new job application from the public form
+    return _handleApplication(data);
+
+  } catch (err) {
+    console.error("doPost error: " + err);
+    return _jsonOut({ status: "error", ok: false, error: String(err) });
   }
 }
 
-function cors(output) {
-  return output.setMimeType(ContentService.MimeType.JSON);
+// ════════════════════════════════════════════════════════════
+//  HANDLER 1 — New job application
+// ════════════════════════════════════════════════════════════
+function _handleApplication(data) {
+  const email    = String(data.email    || "").trim().toLowerCase();
+  const fullName = String(data.fullName || "").trim();
+  const position = String(data.position || "").trim();
+
+  if (!email)    return _jsonOut({ status: "error", error: "email is required" });
+  if (!fullName) return _jsonOut({ status: "error", error: "fullName is required" });
+  if (!position) return _jsonOut({ status: "error", error: "position is required" });
+
+  // Upload resume PDF to Drive if provided
+  let cvLink = String(data.cv || "").trim();
+  if (!cvLink && data.resumeBase64 && data.resumeName) {
+    cvLink = _uploadResume(data.resumeBase64, data.resumeName);
+  }
+
+  const sheet = _getSheet();
+
+  // Build the row — 18 columns
+  const row = new Array(TOTAL_COLS).fill("");
+  row[COL.TIMESTAMP]          = data.timestamp ? new Date(data.timestamp) : new Date();
+  row[COL.POSITION]           = position;
+  row[COL.FULL_NAME]          = fullName;
+  row[COL.EMAIL]              = email;
+  row[COL.PHONE]              = String(data.phone          || "").trim();
+  row[COL.QUALIFICATIONS]     = String(data.qualifications || "").trim();
+  row[COL.EXPERIENCE]         = String(data.experience     || "").trim();
+  row[COL.STATE_ADDRESS]      = String(data.stateAddress   || "").trim();
+  row[COL.EDTECH]             = String(data.edtech         || "").trim();
+  row[COL.AVAILABILITY]       = String(data.availability   || "").trim();
+  row[COL.CV_LINK]            = cvLink;
+  row[COL.SOURCE]             = String(data.source         || "").trim();
+  row[COL.DECLARATION]        = String(data.declaration    || "").trim();
+  row[COL.RESUME_SHORTLISTED] = "";   // blank — HR fills this later
+  row[COL.INTERVIEW_STATUS]   = "";   // blank — set after interviews
+  row[COL.OFFERED]            = "";
+  row[COL.HR_NAME]            = "";
+  row[COL.EMAIL_SENT_FLAG]    = "";
+
+  sheet.appendRow(row);
+  SpreadsheetApp.flush();
+
+  // Send "Application Received" confirmation to the candidate
+  try {
+    _sendApplicationConfirmation({ fullName, email, position });
+  } catch (mailErr) {
+    console.error("Confirmation email failed: " + mailErr);
+  }
+
+  console.log("✅ Application stored → " + email + " | " + position);
+  return _jsonOut({ status: "success", ok: true });
 }
 
-// Shared footer used in all emails
-function emailFooter() {
+// ════════════════════════════════════════════════════════════
+//  HANDLER 2 — HRMS shortlist update
+//  Called by the Node.js backend when HR clicks "Resume Shortlist"
+//  Payload: { action:"updateCandidate", email, shortlisted:true,
+//             fullName, position, phone }
+// ════════════════════════════════════════════════════════════
+function _handleShortlist(data) {
+  const email = String(data.email || "").trim().toLowerCase();
+  if (!email) return _jsonOut({ ok: false, error: "email is required" });
+
+  const sheet  = _getSheet();
+  const values = sheet.getDataRange().getValues();
+
+  // Find candidate row by email (col D = index 3).
+  // We scan ALL rows and keep the LAST match so the most recent
+  // application is updated, not an older duplicate row.
+  let rowIndex = -1;
+  for (let r = 1; r < values.length; r++) {
+    const rowEmail = String(values[r][COL.EMAIL] || "").trim().toLowerCase();
+    if (rowEmail === email) {
+      rowIndex = r; // keep overwriting → lands on the last (newest) match
+    }
+  }
+
+  // Candidate not in sheet → append a minimal row first
+  if (rowIndex === -1) {
+    const newRow = new Array(TOTAL_COLS).fill("");
+    newRow[COL.TIMESTAMP]  = new Date();
+    newRow[COL.POSITION]   = String(data.position || "").trim();
+    newRow[COL.FULL_NAME]  = String(data.fullName || "").trim();
+    newRow[COL.EMAIL]      = email;
+    newRow[COL.PHONE]      = String(data.phone    || "").trim();
+    sheet.appendRow(newRow);
+    SpreadsheetApp.flush();
+    rowIndex = sheet.getLastRow() - 1; // 0-based
+  }
+
+  const sheetRow = rowIndex + 1; // 1-based sheet row
+
+  // Mark col N (Resume Shortlisted) = TRUE
+  sheet.getRange(sheetRow, COL.RESUME_SHORTLISTED + 1).setValue(true);
+  SpreadsheetApp.flush();
+
+  // Read fresh row data for email
+  const row = sheet.getRange(sheetRow, 1, 1, TOTAL_COLS).getValues()[0];
+
+  const candidate = {
+    fullName : String(row[COL.FULL_NAME] || data.fullName || "").trim(),
+    email    : email,
+    position : String(row[COL.POSITION]  || data.position || "").trim(),
+    phone    : String(row[COL.PHONE]     || data.phone    || "").trim(),
+  };
+
+  // Send email only once (duplicate-send guard on col R)
+  const alreadySent = String(row[COL.EMAIL_SENT_FLAG] || "").trim().toLowerCase();
+  let emailed = false;
+
+  if (candidate.email && !alreadySent.startsWith("sent")) {
+    try {
+      _sendShortlistEmail(candidate);
+      sheet.getRange(sheetRow, COL.EMAIL_SENT_FLAG + 1)
+           .setValue("Sent – " + new Date().toLocaleString("en-IN"));
+      SpreadsheetApp.flush();
+      emailed = true;
+      console.log("✅ Shortlist email sent → " + candidate.email + " (row " + sheetRow + ")");
+    } catch (mailErr) {
+      console.error("Shortlist email failed: " + mailErr);
+    }
+  }
+
+  return _jsonOut({ ok: true, row: sheetRow, emailed: emailed });
+}
+
+// ════════════════════════════════════════════════════════════
+//  EMAIL 1 — Application Received
+// ════════════════════════════════════════════════════════════
+function _sendApplicationConfirmation(c) {
+  const subject = "Application Received – " + c.position + " | " + COMPANY_NAME;
+
+  const body =
+    '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">' +
+
+      '<div style="background:linear-gradient(135deg,#064E3B 0%,#059669 100%);padding:28px 32px;text-align:center;">' +
+        '<h2 style="color:#fff;margin:0;font-size:22px;">' + COMPANY_NAME + '</h2>' +
+        '<p style="color:#6EE7B7;margin:6px 0 0;font-size:12px;letter-spacing:2px;text-transform:uppercase;">Talent Acquisition Team</p>' +
+      '</div>' +
+
+      '<div style="background:#F0FDF4;border-bottom:1px solid #BBF7D0;padding:12px 32px;text-align:center;">' +
+        '<span style="background:#059669;color:#fff;padding:5px 20px;border-radius:20px;font-size:13px;font-weight:bold;">✅ Application Received</span>' +
+      '</div>' +
+
+      '<div style="padding:28px 32px;background:#fff;">' +
+        '<p style="font-size:17px;color:#111827;margin:0 0 8px;">Dear <strong>' + c.fullName + '</strong>,</p>' +
+        '<p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 20px;">' +
+          'Thank you for applying to <strong>' + COMPANY_NAME + '</strong> for the position of ' +
+          '<strong>' + c.position + '</strong>. We have received your application and our Talent Acquisition ' +
+          'team will review your profile shortly.' +
+        '</p>' +
+        '<div style="background:#ECFDF5;border-left:4px solid #059669;border-radius:8px;padding:16px 18px;margin-bottom:20px;">' +
+          '<p style="margin:0;font-size:14px;color:#065F46;line-height:1.6;">' +
+            '⏱ If your profile matches our requirements, we will reach out within <strong>5–7 working days</strong> ' +
+            'to schedule the next steps. Please keep your phone reachable.' +
+          '</p>' +
+        '</div>' +
+        '<p style="font-size:13px;color:#6B7280;">For queries, contact us at ' +
+          '<a href="mailto:' + HR_EMAIL + '" style="color:#059669;">' + HR_EMAIL + '</a></p>' +
+        '<p style="margin-top:20px;font-size:14px;color:#374151;">Warm regards,<br>' +
+          '<strong>' + COMPANY_NAME + ' — HR Team</strong></p>' +
+      '</div>' +
+
+      _emailFooter() +
+    '</div>';
+
+  GmailApp.sendEmail(c.email, subject, "", {
+    htmlBody: body,
+    replyTo : HR_EMAIL,
+    name    : COMPANY_NAME + " – Talent Acquisition",
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  EMAIL 2 — Resume Shortlisted
+// ════════════════════════════════════════════════════════════
+function _sendShortlistEmail(c) {
+  const subject = "🎉 Your Resume Has Been Shortlisted! – " + c.position + " | " + COMPANY_NAME;
+
+  const body =
+    '<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">' +
+
+      '<div style="background:linear-gradient(135deg,#064E3B 0%,#065F46 60%,#059669 100%);padding:32px;text-align:center;">' +
+        '<h1 style="color:#fff;margin:0;font-size:24px;">' + COMPANY_NAME + '</h1>' +
+        '<p style="color:#6EE7B7;margin:6px 0 0;font-size:12px;letter-spacing:2px;text-transform:uppercase;">Talent Acquisition Team</p>' +
+      '</div>' +
+
+      '<div style="background:#F0FDF4;border-bottom:1px solid #BBF7D0;padding:14px 32px;text-align:center;">' +
+        '<span style="background:#059669;color:#fff;padding:6px 22px;border-radius:20px;font-size:14px;font-weight:bold;">' +
+          '⭐ Resume Shortlisted — Interview Call Coming Soon!' +
+        '</span>' +
+      '</div>' +
+
+      '<div style="padding:32px;background:#fff;">' +
+
+        '<p style="font-size:18px;color:#111827;margin:0 0 6px;">Dear <strong>' + c.fullName + '</strong>,</p>' +
+        '<p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 20px;">' +
+          'We are excited to inform you that your resume has been <strong style="color:#059669;">shortlisted</strong> ' +
+          'for the <strong>' + c.position + '</strong> role at <strong>' + COMPANY_NAME + '</strong>. ' +
+          'Congratulations — you have cleared the first stage of our selection process!' +
+        '</p>' +
+
+        '<div style="background:#ECFDF5;border-left:4px solid #059669;border-radius:8px;padding:18px;margin-bottom:24px;">' +
+          '<p style="margin:0 0 6px;font-size:15px;font-weight:bold;color:#065F46;">📞 What Happens Next?</p>' +
+          '<p style="margin:0;font-size:14px;color:#065F46;line-height:1.7;">' +
+            'Our HR team will reach out to you <strong>shortly</strong> to schedule your interview call. ' +
+            'Please keep your phone reachable and check your inbox regularly.' +
+          '</p>' +
+        '</div>' +
+
+        '<div style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:8px;padding:16px;margin-bottom:24px;">' +
+          '<p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:#065F46;">🎯 How to Prepare</p>' +
+          '<p style="margin:0;font-size:13px;color:#374151;line-height:1.7;">' +
+            'Review the role requirements, research <strong>' + COMPANY_NAME + '</strong>, ' +
+            'and brush up on your technical skills. <strong>Best of Luck! 🍀</strong>' +
+          '</p>' +
+        '</div>' +
+
+        // Journey steps
+        '<p style="font-weight:bold;font-size:15px;color:#111827;margin:0 0 12px;">📅 Your Selection Journey</p>' +
+
+        _step(true,  "✓", "#059669", "#fff",    "Application Received",   "Your application was successfully submitted.") +
+        _stepHighlight("✓", "🎉 Resume Shortlisted — You are here!", "Your profile has been approved by our recruiter.") +
+        _step(false, "3", "#D1FAE5", "#059669", "HR Screening Call",       "Our HR will call to schedule your interview.") +
+        _step(false, "4", "#F3F4F6", "#9CA3AF", "Interview Round",         "Technical / Managerial round — online or in person.") +
+        _step(false, "5", "#F3F4F6", "#9CA3AF", "Final Decision & Offer",  "Selected candidates receive a formal offer letter.") +
+
+        '<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 16px;margin:20px 0;">' +
+          '<p style="margin:0;font-size:13px;color:#92400E;">' +
+            '🔔 <strong>Tip:</strong> Keep your phone reachable and check your email regularly.' +
+          '</p>' +
+        '</div>' +
+
+        // Summary
+        '<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:18px;margin-bottom:20px;">' +
+          '<p style="margin:0 0 10px;font-weight:bold;font-size:14px;color:#111827;">Application Summary</p>' +
+          '<table style="width:100%;font-size:13px;border-collapse:collapse;">' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;width:110px;">Name</td><td style="padding:7px 0;color:#111827;font-weight:600;">' + c.fullName + '</td></tr>' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;">Position</td><td style="padding:7px 0;color:#111827;font-weight:600;">' + c.position + '</td></tr>' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;">Email</td><td style="padding:7px 0;color:#111827;">' + c.email + '</td></tr>' +
+            '<tr><td style="padding:7px 0;color:#6B7280;">Phone</td><td style="padding:7px 0;color:#111827;">' + (c.phone || "Not provided") + '</td></tr>' +
+          '</table>' +
+        '</div>' +
+
+        '<p style="font-size:13px;color:#6B7280;">For queries: <a href="mailto:' + HR_EMAIL + '" style="color:#059669;font-weight:600;">' + HR_EMAIL + '</a></p>' +
+        '<p style="margin-top:20px;font-size:14px;color:#374151;">Warm regards,<br><strong>' + COMPANY_NAME + ' — HR &amp; Talent Acquisition Team</strong></p>' +
+
+      '</div>' +
+      _emailFooter() +
+    '</div>';
+
+  GmailApp.sendEmail(c.email, subject, "", {
+    htmlBody: body,
+    replyTo : HR_EMAIL,
+    name    : COMPANY_NAME + " – Talent Acquisition",
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  HANDLER 3 — Round Qualified
+//  Payload: { action:"sendRoundQualified", email, fullName,
+//              position, roundNumber }
+// ════════════════════════════════════════════════════════════
+function _handleRoundQualified(data) {
+  const email = String(data.email || "").trim().toLowerCase();
+  if (!email) return _jsonOut({ ok: false, error: "email required" });
+  try {
+    _sendRoundQualifiedEmail({
+      email,
+      fullName   : String(data.fullName    || "Candidate").trim(),
+      position   : String(data.position   || "the role").trim(),
+      roundNumber: Number(data.roundNumber || 1)
+    });
+  } catch (err) {
+    console.error("_handleRoundQualified error: " + err);
+  }
+  return _jsonOut({ ok: true });
+}
+
+// ════════════════════════════════════════════════════════════
+//  HANDLER 4 — Round Not Qualified
+//  Payload: { action:"sendRoundNotQualified", email, fullName,
+//              position, roundNumber }
+// ════════════════════════════════════════════════════════════
+function _handleRoundNotQualified(data) {
+  const email = String(data.email || "").trim().toLowerCase();
+  if (!email) return _jsonOut({ ok: false, error: "email required" });
+  try {
+    _sendRoundNotQualifiedEmail({
+      email,
+      fullName   : String(data.fullName    || "Candidate").trim(),
+      position   : String(data.position   || "the role").trim(),
+      roundNumber: Number(data.roundNumber || 1)
+    });
+  } catch (err) {
+    console.error("_handleRoundNotQualified error: " + err);
+  }
+  return _jsonOut({ ok: true });
+}
+
+// ════════════════════════════════════════════════════════════
+//  HANDLER 5 — Offered
+//  Payload: { action:"sendOffered", email, fullName, position }
+// ════════════════════════════════════════════════════════════
+function _handleOffered(data) {
+  const email = String(data.email || "").trim().toLowerCase();
+  if (!email) return _jsonOut({ ok: false, error: "email required" });
+  try {
+    _sendOfferedEmail({
+      email,
+      fullName : String(data.fullName || "Candidate").trim(),
+      position : String(data.position || "the role").trim()
+    });
+  } catch (err) {
+    console.error("_handleOffered error: " + err);
+  }
+  return _jsonOut({ ok: true });
+}
+
+// ════════════════════════════════════════════════════════════
+//  EMAIL 3 — Round Qualified
+// ════════════════════════════════════════════════════════════
+function _sendRoundQualifiedEmail(c) {
+  const isFinal   = c.roundNumber >= 3;
+  const nextRound = c.roundNumber + 1;
+
+  const subject = isFinal
+    ? "🏆 All 3 Rounds Cleared! — " + c.position + " | " + COMPANY_NAME
+    : "✅ Round " + c.roundNumber + " Cleared — " + c.position + " | " + COMPANY_NAME;
+
+  // Journey steps: mark rounds 1..roundNumber as done, next as upcoming
+  function roundStep(num) {
+    const done = num <= c.roundNumber;
+    const next = !isFinal && num === nextRound;
+    const bg   = done ? "#059669" : next ? "#F59E0B" : "#E5E7EB";
+    const txt  = done ? "#fff"    : next ? "#fff"    : "#9CA3AF";
+    const icon = done ? "✓"       : next ? "→"       : String(num);
+    const label = "Round " + num + " Interview";
+    const sub   = done ? "Cleared ✓" : next ? "Up next — stay prepared!" : "Pending";
+    const subCol = done ? "#059669"   : next ? "#D97706"                 : "#9CA3AF";
+    return (
+      '<div style="display:flex;align-items:center;margin-bottom:12px;">' +
+        '<div style="min-width:36px;height:36px;background:' + bg + ';color:' + txt + ';border-radius:50%;' +
+             'text-align:center;line-height:36px;font-size:14px;font-weight:bold;margin-right:14px;flex-shrink:0;">' + icon + '</div>' +
+        '<div>' +
+          '<p style="margin:0;font-size:13px;font-weight:600;color:#111827;">' + label + '</p>' +
+          '<p style="margin:2px 0 0;font-size:12px;color:' + subCol + ';">' + sub + '</p>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  const nextBlock = isFinal
+    ? '<div style="background:#ECFDF5;border-left:4px solid #059669;border-radius:8px;padding:16px 18px;margin:20px 0;">' +
+        '<p style="margin:0;font-size:15px;font-weight:bold;color:#065F46;">🎉 What Happens Next?</p>' +
+        '<p style="margin:8px 0 0;font-size:14px;color:#065F46;line-height:1.7;">' +
+          'You have successfully cleared <strong>ALL 3 rounds</strong>. Our HR team will review the results and ' +
+          'reach out shortly with the <strong>final decision and offer details</strong>. ' +
+          'Please keep your phone reachable.' +
+        '</p>' +
+      '</div>'
+    : '<div style="background:#FFFBEB;border-left:4px solid #F59E0B;border-radius:8px;padding:16px 18px;margin:20px 0;">' +
+        '<p style="margin:0;font-size:15px;font-weight:bold;color:#92400E;">📞 What Happens Next?</p>' +
+        '<p style="margin:8px 0 0;font-size:14px;color:#92400E;line-height:1.7;">' +
+          'Our HR team will contact you shortly to schedule <strong>Round ' + nextRound + '</strong>. ' +
+          'Please keep your phone reachable and prepare well. <strong>Best of Luck! 🍀</strong>' +
+        '</p>' +
+      '</div>';
+
+  const badgeBg  = isFinal ? "#065F46" : "#059669";
+  const badgeTxt = isFinal ? "🏆 All 3 Rounds Cleared!" : "✅ Round " + c.roundNumber + " — Cleared!";
+
+  const body =
+    '<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">' +
+
+      '<div style="background:linear-gradient(135deg,#064E3B 0%,#065F46 60%,#059669 100%);padding:32px;text-align:center;">' +
+        '<h1 style="color:#fff;margin:0;font-size:24px;">' + COMPANY_NAME + '</h1>' +
+        '<p style="color:#6EE7B7;margin:6px 0 0;font-size:12px;letter-spacing:2px;text-transform:uppercase;">Interview Panel</p>' +
+      '</div>' +
+
+      '<div style="background:#F0FDF4;border-bottom:1px solid #BBF7D0;padding:14px 32px;text-align:center;">' +
+        '<span style="background:' + badgeBg + ';color:#fff;padding:7px 24px;border-radius:20px;font-size:14px;font-weight:bold;">' + badgeTxt + '</span>' +
+      '</div>' +
+
+      '<div style="padding:32px;background:#fff;">' +
+        '<p style="font-size:18px;color:#111827;margin:0 0 10px;">Dear <strong>' + c.fullName + '</strong>,</p>' +
+        '<p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 20px;">' +
+          'Excellent work! We are pleased to inform you that you have <strong style="color:#059669;">successfully cleared Round ' + c.roundNumber + '</strong> ' +
+          'of your interview process for the <strong>' + c.position + '</strong> role at <strong>' + COMPANY_NAME + '</strong>.' +
+        '</p>' +
+
+        nextBlock +
+
+        '<p style="font-weight:bold;font-size:15px;color:#111827;margin:24px 0 12px;">📅 Your Interview Journey</p>' +
+        roundStep(1) + roundStep(2) + roundStep(3) +
+
+        '<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px;margin:20px 0;">' +
+          '<p style="margin:0 0 8px;font-weight:bold;font-size:13px;color:#111827;">📋 Interview Details</p>' +
+          '<table style="width:100%;font-size:13px;border-collapse:collapse;">' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;width:110px;">Name</td><td style="padding:7px 0;color:#111827;font-weight:600;">' + c.fullName + '</td></tr>' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;">Position</td><td style="padding:7px 0;color:#111827;font-weight:600;">' + c.position + '</td></tr>' +
+            '<tr><td style="padding:7px 0;color:#6B7280;">Round</td><td style="padding:7px 0;color:#059669;font-weight:600;">Round ' + c.roundNumber + ' — Cleared ✅</td></tr>' +
+          '</table>' +
+        '</div>' +
+
+        '<p style="font-size:13px;color:#6B7280;">Questions? <a href="mailto:' + HR_EMAIL + '" style="color:#059669;">' + HR_EMAIL + '</a></p>' +
+        '<p style="margin-top:20px;font-size:14px;color:#374151;">Warm regards,<br><strong>' + COMPANY_NAME + ' — HR &amp; Talent Acquisition Team</strong></p>' +
+      '</div>' +
+      _emailFooter() +
+    '</div>';
+
+  GmailApp.sendEmail(c.email, subject, "", {
+    htmlBody: body,
+    replyTo : HR_EMAIL,
+    name    : COMPANY_NAME + " – Talent Acquisition",
+  });
+  console.log("✅ Round qualified email sent → " + c.email + " Round " + c.roundNumber);
+}
+
+// ════════════════════════════════════════════════════════════
+//  EMAIL 4 — Round Not Qualified
+// ════════════════════════════════════════════════════════════
+function _sendRoundNotQualifiedEmail(c) {
+  const subject = "Update on Your Interview — " + c.position + " | " + COMPANY_NAME;
+
+  const body =
+    '<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">' +
+
+      '<div style="background:linear-gradient(135deg,#1E293B 0%,#334155 100%);padding:32px;text-align:center;">' +
+        '<h1 style="color:#fff;margin:0;font-size:24px;">' + COMPANY_NAME + '</h1>' +
+        '<p style="color:#94A3B8;margin:6px 0 0;font-size:12px;letter-spacing:2px;text-transform:uppercase;">Interview Panel</p>' +
+      '</div>' +
+
+      '<div style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:14px 32px;text-align:center;">' +
+        '<span style="background:#475569;color:#fff;padding:7px 24px;border-radius:20px;font-size:14px;font-weight:bold;">📋 Interview Update</span>' +
+      '</div>' +
+
+      '<div style="padding:32px;background:#fff;">' +
+        '<p style="font-size:18px;color:#111827;margin:0 0 10px;">Dear <strong>' + c.fullName + '</strong>,</p>' +
+        '<p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 20px;">' +
+          'Thank you for taking the time to participate in <strong>Round ' + c.roundNumber + '</strong> of our interview ' +
+          'process for the <strong>' + c.position + '</strong> role at <strong>' + COMPANY_NAME + '</strong>.' +
+        '</p>' +
+
+        '<div style="background:#F8FAFC;border-left:4px solid #94A3B8;border-radius:8px;padding:18px;margin-bottom:24px;">' +
+          '<p style="margin:0;font-size:14px;color:#374151;line-height:1.8;">' +
+            'After careful evaluation, we regret to inform you that we have decided to <strong>move forward with other candidates</strong> ' +
+            'for this particular role at this time. This was a difficult decision given the calibre of applicants we received.' +
+          '</p>' +
+        '</div>' +
+
+        '<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:16px;margin-bottom:24px;">' +
+          '<p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:#065F46;">💼 Keep Going — Your Career Journey Continues</p>' +
+          '<p style="margin:0;font-size:13px;color:#374151;line-height:1.7;">' +
+            'We genuinely appreciate the time and effort you invested throughout this process. ' +
+            '<strong>We will keep your profile on file</strong> for future opportunities that align with your experience and skills. ' +
+            'Do not hesitate to apply again for roles that interest you.' +
+          '</p>' +
+        '</div>' +
+
+        '<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px;margin:20px 0;">' +
+          '<p style="margin:0 0 8px;font-weight:bold;font-size:13px;color:#111827;">📋 Interview Summary</p>' +
+          '<table style="width:100%;font-size:13px;border-collapse:collapse;">' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;width:110px;">Name</td><td style="padding:7px 0;color:#111827;font-weight:600;">' + c.fullName + '</td></tr>' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;">Position</td><td style="padding:7px 0;color:#111827;font-weight:600;">' + c.position + '</td></tr>' +
+            '<tr><td style="padding:7px 0;color:#6B7280;">Round</td><td style="padding:7px 0;color:#6B7280;">Round ' + c.roundNumber + '</td></tr>' +
+          '</table>' +
+        '</div>' +
+
+        '<p style="font-size:13px;color:#6B7280;">Questions? <a href="mailto:' + HR_EMAIL + '" style="color:#059669;">' + HR_EMAIL + '</a></p>' +
+        '<p style="margin-top:20px;font-size:14px;color:#374151;">We wish you the very best in your career journey.<br><br>' +
+          'Warm regards,<br><strong>' + COMPANY_NAME + ' — HR &amp; Talent Acquisition Team</strong></p>' +
+      '</div>' +
+      _emailFooter() +
+    '</div>';
+
+  GmailApp.sendEmail(c.email, subject, "", {
+    htmlBody: body,
+    replyTo : HR_EMAIL,
+    name    : COMPANY_NAME + " – Talent Acquisition",
+  });
+  console.log("✅ Round not-qualified email sent → " + c.email + " Round " + c.roundNumber);
+}
+
+// ════════════════════════════════════════════════════════════
+//  EMAIL 5 — Offered (all rounds cleared, offer coming)
+// ════════════════════════════════════════════════════════════
+function _sendOfferedEmail(c) {
+  const subject = "🎊 Congratulations! You've Been Selected — " + c.position + " | " + COMPANY_NAME;
+
+  const body =
+    '<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">' +
+
+      '<div style="background:linear-gradient(135deg,#064E3B 0%,#065F46 50%,#047857 100%);padding:36px 32px;text-align:center;">' +
+        '<div style="font-size:40px;margin-bottom:10px;">🎊</div>' +
+        '<h1 style="color:#fff;margin:0;font-size:26px;">' + COMPANY_NAME + '</h1>' +
+        '<p style="color:#6EE7B7;margin:6px 0 0;font-size:12px;letter-spacing:2px;text-transform:uppercase;">You&rsquo;re Selected!</p>' +
+      '</div>' +
+
+      '<div style="background:#F0FDF4;border-bottom:1px solid #BBF7D0;padding:14px 32px;text-align:center;">' +
+        '<span style="background:#059669;color:#fff;padding:8px 28px;border-radius:20px;font-size:15px;font-weight:bold;">' +
+          '🎉 Congratulations — Offer Letter Coming Soon!' +
+        '</span>' +
+      '</div>' +
+
+      '<div style="padding:32px;background:#fff;">' +
+        '<p style="font-size:18px;color:#111827;margin:0 0 10px;">Dear <strong>' + c.fullName + '</strong>,</p>' +
+        '<p style="font-size:15px;color:#374151;line-height:1.8;margin:0 0 20px;">' +
+          'We are absolutely <strong style="color:#059669;">thrilled</strong> to inform you that you have been <strong>SELECTED</strong> ' +
+          'for the position of <strong>' + c.position + '</strong> at <strong>' + COMPANY_NAME + '</strong>! 🎉' +
+        '</p>' +
+        '<p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 20px;">' +
+          'You have demonstrated exceptional skill and commitment throughout our rigorous interview process, ' +
+          'and we are confident you will be a tremendous addition to our team.' +
+        '</p>' +
+
+        '<div style="background:#ECFDF5;border-left:4px solid #059669;border-radius:8px;padding:18px;margin-bottom:24px;">' +
+          '<p style="margin:0 0 6px;font-size:15px;font-weight:bold;color:#065F46;">📄 What Happens Next?</p>' +
+          '<p style="margin:0;font-size:14px;color:#065F46;line-height:1.8;">' +
+            'Our HR team will send you a <strong>formal Offer Letter (PDF)</strong> within the next <strong>1–2 working days</strong>. ' +
+            'It will contain all the details regarding your compensation, joining date, and employment terms.' +
+          '</p>' +
+        '</div>' +
+
+        '<p style="font-weight:bold;font-size:15px;color:#111827;margin:24px 0 12px;">🏆 Your Interview Journey — Completed!</p>' +
+
+        '<div style="display:flex;align-items:center;margin-bottom:12px;">' +
+          '<div style="min-width:36px;height:36px;background:#059669;color:#fff;border-radius:50%;text-align:center;line-height:36px;font-size:14px;font-weight:bold;margin-right:14px;">✓</div>' +
+          '<div><p style="margin:0;font-size:13px;font-weight:600;color:#111827;">Round 1 Interview</p><p style="margin:2px 0 0;font-size:12px;color:#059669;">Cleared ✓</p></div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;margin-bottom:12px;">' +
+          '<div style="min-width:36px;height:36px;background:#059669;color:#fff;border-radius:50%;text-align:center;line-height:36px;font-size:14px;font-weight:bold;margin-right:14px;">✓</div>' +
+          '<div><p style="margin:0;font-size:13px;font-weight:600;color:#111827;">Round 2 Interview</p><p style="margin:2px 0 0;font-size:12px;color:#059669;">Cleared ✓</p></div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;margin-bottom:12px;">' +
+          '<div style="min-width:36px;height:36px;background:#059669;color:#fff;border-radius:50%;text-align:center;line-height:36px;font-size:14px;font-weight:bold;margin-right:14px;">✓</div>' +
+          '<div><p style="margin:0;font-size:13px;font-weight:600;color:#111827;">Round 3 Interview</p><p style="margin:2px 0 0;font-size:12px;color:#059669;">Cleared ✓</p></div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;margin-bottom:12px;">' +
+          '<div style="min-width:36px;height:36px;background:#F59E0B;color:#fff;border-radius:50%;text-align:center;line-height:36px;font-size:14px;font-weight:bold;margin-right:14px;">★</div>' +
+          '<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;">' +
+            '<p style="margin:0;font-size:13px;font-weight:bold;color:#92400E;">🎉 Selected — Offer Letter on its way!</p>' +
+            '<p style="margin:4px 0 0;font-size:12px;color:#374151;">HR team will reach out within 1–2 working days.</p>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px;margin:20px 0;">' +
+          '<p style="margin:0 0 8px;font-weight:bold;font-size:13px;color:#111827;">📋 Offer Summary</p>' +
+          '<table style="width:100%;font-size:13px;border-collapse:collapse;">' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;width:110px;">Name</td><td style="padding:7px 0;color:#111827;font-weight:600;">' + c.fullName + '</td></tr>' +
+            '<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:7px 0;color:#6B7280;">Position</td><td style="padding:7px 0;color:#111827;font-weight:600;">' + c.position + '</td></tr>' +
+            '<tr><td style="padding:7px 0;color:#6B7280;">Status</td><td style="padding:7px 0;color:#059669;font-weight:600;">Selected 🎉</td></tr>' +
+          '</table>' +
+        '</div>' +
+
+        '<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 16px;margin:20px 0;">' +
+          '<p style="margin:0;font-size:13px;color:#92400E;">' +
+            '📞 <strong>Keep your phone reachable</strong> and watch your inbox — your formal offer letter is coming very soon!' +
+          '</p>' +
+        '</div>' +
+
+        '<p style="font-size:13px;color:#6B7280;">Questions? <a href="mailto:' + HR_EMAIL + '" style="color:#059669;font-weight:600;">' + HR_EMAIL + '</a></p>' +
+        '<p style="margin-top:20px;font-size:15px;color:#374151;font-weight:bold;">Welcome to the ' + COMPANY_NAME + ' family! 🚀</p>' +
+        '<p style="font-size:14px;color:#374151;">Warm regards,<br><strong>' + COMPANY_NAME + ' — HR &amp; Talent Acquisition Team</strong></p>' +
+      '</div>' +
+      _emailFooter() +
+    '</div>';
+
+  GmailApp.sendEmail(c.email, subject, "", {
+    htmlBody: body,
+    replyTo : HR_EMAIL,
+    name    : COMPANY_NAME + " – Talent Acquisition",
+  });
+  console.log("✅ Offered email sent → " + c.email);
+}
+
+// ════════════════════════════════════════════════════════════
+//  EMAIL HELPERS
+// ════════════════════════════════════════════════════════════
+function _step(done, num, bgColor, textColor, title, subtitle) {
   return (
-    '<div style="background:#111827;padding:28px 32px;text-align:center;">' +
+    '<div style="display:flex;align-items:flex-start;margin-bottom:10px;">' +
+      '<div style="min-width:32px;height:32px;background:' + bgColor + ';color:' + textColor + ';border-radius:50%;' +
+           'text-align:center;line-height:32px;font-size:13px;font-weight:bold;margin-right:14px;flex-shrink:0;' +
+           (done ? '' : 'border:2px solid #059669;') + '">' + num + '</div>' +
+      '<div style="padding-top:6px;">' +
+        '<p style="margin:0;font-size:13px;font-weight:bold;color:' + (done ? '#059669' : '#374151') + ';">' + title + '</p>' +
+        '<p style="margin:2px 0 0;font-size:12px;color:#6B7280;">' + subtitle + '</p>' +
+      '</div>' +
+    '</div>'
+  );
+}
 
-      // Logo
-      '<img src="' + LOGO_BASE64 + '" alt="' + COMPANY_NAME + '" width="52" height="52" ' +
-        'style="border-radius:12px;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;" />' +
+function _stepHighlight(num, title, subtitle) {
+  return (
+    '<div style="display:flex;align-items:flex-start;margin-bottom:10px;">' +
+      '<div style="min-width:32px;height:32px;background:#059669;color:#fff;border-radius:50%;' +
+           'text-align:center;line-height:32px;font-size:13px;font-weight:bold;margin-right:14px;flex-shrink:0;">' + num + '</div>' +
+      '<div style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:8px;padding:10px 14px;">' +
+        '<p style="margin:0;font-size:13px;font-weight:bold;color:#065F46;">' + title + '</p>' +
+        '<p style="margin:4px 0 0;font-size:12px;color:#374151;">' + subtitle + '</p>' +
+      '</div>' +
+    '</div>'
+  );
+}
 
+function _emailFooter() {
+  return (
+    '<div style="background:#111827;padding:24px 32px;text-align:center;">' +
       '<p style="color:#F9FAFB;font-size:14px;font-weight:bold;margin:0 0 4px;">' + COMPANY_NAME + '</p>' +
       '<a href="' + WEBSITE_URL + '" style="color:#6EE7B7;font-size:12px;text-decoration:none;">' + WEBSITE_URL + '</a>' +
-
-      // ── Social icons — table layout for reliable mobile rendering ──
-      '<table role="presentation" cellpadding="0" cellspacing="0" border="0" ' +
-        'style="margin:16px auto 10px;border-collapse:collapse;">' +
+      '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:14px auto 10px;border-collapse:collapse;">' +
         '<tr>' +
-
-          // LinkedIn
-          '<td style="padding:0 6px;">' +
-            '<a href="' + LINKEDIN_URL + '" style="text-decoration:none;" title="LinkedIn">' +
-              '<span style="display:inline-block;background:#0A66C2;color:#fff;border-radius:8px;' +
-                'padding:7px 14px;font-size:12px;font-weight:bold;white-space:nowrap;">' +
-                'in&nbsp;LinkedIn' +
-              '</span>' +
-            '</a>' +
-          '</td>' +
-
-          // YouTube
-          '<td style="padding:0 6px;">' +
-            '<a href="' + YOUTUBE_URL + '" style="text-decoration:none;" title="YouTube">' +
-              '<span style="display:inline-block;background:#FF0000;color:#fff;border-radius:8px;' +
-                'padding:7px 14px;font-size:12px;font-weight:bold;white-space:nowrap;">' +
-                '&#9654;&nbsp;YouTube' +
-              '</span>' +
-            '</a>' +
-          '</td>' +
-
-          // Instagram
-          '<td style="padding:0 6px;">' +
-            '<a href="' + INSTAGRAM_URL + '" style="text-decoration:none;" title="Instagram">' +
-              '<span style="display:inline-block;background:#C13584;color:#fff;border-radius:8px;' +
-                'padding:7px 14px;font-size:12px;font-weight:bold;white-space:nowrap;">' +
-                '&#10084;&nbsp;Instagram' +
-              '</span>' +
-            '</a>' +
-          '</td>' +
-
+          '<td style="padding:0 6px;"><a href="' + LINKEDIN_URL + '" style="text-decoration:none;"><span style="display:inline-block;background:#0A66C2;color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:bold;">in LinkedIn</span></a></td>' +
+          '<td style="padding:0 6px;"><a href="' + YOUTUBE_URL + '" style="text-decoration:none;"><span style="display:inline-block;background:#FF0000;color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:bold;">▶ YouTube</span></a></td>' +
+          '<td style="padding:0 6px;"><a href="' + INSTAGRAM_URL + '" style="text-decoration:none;"><span style="display:inline-block;background:#C13584;color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:bold;">❤ Instagram</span></a></td>' +
         '</tr>' +
       '</table>' +
-      // ── end social icons ──
-
-      '<p style="color:#9CA3AF;font-size:11px;margin:10px 0 0;">' +
-        'Questions? Contact us at ' +
-        '<a href="mailto:' + HR_EMAIL + '" style="color:#6EE7B7;">' + HR_EMAIL + '</a>' +
-      '</p>' +
-      '<p style="color:#4B5563;font-size:11px;margin:6px 0 0;">' +
-        'This is an automated message. Please do not reply directly.' +
-      '</p>' +
-
+      '<p style="color:#9CA3AF;font-size:11px;margin:8px 0 0;">Questions? <a href="mailto:' + HR_EMAIL + '" style="color:#6EE7B7;">' + HR_EMAIL + '</a></p>' +
+      '<p style="color:#4B5563;font-size:11px;margin:4px 0 0;">This is an automated message. Please do not reply directly.</p>' +
     '</div>'
   );
 }
 
 // ════════════════════════════════════════════════════════════
-//  EMAIL TEMPLATES
+//  DRIVE — Upload resume PDF, return shareable link
 // ════════════════════════════════════════════════════════════
-
-// ── 1. Application Received ──────────────────────────────────
-function sendApplicationConfirmationEmail(candidate) {
-  const subject = "Application Received - " + candidate.position + " | " + COMPANY_NAME;
-
-  const body =
-    '<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">' +
-
-      // Header
-      '<div style="background:linear-gradient(135deg,#1E1B4B 0%,#3730A3 60%,#4F46E5 100%);padding:32px 32px 24px;text-align:center;">' +
-        '<img src="' + LOGO_BASE64 + '" alt="Logo" width="64" height="64" ' +
-          'style="border-radius:14px;margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;border:3px solid rgba(255,255,255,0.2);" />' +
-        '<h1 style="color:#fff;margin:0;font-size:24px;letter-spacing:-0.5px;">' + COMPANY_NAME + '</h1>' +
-        '<p style="color:#A5B4FC;margin:6px 0 0;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Careers Portal</p>' +
-      '</div>' +
-
-      // Status badge
-      '<div style="background:#F0FDF4;border-bottom:1px solid #BBF7D0;padding:14px 32px;text-align:center;">' +
-        '<span style="background:#16A34A;color:#fff;padding:5px 18px;border-radius:20px;font-size:13px;font-weight:bold;">' +
-          '&#10003; Application Received' +
-        '</span>' +
-      '</div>' +
-
-      // Body
-      '<div style="padding:32px;background:#fff;">' +
-        '<p style="font-size:17px;color:#111827;margin:0 0 6px;">Hi <strong>' + candidate.fullName + '</strong>,</p>' +
-        '<p style="color:#374151;margin:0 0 24px;line-height:1.6;">' +
-          'Thank you for applying for the <strong>' + candidate.position + '</strong> role at ' +
-          '<strong>' + COMPANY_NAME + '</strong>. We have received your application and our team will review it shortly.' +
-        '</p>' +
-
-        // Summary card
-        '<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:20px;margin-bottom:24px;">' +
-          '<p style="margin:0 0 14px;font-weight:bold;font-size:14px;color:#111827;">Application Summary</p>' +
-          '<table style="width:100%;font-size:14px;border-collapse:collapse;">' +
-            '<tr style="border-bottom:1px solid #F3F4F6;">' +
-              '<td style="padding:8px 0;color:#6B7280;width:130px;">Position</td>' +
-              '<td style="padding:8px 0;color:#111827;font-weight:600;">' + candidate.position + '</td>' +
-            '</tr>' +
-            '<tr style="border-bottom:1px solid #F3F4F6;">' +
-              '<td style="padding:8px 0;color:#6B7280;">Name</td>' +
-              '<td style="padding:8px 0;color:#111827;">' + candidate.fullName + '</td>' +
-            '</tr>' +
-            '<tr style="border-bottom:1px solid #F3F4F6;">' +
-              '<td style="padding:8px 0;color:#6B7280;">Email</td>' +
-              '<td style="padding:8px 0;color:#111827;">' + candidate.email + '</td>' +
-            '</tr>' +
-            '<tr style="border-bottom:1px solid #F3F4F6;">' +
-              '<td style="padding:8px 0;color:#6B7280;">Phone</td>' +
-              '<td style="padding:8px 0;color:#111827;">' + (candidate.phone || 'Not provided') + '</td>' +
-            '</tr>' +
-            '<tr style="border-bottom:1px solid #F3F4F6;">' +
-              '<td style="padding:8px 0;color:#6B7280;">Location</td>' +
-              '<td style="padding:8px 0;color:#111827;">' + (candidate.location || 'Not provided') + '</td>' +
-            '</tr>' +
-            '<tr>' +
-              '<td style="padding:8px 0;color:#6B7280;">Applied On</td>' +
-              '<td style="padding:8px 0;color:#111827;">' + new Date().toLocaleDateString("en-IN", {dateStyle:"long"}) + '</td>' +
-            '</tr>' +
-          '</table>' +
-        '</div>' +
-
-        // Next steps
-        '<div style="margin-bottom:24px;">' +
-          '<p style="font-weight:bold;font-size:15px;color:#111827;margin:0 0 14px;">&#128336; What Happens Next?</p>' +
-
-          // Step 1
-          '<div style="display:flex;margin-bottom:12px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:14px 16px;">' +
-            '<div style="min-width:36px;height:36px;background:#4F46E5;color:#fff;border-radius:50%;' +
-              'text-align:center;line-height:36px;font-weight:bold;font-size:14px;margin-right:14px;flex-shrink:0;">1</div>' +
-            '<div>' +
-              '<p style="margin:0 0 3px;font-weight:bold;font-size:13px;color:#111827;">Resume Review </p>' +
-              '<p style="margin:0;font-size:13px;color:#374151;line-height:1.5;">Our HR team will carefully review your application and assess your fit for the <strong>' + candidate.position + '</strong> role.</p>' +
-            '</div>' +
-          '</div>' +
-
-          // Step 2
-          '<div style="display:flex;margin-bottom:12px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:14px 16px;">' +
-            '<div style="min-width:36px;height:36px;background:#4F46E5;color:#fff;border-radius:50%;' +
-              'text-align:center;line-height:36px;font-weight:bold;font-size:14px;margin-right:14px;flex-shrink:0;">2</div>' +
-            '<div>' +
-              '<p style="margin:0 0 3px;font-weight:bold;font-size:13px;color:#111827;">Screening Call &nbsp;<span style="font-weight:normal;color:#6B7280;font-size:12px;">&#183; If Shortlisted</span></p>' +
-              '<p style="margin:0;font-size:13px;color:#374151;line-height:1.5;">A member of our HR team will reach out to schedule a brief introductory call to learn more about you and your experience.</p>' +
-            '</div>' +
-          '</div>' +
-
-          // Step 3
-          '<div style="display:flex;margin-bottom:12px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:14px 16px;">' +
-            '<div style="min-width:36px;height:36px;background:#4F46E5;color:#fff;border-radius:50%;' +
-              'text-align:center;line-height:36px;font-weight:bold;font-size:14px;margin-right:14px;flex-shrink:0;">3</div>' +
-            '<div>' +
-              '<p style="margin:0 0 3px;font-weight:bold;font-size:13px;color:#111827;">Interview Round &nbsp;<span style="font-weight:normal;color:#6B7280;font-size:12px;">&#183; Technical / Managerial</span></p>' +
-              '<p style="margin:0;font-size:13px;color:#374151;line-height:1.5;">Shortlisted candidates will be invited for one or more interview rounds with our team &mdash; conducted online or in person.</p>' +
-            '</div>' +
-          '</div>' +
-
-          // Step 4
-          '<div style="display:flex;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:14px 16px;">' +
-            '<div style="min-width:36px;height:36px;background:#4F46E5;color:#fff;border-radius:50%;' +
-              'text-align:center;line-height:36px;font-weight:bold;font-size:14px;margin-right:14px;flex-shrink:0;">4</div>' +
-            '<div>' +
-              '<p style="margin:0 0 3px;font-weight:bold;font-size:13px;color:#111827;">Final Decision </p>' +
-              '<p style="margin:0;font-size:13px;color:#374151;line-height:1.5;">We will communicate the outcome via email regardless of the result. Selected candidates will receive a formal offer letter.</p>' +
-            '</div>' +
-          '</div>' +
-
-        '</div>' +
-
-        '<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 16px;margin-bottom:20px;">' +
-          '<p style="margin:0;font-size:13px;color:#92400E;">&#128276; <strong>Tip:</strong> We appreciate your patience throughout the process. Feel free to reach out to us if you have any questions while you wait.</p>' +
-        '</div>' +
-
-        '<p style="font-size:13px;color:#6B7280;margin:0;">' +
-          'For any queries, feel free to contact us at ' +
-          '<a href="mailto:' + HR_EMAIL + '" style="color:#4F46E5;font-weight:600;">' + HR_EMAIL + '</a>' +
-        '</p>' +
-        '<p style="margin-top:24px;color:#374151;">Best regards,<br>' +
-          '<strong>' + COMPANY_NAME + ' &mdash; HR Team</strong>' +
-        '</p>' +
-      '</div>' +
-
-      emailFooter() +
-    '</div>';
-
-  GmailApp.sendEmail(candidate.email, subject, "", {
-  htmlBody: body,
-  replyTo: HR_EMAIL,
-  name: "Talent Acquisition Team",
-  from: HR_EMAIL
-  });
-}
-
-
-// ── 2. Resume Shortlisted ────────────────────────────────────
-// FIX: Updated subject/badge wording — says "Resume Shortlisted, Prepare for Interview"
-// FIX: Added "Best of Luck" per business requirement
-function sendShortlistEmail(candidate) {
-  const subject = "Your Resume Has Been Shortlisted - " + candidate.position + " | " + COMPANY_NAME;
-
-  const body =
-    '<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">' +
-
-      // Header
-      '<div style="background:linear-gradient(135deg,#064E3B 0%,#065F46 60%,#059669 100%);padding:32px 32px 24px;text-align:center;">' +
-        '<img src="' + LOGO_BASE64 + '" alt="Logo" width="64" height="64" ' +
-          'style="border-radius:14px;margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;border:3px solid rgba(255,255,255,0.2);" />' +
-        '<h1 style="color:#fff;margin:0;font-size:24px;letter-spacing:-0.5px;">' + COMPANY_NAME + '</h1>' +
-        '<p style="color:#6EE7B7;margin:6px 0 0;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Careers Portal</p>' +
-      '</div>' +
-
-      // Status badge
-      '<div style="background:#F0FDF4;border-bottom:1px solid #BBF7D0;padding:14px 32px;text-align:center;">' +
-        '<span style="background:#059669;color:#fff;padding:5px 18px;border-radius:20px;font-size:13px;font-weight:bold;">' +
-          '&#9733; Resume Shortlisted &mdash; Prepare for Your Interview!' +
-        '</span>' +
-      '</div>' +
-
-      '<div style="padding:32px;background:#fff;">' +
-        '<p style="font-size:17px;color:#111827;margin:0 0 6px;">Hi <strong>' + candidate.fullName + '</strong>,</p>' +
-        '<p style="color:#374151;margin:0 0 20px;line-height:1.6;">' +
-          'Great news! Your resume for the <strong>' + candidate.position + '</strong> role has been ' +
-          '<strong style="color:#059669;">shortlisted</strong> by our HR team. ' +
-          'Congratulations on clearing the first stage of your selection!' +
-        '</p>' +
-
-        '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:20px;margin-bottom:20px;">' +
-          '<p style="margin:0 0 8px;font-weight:bold;font-size:14px;color:#065F46;">&#128197; What Happens Next?</p>' +
-          '<p style="margin:0;font-size:14px;color:#065F46;line-height:1.6;">' +
-            'Our HR team will contact you within <strong>1&ndash;2 business days</strong> to schedule your interview. ' +
-            'Please keep an eye on your inbox and phone.' +
-          '</p>' +
-        '</div>' +
-
-        '<div style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:10px;padding:20px;margin-bottom:20px;">' +
-          '<p style="margin:0 0 8px;font-weight:bold;font-size:14px;color:#065F46;">&#127919; Prepare for the Interview</p>' +
-          '<p style="margin:0;font-size:14px;color:#374151;line-height:1.6;">' +
-            'Take some time to review the job requirements, research <strong>' + COMPANY_NAME + '</strong>, ' +
-            'and brush up on your skills. Preparation goes a long way — <strong>Best of Luck!</strong> &#127808;' +
-          '</p>' +
-        '</div>' +
-
-        '<p style="font-size:14px;color:#374151;line-height:1.6;">' +
-          'We encourage you to learn more about ' +
-          '<a href="' + WEBSITE_URL + '" style="color:#059669;">' + COMPANY_NAME + '</a> ' +
-          'before the interview.' +
-        '</p>' +
-
-        '<p style="font-size:13px;color:#6B7280;margin-top:20px;">' +
-          'Questions? Reach us at <a href="mailto:' + HR_EMAIL + '" style="color:#059669;font-weight:600;">' + HR_EMAIL + '</a>' +
-        '</p>' +
-        '<p style="margin-top:24px;color:#374151;">Best regards,<br>' +
-          '<strong>' + COMPANY_NAME + ' &mdash; HR Team</strong>' +
-        '</p>' +
-      '</div>' +
-
-      emailFooter() +
-    '</div>';
-
-  GmailApp.sendEmail(candidate.email, subject, "", {
-  htmlBody: body,
-  replyTo: HR_EMAIL,
-  name: "Talent Acquisition Team",
-  from: HR_EMAIL
-  });
-}
-
-
-// ── 3. Offer Extended ────────────────────────────────────────
-function sendOfferEmail(candidate) {
-  const subject = "Job Offer - " + candidate.position + " | " + COMPANY_NAME;
-
-  const body =
-    '<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">' +
-
-      // Header
-      '<div style="background:linear-gradient(135deg,#4C1D95 0%,#6D28D9 60%,#7C3AED 100%);padding:32px 32px 24px;text-align:center;">' +
-        '<img src="' + LOGO_BASE64 + '" alt="Logo" width="64" height="64" ' +
-          'style="border-radius:14px;margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;border:3px solid rgba(255,255,255,0.2);" />' +
-        '<h1 style="color:#fff;margin:0;font-size:24px;letter-spacing:-0.5px;">' + COMPANY_NAME + '</h1>' +
-        '<p style="color:#DDD6FE;margin:6px 0 0;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Careers Portal</p>' +
-      '</div>' +
-
-      // Status badge
-      '<div style="background:#FAF5FF;border-bottom:1px solid #DDD6FE;padding:14px 32px;text-align:center;">' +
-        '<span style="background:#7C3AED;color:#fff;padding:5px 18px;border-radius:20px;font-size:13px;font-weight:bold;">' +
-          '&#127881; Congratulations &mdash; Offer Extended!' +
-        '</span>' +
-      '</div>' +
-
-      '<div style="padding:32px;background:#fff;">' +
-        '<p style="font-size:17px;color:#111827;margin:0 0 6px;">Hi <strong>' + candidate.fullName + '</strong>,</p>' +
-        '<p style="color:#374151;margin:0 0 20px;line-height:1.6;">' +
-          'We are thrilled to inform you that <strong>' + COMPANY_NAME + '</strong> would like to extend a ' +
-          '<strong style="color:#7C3AED;">job offer</strong> to you for the position of ' +
-          '<strong>' + candidate.position + '</strong>!' +
-        '</p>' +
-
-        '<div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;padding:20px;margin-bottom:24px;">' +
-          '<p style="margin:0 0 8px;font-weight:bold;font-size:14px;color:#4C1D95;">Offer Details</p>' +
-          '<p style="margin:0;font-size:14px;color:#374151;line-height:1.6;">' + candidate.offered + '</p>' +
-        '</div>' +
-
-        '<p style="font-size:14px;color:#374151;line-height:1.6;">' +
-          'Our HR team will reach out within <strong>24 hours</strong> with the formal offer letter and onboarding details.' +
-        '</p>' +
-        '<p style="font-size:14px;color:#374151;margin-top:12px;">' +
-          'Please confirm your acceptance by replying to ' +
-          '<a href="mailto:' + HR_EMAIL + '" style="color:#7C3AED;font-weight:600;">' + HR_EMAIL + '</a>' +
-        '</p>' +
-
-        '<p style="margin-top:28px;font-size:16px;color:#374151;">' +
-          'Welcome to the <strong>Zyntrix family!</strong><br><br>' +
-          'Best regards,<br><strong>' + COMPANY_NAME + ' &mdash; HR Team</strong>' +
-        '</p>' +
-      '</div>' +
-
-      emailFooter() +
-    '</div>';
-
-  GmailApp.sendEmail(candidate.email, subject, "", {
-  htmlBody: body,
-  replyTo: HR_EMAIL,
-  name: "Talent Acquisition Team",
-  from: HR_EMAIL
-  });
-}
-
-
-// ════════════════════════════════════════════════════════════
-//  doGet — READ all candidates
-// ════════════════════════════════════════════════════════════
-
-function doGet(e) {
+function _uploadResume(base64Data, fileName) {
   try {
-    const sheet = getSheet();
-    if (sheet.getLastRow() <= 1) {
-      return cors(ContentService.createTextOutput(JSON.stringify({ success: true, candidates: [] })));
-    }
-    const lastRow = sheet.getLastRow();
-    const lastCol = Math.max(sheet.getLastColumn(), HEADERS.length);
-    const values  = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
-    const candidates = values
-      .filter(row => row[COL.EMAIL] || row[COL.FULL_NAME])
-      .map(row => ({
-        timestamp       : row[COL.TIMESTAMP]        ? String(row[COL.TIMESTAMP]) : "",
-        position        : row[COL.POSITION]         || "",
-        fullName        : row[COL.FULL_NAME]        || "",
-        email           : row[COL.EMAIL]            || "",
-        phone           : row[COL.PHONE]            || "",
-        qualifications  : row[COL.QUALIFICATIONS]   || "",
-        experience      : row[COL.EXPERIENCE]       || "",
-        location        : row[COL.LOCATION]         || "",
-        edtech          : row[COL.EDTECH]           || "",
-        availability    : row[COL.AVAILABILITY]     || "",
-        resumeLink      : row[COL.RESUME_LINK]      || "",
-        source          : row[COL.SOURCE]           || "",
-        declaration     : row[COL.DECLARATION]      || "",
-        shortlisted     : row[COL.SHORTLISTED] === true
-                          || String(row[COL.SHORTLISTED]).toLowerCase() === "true"
-                          || String(row[COL.SHORTLISTED]).toLowerCase() === "yes",
-        stage           : row[COL.INTERVIEW_STATUS] || "Applied",
-        offered         : row[COL.OFFERED]          || "",
-      }));
-    return cors(ContentService.createTextOutput(JSON.stringify({ success: true, candidates })));
+    const bytes  = Utilities.base64Decode(base64Data);
+    const blob   = Utilities.newBlob(bytes, "application/pdf", fileName);
+    const folders = DriveApp.getFoldersByName(RESUME_FOLDER);
+    const folder  = folders.hasNext() ? folders.next() : DriveApp.createFolder(RESUME_FOLDER);
+    const file    = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    console.log("📎 Resume uploaded → " + file.getUrl());
+    return file.getUrl();
   } catch (err) {
-    return cors(ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() })));
+    console.error("_uploadResume error: " + err);
+    return "";
   }
 }
 
-
 // ════════════════════════════════════════════════════════════
-//  doPost — NEW submission  OR  updateCandidate
+//  HELPERS
 // ════════════════════════════════════════════════════════════
+function _getSheet() {
+  return SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
+}
 
-function doPost(e) {
+function _parseBody(e) {
+  if (!e || !e.postData || !e.postData.contents) return {};
   try {
-    const data = JSON.parse(e.postData.contents);
-
-    // ── Branch 1: CRM is updating shortlist / stage / offered ──
-    if (data.action === "updateCandidate") {
-      const sheet    = getSheet();
-      const lastRow  = sheet.getLastRow();
-      if (lastRow < 2) throw new Error("Sheet has no candidate rows");
-
-      const emailCol = COL.EMAIL + 1;
-      const emails   = sheet.getRange(2, emailCol, lastRow - 1, 1).getValues();
-      let   targetRow = -1;
-      for (let i = 0; i < emails.length; i++) {
-        if (String(emails[i][0]).trim().toLowerCase() === String(data.email).trim().toLowerCase()) {
-          targetRow = i + 2;
-          break;
-        }
-      }
-      if (targetRow === -1) throw new Error("Candidate not found: " + data.email);
-
-      const existingRow    = sheet.getRange(targetRow, 1, 1, HEADERS.length).getValues()[0];
-      const wasShortlisted = existingRow[COL.SHORTLISTED] === true
-                             || String(existingRow[COL.SHORTLISTED]).toLowerCase() === "true";
-      const wasOffered     = existingRow[COL.OFFERED] && String(existingRow[COL.OFFERED]).trim() !== "";
-
-      // ── FIX: Write Resume Shortlisted (col N) correctly ──────────────────
-      sheet.getRange(targetRow, COL.SHORTLISTED + 1).setValue(!!data.shortlisted);
-
-      // ── FIX: Resume Shortlist must ONLY touch col N — never col O ──────────
-      // Col O (Interview Shortlisted) is only updated when HR explicitly sets
-      // an interview stage AFTER the resume shortlist has already been done.
-      // On a fresh resume-shortlist, leave col O exactly as it is (empty).
-      const isNewShortlist = (!!data.shortlisted && !wasShortlisted);
-      if (!isNewShortlist) {
-        // HR is updating an already-shortlisted candidate's interview stage
-        const stageToWrite = data.stage || existingRow[COL.INTERVIEW_STATUS] || "";
-        sheet.getRange(targetRow, COL.INTERVIEW_STATUS + 1).setValue(stageToWrite);
-      }
-      // If isNewShortlist === true, we do NOT write to col O at all.
-
-      sheet.getRange(targetRow, COL.OFFERED + 1).setValue(data.offered || data.hrNotes || "");
-
-      const candidate = {
-        fullName : existingRow[COL.FULL_NAME],
-        email    : existingRow[COL.EMAIL],
-        position : existingRow[COL.POSITION],
-        offered  : data.offered || data.hrNotes || "",
-      };
-
-      try {
-        if (data.shortlisted === true && !wasShortlisted) sendShortlistEmail(candidate);
-        if (candidate.offered.trim() !== "" && !wasOffered) sendOfferEmail(candidate);
-      } catch (mailErr) {
-        console.error("Status email failed: " + mailErr.toString());
-      }
-
-      return cors(ContentService.createTextOutput(JSON.stringify({ success: true })));
-    }
-
-    // ── Branch 2: New job application ──────────────────────
-    let resumeLink = "";
-    if (data.resumeBase64 && data.resumeName) {
-      const folder  = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-      const decoded = Utilities.base64Decode(data.resumeBase64);
-      const blob    = Utilities.newBlob(decoded, "application/pdf", data.resumeName);
-      const file    = folder.createFile(blob);
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      resumeLink = file.getUrl();
-    }
-
-    const sheet = getSheet();
-    ensureHeaders(sheet);
-
-    const row = [
-      data.timestamp      || new Date().toISOString(),
-      data.position       || "",
-      data.fullName       || "",
-      data.email          || "",
-      data.phone          || "",
-      data.qualifications || "",
-      data.experience     || "",
-      data.stateAddress   || "",
-      data.edtech         || "",
-      data.availability   || "",
-      resumeLink,
-      data.source         || "",
-      data.declaration    || "",
-      "",       // Col N: Resume shortlisted — starts empty
-      "",       // Col O: Interview Shortlisted — starts empty (HR sets this later)
-      "",       // Col P: Offered
-    ];
-
-    sheet.appendRow(row);
-    sheet.autoResizeColumns(1, HEADERS.length);
-
-    try {
-      sendApplicationConfirmationEmail({
-        fullName : data.fullName     || "",
-        email    : data.email        || "",
-        position : data.position     || "",
-        phone    : data.phone        || "",
-        location : data.stateAddress || "",
-      });
-    } catch (mailErr) {
-      console.error("Confirmation email failed: " + mailErr.toString());
-    }
-
-    return cors(ContentService.createTextOutput(JSON.stringify({ status: "success", success: true })));
-
-  } catch (err) {
-    return cors(ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() })));
+    return JSON.parse(e.postData.contents);
+  } catch (_) {
+    // URL-encoded fallback
+    const obj = {};
+    e.postData.contents.split("&").forEach(function(pair) {
+      const p = pair.split("=");
+      const k = decodeURIComponent((p[0] || "").replace(/\+/g, " "));
+      const v = decodeURIComponent((p[1] || "").replace(/\+/g, " "));
+      if (k) obj[k] = v;
+    });
+    return obj;
   }
 }
+
+function _jsonOut(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ════════════════════════════════════════════════════════════
+//  SPREADSHEET onEdit TRIGGER
+//  Fires when HR manually types TRUE in col N of the Sheet.
+//  Set up: Extensions → Apps Script → Triggers → onShortlistEdit
+//          → From spreadsheet → On edit
+// ════════════════════════════════════════════════════════════
+function onShortlistEdit(e) {
+  try {
+    const sheet = e.source.getActiveSheet();
+    if (sheet.getName() !== SHEET_NAME) return;
+
+    const editedCol = e.range.getColumn(); // 1-based
+    const editedRow = e.range.getRow();
+
+    // Only react to col N (1-based = 14) "Resume Shortlisted"
+    if (editedCol !== 14) return;
+    if (editedRow < 2)    return;
+
+    const val = String(e.value || "").trim().toLowerCase();
+    if (val !== "true") return;
+
+    const row = sheet.getRange(editedRow, 1, 1, TOTAL_COLS).getValues()[0];
+
+    // Duplicate-send guard
+    const alreadySent = String(row[COL.EMAIL_SENT_FLAG] || "").trim().toLowerCase();
+    if (alreadySent.startsWith("sent")) return;
+
+    const candidate = {
+      fullName : String(row[COL.FULL_NAME] || "").trim(),
+      email    : String(row[COL.EMAIL]     || "").trim(),
+      position : String(row[COL.POSITION]  || "").trim(),
+      phone    : String(row[COL.PHONE]     || "").trim(),
+    };
+
+    if (!candidate.email) return;
+
+    _sendShortlistEmail(candidate);
+
+    sheet.getRange(editedRow, COL.EMAIL_SENT_FLAG + 1)
+         .setValue("Sent – " + new Date().toLocaleString("en-IN"));
+    SpreadsheetApp.flush();
+
+    console.log("✅ onShortlistEdit email sent → " + candidate.email);
+  } catch (err) {
+    console.error("onShortlistEdit error: " + err);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  DEPLOYMENT CHECKLIST
+//  1. Paste this file into script.google.com (replace everything)
+//  2. Save (Ctrl+S)
+//  3. Deploy → Manage Deployments → Edit → New version → Deploy
+//     Execute as: Me  |  Who can access: Anyone
+//  4. Triggers → onShortlistEdit → From spreadsheet → On edit
+//  5. Set GAS_WEBAPP_URL in Render env vars to the /exec URL
+// ════════════════════════════════════════════════════════════

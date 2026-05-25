@@ -5,13 +5,18 @@ const {
   shortlistCandidate,
   rejectCandidate,
   deleteCandidate,
-  importFromLink
+  importFromLink,
+  applyForJob
 } = require("../controllers/candidateController");
 const auth = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// All routes require HR / super_admin
+// ── PUBLIC — no auth required ───────────────────────────────────────────────
+// This replaces the direct GAS web-app POST and avoids browser CORS errors.
+router.post("/apply", applyForJob);
+
+// ── HR only ─────────────────────────────────────────────────────────────────
 router.get   ("/candidates",                   auth, getCandidates);
 router.post  ("/candidates/bulk-import",       auth, bulkImport);
 router.post  ("/candidates/import-from-link",  auth, importFromLink);

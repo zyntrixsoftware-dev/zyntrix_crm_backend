@@ -33,6 +33,31 @@ function signOff() {
   ].join("\n");
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// GAS EMAIL ROUTER — forwards payload to GAS web app which sends a
+// professional HTML email via Gmail. Returns true if GAS accepted the call.
+// Falls back to nodemailer (safeSend) if GAS is not configured or fails.
+// ─────────────────────────────────────────────────────────────────────────────
+async function callGasEmail(payload) {
+  const gasUrl = process.env.GAS_WEBAPP_URL;
+  if (!gasUrl) return false;
+  try {
+    const res = await fetch(gasUrl, {
+      method  : "POST",
+      headers : { "Content-Type": "application/json" },
+      body    : JSON.stringify(payload),
+      redirect: "follow",
+    });
+    const text = await res.text();
+    console.log("[GAS email]", payload.action, "→", payload.email,
+                "| HTTP", res.status, "|", text.slice(0, 100));
+    return res.ok;
+  } catch (err) {
+    console.warn("[GAS email] failed →", payload.action, "|", err.message);
+    return false;
+  }
+}
+
 // Defensive send — never throws to the caller.
 async function safeSend(to, subject, body, opts) {
   if (!to || typeof to !== "string" || !to.includes("@")) {
@@ -99,6 +124,17 @@ async function notifyShortlisted(interview) {
 
 // 3a. ROUND QUALIFIED --------------------------------------------------------
 async function notifyRoundQualified(interview, roundNumber) {
+  // Try GAS first — sends a polished HTML email via Gmail
+  const gasOk = await callGasEmail({
+    action     : "sendRoundQualified",
+    email      : interview.candidateEmail,
+    fullName   : interview.candidateName  || "Candidate",
+    position   : interview.appliedFor     || "the role",
+    roundNumber: roundNumber,
+  });
+  if (gasOk) return { sent: true, reason: "via_gas" };
+
+  // Fallback — plain text via nodemailer
   const role = interview.appliedFor || "your applied role";
   const isFinalRound = roundNumber >= 3;
   const subject = `Great News - You cleared Round ${roundNumber} | ${role}`;
@@ -120,6 +156,17 @@ async function notifyRoundQualified(interview, roundNumber) {
 
 // 3b. ROUND NOT QUALIFIED ----------------------------------------------------
 async function notifyRoundNotQualified(interview, roundNumber) {
+  // Try GAS first — sends a polished HTML email via Gmail
+  const gasOk = await callGasEmail({
+    action     : "sendRoundNotQualified",
+    email      : interview.candidateEmail,
+    fullName   : interview.candidateName  || "Candidate",
+    position   : interview.appliedFor     || "the role",
+    roundNumber: roundNumber,
+  });
+  if (gasOk) return { sent: true, reason: "via_gas" };
+
+  // Fallback — plain text via nodemailer
   const role = interview.appliedFor || "your applied role";
   const subject = `Update on your Interview - ${role}`;
   const body = [
@@ -142,6 +189,16 @@ async function notifyRoundNotQualified(interview, roundNumber) {
 // Sent when HR ticks the "Offered" checkbox on the Interview Panel. The
 // formal signed PDF offer arrives separately via the Offer Letters page.
 async function notifyMarkedForOffer(interview) {
+  // Try GAS first — sends a polished HTML email via Gmail
+  const gasOk = await callGasEmail({
+    action  : "sendOffered",
+    email   : interview.candidateEmail,
+    fullName: interview.candidateName || "Candidate",
+    position: interview.appliedFor    || "the role",
+  });
+  if (gasOk) return { sent: true, reason: "via_gas" };
+
+  // Fallback — plain text via nodemailer
   const role = interview.appliedFor || "your applied role";
   const subject = `Congratulations - Offer Coming Your Way | ${role}`;
   const body = [
