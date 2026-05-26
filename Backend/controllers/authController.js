@@ -325,12 +325,9 @@ exports.smtpCheck = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 exports.gasCheck = async (req, res) => {
   try {
-    if (!req.user || !["hr", "super_admin"].includes(req.user.role)) {
-      return res.status(403).json({ msg: "Access denied" });
-    }
     const to = (req.query.to || req.body?.to || "").trim();
     if (!to || !to.includes("@")) {
-      return res.status(400).json({ msg: "Provide ?to=<email>" });
+      return res.status(400).json({ msg: "Provide ?to=<email>  e.g. /_gas-check?to=you@gmail.com" });
     }
 
     const gasUrl = process.env.GAS_WEBAPP_URL;
