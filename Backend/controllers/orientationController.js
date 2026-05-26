@@ -44,11 +44,17 @@ exports.list = async (req, res) => {
     // ── Auto-sync: create orientation records for any onboarded candidates
     //    that don't have one yet (covers candidates onboarded before this
     //    feature was introduced, or cases where autoCreate failed silently).
+    //    IMPORTANT: always query ALL existing orientations for the email check —
+    //    never use the filtered `records` set, which may exclude valid existing
+    //    records and cause spurious duplicate-create attempts.
     try {
-      const onboardedList = await Onboarding.find({ onboardingStatus: "onboarded" })
-        .select("_id candidateEmail candidateName position department joiningDate");
+      const [onboardedList, allExisting] = await Promise.all([
+        Onboarding.find({ onboardingStatus: "onboarded" })
+          .select("_id candidateEmail candidateName position department joiningDate"),
+        Orientation.find({}).select("candidateEmail")
+      ]);
 
-      const existingEmails = new Set(records.map(r => r.candidateEmail.toLowerCase()));
+      const existingEmails = new Set(allExisting.map(r => r.candidateEmail.toLowerCase()));
       const missing = onboardedList.filter(ob =>
         ob.candidateEmail && !existingEmails.has(ob.candidateEmail.toLowerCase())
       );
@@ -84,15 +90,15 @@ exports.list = async (req, res) => {
       console.warn("[Orientation list] auto-sync failed:", syncErr.message);
     }
 
-    // Compute stats
-    const all = await Orientation.find({});
-    const stats = {
-      total:      all.length,
-      pending:    all.filter(o => o.orientationStatus === "pending").length,
-      invited:    all.filter(o => o.orientationStatus === "invited").length,
-      in_progress:all.filter(o => o.orientationStatus === "in_progress").length,
-      completed:  all.filter(o => o.orientationStatus === "completed").length,
-    };
+    // Compute stats via aggregation (one DB round-trip instead of fetching all docs)
+    const statusCounts = await Orientation.aggregate([
+      { $group: { _id: "$orientationStatus", count: { $sum: 1 } } }
+    ]);
+    const stats = { total: 0, pending: 0, invited: 0, in_progress: 0, completed: 0 };
+    statusCounts.forEach(({ _id, count }) => {
+      stats.total += count;
+      if (_id in stats) stats[_id] = count;
+    });
 
     return res.json({ orientations: records, total: records.length, stats });
   } catch (err) {

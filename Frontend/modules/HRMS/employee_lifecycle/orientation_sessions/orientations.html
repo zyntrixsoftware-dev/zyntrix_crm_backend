@@ -1119,4 +1119,11 @@ function debounceSearch() {
 function toast(msg, type = "info") {
   const w = document.getElementById("toast-wrap");
   const t = document.createElement("div");
-  t.className = "toast " + t
+  t.className = "toast " + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+</script>
+</body>
+</html>
