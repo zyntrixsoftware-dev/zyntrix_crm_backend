@@ -2,6 +2,15 @@ const Onboarding  = require("../models/Onboarding");
 const { notifyOnboarded } = require("../utils/candidateEmails");
 const OfferLetter = require("../models/OfferLetter");
 const Interview   = require("../models/Interview");
+// Lazy-require to avoid circular deps — orientationController is loaded after this file
+function _autoCreateOrientation(ob, userId) {
+  try {
+    const { autoCreate } = require("./orientationController");
+    return autoCreate(ob, userId);
+  } catch (e) {
+    console.error("[onboarding] autoCreateOrientation import failed:", e.message);
+  }
+}
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -211,10 +220,14 @@ exports.updateStatus = async (req, res) => {
     if (status === "onboarded" && !ob.onboardedAt) ob.onboardedAt = new Date();
     await ob.save();
 
-    // Fire onboarding-complete email when HR marks the candidate as onboarded
+    // Fire onboarding-complete email + auto-create orientation record
     if (status === "onboarded") {
       notifyOnboarded(ob).catch(err =>
         console.warn("[updateStatus] onboarded email failed:", err.message)
+      );
+      // Auto-create orientation record for this candidate (fire-and-forget)
+      _autoCreateOrientation(ob, req.user.id).catch(err =>
+        console.warn("[updateStatus] orientation auto-create failed:", err?.message)
       );
     }
 

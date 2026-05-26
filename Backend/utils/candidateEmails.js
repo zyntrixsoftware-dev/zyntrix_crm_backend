@@ -168,6 +168,22 @@ async function notifyOnboarded(ob) {
   return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
 }
 
+// 9. ORIENTATION INVITE — full session schedule emailed to the candidate ----------
+// sessions: [{ title, description, date, startTime, endTime, mode, venue, facilitator, isMandatory }]
+async function notifyOrientationInvite(orientation, sessions) {
+  const ok = await callGasEmail({
+    action      : "sendOrientationInvite",
+    email       : orientation.candidateEmail,
+    fullName    : orientation.candidateName  || "Candidate",
+    position    : orientation.position       || "the role",
+    joiningDate : orientation.joiningDate    || "",
+    mentorName  : orientation.mentorName     || "",
+    mentorEmail : orientation.mentorEmail    || "",
+    sessions    : sessions || [],
+  });
+  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
+}
+
 module.exports = {
   notifyApplicationReceived,
   notifyShortlisted,
@@ -176,5 +192,6 @@ module.exports = {
   notifyMarkedForOffer,
   notifyOfferLetter,
   notifyRejected,
-  notifyOnboarded
+  notifyOnboarded,
+  notifyOrientationInvite,
 };

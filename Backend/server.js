@@ -19,6 +19,7 @@ const employeeRoutes        = require("./routes/employeeRoutes");
 const requestRoutes         = require("./routes/requestRoutes");
 const offboardingRoutes     = require("./routes/offboardingRoutes");
 const onboardingRoutes      = require("./routes/onboardingRoutes");
+const orientationRoutes     = require("./routes/orientationRoutes");
 
 const app = express();
 
@@ -106,6 +107,7 @@ app.use("/api/hr",         interviewOfferRoutes);   // interview + offer letter 
 app.use("/api/hr",         candidateRoutes);        // candidate import + shortlist
 app.use("/api/hr",         offboardingRoutes);      // employee offboarding / separation
 app.use("/api/hr",         onboardingRoutes);       // candidate onboarding + doc webhook
+app.use("/api/hr",         orientationRoutes);      // candidate orientation + session schedule
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────
 app.get("/", (req, res) => {

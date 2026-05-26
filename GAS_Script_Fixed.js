@@ -77,6 +77,24 @@ const COL = {
 const TOTAL_COLS = 18;
 
 // ════════════════════════════════════════════════════════════
+//  _checkQuota — returns remaining daily email quota.
+//  Throws a clear error if quota is 0 so callers surface it
+//  to the backend instead of swallowing it silently.
+// ════════════════════════════════════════════════════════════
+function _checkQuota() {
+  var remaining = MailApp.getRemainingDailyQuota();
+  console.log("Gmail daily quota remaining: " + remaining);
+  if (remaining < 1) {
+    throw new Error(
+      "Gmail daily quota exhausted (0 emails left). " +
+      "Quota resets at midnight Pacific time. " +
+      "Free accounts: 100/day. Google Workspace: 1,500/day."
+    );
+  }
+  return remaining;
+}
+
+// ════════════════════════════════════════════════════════════
 //  _safeSendEmail — THE CORE FIX
 //
 //  Problem: GmailApp.sendEmail with "from: HR_EMAIL" requires that
@@ -90,6 +108,8 @@ const TOTAL_COLS = 18;
 //  replyTo is always set to HR_EMAIL so replies still reach HR.
 // ════════════════════════════════════════════════════════════
 function _safeSendEmail(to, subject, htmlBody, senderName) {
+  // Fail fast with a clear message if quota is gone — before attempting send
+  _checkQuota();
   var baseOpts = {
     htmlBody : htmlBody,
     replyTo  : HR_EMAIL,
@@ -128,10 +148,12 @@ function _safeSendEmail(to, subject, htmlBody, senderName) {
 //  Check the Execution Log for SUCCESS or FAILED details.
 // ════════════════════════════════════════════════════════════
 function testEmailDiagnostic() {
-  var testTo = Session.getActiveUser().getEmail();
+  // Send the test to HR_EMAIL so no extra OAuth scope is needed.
+  // Check that inbox after running this function.
+  var testTo = HR_EMAIL;
   Logger.log("=== GAS Email Diagnostic ===");
-  Logger.log("Script owner / sender account: " + testTo);
   Logger.log("HR alias target: " + HR_EMAIL);
+  Logger.log("Gmail quota remaining today: " + MailApp.getRemainingDailyQuota());
   Logger.log("Sending test email to: " + testTo);
 
   try {
@@ -139,21 +161,20 @@ function testEmailDiagnostic() {
       testTo,
       "[Zyntrix GAS Test] Email diagnostic — " + new Date().toLocaleString("en-IN"),
       '<div style="font-family:Arial,sans-serif;padding:20px;">' +
-        '<h2 style="color:#0A0A0A;">GAS Email Test — PASSED ✓</h2>' +
+        '<h2 style="color:#0A0A0A;">GAS Email Test — PASSED</h2>' +
         '<p>If you see this email, Google Apps Script can send emails correctly.</p>' +
-        '<p><strong>Sent by:</strong> ' + testTo + '</p>' +
         '<p><strong>Reply-to:</strong> ' + HR_EMAIL + '</p>' +
         '<p><strong>Time:</strong> ' + new Date().toLocaleString("en-IN") + '</p>' +
       '</div>',
       COMPANY_NAME + " - GAS Diagnostic"
     );
-    Logger.log("SUCCESS — test email sent. Check your inbox at: " + testTo);
+    Logger.log("SUCCESS — test email sent to " + testTo + ". Check that inbox now.");
   } catch (err) {
     Logger.log("FAILED — " + err);
     Logger.log("Common fixes:");
     Logger.log("  1. Re-authorize the script: Run > Review Permissions");
     Logger.log("  2. Check Gmail daily quota (100/day free, 1500/day Workspace)");
-    Logger.log("  3. Make sure the account (" + testTo + ") is a Google Workspace account");
+    Logger.log("  3. Verify the Google account running this script has Gmail enabled");
   }
 }
 
@@ -178,6 +199,7 @@ function doPost(e) {
     if (data.action === "sendApplicationReceived")  return _handleSendApplicationReceived(data);
     if (data.action === "sendRejected")             return _handleSendRejected(data);
     if (data.action === "sendOnboarded")            return _handleSendOnboarded(data);
+    if (data.action === "sendOrientationInvite")    return _handleSendOrientationInvite(data);
     return _handleApplication(data);
   } catch (err) {
     console.error("doPost error: " + err);
@@ -453,6 +475,154 @@ function _handleSendOnboarded(data) {
     console.error("_handleSendOnboarded error: " + err);
     return _jsonOut({ ok: false, error: String(err) });
   }
+}
+
+// ════════════════════════════════════════════════════════════
+//  HANDLER 10 — Orientation Invite (with full session schedule)
+// ════════════════════════════════════════════════════════════
+function _handleSendOrientationInvite(data) {
+  const email = String(data.email || "").trim().toLowerCase();
+  if (!email) return _jsonOut({ ok: false, error: "email required" });
+  try {
+    _sendOrientationInviteEmail({
+      email      : email,
+      fullName   : String(data.fullName    || "Candidate").trim(),
+      position   : String(data.position    || "the role").trim(),
+      joiningDate: String(data.joiningDate || "").trim(),
+      mentorName : String(data.mentorName  || "").trim(),
+      mentorEmail: String(data.mentorEmail || "").trim(),
+      sessions   : Array.isArray(data.sessions) ? data.sessions : [],
+    });
+    return _jsonOut({ ok: true });
+  } catch (err) {
+    console.error("_handleSendOrientationInvite error: " + err);
+    return _jsonOut({ ok: false, error: String(err) });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  EMAIL 10 — Orientation Invite
+//  Includes a full session-by-session schedule table.
+// ════════════════════════════════════════════════════════════
+function _sendOrientationInviteEmail(c) {
+  const subject = "Your Orientation Schedule — Welcome to " + COMPANY_NAME + "!";
+
+  // ── Build session schedule table ────────────────────────────────
+  function modeLabel(mode) {
+    if (!mode) return "In-Person";
+    if (mode === "online_zoom")  return "Online (Zoom)";
+    if (mode === "online_meet")  return "Online (Google Meet)";
+    if (mode === "hybrid")       return "Hybrid";
+    return "In-Person";
+  }
+  function fmtDate(d) {
+    if (!d) return "TBD";
+    try {
+      var dt = new Date(d + "T00:00:00");
+      return dt.toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+    } catch(e) { return d; }
+  }
+
+  var sessionsHtml = "";
+  if (c.sessions && c.sessions.length > 0) {
+    // Group sessions by date
+    var byDate = {};
+    c.sessions.forEach(function(s) {
+      var key = s.date || "TBD";
+      if (!byDate[key]) byDate[key] = [];
+      byDate[key].push(s);
+    });
+    Object.keys(byDate).sort().forEach(function(dateKey) {
+      sessionsHtml +=
+        '<tr style="background:' + C_GRAY_DARK + ';">' +
+          '<td colspan="5" style="padding:10px 14px;font-size:12px;font-weight:700;color:' + C_LIME + ';letter-spacing:0.5px;text-transform:uppercase;">' +
+            fmtDate(dateKey) +
+          '</td>' +
+        '</tr>';
+      byDate[dateKey].forEach(function(s) {
+        var timeStr = (s.startTime && s.endTime) ? (s.startTime + " – " + s.endTime) : (s.startTime || "TBD");
+        sessionsHtml +=
+          '<tr>' +
+            '<td style="padding:11px 14px;font-size:13px;font-weight:600;color:' + C_GRAY_DARK + ';border-top:1px solid ' + C_GRAY_BORDER + ';">' +
+              s.title + (s.isMandatory ? ' <span style="font-size:10px;background:#FEF3C7;color:#92400E;padding:2px 6px;border-radius:4px;font-weight:500;margin-left:4px;">Mandatory</span>' : '') +
+            '</td>' +
+            '<td style="padding:11px 14px;font-size:12px;color:#6B7280;border-top:1px solid ' + C_GRAY_BORDER + ';">' + timeStr + '</td>' +
+            '<td style="padding:11px 14px;font-size:12px;color:#6B7280;border-top:1px solid ' + C_GRAY_BORDER + ';">' + modeLabel(s.mode) + '</td>' +
+            '<td style="padding:11px 14px;font-size:12px;color:#6B7280;border-top:1px solid ' + C_GRAY_BORDER + ';">' + (s.venue || "—") + '</td>' +
+            '<td style="padding:11px 14px;font-size:12px;color:#6B7280;border-top:1px solid ' + C_GRAY_BORDER + ';">' + (s.facilitator || "—") + '</td>' +
+          '</tr>' +
+          (s.description ? '<tr><td colspan="5" style="padding:0 14px 10px;font-size:12px;color:#9CA3AF;border-top:none;">' + s.description + '</td></tr>' : '');
+      });
+    });
+  } else {
+    sessionsHtml =
+      '<tr><td colspan="5" style="padding:16px 14px;font-size:13px;color:#9CA3AF;text-align:center;">Our HR team will share the detailed schedule closer to your joining date.</td></tr>';
+  }
+
+  var mentorBlock = c.mentorName
+    ? '<div style="background:' + C_LIME_LIGHT + ';border:1px solid ' + C_LIME_DARK + ';border-radius:8px;padding:16px 18px;margin-bottom:24px;">' +
+        '<p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:' + C_GRAY_DARK + ';">Your Mentor / Buddy</p>' +
+        '<p style="margin:0;font-size:14px;color:' + C_GRAY_MID + ';">' + c.mentorName +
+          (c.mentorEmail ? ' — <a href="mailto:' + c.mentorEmail + '" style="color:' + C_GRAY_DARK + ';">' + c.mentorEmail + '</a>' : '') +
+        '</p>' +
+        '<p style="margin:6px 0 0;font-size:12px;color:#6B7280;">Feel free to reach out to your mentor with any questions before your first day.</p>' +
+      '</div>'
+    : '';
+
+  var joiningBlock = c.joiningDate
+    ? '<p style="font-size:14px;color:' + C_GRAY_MID + ';line-height:1.8;margin:0 0 20px;">Your joining date is <strong>' + c.joiningDate + '</strong>. Please report to the HR team on arrival.</p>'
+    : '<p style="font-size:14px;color:' + C_GRAY_MID + ';line-height:1.8;margin:0 0 20px;">Our HR team will confirm your joining date and reporting instructions shortly.</p>';
+
+  const body =
+    '<div style="font-family:Arial,sans-serif;max-width:700px;margin:auto;border:1px solid ' + C_GRAY_BORDER + ';border-radius:12px;overflow:hidden;">' +
+      _emailHeader("Onboarding & Orientation Team") +
+      '<div style="background:' + C_LIME + ';padding:14px 32px;text-align:center;">' +
+        '<span style="color:' + C_BLACK + ';font-size:14px;font-weight:bold;letter-spacing:0.5px;">YOUR ORIENTATION SCHEDULE IS READY!</span>' +
+      '</div>' +
+      '<div style="padding:32px;background:' + C_WHITE + ';">' +
+        '<p style="font-size:18px;color:' + C_GRAY_DARK + ';margin:0 0 10px;">Dear <strong>' + c.fullName + '</strong>,</p>' +
+        '<p style="font-size:15px;color:' + C_GRAY_MID + ';line-height:1.8;margin:0 0 16px;">' +
+          'Welcome to <strong>' + COMPANY_NAME + '</strong>! We are excited to have you join us as <strong>' + c.position + '</strong>. ' +
+          'Your orientation programme is designed to help you settle in, understand our culture, and connect with your team.' +
+        '</p>' +
+        joiningBlock +
+        mentorBlock +
+
+        '<p style="font-weight:bold;font-size:15px;color:' + C_GRAY_DARK + ';margin:0 0 14px;">Your Orientation Schedule</p>' +
+        '<div style="border:1px solid ' + C_GRAY_BORDER + ';border-radius:8px;overflow:hidden;margin-bottom:24px;">' +
+          '<table style="width:100%;border-collapse:collapse;background:#fff;">' +
+            '<thead>' +
+              '<tr style="background:#F9FAFB;">' +
+                '<th style="padding:10px 14px;font-size:11px;font-weight:600;color:#6B7280;text-align:left;text-transform:uppercase;letter-spacing:0.5px;">Session</th>' +
+                '<th style="padding:10px 14px;font-size:11px;font-weight:600;color:#6B7280;text-align:left;text-transform:uppercase;letter-spacing:0.5px;">Time</th>' +
+                '<th style="padding:10px 14px;font-size:11px;font-weight:600;color:#6B7280;text-align:left;text-transform:uppercase;letter-spacing:0.5px;">Mode</th>' +
+                '<th style="padding:10px 14px;font-size:11px;font-weight:600;color:#6B7280;text-align:left;text-transform:uppercase;letter-spacing:0.5px;">Venue / Link</th>' +
+                '<th style="padding:10px 14px;font-size:11px;font-weight:600;color:#6B7280;text-align:left;text-transform:uppercase;letter-spacing:0.5px;">Facilitator</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody>' + sessionsHtml + '</tbody>' +
+          '</table>' +
+        '</div>' +
+
+        '<div style="background:' + C_LIME_LIGHT + ';border-left:4px solid ' + C_LIME + ';border-radius:6px;padding:16px 18px;margin-bottom:24px;">' +
+          '<p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:' + C_GRAY_DARK + ';">Before Your First Day — Checklist</p>' +
+          '<ul style="margin:0;padding-left:18px;font-size:13px;color:' + C_GRAY_MID + ';line-height:2;">' +
+            '<li>Read the welcome email and note your joining details</li>' +
+            '<li>Keep your original documents ready for verification</li>' +
+            '<li>Bring 2 passport-size photographs on Day 1</li>' +
+            '<li>Reach out to your mentor if you have any questions</li>' +
+          '</ul>' +
+        '</div>' +
+
+        '<p style="font-size:13px;color:' + C_GRAY_LIGHT + ';">Questions? Write to us at <a href="mailto:' + HR_EMAIL + '" style="color:' + C_GRAY_DARK + ';font-weight:600;">' + HR_EMAIL + '</a></p>' +
+        '<p style="margin-top:24px;font-size:15px;color:' + C_GRAY_DARK + ';font-weight:bold;">We look forward to welcoming you on Day 1!</p>' +
+        '<p style="font-size:14px;color:' + C_GRAY_MID + ';">Regards,<br><strong>' + COMPANY_NAME + ' — HR & Onboarding Team</strong></p>' +
+      '</div>' +
+      _emailFooter() +
+    '</div>';
+
+  _safeSendEmail(c.email, subject, body, COMPANY_NAME + " - Onboarding Team");
+  console.log("Orientation invite sent: " + c.email);
 }
 
 // ════════════════════════════════════════════════════════════
