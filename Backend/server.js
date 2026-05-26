@@ -20,6 +20,7 @@ const requestRoutes         = require("./routes/requestRoutes");
 const offboardingRoutes     = require("./routes/offboardingRoutes");
 const onboardingRoutes      = require("./routes/onboardingRoutes");
 const orientationRoutes     = require("./routes/orientationRoutes");
+const deploymentRoutes      = require("./routes/deploymentRoutes");
 
 const app = express();
 
@@ -108,6 +109,7 @@ app.use("/api/hr",         candidateRoutes);        // candidate import + shortl
 app.use("/api/hr",         offboardingRoutes);      // employee offboarding / separation
 app.use("/api/hr",         onboardingRoutes);       // candidate onboarding + doc webhook
 app.use("/api/hr",         orientationRoutes);      // candidate orientation + session schedule
+app.use("/api/hr",         deploymentRoutes);       // team deployment after orientation
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────
 app.get("/", (req, res) => {

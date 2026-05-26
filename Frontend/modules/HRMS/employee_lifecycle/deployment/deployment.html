@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HRMS — Deployment</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -23,7 +22,6 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
 .content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
-/* SIDEBAR */
 .brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
 .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
 .brand-name{font-size:15px;font-weight:600;color:var(--text)}
@@ -35,38 +33,46 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
 .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent2);border-radius:0 3px 3px 0}
 .nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
-.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
 .nav-divider{height:1px;background:var(--border);margin:8px 10px}
 .sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
-.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
-.user-pill:hover{background:var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
 .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
-/* TOPBAR */
 .page-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
 .breadcrumb{font-size:12px;color:var(--text3)}
 .breadcrumb span{color:var(--text2)}
-.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;min-width:200px}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;min-width:220px}
 .search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%}
 .search-box input::placeholder{color:var(--text3)}
 .topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
 .topbar-btn:hover{background:var(--navy3)}
 .topbar-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.topbar-btn.primary:hover{background:var(--accent);border-color:var(--accent)}
-.notif-wrap{position:relative}
-.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--rose);border-radius:50%;border:2px solid var(--navy2)}
-/* LAYOUT */
-.grid{display:grid;gap:16px}
-.g4{grid-template-columns:repeat(4,1fr)}
-.g3{grid-template-columns:repeat(3,1fr)}
-.g2{grid-template-columns:repeat(2,1fr)}
-.g21{grid-template-columns:2fr 1fr}
-.g12{grid-template-columns:1fr 2fr}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-.card-sm{padding:16px}
-.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
+.topbar-btn.primary:hover{background:var(--accent)}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;align-items:center;gap:12px}
+.kpi-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.kpi-val{font-size:24px;font-weight:600;line-height:1}
+.kpi-lbl{font-size:11px;color:var(--text3);margin-top:3px}
+/* Tabs */
+.tab-bar{display:flex;gap:2px;background:var(--navy3);padding:4px;border-radius:10px;margin-bottom:18px}
+.tab-btn{padding:8px 18px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;border:none;background:none;font-family:var(--font)}
+.tab-btn.active{background:var(--navy2);color:var(--text)}
+.tab-btn:hover:not(.active){color:var(--text)}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+/* Card */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;animation:fadeUp .3s ease both}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
 .card-title{font-size:14px;font-weight:600;color:var(--text)}
 .card-sub{font-size:12px;color:var(--text3);margin-top:2px}
-/* BADGES */
+/* Table */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px;white-space:nowrap}
+td{padding:11px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
+tr:first-child td{border-top:none}
+tr.clickable:hover td{background:rgba(255,255,255,.025);cursor:pointer}
+.td-main{font-weight:500;color:var(--text)}
+/* Badge */
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
 .b-green{background:rgba(34,197,94,0.13);color:var(--green)}
 .b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
@@ -75,77 +81,60 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
 .b-teal{background:rgba(45,212,191,0.13);color:var(--teal)}
 .b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
-/* TABS */
-.tabs{display:flex;gap:2px;background:var(--navy3);padding:4px;border-radius:10px;margin-bottom:18px}
-.tab{padding:7px 16px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;white-space:nowrap}
-.tab.active{background:var(--navy2);color:var(--text);font-weight:500}
-.tab:hover:not(.active){color:var(--text)}
-/* TABLE */
-table{width:100%;border-collapse:collapse}
-th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px}
-td{padding:12px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
-tr:first-child td{border-top:none}
-tr:hover td{background:rgba(255,255,255,.02)}
-.td-main{font-weight:500;color:var(--text)}
-.td-sub{font-size:11px;color:var(--text3);margin-top:1px}
-/* MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+/* Team card */
+.team-card{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .15s}
+.team-card:hover{border-color:rgba(59,130,246,0.35);transform:translateY(-1px)}
+/* Ready card */
+.ready-card{background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:10px;transition:border-color .15s}
+.ready-card:hover{border-color:rgba(34,197,94,0.4)}
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
 .overlay.open{display:flex}
-.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:580px;max-width:94vw;max-height:90vh;overflow-y:auto}
-.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.modal-title{font-size:15px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:620px;max-width:96vw;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--navy2);z-index:2}
+.modal-title{font-size:15px;font-weight:600;color:var(--text)}
+.modal-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1;flex-shrink:0;padding:0 0 0 12px}
 .modal-close:hover{color:var(--text)}
-.modal-body{padding:22px 24px}
-.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.modal-body{padding:22px 24px;flex:1}
+.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--navy2);z-index:2}
+/* Form */
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:0}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 label{font-size:12px;font-weight:500;color:var(--text2)}
 input,select,textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
 select option{background:var(--navy2)}
-textarea{resize:vertical;min-height:70px}
+textarea{resize:vertical;min-height:60px}
+/* Buttons */
 .btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
 .btn:hover{background:var(--navy3)}
 .btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
-.btn.danger{background:var(--rose);border-color:var(--rose);color:#fff}
+.btn.primary:hover{background:var(--accent)}
+.btn.danger{background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.3);color:var(--rose)}
+.btn.danger:hover{background:rgba(244,63,94,0.22)}
 .btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
-/* TEAM CARD */
-.team-card{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .15s;cursor:pointer}
-.team-card:hover{border-color:rgba(59,130,246,0.35);transform:translateY(-1px)}
-.team-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
-.team-lead{font-size:12px;color:var(--text3);margin-bottom:10px}
-.av-stack{display:flex}
-.av-sm{width:26px;height:26px;border-radius:50%;border:2px solid var(--navy3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;margin-left:-6px;flex-shrink:0}
-.av-sm:first-child{margin-left:0}
-/* SHIFT GRID */
-.shift-grid{display:grid;grid-template-columns:140px repeat(5,1fr);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.sg-head{background:var(--navy3);padding:10px 12px;font-size:11px;font-weight:500;color:var(--text2);text-align:center;border-bottom:1px solid var(--border)}
-.sg-head.emp{text-align:left}
-.sg-cell{background:var(--card);padding:8px;border-top:1px solid var(--border);border-left:1px solid var(--border)}
-.sg-cell.emp{padding:10px 12px;border-left:none}
-.shift-badge{padding:5px 8px;border-radius:6px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;transition:all .15s}
-.shift-m{background:rgba(59,130,246,0.13);color:var(--accent);border:1px solid rgba(59,130,246,0.25)}
-.shift-a{background:rgba(167,139,250,0.13);color:var(--purple);border:1px solid rgba(167,139,250,0.25)}
-.shift-n{background:rgba(45,212,191,0.13);color:var(--teal);border:1px solid rgba(45,212,191,0.25)}
-.shift-off{background:rgba(244,63,94,0.08);color:var(--rose);border:1px solid rgba(244,63,94,0.2)}
-.shift-badge:hover{filter:brightness(1.15)}
-/* PROGRESS */
-.prog-bar{height:5px;background:var(--navy4);border-radius:3px;overflow:hidden}
-.prog-fill{height:100%;border-radius:3px}
-/* DOMAIN TABLE mono */
-.mono{font-family:var(--mono);font-size:11px}
-/* ACCESS PILLS */
-.access-pill{display:inline-flex;align-items:center;padding:2px 7px;background:var(--navy4);border-radius:4px;font-size:10px;color:var(--text2);margin:1px;font-family:var(--mono)}
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-/* TAG */
-.tag{display:inline-flex;padding:2px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+/* Access tags */
+.acc-tag{display:inline-flex;padding:2px 8px;background:var(--navy4);border-radius:4px;font-size:10px;color:var(--text2);margin:1px;font-family:var(--mono)}
+/* Section label */
+.sec-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px}
+.sec-lbl:first-child{margin-top:0}
+/* Check group */
+.chk-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chk-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);background:var(--navy3);padding:5px 10px;border-radius:6px;cursor:pointer;border:1px solid var(--border);transition:all .15s;user-select:none}
+.chk-item.on{border-color:var(--accent2);background:rgba(59,130,246,0.1);color:var(--accent)}
+.chk-item input{display:none}
+/* Empty */
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:10px}
+/* Toast */
+#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;color:#fff;display:flex;align-items:center;gap:8px;animation:slideIn .25s ease;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.toast.ok{background:#166534}.toast.err{background:#7f1d1d}.toast.info{background:#1e3a5f}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.card,.team-card{animation:fadeUp .3s ease both}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
 </style>
 <script src="../../../../assets/js/api.js"></script>
 <script src="../../../../assets/js/auth.js?v=3"></script>
@@ -153,11 +142,12 @@ textarea{resize:vertical;min-height:70px}
 <body>
 <script>requireAuth(); requireModuleAccess("hr");</script>
 <div class="shell">
+
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-icon">👥</div>
-    <div><div class="brand-name">HRMS Pro</div><div class="brand-ver">v2.5 · 2025</div></div>
+    <div><div class="brand-name">HRMS Pro</div><div class="brand-ver">v2.5</div></div>
   </div>
   <div class="nav-section">
     <div class="nav-label">Overview</div>
@@ -171,7 +161,7 @@ textarea{resize:vertical;min-height:70px}
   <div class="nav-section">
     <div class="nav-label">Talent Acquisition</div>
     <a class="nav-item" href="../../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
-    <a class="nav-item" href="../../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates <span class="nav-badge">14</span></a>
+    <a class="nav-item" href="../../talent_acquisition/candidates/candidates.html"><span class="nav-icon">👤</span> Candidates</a>
     <a class="nav-item" href="../../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
   </div>
   <div class="nav-divider"></div>
@@ -180,21 +170,23 @@ textarea{resize:vertical;min-height:70px}
     <a class="nav-item" href="../offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
     <a class="nav-item" href="../onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
     <a class="nav-item" href="../orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
-    <a class="nav-item active" href="../deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
+    <a class="nav-item active" href="deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
     <a class="nav-item" href="../offboarding/offboarding.html"><span class="nav-icon">🚪</span> Offboarding</a>
   </div>
   <div class="nav-divider"></div>
   <div class="nav-section">
     <div class="nav-label">Operations</div>
     <a class="nav-item" href="../../employees/shift-requests.html"><span class="nav-icon">🔄</span> Shift Requests</a>
-    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations <span class="nav-badge">3</span></a>
     <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
   <div class="sidebar-footer">
     <div class="user-pill">
-      <div class="avatar">AR</div>
-      <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--text);">Arjun Rao</div><div style="font-size:11px;color:var(--text3);">HR Manager</div></div>
-      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+      <div class="avatar" id="user-avatar">HR</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:500;color:var(--text);" id="user-name">Loading…</div>
+        <div style="font-size:11px;color:var(--text3);" id="user-role">HR</div>
+      </div>
+      <button onclick="logout()" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
     </div>
   </div>
 </aside>
@@ -202,163 +194,118 @@ textarea{resize:vertical;min-height:70px}
 <!-- ═══ MAIN ═══ -->
 <div class="main">
   <div class="topbar">
-    <div>
-      <div class="page-title">Deployment</div>
-      <div class="breadcrumb">HRMS Pro <span>›</span> Employee Lifecycle <span>›</span> Deployment</div>
+    <div style="flex:1">
+      <div class="page-title">Team Deployment</div>
+      <div class="breadcrumb">HRMS <span>›</span> Employee Lifecycle <span>›</span> Deployment</div>
     </div>
-    <div class="search-box"><span>🔍</span><input type="text" id="dep-search" placeholder="Search employee, team, domain…" oninput="renderAll()"></div>
-    <div class="notif-wrap"><button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button><span class="notif-dot"></span></div>
-    <button class="topbar-btn primary" onclick="openModal('assign-modal')">＋ Assign Employee</button>
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="search-input" placeholder="Search candidate, team, role…" oninput="debounceSearch()">
+    </div>
+    <select id="dept-filter" onchange="loadData()" style="width:140px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none">
+      <option value="">All Departments</option>
+    </select>
+    <button class="topbar-btn primary" onclick="openTeamModal(null)">＋ New Team</button>
+    <button class="topbar-btn" onclick="loadData()" id="refresh-btn">↻ Refresh</button>
   </div>
 
   <div class="content">
-
     <!-- KPI -->
-    <div class="grid g4" style="margin-bottom:20px;">
-      <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--accent);">247</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Total Employees</div>
-        <div style="font-size:11px;color:var(--green);margin-top:3px;">▲ 8 this month</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(34,197,94,0.12);">🟢</div>
+        <div><div class="kpi-val" id="kpi-ready" style="color:var(--green);">—</div><div class="kpi-lbl">Ready to Deploy</div></div>
       </div>
-      <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--green);">12</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Active Teams</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:3px;">Across 5 departments</div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(79,156,249,0.12);">🗂️</div>
+        <div><div class="kpi-val" id="kpi-deployed" style="color:var(--accent);">—</div><div class="kpi-lbl">Deployed</div></div>
       </div>
-      <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--amber);">6</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Pending ID Assignments</div>
-        <div style="font-size:11px;color:var(--amber);margin-top:3px;">Action required</div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(167,139,250,0.12);">👥</div>
+        <div><div class="kpi-val" id="kpi-teams" style="color:var(--purple);">—</div><div class="kpi-lbl">Active Teams</div></div>
       </div>
-      <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:26px;font-weight:600;color:var(--teal);">3</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Active Shift Types</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:3px;">Morning · Afternoon · Night</div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(245,158,11,0.12);">⏳</div>
+        <div><div class="kpi-val" id="kpi-pending" style="color:var(--amber);">—</div><div class="kpi-lbl">Pending</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(45,212,191,0.12);">🔄</div>
+        <div><div class="kpi-val" id="kpi-onhold" style="color:var(--teal);">—</div><div class="kpi-lbl">On Hold</div></div>
       </div>
     </div>
 
     <!-- TABS -->
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab(this,'teams')">Team Allocations</div>
-      <div class="tab" onclick="switchTab(this,'domain')">Domain &amp; System IDs</div>
-      <div class="tab" onclick="switchTab(this,'shifts')">Shift Schedule</div>
-      <div class="tab" onclick="switchTab(this,'location')">Location &amp; Remote</div>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-ready-btn"    onclick="switchTab('ready')">🟢 Ready to Deploy <span id="ready-badge" style="background:var(--green);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:4px;font-weight:600;">0</span></button>
+      <button class="tab-btn"        id="tab-teams-btn"    onclick="switchTab('teams')">👥 Teams</button>
+      <button class="tab-btn"        id="tab-deployed-btn" onclick="switchTab('deployed')">🗂️ Deployed Employees</button>
     </div>
 
-    <!-- ──────────── TAB: TEAMS ──────────── -->
-    <div id="tab-teams">
+    <!-- ── TAB: READY TO DEPLOY ── -->
+    <div class="tab-pane active" id="tab-ready">
       <div class="card-hd" style="margin-bottom:14px;">
         <div>
-          <div class="card-title" style="font-size:15px;">Team Allocations</div>
-          <div class="card-sub">All active teams · 247 employees across 12 teams</div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <select id="dept-filter" onchange="renderTeams()" style="width:auto;padding:5px 10px;font-size:12px;">
-            <option value="">All Departments</option>
-            <option>Engineering</option><option>Product</option><option>Sales</option><option>Operations</option><option>HR / Admin</option>
-          </select>
-          <button class="btn btn-sm primary" onclick="openModal('team-modal')">＋ New Team</button>
+          <div class="card-title" style="font-size:15px;">Candidates Ready for Deployment</div>
+          <div class="card-sub">Orientation completed — awaiting team assignment</div>
         </div>
       </div>
-      <div id="teams-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px;"></div>
-
-      <div class="card">
-        <div class="card-hd"><div class="card-title">Employee — Team Register</div><div class="card-sub" id="emp-count">Showing all employees</div></div>
-        <table>
-          <thead><tr><th>Employee</th><th>Department</th><th>Team</th><th>Role</th><th>Location</th><th>Shift</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="emp-tbody"></tbody>
-        </table>
+      <div id="ready-list">
+        <div class="empty"><div class="empty-icon">⏳</div>Loading…</div>
       </div>
     </div>
 
-    <!-- ──────────── TAB: DOMAIN ──────────── -->
-    <div id="tab-domain" style="display:none;">
-      <div class="card">
+    <!-- ── TAB: TEAMS ── -->
+    <div class="tab-pane" id="tab-teams">
+      <div class="card-hd" style="margin-bottom:14px;">
+        <div>
+          <div class="card-title" style="font-size:15px;">Team Directory</div>
+          <div class="card-sub">All deployment teams. Click a team to view members.</div>
+        </div>
+        <button class="btn btn-sm primary" onclick="openTeamModal(null)">＋ New Team</button>
+      </div>
+      <div id="teams-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;"></div>
+    </div>
+
+    <!-- ── TAB: DEPLOYED ── -->
+    <div class="tab-pane" id="tab-deployed">
+      <div class="card" style="overflow:hidden;">
         <div class="card-hd">
-          <div><div class="card-title">Domain &amp; System ID Management</div><div class="card-sub">Email accounts, tool access, credentials status</div></div>
-          <div style="display:flex;gap:8px;">
-            <select onchange="renderDomain()" id="id-status-filter" style="width:auto;padding:5px 10px;font-size:12px;">
-              <option value="">All Statuses</option>
-              <option>Active</option><option>Pending</option><option>Partial</option><option>Not Created</option>
-            </select>
-            <button class="btn btn-sm primary" onclick="openModal('id-modal')">＋ Create ID</button>
+          <div>
+            <div class="card-title">Deployed Employees</div>
+            <div class="card-sub" id="deployed-count">All deployment records</div>
           </div>
-        </div>
-        <table>
-          <thead><tr><th>Employee</th><th>Domain Email</th><th>Systems &amp; Tools</th><th>Devices</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="domain-tbody"></tbody>
-        </table>
-      </div>
-
-      <div class="grid g3" style="margin-top:16px;">
-        <div class="card card-sm" style="text-align:center;">
-          <div style="font-size:24px;font-weight:600;color:var(--green);">241</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:4px;">IDs Active</div>
-        </div>
-        <div class="card card-sm" style="text-align:center;">
-          <div style="font-size:24px;font-weight:600;color:var(--amber);">6</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:4px;">Pending / Partial</div>
-        </div>
-        <div class="card card-sm" style="text-align:center;">
-          <div style="font-size:24px;font-weight:600;color:var(--accent);">98%</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:4px;">ID Coverage</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ──────────── TAB: SHIFTS ──────────── -->
-    <div id="tab-shifts" style="display:none;">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-hd">
-          <div><div class="card-title">Shift Schedule — Week of May 5–9, 2025</div><div class="card-sub">Click any cell to reassign shift</div></div>
           <div style="display:flex;gap:8px;align-items:center;">
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);"><span style="width:10px;height:10px;background:rgba(59,130,246,0.4);border-radius:2px;display:inline-block;"></span>Morning (9A–6P)</span>
-              <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);"><span style="width:10px;height:10px;background:rgba(167,139,250,0.4);border-radius:2px;display:inline-block;"></span>Afternoon (2P–11P)</span>
-              <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);"><span style="width:10px;height:10px;background:rgba(45,212,191,0.4);border-radius:2px;display:inline-block;"></span>Night (10P–7A)</span>
-              <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);"><span style="width:10px;height:10px;background:rgba(244,63,94,0.2);border-radius:2px;display:inline-block;"></span>Off</span>
-            </div>
-            <button class="btn btn-sm primary" onclick="openModal('shift-modal')">+ Assign Shift</button>
+            <select id="status-filter" onchange="loadDeployed()" style="width:130px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;color:var(--text);font-family:var(--font);font-size:12px;outline:none">
+              <option value="">All Statuses</option>
+              <option value="deployed">Deployed</option>
+              <option value="pending">Pending</option>
+              <option value="on_hold">On Hold</option>
+              <option value="transferred">Transferred</option>
+              <option value="exited">Exited</option>
+            </select>
           </div>
         </div>
         <div style="overflow-x:auto;">
-          <div class="shift-grid" id="shift-grid"></div>
+          <table>
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Position</th>
+                <th>Team</th>
+                <th>Role in Team</th>
+                <th>Shift</th>
+                <th>Location</th>
+                <th>Domain Email</th>
+                <th>Deployed On</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="deployed-tbody">
+              <tr><td colspan="10" style="text-align:center;padding:28px;color:var(--text3);">Loading…</td></tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <div class="grid g2">
-        <div class="card">
-          <div class="card-hd"><div class="card-title">Shift Distribution</div></div>
-          <div style="height:180px;position:relative;"><canvas id="shiftChart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-hd"><div class="card-title">Weekly Coverage by Dept.</div></div>
-          <div style="height:180px;position:relative;"><canvas id="coverageChart"></canvas></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ──────────── TAB: LOCATION ──────────── -->
-    <div id="tab-location" style="display:none;">
-      <div class="grid g2" style="margin-bottom:16px;">
-        <div class="card">
-          <div class="card-hd"><div class="card-title">Work Location Distribution</div></div>
-          <div style="height:200px;position:relative;"><canvas id="locChart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-hd"><div class="card-title">Office-wise Headcount</div></div>
-          <div style="display:flex;flex-direction:column;gap:12px;" id="office-list"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hd">
-          <div><div class="card-title">Remote Work Approvals</div><div class="card-sub">Active WFH / remote arrangements</div></div>
-          <button class="btn btn-sm primary" onclick="openModal('remote-modal')">＋ Request Remote</button>
-        </div>
-        <table>
-          <thead><tr><th>Employee</th><th>Team</th><th>Location</th><th>WFH Type</th><th>Approved By</th><th>Valid Until</th><th>Status</th></tr></thead>
-          <tbody id="remote-tbody"></tbody>
-        </table>
       </div>
     </div>
 
@@ -366,432 +313,848 @@ textarea{resize:vertical;min-height:70px}
 </div><!-- /main -->
 </div><!-- /shell -->
 
-<!-- ═══ ASSIGN EMPLOYEE MODAL ═══ -->
-<div class="overlay" id="assign-modal" onclick="closeModal('assign-modal')">
+<!-- ═══ DEPLOY MODAL ═══ -->
+<div class="overlay" id="deploy-modal" onclick="if(event.target===this)closeModal('deploy-modal')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Assign Employee to Team</span><button class="modal-close" onclick="closeModal('assign-modal')">×</button></div>
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="dm-title">Deploy Candidate</div>
+        <div class="modal-sub" id="dm-sub">Assign to a team</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('deploy-modal')">×</button>
+    </div>
     <div class="modal-body">
+      <input type="hidden" id="dm-orientation-id">
+      <input type="hidden" id="dm-candidate-email">
+
+      <div class="sec-lbl">Candidate Info</div>
+      <div style="background:var(--navy3);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;">
+        <div style="font-weight:600;color:var(--text);" id="dm-candidate-name">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="dm-candidate-info">—</div>
+      </div>
+
+      <div class="sec-lbl">Team Assignment</div>
       <div class="frow">
-        <div class="fg"><label>Employee *</label>
-          <select id="ae-emp"><option>Rohit Mehra</option><option>Vikram Nair</option><option>Deepa Krishnan</option><option>Arun Mehta</option></select>
+        <div class="fg" style="margin-bottom:0">
+          <label>Team *</label>
+          <select id="dm-team" onchange="onTeamChange()">
+            <option value="">— Select Team —</option>
+          </select>
         </div>
-        <div class="fg"><label>Team *</label>
-          <select id="ae-team"><option>Team Phoenix</option><option>Team Kraken</option><option>Growth Squad</option><option>Sales North</option><option>Ops Alpha</option></select>
+        <div class="fg" style="margin-bottom:0">
+          <label>Role in Team *</label>
+          <input id="dm-role" placeholder="e.g. Backend Developer">
         </div>
       </div>
-      <div class="frow">
-        <div class="fg"><label>Role in Team</label><input id="ae-role" placeholder="e.g. Backend Developer"></div>
-        <div class="fg"><label>Reporting Manager</label><input id="ae-mgr" placeholder="Manager name"></div>
-      </div>
-      <div class="frow">
-        <div class="fg"><label>Work Location</label>
-          <select id="ae-loc"><option>Bangalore Office</option><option>Hyderabad Office</option><option>Mumbai Office</option><option>Remote</option><option>Hybrid</option></select>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
+          <label>Reporting Manager</label>
+          <input id="dm-manager" placeholder="Manager name">
         </div>
-        <div class="fg"><label>Shift</label>
-          <select id="ae-shift"><option>Morning (9A–6P)</option><option>Afternoon (2P–11P)</option><option>Night (10P–7A)</option><option>Flexible</option></select>
+        <div class="fg" style="margin-bottom:0">
+          <label>Deployment Date</label>
+          <input id="dm-date" type="date">
         </div>
       </div>
-      <div class="fg"><label>Effective From</label><input id="ae-date" type="date"></div>
+
+      <div class="sec-lbl" style="margin-top:16px;">Work Setup</div>
+      <div class="frow">
+        <div class="fg" style="margin-bottom:0">
+          <label>Work Location</label>
+          <select id="dm-work-loc">
+            <option value="office">Office</option>
+            <option value="remote">Remote</option>
+            <option value="hybrid">Hybrid</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Office / City</label>
+          <input id="dm-office" placeholder="e.g. Hyderabad Office">
+        </div>
+      </div>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
+          <label>Shift</label>
+          <select id="dm-shift">
+            <option value="morning">Morning (9AM – 6PM)</option>
+            <option value="afternoon">Afternoon (2PM – 11PM)</option>
+            <option value="night">Night (10PM – 7AM)</option>
+            <option value="flexible">Flexible</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Device Issued</label>
+          <input id="dm-device" placeholder="e.g. MacBook Pro, Pending">
+        </div>
+      </div>
+
+      <div class="sec-lbl" style="margin-top:16px;">System &amp; Domain Setup</div>
+      <div class="fg">
+        <label>Domain Email</label>
+        <input id="dm-email" type="email" placeholder="firstname.l@company.com">
+      </div>
+      <div class="fg">
+        <label>System Access</label>
+        <div class="chk-group" id="access-group">
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Slack"> Slack</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Jira"> Jira</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="GitHub"> GitHub</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Confluence"> Confluence</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Figma"> Figma</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="AWS"> AWS</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="VPN"> VPN</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Salesforce"> Salesforce</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Google Workspace"> Google Workspace</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Zoom"> Zoom</label>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Notes</label>
+        <textarea id="dm-notes" rows="2" placeholder="Any deployment notes…"></textarea>
+      </div>
     </div>
     <div class="modal-ft">
-      <button class="btn" onclick="closeModal('assign-modal')">Cancel</button>
-      <button class="btn primary" onclick="assignEmployee()">Assign</button>
+      <button class="btn" onclick="closeModal('deploy-modal')">Cancel</button>
+      <button class="btn primary" id="dm-save-btn" onclick="saveDeploy()">🚀 Deploy</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ NEW TEAM MODAL ═══ -->
-<div class="overlay" id="team-modal" onclick="closeModal('team-modal')">
-  <div class="modal" style="width:500px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Create New Team</span><button class="modal-close" onclick="closeModal('team-modal')">×</button></div>
+<!-- ═══ EDIT DEPLOYMENT MODAL ═══ -->
+<div class="overlay" id="edit-modal" onclick="if(event.target===this)closeModal('edit-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">Edit Deployment</div>
+        <div class="modal-sub" id="em-sub">Update assignment details</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('edit-modal')">×</button>
+    </div>
     <div class="modal-body">
+      <input type="hidden" id="em-id">
       <div class="frow">
-        <div class="fg"><label>Team Name *</label><input id="nt-name" placeholder="e.g. Team Aurora"></div>
-        <div class="fg"><label>Department *</label>
-          <select id="nt-dept"><option>Engineering</option><option>Product</option><option>Sales</option><option>Operations</option><option>HR / Admin</option></select>
+        <div class="fg" style="margin-bottom:0">
+          <label>Team</label>
+          <select id="em-team">
+            <option value="">— Select Team —</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Role in Team</label>
+          <input id="em-role">
         </div>
       </div>
-      <div class="frow">
-        <div class="fg"><label>Team Lead *</label><input id="nt-lead" placeholder="Lead's name"></div>
-        <div class="fg"><label>Location</label>
-          <select id="nt-loc"><option>Bangalore</option><option>Hyderabad</option><option>Mumbai</option><option>Remote</option></select>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
+          <label>Reporting Manager</label>
+          <input id="em-manager">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Status</label>
+          <select id="em-status">
+            <option value="deployed">Deployed</option>
+            <option value="pending">Pending</option>
+            <option value="on_hold">On Hold</option>
+            <option value="transferred">Transferred</option>
+            <option value="exited">Exited</option>
+          </select>
         </div>
       </div>
-      <div class="fg" style="margin-bottom:0;"><label>Team Description</label><textarea id="nt-desc" placeholder="Team purpose, key projects…"></textarea></div>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
+          <label>Work Location</label>
+          <select id="em-work-loc">
+            <option value="office">Office</option>
+            <option value="remote">Remote</option>
+            <option value="hybrid">Hybrid</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Shift</label>
+          <select id="em-shift">
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="night">Night</option>
+            <option value="flexible">Flexible</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
+          <label>Domain Email</label>
+          <input id="em-email" type="email">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Device Issued</label>
+          <input id="em-device">
+        </div>
+      </div>
+      <div class="fg" style="margin-top:14px;">
+        <label>System Access</label>
+        <div class="chk-group" id="em-access-group">
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Slack"> Slack</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Jira"> Jira</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="GitHub"> GitHub</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Confluence"> Confluence</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Figma"> Figma</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="AWS"> AWS</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="VPN"> VPN</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Salesforce"> Salesforce</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Google Workspace"> Google Workspace</label>
+          <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Zoom"> Zoom</label>
+        </div>
+      </div>
+      <div class="fg" style="margin-top:14px;">
+        <label>Notes</label>
+        <textarea id="em-notes" rows="2"></textarea>
+      </div>
     </div>
     <div class="modal-ft">
+      <button class="btn danger btn-sm" style="margin-right:auto;" onclick="removeDeployment()">🗑 Remove</button>
+      <button class="btn" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="btn primary" id="em-save-btn" onclick="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TEAM MODAL ═══ -->
+<div class="overlay" id="team-modal" onclick="if(event.target===this)closeModal('team-modal')">
+  <div class="modal" onclick="event.stopPropagation()" style="width:540px;">
+    <div class="modal-hd">
+      <span class="modal-title" id="tm-title-label">Create New Team</span>
+      <button class="modal-close" onclick="closeModal('team-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tm-id">
+      <div class="frow">
+        <div class="fg" style="margin-bottom:0">
+          <label>Team Name *</label>
+          <input id="tm-name" placeholder="e.g. Team Aurora">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Department *</label>
+          <input id="tm-dept" placeholder="e.g. Engineering">
+        </div>
+      </div>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
+          <label>Team Lead</label>
+          <input id="tm-lead" placeholder="Lead's full name">
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Lead Email</label>
+          <input id="tm-lead-email" type="email" placeholder="lead@company.com">
+        </div>
+      </div>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
+          <label>Location Type</label>
+          <select id="tm-loc">
+            <option value="office">Office</option>
+            <option value="remote">Remote</option>
+            <option value="hybrid">Hybrid</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Office / City</label>
+          <input id="tm-office" placeholder="e.g. Hyderabad Office">
+        </div>
+      </div>
+      <div class="fg" style="margin-top:14px;">
+        <label>Description</label>
+        <textarea id="tm-desc" rows="2" placeholder="Team purpose or key responsibilities…"></textarea>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn danger btn-sm" id="tm-del-btn" style="margin-right:auto;display:none;" onclick="deleteTeam()">🗑 Delete Team</button>
       <button class="btn" onclick="closeModal('team-modal')">Cancel</button>
-      <button class="btn primary" onclick="createTeam()">Create Team</button>
+      <button class="btn primary" id="tm-save-btn" onclick="saveTeam()">Save Team</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ CREATE DOMAIN ID MODAL ═══ -->
-<div class="overlay" id="id-modal" onclick="closeModal('id-modal')">
-  <div class="modal" style="width:500px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Create Domain ID &amp; Access</span><button class="modal-close" onclick="closeModal('id-modal')">×</button></div>
-    <div class="modal-body">
-      <div class="frow">
-        <div class="fg"><label>Employee *</label>
-          <select id="ci-emp"><option>Rohit Mehra</option><option>Vikram Nair</option><option>Deepa Krishnan</option></select>
-        </div>
-        <div class="fg"><label>Domain Email *</label><input id="ci-email" placeholder="firstname.l@acme.io"></div>
+<!-- ═══ TEAM MEMBERS MODAL ═══ -->
+<div class="overlay" id="members-modal" onclick="if(event.target===this)closeModal('members-modal')">
+  <div class="modal" onclick="event.stopPropagation()" style="width:660px;">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="mm-title">Team Members</div>
+        <div class="modal-sub" id="mm-sub"></div>
       </div>
-      <div class="frow">
-        <div class="fg"><label>Primary Role</label><input id="ci-role" placeholder="e.g. Developer"></div>
-        <div class="fg"><label>Device Issued</label>
-          <select id="ci-device"><option>MacBook Pro</option><option>Dell Laptop</option><option>Lenovo ThinkPad</option><option>Pending</option></select>
-        </div>
-      </div>
-      <div class="fg" style="margin-bottom:0;">
-        <label>System Access (select all that apply)</label>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;" id="access-checkboxes">
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;" checked> Jira</label>
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;" checked> Slack</label>
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;"> GitHub</label>
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;"> AWS</label>
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;"> VPN</label>
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;"> Confluence</label>
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;"> Figma</label>
-          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;"> Salesforce</label>
-        </div>
-      </div>
+      <button class="modal-close" onclick="closeModal('members-modal')">×</button>
     </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('id-modal')">Cancel</button>
-      <button class="btn primary" onclick="alert('Domain ID created and credentials sent!');closeModal('id-modal')">Create &amp; Send Credentials</button>
-    </div>
+    <div class="modal-body" id="mm-body">Loading…</div>
   </div>
 </div>
 
-<!-- ═══ ASSIGN SHIFT MODAL ═══ -->
-<div class="overlay" id="shift-modal" onclick="closeModal('shift-modal')">
-  <div class="modal" style="width:480px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Assign Shift</span><button class="modal-close" onclick="closeModal('shift-modal')">×</button></div>
-    <div class="modal-body">
-      <div class="frow">
-        <div class="fg"><label>Employee *</label>
-          <select><option>Priya Sharma</option><option>Kiran Shah</option><option>Vikram Nair</option><option>Rohit Mehra</option></select>
-        </div>
-        <div class="fg"><label>Shift Type *</label>
-          <select><option>Morning (9A–6P)</option><option>Afternoon (2P–11P)</option><option>Night (10P–7A)</option><option>Flexible</option></select>
-        </div>
-      </div>
-      <div class="frow">
-        <div class="fg"><label>Week Starting</label><input type="date"></div>
-        <div class="fg"><label>Duration</label>
-          <select><option>1 Week</option><option>2 Weeks</option><option>1 Month</option><option>Permanent</option></select>
-        </div>
-      </div>
-      <div class="fg"><label>Days Off</label>
-        <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;"> Sat</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);font-weight:400;"><input type="checkbox" style="width:auto;padding:0;border:none;background:none;" checked> Sun</label>
-        </div>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('shift-modal')">Cancel</button>
-      <button class="btn primary" onclick="alert('Shift assigned!');closeModal('shift-modal')">Assign Shift</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ REMOTE WORK MODAL ═══ -->
-<div class="overlay" id="remote-modal" onclick="closeModal('remote-modal')">
-  <div class="modal" style="width:480px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Remote Work Request</span><button class="modal-close" onclick="closeModal('remote-modal')">×</button></div>
-    <div class="modal-body">
-      <div class="frow">
-        <div class="fg"><label>Employee *</label>
-          <select><option>Priya Sharma</option><option>Kiran Shah</option><option>Rohit Mehra</option></select>
-        </div>
-        <div class="fg"><label>WFH Type</label>
-          <select><option>Fully Remote</option><option>Hybrid (3 days WFH)</option><option>Temporary WFH</option></select>
-        </div>
-      </div>
-      <div class="frow">
-        <div class="fg"><label>From Date</label><input type="date"></div>
-        <div class="fg"><label>Until Date</label><input type="date"></div>
-      </div>
-      <div class="fg"><label>Reason</label><textarea rows="2" placeholder="Reason for remote work arrangement…"></textarea></div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('remote-modal')">Cancel</button>
-      <button class="btn primary" onclick="alert('Remote work request approved!');closeModal('remote-modal')">Approve</button>
-    </div>
-  </div>
-</div>
-
-<!-- NOTIF -->
-<div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
-  <div class="modal" style="width:400px;" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span class="modal-title">Notifications</span><button class="modal-close" onclick="closeModal('notif-modal')">×</button></div>
-    <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="padding:12px;background:rgba(245,158,11,0.08);border-radius:8px;border-left:3px solid var(--amber);font-size:13px;"><strong>6 employees</strong> pending domain ID creation</div>
-        <div style="padding:12px;background:var(--navy3);border-radius:8px;font-size:13px;">🗂️ Ops Alpha team restructuring in progress</div>
-      </div>
-    </div>
-  </div>
-</div>
+<div id="toast-wrap"></div>
 
 <script>
-/* ─── DATA ─── */
-const TEAMS = [
-  {name:'Team Phoenix',  lead:'Kiran Shah',   dept:'Engineering', members:12, loc:'Bangalore', col:'#3b82f6', inits:['KS','PS','VN','AM','RK'], status:'Active'},
-  {name:'Team Kraken',   lead:'Meera Iyer',   dept:'Engineering', members:8,  loc:'Remote',    col:'#a78bfa', inits:['MI','AP','SD','NR'],     status:'Active'},
-  {name:'Growth Squad',  lead:'Sanjay Das',   dept:'Product',     members:6,  loc:'Hyderabad', col:'#2dd4bf', inits:['SD','RM','PM'],           status:'Active'},
-  {name:'Sales North',   lead:'Pooja Verma',  dept:'Sales',       members:15, loc:'Mumbai',    col:'#f59e0b', inits:['PV','AD','AJ','MK','RS'], status:'Active'},
-  {name:'Sales South',   lead:'Ravi Iyer',    dept:'Sales',       members:12, loc:'Bangalore', col:'#22c55e', inits:['RI','DK','SR','PK'],      status:'Active'},
-  {name:'Ops Alpha',     lead:'Ravi Kumar',   dept:'Operations',  members:10, loc:'Hyderabad', col:'#f43f5e', inits:['RK','SN','AP'],           status:'Restructuring'},
-  {name:'HR Core',       lead:'Arjun Rao',    dept:'HR / Admin',  members:7,  loc:'Bangalore', col:'#6366f1', inits:['AR','PM','LK'],           status:'Active'},
-];
-const EMPLOYEES_DEP = [
-  {name:'Priya Sharma', init:'PS',col:'#3b82f6',dept:'Engineering',team:'Team Phoenix',    role:'Full Stack Dev',  loc:'Bangalore',shift:'Morning',status:'Active'},
-  {name:'Kiran Shah',   init:'KS',col:'#a78bfa',dept:'Engineering',team:'Team Phoenix',    role:'Engineering Lead',loc:'Bangalore',shift:'Afternoon',status:'Active'},
-  {name:'Rohit Mehra',  init:'RM',col:'#6366f1',dept:'Product',    team:'Growth Squad',    role:'Product Manager', loc:'Hyderabad',shift:'Morning',status:'Active'},
-  {name:'Vikram Nair',  init:'VN',col:'#f59e0b',dept:'Engineering',team:'Team Phoenix',    role:'DevOps Engineer', loc:'Remote',   shift:'Night',   status:'Active'},
-  {name:'Deepa Krishnan',init:'DK',col:'#2dd4bf',dept:'Sales',     team:'Sales South',     role:'Sales Associate', loc:'Bangalore',shift:'Morning',status:'Active'},
-  {name:'Ananya Das',   init:'AD',col:'#f43f5e',dept:'Sales',      team:'Sales North',     role:'Sales Lead',      loc:'Mumbai',   shift:'Morning',status:'Active'},
-  {name:'Sanjay Das',   init:'SD',col:'#22c55e',dept:'Product',    team:'Growth Squad',    role:'CPO',             loc:'Hyderabad',shift:'Flexible',status:'Active'},
-  {name:'Pooja Verma',  init:'PV',col:'#f59e0b',dept:'Sales',      team:'Sales North',     role:'VP Sales',        loc:'Mumbai',   shift:'Morning',status:'Active'},
-];
-const DOMAIN_DATA = [
-  {name:'Priya Sharma', init:'PS',col:'#3b82f6',email:'priya.s@acme.io',   systems:['Jira','GitHub','Slack','AWS','VPN'],device:'MacBook Pro',created:'Apr 22',status:'Active'},
-  {name:'Kiran Shah',   init:'KS',col:'#a78bfa',email:'kiran.s@acme.io',   systems:['Jira','GitHub','Slack','AWS','Confluence'],device:'MacBook Pro',created:'Mar 10',status:'Active'},
-  {name:'Rohit Mehra',  init:'RM',col:'#6366f1',email:'rohit.m@acme.io',   systems:['Jira','Slack'],device:'Dell Laptop',created:'May 1',status:'Partial'},
-  {name:'Vikram Nair',  init:'VN',col:'#f59e0b',email:'vikram.n@acme.io',  systems:['Jira','AWS'],device:'Pending',created:'Apr 28',status:'Partial'},
-  {name:'Deepa Krishnan',init:'DK',col:'#2dd4bf',email:'—',               systems:[],device:'Pending',created:'—',status:'Not Created'},
-  {name:'Ananya Das',   init:'AD',col:'#f43f5e',email:'ananya.d@acme.io',  systems:['Slack','Salesforce'],device:'Lenovo',created:'Apr 20',status:'Active'},
-  {name:'Sanjay Das',   init:'SD',col:'#22c55e',email:'sanjay.d@acme.io',  systems:['Jira','GitHub','Slack','Figma','Confluence'],device:'MacBook Pro',created:'Jan 5',status:'Active'},
-];
-const SHIFT_DATA = [
-  {name:'Priya Sharma',  shifts:['M','M','M','Off','M']},
-  {name:'Kiran Shah',    shifts:['A','A','Off','A','A']},
-  {name:'Vikram Nair',   shifts:['M','Off','M','M','M']},
-  {name:'Rohit Mehra',   shifts:['M','M','M','M','M']},
-  {name:'Ananya Das',    shifts:['M','M','A','M','M']},
-  {name:'Sanjay Das',    shifts:['M','M','M','M','Off']},
-  {name:'Deepa Krishnan',shifts:['N','N','N','Off','N']},
-];
-const REMOTE_DATA = [
-  {name:'Priya Sharma', init:'PS',col:'#3b82f6',team:'Team Phoenix', loc:'Bangalore/Remote', wfh:'Hybrid (3d WFH)', approver:'Kiran Shah',  until:'Jun 30',  status:'Approved'},
-  {name:'Vikram Nair',  init:'VN',col:'#f59e0b',team:'Team Phoenix', loc:'Remote',           wfh:'Fully Remote',    approver:'Kiran Shah',  until:'Permanent',status:'Approved'},
-  {name:'Sanjay Das',   init:'SD',col:'#22c55e',team:'Growth Squad', loc:'Hyderabad/Remote', wfh:'Hybrid (2d WFH)', approver:'CEO',          until:'Jun 15',  status:'Approved'},
-  {name:'Rohit Mehra',  init:'RM',col:'#6366f1',team:'Growth Squad', loc:'Remote',           wfh:'Temporary WFH',   approver:'Sanjay Das',  until:'May 31',  status:'Pending'},
-];
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let allTeams  = [];
+let readyList = [];
+let searchTimer = null;
+let currentTab = "ready";
 
-let currentTab = 'teams';
+// ─── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  const u = JSON.parse(localStorage.getItem("user") || "{}");
+  if (u.name) {
+    document.getElementById("user-name").textContent = u.name;
+    document.getElementById("user-avatar").textContent =
+      u.name.split(" ").map(p => p[0]).join("").slice(0,2).toUpperCase();
+  }
+  if (u.role) document.getElementById("user-role").textContent = u.role;
 
-/* ─── RENDER TEAMS ─── */
-function renderTeams(){
-  const deptF = document.getElementById('dept-filter')?.value||'';
-  const q     = document.getElementById('dep-search')?.value.toLowerCase()||'';
-  const teams = TEAMS.filter(t=>{
-    if(deptF && t.dept!==deptF) return false;
-    if(q && !t.name.toLowerCase().includes(q) && !t.lead.toLowerCase().includes(q)) return false;
+  loadData();
+});
+
+async function loadData() {
+  setRefreshing(true);
+  await Promise.all([loadTeams(), loadReady(), loadDeployed()]);
+  setRefreshing(false);
+}
+
+function setRefreshing(on) {
+  const btn = document.getElementById("refresh-btn");
+  btn.disabled = on;
+  btn.textContent = on ? "↻ Loading…" : "↻ Refresh";
+}
+
+// ─── LOAD TEAMS ────────────────────────────────────────────────────────────
+async function loadTeams() {
+  try {
+    const data = await apiRequest("/hr/deployment/teams");
+    if (data.error) throw new Error(data.msg);
+    allTeams = data.teams || [];
+
+    // Update KPI
+    document.getElementById("kpi-teams").textContent =
+      allTeams.filter(t => t.status === "active").length;
+
+    // Populate dept filter
+    const depts = [...new Set(allTeams.map(t => t.department).filter(Boolean))].sort();
+    const df = document.getElementById("dept-filter");
+    const current = df.value;
+    df.innerHTML = `<option value="">All Departments</option>` +
+      depts.map(d => `<option value="${esc(d)}" ${d===current?"selected":""}>${esc(d)}</option>`).join("");
+
+    // Populate team dropdowns in modals
+    const teamOpts = allTeams.filter(t => t.status === "active")
+      .map(t => `<option value="${t._id}">${esc(t.name)} — ${esc(t.department)}</option>`).join("");
+    document.getElementById("dm-team").innerHTML = `<option value="">— Select Team —</option>` + teamOpts;
+    document.getElementById("em-team").innerHTML = `<option value="">— Select Team —</option>` + teamOpts;
+
+    renderTeams();
+  } catch(err) {
+    document.getElementById("teams-grid").innerHTML =
+      `<div class="empty"><div class="empty-icon">⚠️</div><div style="color:var(--rose);">${esc(err.message)}</div></div>`;
+  }
+}
+
+function renderTeams() {
+  const q    = (document.getElementById("search-input").value || "").toLowerCase();
+  const dept = document.getElementById("dept-filter").value;
+  const teams = allTeams.filter(t => {
+    if (dept && t.department !== dept) return false;
+    if (q && !t.name.toLowerCase().includes(q) && !t.teamLead.toLowerCase().includes(q)) return false;
     return true;
   });
-  document.getElementById('teams-grid').innerHTML = teams.map(t=>`
-    <div class="team-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
-        <div class="team-name">${t.name}</div>
-        <span class="badge ${t.status==='Active'?'b-green':'b-amber'}">${t.status}</span>
-      </div>
-      <div class="team-lead">Lead: ${t.lead} · ${t.dept}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div class="av-stack">
-          ${t.inits.map((i,idx)=>`<div class="av-sm" style="background:${['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#22c55e'][idx%5]};">${i}</div>`).join('')}
-          ${t.members>t.inits.length?`<div class="av-sm" style="background:var(--navy4);color:var(--text3);">+${t.members-t.inits.length}</div>`:''}
+  const colors = ["#3b82f6","#a78bfa","#2dd4bf","#f59e0b","#22c55e","#f43f5e","#6366f1"];
+  const grid = document.getElementById("teams-grid");
+  if (!teams.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">👥</div>No teams yet. Create your first team using "＋ New Team".</div>`;
+    return;
+  }
+  grid.innerHTML = teams.map((t, i) => {
+    const col   = colors[i % colors.length];
+    const ini   = (t.name || "T").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    return `<div class="team-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:${col};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">${ini}</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text);">${esc(t.name)}</div>
+            <div style="font-size:11px;color:var(--text3);">${esc(t.department)}</div>
+          </div>
         </div>
-        <span style="font-size:12px;color:var(--text3);">📍 ${t.loc}</span>
+        <span class="badge ${t.status==='active'?'b-green':'b-gray'}">${t.status}</span>
       </div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">${t.members} members</div>
+      ${t.teamLead ? `<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">👤 Lead: <span style="color:var(--text2);">${esc(t.teamLead)}</span></div>` : ""}
+      ${t.officeLocation || t.location ? `<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">📍 ${esc(t.officeLocation || t.location)}</div>` : ""}
+      ${t.description ? `<div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">${esc(t.description)}</div>` : ""}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:12px;color:var(--accent);">👥 ${t.memberCount ?? 0} member${(t.memberCount??0)===1?'':'s'}</span>
+      </div>
       <div style="display:flex;gap:6px;">
-        <button class="btn btn-sm primary" onclick="alert('Managing ${t.name}...')">Manage</button>
-        <button class="btn btn-sm" onclick="alert('Viewing ${t.name} members...')">Members</button>
+        <button class="btn btn-sm primary" onclick="openTeamModal('${t._id}')">✏️ Edit</button>
+        <button class="btn btn-sm" onclick="openMembersModal('${t._id}')">👥 Members</button>
       </div>
-    </div>
-  `).join('');
-
-  /* employee table */
-  const q2 = q;
-  const emps = EMPLOYEES_DEP.filter(e=> !q2 || e.name.toLowerCase().includes(q2) || e.team.toLowerCase().includes(q2));
-  document.getElementById('emp-count').textContent = emps.length+' employees';
-  document.getElementById('emp-tbody').innerHTML = emps.map(e=>`
-    <tr>
-      <td><div style="display:flex;align-items:center;gap:9px;">
-        <div style="width:30px;height:30px;border-radius:50%;background:${e.col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">${e.init}</div>
-        <div class="td-main">${e.name}</div>
-      </div></td>
-      <td>${e.dept}</td>
-      <td><span class="tag">${e.team}</span></td>
-      <td>${e.role}</td>
-      <td>📍 ${e.loc}</td>
-      <td><span class="badge ${e.shift==='Morning'?'b-blue':e.shift==='Afternoon'?'b-purple':e.shift==='Night'?'b-teal':'b-gray'}">${e.shift}</span></td>
-      <td><span class="badge b-green">${e.status}</span></td>
-      <td><div style="display:flex;gap:5px;">
-        <button class="btn btn-sm" onclick="openModal('assign-modal')">Edit</button>
-      </div></td>
-    </tr>
-  `).join('');
+    </div>`;
+  }).join("");
 }
 
-/* ─── RENDER DOMAIN ─── */
-function renderDomain(){
-  const f=document.getElementById('id-status-filter')?.value||'';
-  const q=document.getElementById('dep-search')?.value.toLowerCase()||'';
-  const data=DOMAIN_DATA.filter(d=>{
-    if(f && d.status!==f) return false;
-    if(q && !d.name.toLowerCase().includes(q)) return false;
-    return true;
-  });
-  const cls={Active:'b-green',Partial:'b-amber','Not Created':'b-rose'};
-  document.getElementById('domain-tbody').innerHTML=data.map(d=>`
-    <tr>
-      <td><div style="display:flex;align-items:center;gap:9px;">
-        <div style="width:30px;height:30px;border-radius:50%;background:${d.col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">${d.init}</div>
-        <div class="td-main">${d.name}</div>
-      </div></td>
-      <td><code style="font-family:var(--mono);font-size:11px;color:${d.email==='—'?'var(--text3)':'var(--teal)'};">${d.email}</code></td>
-      <td><div style="display:flex;flex-wrap:wrap;gap:2px;">${d.systems.map(s=>`<span class="access-pill">${s}</span>`).join('')}${d.systems.length===0?'<span style="font-size:12px;color:var(--text3);">None</span>':''}</div></td>
-      <td style="font-size:12px;">${d.device}</td>
-      <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${d.created}</td>
-      <td><span class="badge ${cls[d.status]||'b-gray'}">${d.status}</span></td>
-      <td><div style="display:flex;gap:5px;">
-        <button class="btn btn-sm primary" onclick="openModal('id-modal')">${d.status==='Not Created'?'Create':'Edit'}</button>
-        ${d.status==='Active'?`<button class="btn btn-sm" style="color:var(--rose);border-color:rgba(244,63,94,0.3);" onclick="alert('Access revoked for ${d.name}')">Revoke</button>`:''}
-      </div></td>
-    </tr>
-  `).join('');
+// ─── LOAD READY ────────────────────────────────────────────────────────────
+async function loadReady() {
+  try {
+    const data = await apiRequest("/hr/deployment/ready");
+    if (data.error) throw new Error(data.msg);
+    readyList = data.ready || [];
+
+    const count = readyList.length;
+    document.getElementById("kpi-ready").textContent = count;
+    document.getElementById("ready-badge").textContent = count;
+
+    renderReady();
+  } catch(err) {
+    document.getElementById("ready-list").innerHTML =
+      `<div class="empty"><div class="empty-icon">⚠️</div><div style="color:var(--rose);">${esc(err.message)}</div></div>`;
+  }
 }
 
-/* ─── RENDER SHIFT GRID ─── */
-function renderShiftGrid(){
-  const days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
-  const shiftMap={M:'shift-m',A:'shift-a',N:'shift-n',Off:'shift-off'};
-  const shiftLabel={M:'9A–6P',A:'2P–11P',N:'10P–7A',Off:'Off'};
-  let html=`<div class="sg-head emp">Employee</div>`;
-  days.forEach(d=>{ html+=`<div class="sg-head">${d}</div>`; });
-  SHIFT_DATA.forEach(e=>{
-    html+=`<div class="sg-cell emp"><div style="font-size:13px;font-weight:500;color:var(--text);">${e.name}</div></div>`;
-    e.shifts.forEach((s,i)=>{
-      html+=`<div class="sg-cell"><div class="shift-badge ${shiftMap[s]||'shift-off'}" onclick="cycleShift(${SHIFT_DATA.indexOf(e)},${i})">${shiftLabel[s]||s}</div></div>`;
-    });
-  });
-  document.getElementById('shift-grid').innerHTML=html;
-}
-function cycleShift(eIdx,dIdx){
-  const cycle=['M','A','N','Off'];
-  const cur=SHIFT_DATA[eIdx].shifts[dIdx];
-  const next=cycle[(cycle.indexOf(cur)+1)%cycle.length];
-  SHIFT_DATA[eIdx].shifts[dIdx]=next;
-  renderShiftGrid();
-}
-
-/* ─── RENDER LOCATION ─── */
-function renderLocation(){
-  const offices=[
-    {city:'Bangalore',count:98, pct:40, col:'#3b82f6'},
-    {city:'Hyderabad', count:62, pct:25, col:'#a78bfa'},
-    {city:'Mumbai',    count:49, pct:20, col:'#2dd4bf'},
-    {city:'Remote',    count:38, pct:15, col:'#22c55e'},
-  ];
-  document.getElementById('office-list').innerHTML=offices.map(o=>`
-    <div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
-        <span style="font-weight:500;color:var(--text);">📍 ${o.city}</span>
-        <span style="color:var(--text2);">${o.count} employees · ${o.pct}%</span>
+function renderReady() {
+  const q    = (document.getElementById("search-input").value || "").toLowerCase();
+  const list = readyList.filter(o =>
+    !q || o.candidateName.toLowerCase().includes(q) ||
+          o.candidateEmail.toLowerCase().includes(q) ||
+          (o.position||"").toLowerCase().includes(q)
+  );
+  const cont = document.getElementById("ready-list");
+  if (!list.length) {
+    cont.innerHTML = `<div class="empty"><div class="empty-icon">✅</div>
+      ${readyList.length === 0
+        ? 'No candidates ready for deployment yet.<br><span style="font-size:12px;">Candidates appear here once their orientation is marked <strong style="color:var(--text2);">Completed</strong>.</span>'
+        : 'No results match your search.'}
+    </div>`;
+    return;
+  }
+  cont.innerHTML = list.map(o => {
+    const join = o.joiningDate
+      ? new Date(o.joiningDate).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})
+      : "—";
+    const completed = o.completedAt
+      ? new Date(o.completedAt).toLocaleDateString("en-IN",{day:"numeric",month:"short"})
+      : "—";
+    const ini = (o.candidateName||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    return `<div class="ready-card">
+      <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">${esc(ini)}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;color:var(--text);font-size:14px;">${esc(o.candidateName||"—")}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${esc(o.candidateEmail)} · ${esc(o.position||"—")} · ${esc(o.department||"—")}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Joining: ${join} &nbsp;|&nbsp; Orientation completed: ${completed}</div>
       </div>
-      <div class="prog-bar"><div class="prog-fill" style="width:${o.pct*2.5}%;background:${o.col};"></div></div>
-    </div>
-  `).join('');
-
-  document.getElementById('remote-tbody').innerHTML=REMOTE_DATA.map(r=>`
-    <tr>
-      <td><div style="display:flex;align-items:center;gap:9px;">
-        <div style="width:28px;height:28px;border-radius:50%;background:${r.col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">${r.init}</div>
-        <div class="td-main">${r.name}</div>
-      </div></td>
-      <td><span class="tag">${r.team}</span></td>
-      <td style="font-size:12px;">📍 ${r.loc}</td>
-      <td style="font-size:12px;">${r.wfh}</td>
-      <td style="font-size:12px;color:var(--text3);">${r.approver}</td>
-      <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${r.until}</td>
-      <td><span class="badge ${r.status==='Approved'?'b-green':'b-amber'}">${r.status}</span></td>
-    </tr>
-  `).join('');
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <span class="badge b-green">Orientation Complete</span>
+        <button class="btn btn-sm primary" onclick="openDeployModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">🚀 Deploy Now</button>
+      </div>
+    </div>`;
+  }).join("");
 }
 
-/* ─── CHARTS ─── */
-function initCharts(){
-  const ctd={plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}},
-    scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:10}}}}};
+// ─── LOAD DEPLOYED ─────────────────────────────────────────────────────────
+async function loadDeployed() {
+  const q      = document.getElementById("search-input").value.trim();
+  const status = document.getElementById("status-filter").value;
+  let url = "/hr/deployment?";
+  if (q)      url += "search=" + encodeURIComponent(q) + "&";
+  if (status) url += "status=" + encodeURIComponent(status) + "&";
 
-  if(document.getElementById('shiftChart')&&!document.getElementById('shiftChart').dataset.init){
-    document.getElementById('shiftChart').dataset.init='1';
-    new Chart(document.getElementById('shiftChart'),{
-      type:'doughnut',
-      data:{labels:['Morning','Afternoon','Night','Flexible'],datasets:[{data:[162,48,22,15],backgroundColor:['#3b82f6','#a78bfa','#2dd4bf','#f59e0b'],borderWidth:0,hoverOffset:4}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:8,padding:6}},tooltip:{...ctd.plugins.tooltip}}}
-    });
-  }
-  if(document.getElementById('coverageChart')&&!document.getElementById('coverageChart').dataset.init){
-    document.getElementById('coverageChart').dataset.init='1';
-    new Chart(document.getElementById('coverageChart'),{
-      type:'bar',
-      data:{labels:['Eng','Product','Sales','Ops','HR'],datasets:[{data:[82,34,55,48,28],backgroundColor:['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#f43f5e'],borderRadius:5}]},
-      options:{...ctd,responsive:true,maintainAspectRatio:false}
-    });
-  }
-  if(document.getElementById('locChart')&&!document.getElementById('locChart').dataset.init){
-    document.getElementById('locChart').dataset.init='1';
-    new Chart(document.getElementById('locChart'),{
-      type:'doughnut',
-      data:{labels:['Bangalore','Hyderabad','Mumbai','Remote'],datasets:[{data:[98,62,49,38],backgroundColor:['#3b82f6','#a78bfa','#2dd4bf','#22c55e'],borderWidth:0,hoverOffset:4}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:8,padding:6}},tooltip:{...ctd.plugins.tooltip}}}
-    });
+  try {
+    const data = await apiRequest(url);
+    if (data.error) throw new Error(data.msg);
+    const list  = data.deployments || [];
+    const stats = data.stats || {};
+
+    document.getElementById("kpi-deployed").textContent = stats.deployed ?? "—";
+    document.getElementById("kpi-pending").textContent  = stats.pending  ?? "—";
+    document.getElementById("kpi-onhold").textContent   = stats.on_hold  ?? "—";
+    if (stats.readyToDeploy !== undefined)
+      document.getElementById("kpi-ready").textContent  = stats.readyToDeploy;
+
+    document.getElementById("deployed-count").textContent = `${list.length} record${list.length===1?'':'s'}`;
+    renderDeployed(list);
+  } catch(err) {
+    document.getElementById("deployed-tbody").innerHTML =
+      `<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--rose);">${esc(err.message)}</td></tr>`;
   }
 }
 
-/* ─── TAB SWITCH ─── */
-function switchTab(el,tab){
-  currentTab=tab;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  ['teams','domain','shifts','location'].forEach(t=>{
-    const el2=document.getElementById('tab-'+t);
-    if(el2) el2.style.display=t===tab?'block':'none';
+function renderDeployed(list) {
+  const tbody = document.getElementById("deployed-tbody");
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="empty-icon">🗂️</div>No deployment records found.</div></td></tr>`;
+    return;
+  }
+  const shiftLabel = { morning:"Morning",afternoon:"Afternoon",night:"Night",flexible:"Flexible" };
+  tbody.innerHTML = list.map(d => {
+    const { cls, lbl } = statusBadge(d.status);
+    const ini = (d.candidateName||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    const dep = d.deployedDate
+      ? new Date(d.deployedDate).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})
+      : "—";
+    const teamName = d.teamId?.name || d.teamName || "—";
+    const wfhIco = {office:"🏢",remote:"🏠",hybrid:"🔀"}[d.workLocation] || "";
+    return `<tr class="clickable" onclick="openEditModal(${JSON.stringify(d).replace(/"/g,'&quot;')})">
+      <td>
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">${esc(ini)}</div>
+          <div>
+            <div class="td-main">${esc(d.candidateName||"—")}</div>
+            <div style="font-size:11px;color:var(--text3);">${esc(d.candidateEmail)}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-size:12px;">${esc(d.position||"—")}</td>
+      <td><span style="background:var(--navy4);padding:3px 8px;border-radius:5px;font-size:12px;">${esc(teamName)}</span></td>
+      <td style="font-size:12px;">${esc(d.roleInTeam||"—")}</td>
+      <td><span class="badge b-blue">${esc(shiftLabel[d.shift]||d.shift||"—")}</span></td>
+      <td style="font-size:12px;">${wfhIco} ${esc(d.officeLocation||d.workLocation||"—")}</td>
+      <td style="font-size:11px;font-family:var(--mono);color:var(--teal);">${esc(d.domainEmail||"—")}</td>
+      <td style="font-size:11px;font-family:var(--mono);color:var(--text3);">${dep}</td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn btn-sm" onclick="openEditModal(${JSON.stringify(d).replace(/"/g,'&quot;')})">✏️ Edit</button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+// ─── DEPLOY MODAL ──────────────────────────────────────────────────────────
+function openDeployModal(orientation) {
+  document.getElementById("dm-orientation-id").value  = orientation._id || "";
+  document.getElementById("dm-candidate-email").value = orientation.candidateEmail || "";
+  document.getElementById("dm-candidate-name").textContent  = orientation.candidateName || "—";
+  document.getElementById("dm-candidate-info").textContent  =
+    [orientation.position, orientation.department, orientation.candidateEmail].filter(Boolean).join(" · ");
+  document.getElementById("dm-title").textContent = "Deploy — " + (orientation.candidateName || "Candidate");
+  document.getElementById("dm-sub").textContent   = orientation.position || "";
+  document.getElementById("dm-team").value    = "";
+  document.getElementById("dm-role").value    = orientation.position || "";
+  document.getElementById("dm-manager").value = "";
+  document.getElementById("dm-date").value    = new Date().toISOString().slice(0,10);
+  document.getElementById("dm-work-loc").value= "office";
+  document.getElementById("dm-office").value  = "";
+  document.getElementById("dm-shift").value   = "morning";
+  document.getElementById("dm-email").value   = "";
+  document.getElementById("dm-device").value  = "Pending";
+  document.getElementById("dm-notes").value   = "";
+  // Reset access checkboxes
+  document.querySelectorAll("#access-group .chk-item").forEach(el => {
+    el.classList.remove("on");
+    el.querySelector("input").checked = false;
   });
-  if(tab==='shifts'){renderShiftGrid();setTimeout(initCharts,50);}
-  if(tab==='location'){renderLocation();setTimeout(initCharts,50);}
-  if(tab==='domain') renderDomain();
+  openModal("deploy-modal");
 }
 
-/* ─── ACTIONS ─── */
-function assignEmployee(){
-  const emp=document.getElementById('ae-emp').value;
-  alert(`${emp} assigned to ${document.getElementById('ae-team').value}!`);
-  closeModal('assign-modal');
-}
-function createTeam(){
-  const n=document.getElementById('nt-name').value.trim();
-  if(!n){alert('Please enter a team name.');return;}
-  TEAMS.push({name:n,lead:document.getElementById('nt-lead').value||'TBD',dept:document.getElementById('nt-dept').value,members:0,loc:document.getElementById('nt-loc').value,col:'#6366f1',inits:[],status:'Active'});
-  closeModal('team-modal');
-  renderTeams();
-  alert(`Team "${n}" created!`);
+function onTeamChange() {
+  const teamId = document.getElementById("dm-team").value;
+  const team   = allTeams.find(t => t._id === teamId);
+  if (team) {
+    if (!document.getElementById("dm-manager").value) document.getElementById("dm-manager").value = team.teamLead || "";
+    if (!document.getElementById("dm-office").value)  document.getElementById("dm-office").value  = team.officeLocation || "";
+    if (team.location) document.getElementById("dm-work-loc").value = team.location;
+  }
 }
 
-function renderAll(){renderTeams();}
+async function saveDeploy() {
+  const teamId = document.getElementById("dm-team").value;
+  const role   = document.getElementById("dm-role").value.trim();
+  if (!teamId) { toast("Please select a team.", "err"); return; }
+  if (!role)   { toast("Please enter the role in team.", "err"); return; }
 
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'))});
+  const btn = document.getElementById("dm-save-btn");
+  btn.disabled = true; btn.textContent = "Deploying…";
 
-/* INIT */
-renderTeams();
+  const systemAccess = [...document.querySelectorAll("#access-group .chk-item.on input")]
+    .map(i => i.value);
+
+  const payload = {
+    orientationId:    document.getElementById("dm-orientation-id").value || undefined,
+    candidateEmail:   document.getElementById("dm-candidate-email").value,
+    candidateName:    document.getElementById("dm-candidate-name").textContent,
+    position:         document.getElementById("dm-candidate-info").textContent.split(" · ")[0] || "",
+    teamId,
+    roleInTeam:       role,
+    reportingManager: document.getElementById("dm-manager").value.trim(),
+    deployedDate:     document.getElementById("dm-date").value,
+    workLocation:     document.getElementById("dm-work-loc").value,
+    officeLocation:   document.getElementById("dm-office").value.trim(),
+    shift:            document.getElementById("dm-shift").value,
+    domainEmail:      document.getElementById("dm-email").value.trim(),
+    systemAccess,
+    deviceIssued:     document.getElementById("dm-device").value.trim(),
+    notes:            document.getElementById("dm-notes").value.trim(),
+  };
+
+  try {
+    const res = await apiRequest("/hr/deployment", "POST", payload);
+    if (res.error) throw new Error(res.msg || "Deploy failed");
+    toast("Candidate deployed successfully! 🚀", "ok");
+    closeModal("deploy-modal");
+    loadData();
+  } catch(err) {
+    toast("Deploy failed: " + err.message, "err");
+  } finally {
+    btn.disabled = false; btn.textContent = "🚀 Deploy";
+  }
+}
+
+// ─── EDIT MODAL ────────────────────────────────────────────────────────────
+function openEditModal(dep) {
+  document.getElementById("em-id").value = dep._id;
+  document.getElementById("em-sub").textContent = `${dep.candidateName||""} — ${dep.candidateEmail||""}`;
+  document.getElementById("em-team").value    = dep.teamId?._id || dep.teamId || "";
+  document.getElementById("em-role").value    = dep.roleInTeam   || "";
+  document.getElementById("em-manager").value = dep.reportingManager || "";
+  document.getElementById("em-status").value  = dep.status       || "deployed";
+  document.getElementById("em-work-loc").value= dep.workLocation || "office";
+  document.getElementById("em-shift").value   = dep.shift        || "morning";
+  document.getElementById("em-email").value   = dep.domainEmail  || "";
+  document.getElementById("em-device").value  = dep.deviceIssued || "";
+  document.getElementById("em-notes").value   = dep.notes        || "";
+
+  const access = new Set(dep.systemAccess || []);
+  document.querySelectorAll("#em-access-group .chk-item").forEach(el => {
+    const val = el.querySelector("input").value;
+    const on  = access.has(val);
+    el.classList.toggle("on", on);
+    el.querySelector("input").checked = on;
+  });
+  openModal("edit-modal");
+}
+
+async function saveEdit() {
+  const id  = document.getElementById("em-id").value;
+  const btn = document.getElementById("em-save-btn");
+  btn.disabled = true; btn.textContent = "Saving…";
+
+  const systemAccess = [...document.querySelectorAll("#em-access-group .chk-item.on input")]
+    .map(i => i.value);
+
+  const payload = {
+    teamId:           document.getElementById("em-team").value || undefined,
+    roleInTeam:       document.getElementById("em-role").value.trim(),
+    reportingManager: document.getElementById("em-manager").value.trim(),
+    status:           document.getElementById("em-status").value,
+    workLocation:     document.getElementById("em-work-loc").value,
+    shift:            document.getElementById("em-shift").value,
+    domainEmail:      document.getElementById("em-email").value.trim(),
+    deviceIssued:     document.getElementById("em-device").value.trim(),
+    systemAccess,
+    notes:            document.getElementById("em-notes").value.trim(),
+  };
+
+  try {
+    const res = await apiRequest("/hr/deployment/" + id, "PATCH", payload);
+    if (res.error) throw new Error(res.msg || "Save failed");
+    toast("Updated ✓", "ok");
+    closeModal("edit-modal");
+    loadDeployed();
+  } catch(err) {
+    toast("Save failed: " + err.message, "err");
+  } finally {
+    btn.disabled = false; btn.textContent = "💾 Save Changes";
+  }
+}
+
+async function removeDeployment() {
+  const id = document.getElementById("em-id").value;
+  if (!id) return;
+  if (!confirm("Remove this deployment record? This cannot be undone.")) return;
+  try {
+    const res = await apiRequest("/hr/deployment/" + id, "DELETE");
+    if (res.error) throw new Error(res.msg);
+    toast("Deployment record removed.", "info");
+    closeModal("edit-modal");
+    loadData();
+  } catch(err) {
+    toast("Delete failed: " + err.message, "err");
+  }
+}
+
+// ─── TEAM MODAL ────────────────────────────────────────────────────────────
+function openTeamModal(id) {
+  document.getElementById("tm-id").value        = id || "";
+  document.getElementById("tm-name").value      = "";
+  document.getElementById("tm-dept").value      = "";
+  document.getElementById("tm-lead").value      = "";
+  document.getElementById("tm-lead-email").value= "";
+  document.getElementById("tm-loc").value       = "office";
+  document.getElementById("tm-office").value    = "";
+  document.getElementById("tm-desc").value      = "";
+  document.getElementById("tm-del-btn").style.display  = "none";
+  document.getElementById("tm-title-label").textContent = "Create New Team";
+
+  if (id) {
+    const team = allTeams.find(t => t._id === id);
+    if (team) {
+      document.getElementById("tm-title-label").textContent = "Edit Team";
+      document.getElementById("tm-name").value       = team.name        || "";
+      document.getElementById("tm-dept").value       = team.department  || "";
+      document.getElementById("tm-lead").value       = team.teamLead    || "";
+      document.getElementById("tm-lead-email").value = team.teamLeadEmail || "";
+      document.getElementById("tm-loc").value        = team.location    || "office";
+      document.getElementById("tm-office").value     = team.officeLocation || "";
+      document.getElementById("tm-desc").value       = team.description || "";
+      document.getElementById("tm-del-btn").style.display = "inline-flex";
+    }
+  }
+  openModal("team-modal");
+}
+
+async function saveTeam() {
+  const name = document.getElementById("tm-name").value.trim();
+  const dept = document.getElementById("tm-dept").value.trim();
+  if (!name) { toast("Team name is required.", "err"); return; }
+  if (!dept) { toast("Department is required.", "err"); return; }
+
+  const id  = document.getElementById("tm-id").value;
+  const btn = document.getElementById("tm-save-btn");
+  btn.disabled = true; btn.textContent = "Saving…";
+
+  const payload = {
+    name, department: dept,
+    teamLead:       document.getElementById("tm-lead").value.trim(),
+    teamLeadEmail:  document.getElementById("tm-lead-email").value.trim(),
+    location:       document.getElementById("tm-loc").value,
+    officeLocation: document.getElementById("tm-office").value.trim(),
+    description:    document.getElementById("tm-desc").value.trim(),
+  };
+
+  try {
+    let res;
+    if (id) {
+      res = await apiRequest("/hr/deployment/teams/" + id, "PATCH", payload);
+    } else {
+      res = await apiRequest("/hr/deployment/teams", "POST", payload);
+    }
+    if (res.error) throw new Error(res.msg || "Save failed");
+    toast(id ? "Team updated ✓" : "Team created ✓", "ok");
+    closeModal("team-modal");
+    loadTeams();
+  } catch(err) {
+    toast("Save failed: " + err.message, "err");
+  } finally {
+    btn.disabled = false; btn.textContent = "Save Team";
+  }
+}
+
+async function deleteTeam() {
+  const id = document.getElementById("tm-id").value;
+  if (!id) return;
+  if (!confirm("Delete this team? All members must be reassigned first.")) return;
+  try {
+    const res = await apiRequest("/hr/deployment/teams/" + id, "DELETE");
+    if (res.error) throw new Error(res.msg || "Delete failed");
+    toast("Team deleted.", "info");
+    closeModal("team-modal");
+    loadTeams();
+  } catch(err) {
+    toast("Delete failed: " + err.message, "err");
+  }
+}
+
+// ─── TEAM MEMBERS MODAL ────────────────────────────────────────────────────
+async function openMembersModal(teamId) {
+  const team = allTeams.find(t => t._id === teamId);
+  document.getElementById("mm-title").textContent = team?.name || "Team Members";
+  document.getElementById("mm-sub").textContent   = team ? `${team.department} · Lead: ${team.teamLead||"—"}` : "";
+  document.getElementById("mm-body").innerHTML = "Loading…";
+  openModal("members-modal");
+
+  try {
+    const data = await apiRequest("/hr/deployment/teams/" + teamId + "/members");
+    if (data.error) throw new Error(data.msg);
+    const members = data.members || [];
+    if (!members.length) {
+      document.getElementById("mm-body").innerHTML =
+        `<div class="empty"><div class="empty-icon">👥</div>No members deployed to this team yet.</div>`;
+      return;
+    }
+    const shiftLabel = { morning:"Morning",afternoon:"Afternoon",night:"Night",flexible:"Flexible" };
+    document.getElementById("mm-body").innerHTML = `
+      <table>
+        <thead><tr><th>Employee</th><th>Role</th><th>Shift</th><th>Location</th><th>Domain Email</th><th>Status</th></tr></thead>
+        <tbody>${members.map(m => {
+          const { cls, lbl } = statusBadge(m.status);
+          const ini = (m.candidateName||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+          return `<tr>
+            <td><div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">${esc(ini)}</div>
+              <div><div style="font-weight:500;color:var(--text);font-size:13px;">${esc(m.candidateName||"—")}</div>
+              <div style="font-size:11px;color:var(--text3);">${esc(m.candidateEmail)}</div></div>
+            </div></td>
+            <td style="font-size:12px;">${esc(m.roleInTeam||"—")}</td>
+            <td><span class="badge b-blue">${shiftLabel[m.shift]||m.shift||"—"}</span></td>
+            <td style="font-size:12px;">${esc(m.officeLocation||m.workLocation||"—")}</td>
+            <td style="font-size:11px;font-family:var(--mono);color:var(--teal);">${esc(m.domainEmail||"—")}</td>
+            <td><span class="badge ${cls}">${lbl}</span></td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table>`;
+  } catch(err) {
+    document.getElementById("mm-body").innerHTML =
+      `<div style="color:var(--rose);">Failed to load members: ${esc(err.message)}</div>`;
+  }
+}
+
+// ─── TABS ──────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  ["ready","teams","deployed"].forEach(t => {
+    document.getElementById("tab-"+t+"-btn").classList.toggle("active", t===tab);
+    document.getElementById("tab-"+t).classList.toggle("active", t===tab);
+  });
+}
+
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function statusBadge(s) {
+  return ({
+    deployed:    { cls:"b-green",  lbl:"Deployed"    },
+    pending:     { cls:"b-amber",  lbl:"Pending"     },
+    on_hold:     { cls:"b-teal",   lbl:"On Hold"     },
+    transferred: { cls:"b-purple", lbl:"Transferred" },
+    exited:      { cls:"b-rose",   lbl:"Exited"      },
+  })[s] || { cls:"b-gray", lbl: s || "—" };
+}
+
+function toggleAccess(el) {
+  const cb = el.querySelector("input");
+  // Defer — the onclick fires before the checkbox state changes
+  setTimeout(() => {
+    el.classList.toggle("on", cb.checked);
+  }, 0);
+}
+
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function openModal(id)  { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape")
+    document.querySelectorAll(".overlay.open").forEach(m => m.classList.remove("open"));
+});
+
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    renderReady();
+    renderTeams();
+    if (currentTab === "deployed") loadDeployed();
+  }, 320);
+}
+
+function toast(msg, type = "info") {
+  const w = document.getElementById("toast-wrap");
+  const t = document.createElement("div");
+  t.className = "toast " + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
 </script>
 </body>
 </html>
