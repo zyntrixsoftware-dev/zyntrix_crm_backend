@@ -328,24 +328,31 @@ exports.syncFromSheet = async (req, res) => {
       return res.status(400).json({ msg: "A valid Google Sheets URL is required" });
     }
 
-    // ── Extract spreadsheet ID from any Google Sheets URL format ─────────────
-    const idMatch = sheetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (!idMatch) return res.status(400).json({ msg: "Could not extract spreadsheet ID from the URL" });
-    const sheetId = idMatch[1];
+    // ── Build the CSV export URL from whatever URL the user pasted ─────────────
+    // Google gives two distinct URL formats:
+    //   1. Editing URL:   .../d/SHEET_ID/edit#gid=XXXX
+    //   2. Published URL: .../d/e/LONG_PUB_ID/pubhtml?gid=XXXX&single=true
+    // For format 2, the path has /d/e/LONG_ID/ — we capture "e/LONG_ID" so we
+    // can reconstruct the correct base URL.
+    // The gid may be ?gid=, &gid=, or #gid= (hash fragment in editing URLs).
 
-    // ── Extract gid if present in the URL (e.g. from a published CSV link) ───
-    // Google Form responses sheets often have a gid other than 0.
-    // If the user pastes a URL that already contains gid=XXXX we honour it;
-    // otherwise we omit the gid so Google returns the first published sheet.
-    const gidMatch = sheetUrl.match(/[?&#]gid=(\d+)/);  // handles ?gid=, &gid=, and #gid= (editing URL hash fragment)
-    // single=true is required when targeting a specific tab — without it Google
-    // ignores the gid parameter and returns the first sheet (or a 403).
+    let sheetBase;
+    const pubIdMatch = sheetUrl.match(/\/d\/(e\/[a-zA-Z0-9_-]+)\//);
+    if (pubIdMatch) {
+      // Published URL format: /d/e/2PACX-.../pubhtml
+      sheetBase = `https://docs.google.com/spreadsheets/d/${pubIdMatch[1]}`;
+    } else {
+      const stdIdMatch = sheetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (!stdIdMatch) return res.status(400).json({ msg: "Could not extract spreadsheet ID from the URL" });
+      sheetBase = `https://docs.google.com/spreadsheets/d/${stdIdMatch[1]}`;
+    }
+
+    const gidMatch = sheetUrl.match(/[?&#]gid=(\d+)/);
     const gidParam  = gidMatch ? `&gid=${gidMatch[1]}&single=true` : "";
 
-    // ── Always use the /pub?output=csv URL ────────────────────────────────────
-    // IMPORTANT: /export?format=csv requires a Google login even on "shared" sheets.
-    // Only /pub?output=csv (Publish to web) is truly public and works server-side.
-    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv${gidParam}`;
+    // /pub?output=csv is the only truly public endpoint — /export requires a Google login
+    const csvUrl = `${sheetBase}/pub?output=csv${gidParam}`;
+    console.log("[syncFromSheet] fetching:", csvUrl);
 
     // Fetch the CSV (Node 18+ built-in fetch, server-side — avoids browser CORS restrictions)
     let csvText;
