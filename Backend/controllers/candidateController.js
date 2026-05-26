@@ -8,42 +8,6 @@ const {
   notifyRejected
 } = require("../utils/candidateEmails");
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Sync a shortlist action back to the Google Sheet via the GAS web app.
-// Uses native fetch (Node 18+) which follows GAS redirects automatically.
-// Fire-and-forget — a Sheet sync failure never blocks the HR action.
-// ─────────────────────────────────────────────────────────────────────────────
-function syncShortlistToSheet(candidate) {
-  const gasUrl = process.env.GAS_WEBAPP_URL;
-  if (!gasUrl) {
-    console.warn("[GAS sync] GAS_WEBAPP_URL not set — skipping sheet sync");
-    return;
-  }
-
-  // Send the candidate's identity too, so the Apps Script can locate the row by
-  // email (and append it if missing) before flipping Column O to TRUE + emailing.
-  const payload = JSON.stringify({
-    action      : "updateCandidate",
-    shortlisted : true,
-    email       : candidate.email      || "",
-    fullName    : candidate.name       || "",
-    position    : candidate.appliedFor || "",
-    phone       : candidate.phone      || "",
-    secret      : process.env.GAS_WEBAPP_SECRET || undefined
-  });
-
-  // Intentionally NOT awaited — fire and forget
-  fetch(gasUrl, {
-    method : "POST",
-    headers: { "Content-Type": "application/json" },
-    body   : payload,
-    redirect: "follow",   // follow GAS's 302 redirect automatically
-  })
-    .then(res => res.text().then(body => {
-      console.log("[GAS sync] shortlist →", candidate.email, "| HTTP", res.status, "|", body.slice(0, 120));
-    }))
-    .catch(err => console.warn("[GAS sync] failed →", candidate.email, "|", err.message));
-}
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -307,16 +271,11 @@ exports.shortlistCandidate = async (req, res) => {
     candidate.interviewId = interview._id;
     await candidate.save();
 
-    // Sync resume-shortlisted flag (Column O = TRUE) back to the Google Sheet.
-    // Fire-and-forget — sheet sync failure never blocks the shortlist action.
-    syncShortlistToSheet(candidate);
-
-    // Email: when the Google Sheet web app is configured, the Apps Script sends
-    // the shortlist email (your polished template) right after it flips Column O,
-    // so we skip the CRM's own email here to avoid double-sending. If the web app
-    // isn't configured, the CRM sends its built-in shortlist email as a fallback.
-    let emailResult = { sent: false, reason: "handled_by_google_sheet" };
-    if (!process.env.GAS_WEBAPP_URL) {
+    // Send shortlist email via GAS (updates col N in the Sheet AND emails the candidate).
+    // Always called — the backend's shortlistEmailSentAt guard prevents re-sends on
+    // repeated clicks, and GAS's own EMAIL_SENT_FLAG (col R) provides a second guard.
+    let emailResult = { sent: false, reason: "already_sent" };
+    if (!interview.shortlistEmailSentAt) {
       emailResult = await notifyShortlisted(interview);
       if (emailResult.sent) {
         interview.shortlistEmailSentAt = new Date();
