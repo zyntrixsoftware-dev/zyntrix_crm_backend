@@ -27,9 +27,13 @@ async function callGasEmail(payload) {
     return false;
   }
   try {
+    // IMPORTANT: Must use "text/plain" not "application/json".
+    // GAS webapps redirect application/json POSTs (302), and Node fetch
+    // follows the redirect as GET — dropping the body. text/plain is
+    // processed directly by GAS without redirect.
     const res = await fetch(gasUrl, {
       method  : "POST",
-      headers : { "Content-Type": "application/json" },
+      headers : { "Content-Type": "text/plain;charset=utf-8" },
       body    : JSON.stringify(payload),
       redirect: "follow",
     });
