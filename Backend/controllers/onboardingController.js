@@ -335,10 +335,9 @@ exports.syncFromSheet = async (req, res) => {
 
     // ── Extract gid if present in the URL (e.g. from a published CSV link) ───
     // Google Form responses sheets often have a gid other than 0.
-    // The editing URL uses a hash fragment (#gid=XXXX) while the published URL
-    // uses a query parameter (?gid=XXXX). We match both so the user can paste
-    // either the editing URL or the published URL.
-    const gidMatch = sheetUrl.match(/[?&#]gid=(\d+)/);
+    // If the user pastes a URL that already contains gid=XXXX we honour it;
+    // otherwise we omit the gid so Google returns the first published sheet.
+    const gidMatch = sheetUrl.match(/[?&#]gid=(\d+)/);  // handles ?gid=, &gid=, and #gid= (editing URL hash fragment)
     // single=true is required when targeting a specific tab — without it Google
     // ignores the gid parameter and returns the first sheet (or a 403).
     const gidParam  = gidMatch ? `&gid=${gidMatch[1]}&single=true` : "";
@@ -348,7 +347,7 @@ exports.syncFromSheet = async (req, res) => {
     // Only /pub?output=csv (Publish to web) is truly public and works server-side.
     const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv${gidParam}`;
 
-    // Fetch the CSV (Node 18+ built-in fetch)
+    // Fetch the CSV (Node 18+ built-in fetch, server-side — avoids browser CORS restrictions)
     let csvText;
     try {
       const resp = await fetch(csvUrl, {
@@ -358,9 +357,7 @@ exports.syncFromSheet = async (req, res) => {
 
       csvText = await resp.text();
 
-      // Detect if Google returned a login wall (HTML) instead of CSV data.
-      // This happens when the sheet is not published to the web, OR when the
-      // gid targets a tab that was not included in the publish.
+      // Detect login wall (HTML) — happens when sheet is not published or gid is wrong
       const ct = resp.headers.get("content-type") || "";
       if (
         !resp.ok ||
@@ -368,15 +365,15 @@ exports.syncFromSheet = async (req, res) => {
         csvText.trimStart().startsWith("<!DOCTYPE") ||
         csvText.trimStart().startsWith("<html")
       ) {
-        console.warn(`[syncFromSheet] Google returned status=${resp.status} ct=${ct} for URL: ${csvUrl}`);
+        console.warn(`[syncFromSheet] Google returned status=${resp.status} ct=${ct} csvUrl=${csvUrl}`);
         return res.status(403).json({
-          msg: `Sheet not accessible (HTTP ${resp.status}). Make sure the sheet is published to the web and the correct tab is selected.`,
-          fix: "In Google Sheets: File → Share → Publish to web → select 'Entire Document' (or the specific form responses tab) → CSV → Publish. Then paste the spreadsheet URL again.",
+          msg: `Sheet not accessible (HTTP ${resp.status}). Make sure it is published to the web and the correct tab is included.`,
+          fix: "In Google Sheets: File → Share → Publish to web → select 'Entire Document' → CSV → Publish. Then save the URL again.",
           csvUrl
         });
       }
     } catch (fetchErr) {
-      console.error("[syncFromSheet] fetch threw:", fetchErr.message, "URL:", csvUrl);
+      console.error("[syncFromSheet] fetch threw:", fetchErr.message, "csvUrl:", csvUrl);
       return res.status(502).json({
         msg: "Could not reach Google Sheets: " + fetchErr.message,
         fix: "Make sure the sheet is published: File → Share → Publish to web → CSV → Publish.",
@@ -609,4 +606,17 @@ exports.manualImport = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 exports.updateOnboarding = async (req, res) => {
   try {
-    if (!checkHrAccess(req, res)) retu
+    if (!checkHrAccess(req, res)) return;
+
+    const allowed = ["joiningDate", "buddy", "notes", "location", "reportingTo"];
+    const ob = await Onboarding.findById(req.params.id);
+    if (!ob) return res.status(404).json({ msg: "Onboarding record not found" });
+
+    allowed.forEach(f => { if (req.body[f] !== undefined) ob[f] = req.body[f]; });
+    await ob.save();
+
+    return res.json({ msg: "Onboarding updated", onboarding: ob });
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
