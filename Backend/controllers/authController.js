@@ -317,3 +317,67 @@ exports.smtpCheck = async (req, res) => {
     return res.status(500).json({ msg: "Server error: " + err.message });
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GAS TEST — GET /api/auth/_gas-check?to=<email>
+// Sends a real test email via GAS and returns the full response so you can see
+// exactly what GAS is returning without reading Render logs.
+// ─────────────────────────────────────────────────────────────────────────────
+exports.gasCheck = async (req, res) => {
+  try {
+    if (!req.user || !["hr", "super_admin"].includes(req.user.role)) {
+      return res.status(403).json({ msg: "Access denied" });
+    }
+    const to = (req.query.to || req.body?.to || "").trim();
+    if (!to || !to.includes("@")) {
+      return res.status(400).json({ msg: "Provide ?to=<email>" });
+    }
+
+    const gasUrl = process.env.GAS_WEBAPP_URL;
+    if (!gasUrl) {
+      return res.status(500).json({ ok: false, msg: "GAS_WEBAPP_URL env var is not set on this server" });
+    }
+
+    // Step 1: ping GAS with a GET to check it's alive
+    let pingStatus, pingBody;
+    try {
+      const ping = await fetch(gasUrl, { method: "GET", redirect: "follow" });
+      pingStatus = ping.status;
+      pingBody   = (await ping.text()).slice(0, 300);
+    } catch (e) {
+      return res.json({ ok: false, step: "GET ping", error: e.message, gasUrl });
+    }
+
+    // Step 2: send a real test email via GAS
+    let postStatus, postBody;
+    try {
+      const post = await fetch(gasUrl, {
+        method : "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body   : JSON.stringify({
+          action  : "sendApplicationReceived",
+          email   : to,
+          fullName: "GAS Test",
+          position: "Diagnostic Test"
+        }),
+        redirect: "follow",
+      });
+      postStatus = post.status;
+      postBody   = (await post.text()).slice(0, 500);
+    } catch (e) {
+      return res.json({ ok: false, step: "POST test email", pingStatus, pingBody, error: e.message });
+    }
+
+    return res.json({
+      ok        : postStatus >= 200 && postStatus < 300,
+      gasUrl,
+      pingStatus,
+      pingBody,
+      postStatus,
+      postBody,
+      sentTo    : to
+    });
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error: " + err.message });
+  }
+};

@@ -5,7 +5,8 @@ const {
 	verifyOtp,
 	resetPassword,
 	forgotPassword,
-	smtpCheck
+	smtpCheck,
+	gasCheck
 } = require("../controllers/authController");
 const { changePassword, revokeSessions } = require("../controllers/employeeController");
 const auth = require("../middleware/authMiddleware");
@@ -28,5 +29,7 @@ router.post("/forgot-password", forgotPassword);
 // GET  /api/auth/_smtp-check?to=<email>  — verifies outbound SMTP delivery
 router.get ("/_smtp-check", auth, smtpCheck);
 router.post("/_smtp-check", auth, smtpCheck);
+router.get ("/_gas-check",  auth, gasCheck);
+router.post("/_gas-check",  auth, gasCheck);
 
 module.exports = router;
