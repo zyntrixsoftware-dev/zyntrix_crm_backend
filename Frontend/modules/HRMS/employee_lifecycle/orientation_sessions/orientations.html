@@ -200,6 +200,8 @@ textarea{resize:vertical;min-height:70px}
   <div class="nav-section">
     <div class="nav-label">Operations</div>
     <a class="nav-item" href="../../employees/shift-requests.html"><span class="nav-icon">🔄</span> Shift Requests</a>
+    <a class="nav-item" href="../../employees/requests.html"><span class="nav-icon">📨</span> Leave &amp; Requests</a>
+    <a class="nav-item" href="../../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations</a>
     <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
   <div class="sidebar-footer">
@@ -1117,11 +1119,4 @@ function debounceSearch() {
 function toast(msg, type = "info") {
   const w = document.getElementById("toast-wrap");
   const t = document.createElement("div");
-  t.className = "toast " + type;
-  t.textContent = msg;
-  w.appendChild(t);
-  setTimeout(() => t.remove(), 4000);
-}
-</script>
-</body>
-</html>
+  t.className = "toast " + t
