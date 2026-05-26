@@ -38,11 +38,33 @@ async function callGasEmail(payload) {
       redirect: "follow",
     });
     const text = await res.text();
-    console.log("[GAS email]", payload.action, "→", payload.email,
-                "| HTTP", res.status, "|", text.slice(0, 100));
-    return res.ok;
+
+    if (!res.ok) {
+      console.warn("[GAS email] HTTP error →", payload.action, "| HTTP", res.status, "|", text.slice(0, 200));
+      return false;
+    }
+
+    // GAS always returns HTTP 200 even when email sending fails internally.
+    // Parse the JSON body and check the ok flag — this is the real success signal.
+    try {
+      const json = JSON.parse(text);
+      if (json.ok === false) {
+        console.warn("[GAS email] GAS reported failure →", payload.action,
+                     "| error:", json.error || "unknown", "| to:", payload.email);
+        return false;
+      }
+    } catch (_) {
+      // GAS returned non-JSON (e.g. an HTML error page from Google) — treat as failure
+      if (!text.includes('"ok":true') && !text.includes('"ok": true')) {
+        console.warn("[GAS email] non-JSON GAS response →", payload.action, "|", text.slice(0, 200));
+        return false;
+      }
+    }
+
+    console.log("[GAS email] sent ✓ →", payload.action, "→", payload.email, "| HTTP", res.status);
+    return true;
   } catch (err) {
-    console.warn("[GAS email] failed →", payload.action, "|", err.message);
+    console.warn("[GAS email] fetch failed →", payload.action, "|", err.message);
     return false;
   }
 }
