@@ -265,7 +265,7 @@ exports.sendInvite = async (req, res) => {
 
     if (!result.sent) {
       return res.status(502).json({
-        msg: "Orientation invite could not be sent — GAS email service unavailable. Check GAS_WEBAPP_URL and Gmail quota.",
+        msg: "Orientation invite could not be sent — email delivery failed. Check SMTP credentials (EMAIL_USER / EMAIL_PASS) in server environment.",
         reason: result.reason
       });
     }

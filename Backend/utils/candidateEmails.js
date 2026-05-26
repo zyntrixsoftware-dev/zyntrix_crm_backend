@@ -1,189 +1,192 @@
 /**
  * candidateEmails.js
  *
- * Lifecycle email templates the HRMS sends to candidates as they move
- * through the funnel:
+ * Lifecycle emails sent to candidates as they progress through the HRMS:
  *
- *   1. Application Received  -- when imported on Candidates page
- *   2. Shortlisted           -- when shortlisted into the Interview Panel
- *   3. Round Qualified       -- after each interview round passes
- *   4. Round Not Qualified   -- if a round fails
- *   5. Marked for Offer      -- when HR ticks "Offered" on the panel
- *      (informational; the actual signed PDF offer is sent separately)
- *   6. Rejected              -- when HR clicks Reject on candidates page
+ *   1.  Application Received
+ *   2.  Resume Shortlisted
+ *   3a. Round Qualified
+ *   3b. Round Not Qualified
+ *   4.  Marked for Offer
+ *   5.  Offer Letter (PDF attached)
+ *   6.  Rejected
+ *   7.  Onboarded (documents verified, ready to join)
+ *   8.  Orientation Invite (session schedule)
  *
- * ALL emails are sent through Google Apps Script (GAS) via Gmail.
- * No SMTP / nodemailer is used anywhere in this file.
+ * All emails are sent via nodemailer SMTP (Gmail: 500/day).
+ * GAS / GmailApp is no longer used — it had a 100/day quota
+ * that was routinely exhausted.
+ *
+ * Required env vars:
+ *   EMAIL_USER        e.g. kolasanidinesh875@gmail.com
+ *   EMAIL_PASS        Gmail App Password (16-char)
+ *   EMAIL_FROM        (optional) defaults to EMAIL_USER
+ *   EMAIL_SENDER_NAME (optional) defaults to company name
+ *   EMAIL_HOST        smtp.gmail.com
+ *   EMAIL_PORT        587
  */
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GAS EMAIL ROUTER — forwards payload to GAS web app which sends a
-// professional HTML email via Gmail. Returns true if GAS accepted the call.
-// ─────────────────────────────────────────────────────────────────────────────
-async function callGasEmail(payload) {
-  const gasUrl = process.env.GAS_WEBAPP_URL;
-  if (!gasUrl) {
-    console.warn("[candidateEmails] GAS_WEBAPP_URL not set — email skipped:", payload.action);
-    return false;
-  }
+const sendEmail = require("./sendEmail");
+const T         = require("./emailTemplates");
+
+const HR_EMAIL    = "hr@zyntrixsoftware.com";
+const SENDER_NAME = process.env.EMAIL_SENDER_NAME || "Zyntrix Software Solution — HR";
+
+// ── Wrapper: sends an HTML email and normalises the return value ─────────────
+async function _send(to, subject, html, opts = {}) {
   try {
-    // IMPORTANT: Must use "text/plain" not "application/json".
-    // GAS webapps redirect application/json POSTs (302), and Node fetch
-    // follows the redirect as GET — dropping the body. text/plain is
-    // processed directly by GAS without redirect.
-    const res = await fetch(gasUrl, {
-      method  : "POST",
-      headers : { "Content-Type": "text/plain;charset=utf-8" },
-      body    : JSON.stringify(payload),
-      redirect: "follow",
-    });
-    const text = await res.text();
-
-    if (!res.ok) {
-      console.warn("[GAS email] HTTP error →", payload.action, "| HTTP", res.status, "|", text.slice(0, 200));
-      return false;
-    }
-
-    // GAS always returns HTTP 200 even when email sending fails internally.
-    // Parse the JSON body and check the ok flag — this is the real success signal.
-    try {
-      const json = JSON.parse(text);
-      if (json.ok === false) {
-        console.warn("[GAS email] GAS reported failure →", payload.action,
-                     "| error:", json.error || "unknown", "| to:", payload.email);
-        return false;
-      }
-    } catch (_) {
-      // GAS returned non-JSON (e.g. an HTML error page from Google) — treat as failure
-      if (!text.includes('"ok":true') && !text.includes('"ok": true')) {
-        console.warn("[GAS email] non-JSON GAS response →", payload.action, "|", text.slice(0, 200));
-        return false;
-      }
-    }
-
-    console.log("[GAS email] sent ✓ →", payload.action, "→", payload.email, "| HTTP", res.status);
-    return true;
+    await sendEmail(to, subject, "", { html, ...opts });
+    return { sent: true, reason: "via_smtp" };
   } catch (err) {
-    console.warn("[GAS email] fetch failed →", payload.action, "|", err.message);
-    return false;
+    console.error(`[candidateEmails] send failed → ${to} | ${subject} | ${err.message}`);
+    return { sent: false, reason: err.message };
   }
 }
 
-// 1. APPLICATION RECEIVED ----------------------------------------------------
+// ════════════════════════════════════════════════════════════════════════════
+//  1. APPLICATION RECEIVED
+// ════════════════════════════════════════════════════════════════════════════
 async function notifyApplicationReceived(candidate) {
-  const ok = await callGasEmail({
-    action  : "sendApplicationReceived",
-    email   : candidate.email,
+  const { subject, html } = T.applicationReceived({
     fullName: candidate.name       || "Candidate",
     position: candidate.appliedFor || "the role",
   });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
+  return _send(candidate.email, subject, html);
 }
 
-// 2. RESUME SHORTLISTED -------------------------------------------------------
-// Routes through the same GAS "updateCandidate" action that also marks col N
-// in the Sheet and sends the branded shortlist email.
+// ════════════════════════════════════════════════════════════════════════════
+//  2. RESUME SHORTLISTED
+// ════════════════════════════════════════════════════════════════════════════
 async function notifyShortlisted(interview) {
-  const ok = await callGasEmail({
-    action  : "updateCandidate",
-    email   : interview.candidateEmail,
-    fullName: interview.candidateName || "Candidate",
-    position: interview.appliedFor    || "the role",
+  const { subject, html } = T.resumeShortlisted({
+    fullName: interview.candidateName  || "Candidate",
+    position: interview.appliedFor     || "the role",
     phone   : interview.candidatePhone || "",
-  });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
-}
-
-// 3a. ROUND QUALIFIED --------------------------------------------------------
-async function notifyRoundQualified(interview, roundNumber) {
-  const ok = await callGasEmail({
-    action     : "sendRoundQualified",
-    email      : interview.candidateEmail,
-    fullName   : interview.candidateName  || "Candidate",
-    position   : interview.appliedFor     || "the role",
-    roundNumber: roundNumber,
-  });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
-}
-
-// 3b. ROUND NOT QUALIFIED ----------------------------------------------------
-async function notifyRoundNotQualified(interview, roundNumber) {
-  const ok = await callGasEmail({
-    action     : "sendRoundNotQualified",
-    email      : interview.candidateEmail,
-    fullName   : interview.candidateName  || "Candidate",
-    position   : interview.appliedFor     || "the role",
-    roundNumber: roundNumber,
-  });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
-}
-
-// 4. MARKED FOR OFFER --------------------------------------------------------
-// Sent when HR ticks the "Offered" checkbox on the Interview Panel.
-// The formal signed PDF offer arrives separately via the Offer Letters page.
-async function notifyMarkedForOffer(interview) {
-  const ok = await callGasEmail({
-    action  : "sendOffered",
     email   : interview.candidateEmail,
+  });
+  return _send(interview.candidateEmail, subject, html);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  3a. ROUND QUALIFIED
+// ════════════════════════════════════════════════════════════════════════════
+async function notifyRoundQualified(interview, roundNumber) {
+  const { subject, html } = T.roundQualified({
+    fullName   : interview.candidateName || "Candidate",
+    position   : interview.appliedFor    || "the role",
+    roundNumber: roundNumber,
+  });
+  return _send(interview.candidateEmail, subject, html);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  3b. ROUND NOT QUALIFIED
+// ════════════════════════════════════════════════════════════════════════════
+async function notifyRoundNotQualified(interview, roundNumber) {
+  const { subject, html } = T.roundNotQualified({
+    fullName   : interview.candidateName || "Candidate",
+    position   : interview.appliedFor    || "the role",
+    roundNumber: roundNumber,
+  });
+  return _send(interview.candidateEmail, subject, html);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  4. MARKED FOR OFFER
+// ════════════════════════════════════════════════════════════════════════════
+async function notifyMarkedForOffer(interview) {
+  const { subject, html } = T.markedForOffer({
     fullName: interview.candidateName || "Candidate",
     position: interview.appliedFor    || "the role",
   });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
+  return _send(interview.candidateEmail, subject, html);
 }
 
-// 5. REJECTED ----------------------------------------------------------------
+// ════════════════════════════════════════════════════════════════════════════
+//  5. OFFER LETTER (PDF attached)
+//  payload: { email, fullName, position, phone?, hrName?, offerPdfBase64, offerPdfName }
+// ════════════════════════════════════════════════════════════════════════════
+async function notifyOfferLetter(payload) {
+  const { subject, html } = T.offerLetter({
+    fullName        : payload.fullName || "Candidate",
+    position        : payload.position || "the role",
+    hasAttachment   : !!payload.offerPdfBase64,
+    onboardingFormUrl: process.env.ONBOARDING_FORM_URL || "",
+  });
+
+  const opts = {};
+  if (payload.offerPdfBase64 && payload.offerPdfName) {
+    opts.attachments = [{
+      filename   : payload.offerPdfName,
+      content    : Buffer.from(payload.offerPdfBase64, "base64"),
+      contentType: "application/pdf",
+    }];
+  }
+
+  return _send(payload.email, subject, html, opts);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  6. REJECTED
+// ════════════════════════════════════════════════════════════════════════════
 async function notifyRejected(candidate) {
-  const ok = await callGasEmail({
-    action  : "sendRejected",
-    email   : candidate.email,
+  const { subject, html } = T.rejected({
     fullName: candidate.name       || "Candidate",
     position: candidate.appliedFor || "the role",
   });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
+  return _send(candidate.email, subject, html);
 }
 
-// 7. OFFER LETTER (PDF) -------------------------------------------------------
-// Sends the formal offer letter via the GAS web app (Gmail), with the generated
-// PDF attached. Offers go out through Apps Script ONLY — there is deliberately
-// no SMTP fallback here.
-//   payload: { email, fullName, position, phone?, hrName?, offerPdfBase64, offerPdfName }
-async function notifyOfferLetter(payload) {
-  const ok = await callGasEmail({ action: "sendOfferLetter", ...payload });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
-}
-
-
-// 8. ONBOARDED — documents verified, candidate is ready to join ---------------
-// Triggered when HR clicks "Mark Onboarded" on the onboarding page.
+// ════════════════════════════════════════════════════════════════════════════
+//  7. ONBOARDED — documents verified, ready to join
+// ════════════════════════════════════════════════════════════════════════════
 async function notifyOnboarded(ob) {
-  const ok = await callGasEmail({
-    action     : "sendOnboarded",
-    email      : ob.candidateEmail,
-    fullName   : ob.candidateName  || "Candidate",
-    position   : ob.position       || "the role",
-    joiningDate: ob.joiningDate
-      ? new Date(ob.joiningDate).toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" })
-      : "",
+  const joiningDate = ob.joiningDate
+    ? new Date(ob.joiningDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : "";
+  const { subject, html } = T.onboarded({
+    fullName   : ob.candidateName || "Candidate",
+    position   : ob.position      || "the role",
+    joiningDate,
   });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
+  return _send(ob.candidateEmail, subject, html);
 }
 
-// 9. ORIENTATION INVITE — full session schedule emailed to the candidate ----------
-// sessions: [{ title, description, date, startTime, endTime, mode, venue, facilitator, isMandatory }]
+// ════════════════════════════════════════════════════════════════════════════
+//  8. ORIENTATION INVITE — full session schedule
+//  orientation: Orientation model doc
+//  sessions: [OrientationSession docs]
+// ════════════════════════════════════════════════════════════════════════════
 async function notifyOrientationInvite(orientation, sessions) {
-  const ok = await callGasEmail({
-    action      : "sendOrientationInvite",
-    email       : orientation.candidateEmail,
+  const joiningDate = orientation.joiningDate
+    ? new Date(orientation.joiningDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : "";
+
+  // Normalise session objects for the template
+  const sessionList = (sessions || []).map(s => ({
+    title        : s.title         || "Orientation Session",
+    scheduledDate: s.scheduledDate || "",
+    startTime    : s.startTime     || "",
+    endTime      : s.endTime       || "",
+    mode         : s.mode          || "in_person",
+    venue        : s.venue         || "",
+    facilitator  : s.facilitator   || "",
+    isMandatory  : s.isMandatory !== false,
+  }));
+
+  const { subject, html } = T.orientationInvite({
     fullName    : orientation.candidateName  || "Candidate",
     position    : orientation.position       || "the role",
-    joiningDate : orientation.joiningDate    || "",
+    joiningDate,
     mentorName  : orientation.mentorName     || "",
     mentorEmail : orientation.mentorEmail    || "",
-    sessions    : sessions || [],
+    sessions    : sessionList,
   });
-  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
+
+  return _send(orientation.candidateEmail, subject, html);
 }
 
+// ════════════════════════════════════════════════════════════════════════════
 module.exports = {
   notifyApplicationReceived,
   notifyShortlisted,

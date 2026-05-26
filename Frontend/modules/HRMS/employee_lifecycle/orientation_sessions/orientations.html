@@ -390,7 +390,7 @@ textarea{resize:vertical;min-height:70px}
         <div class="invite-preview" id="invite-preview">—</div>
 
         <div style="margin-top:14px;padding:12px 16px;background:rgba(79,156,249,0.07);border:1px solid rgba(79,156,249,0.2);border-radius:8px;font-size:12px;color:var(--text2);">
-          📧 Will be sent to <strong id="invite-to">—</strong> via GAS/Gmail with the full session schedule.
+          📧 Will be sent to <strong id="invite-to">—</strong> via email with the full orientation schedule.
         </div>
 
         <div id="invite-sent-row" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(34,197,94,0.08);border-radius:8px;font-size:12px;color:var(--green);">
@@ -526,12 +526,13 @@ async function loadOrientations() {
   setRefreshing(true);
   const search = document.getElementById("search-input").value.trim();
   const status = document.getElementById("status-filter").value;
-  let url = "/api/hr/orientation?";
+  let url = "/hr/orientation?";
   if (search) url += "search=" + encodeURIComponent(search) + "&";
   if (status) url += "status=" + encodeURIComponent(status) + "&";
 
   try {
     const data = await apiRequest(url);
+    if (data.error) throw new Error(data.msg || "Server error");
     const list  = data.orientations || [];
     const stats = data.stats || {};
 
@@ -602,7 +603,8 @@ function renderTable(list) {
 // ─── LOAD SESSIONS ────────────────────────────────────────────────────────────
 async function loadSessions() {
   try {
-    const data = await apiRequest("/api/hr/orientation/sessions/all");
+    const data = await apiRequest("/hr/orientation/sessions/all");
+    if (data.error) throw new Error(data.msg || "Server error");
     allSessions = data.sessions || data || [];
     renderSessionsPanel();
   } catch (err) {
@@ -643,7 +645,7 @@ function renderSessionsPanel() {
 // ─── LOAD EMPLOYEES (mentor datalist) ────────────────────────────────────────
 async function loadEmployees() {
   try {
-    const data = await apiRequest("/api/hr/employees");
+    const data = await apiRequest("/hr/employees");
     const list = data.employees || data || [];
     const dl = document.getElementById("emp-dl");
     dl.innerHTML = list.map(e =>
@@ -662,7 +664,8 @@ async function openDetailModal(id) {
   document.getElementById("dm-sub").textContent  = "";
 
   try {
-    const data = await apiRequest("/api/hr/orientation/" + id);
+    const data = await apiRequest("/hr/orientation/" + id);
+    if (data.error) throw new Error(data.msg || "Server error");
     currentOrient = data.orientation || data;
     fillDetailModal(currentOrient);
   } catch(err) {
@@ -771,7 +774,8 @@ async function saveMentor() {
       orientationStatus: document.getElementById("dm-status").value,
       notes:             document.getElementById("dm-notes").value.trim(),
     };
-    const res = await apiRequest("/api/hr/orientation/" + currentOrient._id, "PATCH", payload);
+    const res = await apiRequest("/hr/orientation/" + currentOrient._id, "PATCH", payload);
+    if (res.error) throw new Error(res.msg || "Save failed");
     const updated = res.orientation || res;
     // Merge into currentOrient without losing populated sessionIds
     Object.assign(currentOrient, {
@@ -797,11 +801,11 @@ async function saveSessionEnroll() {
   const btn = document.getElementById("save-sessions-btn");
   btn.disabled = true; btn.textContent = "Saving…";
   try {
-    await apiRequest("/api/hr/orientation/" + currentOrient._id, "PATCH", {
+    await apiRequest("/hr/orientation/" + currentOrient._id, "PATCH", {
       sessionIds: enrollSelected
     });
     // Re-fetch the full orientation to get populated sessionIds for the invite preview
-    const fresh = await apiRequest("/api/hr/orientation/" + currentOrient._id);
+    const fresh = await apiRequest("/hr/orientation/" + currentOrient._id);
     currentOrient = fresh.orientation || fresh;
     // Rebuild enroll list from fresh data
     const enrolledIds = (currentOrient.sessionIds || []).map(s =>
@@ -876,7 +880,7 @@ async function toggleChecklist(itemId, currentDone) {
   try {
     // Send explicit done value — backend also supports toggle-if-absent
     const res = await apiRequest(
-      `/api/hr/orientation/${currentOrient._id}/checklist/${itemId}`,
+      `/hr/orientation/${currentOrient._id}/checklist/${itemId}`,
       "PATCH",
       { done: newDone }
     );
@@ -954,7 +958,8 @@ async function sendInvite() {
   msg.textContent = ""; msg.style.color = "";
 
   try {
-    await apiRequest("/api/hr/orientation/" + currentOrient._id + "/send-invite", "POST", {});
+    const res = await apiRequest("/hr/orientation/" + currentOrient._id + "/send-invite", "POST", {});
+    if (res.error) throw new Error(res.msg || "Send failed");
     toast("Invite sent! ✓", "ok");
     msg.textContent = "Sent ✓"; msg.style.color = "var(--green)";
     currentOrient.inviteSentAt     = new Date().toISOString();
@@ -1038,10 +1043,10 @@ async function saveSession() {
 
   try {
     if (id) {
-      await apiRequest("/api/hr/orientation/sessions/" + id, "PATCH", payload);
+      await apiRequest("/hr/orientation/sessions/" + id, "PATCH", payload);
       toast("Session updated ✓", "ok");
     } else {
-      await apiRequest("/api/hr/orientation/sessions", "POST", payload);
+      await apiRequest("/hr/orientation/sessions", "POST", payload);
       toast("Session created ✓", "ok");
     }
     closeModal("session-modal");
@@ -1066,7 +1071,7 @@ async function deleteSession() {
   if (!id) return;
   if (!confirm("Delete this session? It will be removed from all enrolled candidates.")) return;
   try {
-    await apiRequest("/api/hr/orientation/sessions/" + id, "DELETE");
+    await apiRequest("/hr/orientation/sessions/" + id, "DELETE");
     toast("Session deleted.", "info");
     closeModal("session-modal");
     await loadSessions();
