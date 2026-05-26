@@ -126,6 +126,22 @@ async function notifyOfferLetter(payload) {
   return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
 }
 
+
+// 8. ONBOARDED — documents verified, candidate is ready to join ---------------
+// Triggered when HR clicks "Mark Onboarded" on the onboarding page.
+async function notifyOnboarded(ob) {
+  const ok = await callGasEmail({
+    action     : "sendOnboarded",
+    email      : ob.candidateEmail,
+    fullName   : ob.candidateName  || "Candidate",
+    position   : ob.position       || "the role",
+    joiningDate: ob.joiningDate
+      ? new Date(ob.joiningDate).toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" })
+      : "",
+  });
+  return { sent: ok, reason: ok ? "via_gas" : "gas_unavailable" };
+}
+
 module.exports = {
   notifyApplicationReceived,
   notifyShortlisted,
@@ -133,5 +149,6 @@ module.exports = {
   notifyRoundNotQualified,
   notifyMarkedForOffer,
   notifyOfferLetter,
-  notifyRejected
+  notifyRejected,
+  notifyOnboarded
 };

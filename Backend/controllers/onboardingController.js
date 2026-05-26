@@ -1,4 +1,5 @@
 const Onboarding  = require("../models/Onboarding");
+const { notifyOnboarded } = require("../utils/candidateEmails");
 const OfferLetter = require("../models/OfferLetter");
 const Interview   = require("../models/Interview");
 
@@ -209,6 +210,13 @@ exports.updateStatus = async (req, res) => {
     ob.onboardingStatus = status;
     if (status === "onboarded" && !ob.onboardedAt) ob.onboardedAt = new Date();
     await ob.save();
+
+    // Fire onboarding-complete email when HR marks the candidate as onboarded
+    if (status === "onboarded") {
+      notifyOnboarded(ob).catch(err =>
+        console.warn("[updateStatus] onboarded email failed:", err.message)
+      );
+    }
 
     return res.json({ msg: "Status updated", onboarding: ob });
   } catch (err) {
