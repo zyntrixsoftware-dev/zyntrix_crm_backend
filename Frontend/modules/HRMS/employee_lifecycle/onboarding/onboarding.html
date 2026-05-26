@@ -1064,13 +1064,105 @@ async function syncSheet(sheetUrl, silent) {
   if (!sheetUrl) return false;
   if (!silent) setSyncStatus("🔄 Syncing from Google Sheet…", "var(--teal)");
   try {
-    const result = await apiFetch("/hr/onboarding/sync-sheet", {
+    // ── Step 1: Build the published CSV URL from the sheet URL ────────────────
+    const idMatch = sheetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (!idMatch) throw new Error("Invalid Google Sheets URL");
+    const sheetId = idMatch[1];
+    const gidMatch = sheetUrl.match(/[?&]gid=(\d+)/);
+    const gidParam  = gidMatch ? `&gid=${gidMatch[1]}&single=true` : "";
+    const csvUrl    = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv${gidParam}`;
+
+    // ── Step 2: Fetch CSV directly from the browser (avoids server-side fetch) ─
+    const resp = await fetch(csvUrl);
+    if (!resp.ok) throw new Error(`Google returned HTTP ${resp.status}`);
+    const csvText = await resp.text();
+    const ct = resp.headers.get("content-type") || "";
+    if (ct.includes("text/html") || csvText.trimStart().startsWith("<!DOCTYPE") || csvText.trimStart().startsWith("<html")) {
+      toast("⚠️ Sheet not readable — make sure it's published: File → Share → Publish to web → Form Responses 1 → CSV", true);
+      setSyncStatus("⚠ Sheet not published", "var(--amber)");
+      setTimeout(clearSyncStatus, 6000);
+      return false;
+    }
+
+    // ── Step 3: Parse CSV ──────────────────────────────────────────────────────
+    function splitLine(line) {
+      const cols = []; let cur = "", inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; continue; }
+        if (ch === ',' && !inQ) { cols.push(cur); cur = ""; continue; }
+        cur += ch;
+      }
+      cols.push(cur);
+      return cols.map(c => c.trim());
+    }
+    const lines = csvText.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) {
+      if (!silent) { setSyncStatus("✅ Sheet is empty", "var(--green)"); setTimeout(clearSyncStatus, 3000); }
+      return true;
+    }
+    const headers = splitLine(lines[0]);
+
+    // ── Step 4: Map columns to document keys ──────────────────────────────────
+    function findCol(...kws) { return headers.find(h => kws.some(k => h.toLowerCase().trim().includes(k))); }
+    function docKey(h) {
+      const lh = h.toLowerCase().trim();
+      if (lh.includes("10th") || lh.includes("ssc"))                return "tenthMarksheet";
+      if (lh.includes("12th") || lh.includes("hsc"))                return "twelfthMarksheet";
+      if (lh.includes("post") && lh.includes("grad"))               return "postGraduationCert";
+      if (lh.includes("grad") || lh.includes("degree"))             return "graduationCert";
+      if (lh.includes("passport"))                                   return "passportPhoto";
+      if (lh.includes("government")||lh.includes("pan")||
+          lh.includes("voter")||lh.includes("driving")||
+          lh.includes("govt"))                                       return "governmentId";
+      if (lh.includes("bank")||lh.includes("passbook")||
+          lh.includes("account"))                                    return "bankDetails";
+      if (lh.includes("accept")||lh.includes("confirmation"))       return "acceptanceLetter";
+      return null;
+    }
+    const emailCol     = findCol("email");
+    const nameCol      = findCol("full name", "name");
+    const positionCol  = findCol("position", "applied for", "role");
+    const timestampCol = findCol("timestamp", "submitted", "date");
+    if (!emailCol) throw new Error("No email column found in sheet");
+    const docColMap = {};
+    headers.forEach(h => { const k = docKey(h); if (k) docColMap[k] = h; });
+
+    // ── Step 5: Build candidates array ────────────────────────────────────────
+    const candidates = [];
+    for (const line of lines.slice(1)) {
+      const cols = splitLine(line);
+      const row  = {};
+      headers.forEach((h, i) => { row[h] = (cols[i] || "").trim(); });
+      const email = (row[emailCol] || "").trim().toLowerCase();
+      if (!email) continue;
+      const docs = {};
+      Object.entries(docColMap).forEach(([key, col]) => {
+        const url = (row[col] || "").trim();
+        if (url) docs[key] = url;
+      });
+      candidates.push({
+        candidateEmail: email,
+        candidateName:  nameCol      ? (row[nameCol]      || "").trim() : "",
+        position:       positionCol  ? (row[positionCol]  || "").trim() : "",
+        submittedAt:    timestampCol ? (row[timestampCol] || "")        : "",
+        documents: docs
+      });
+    }
+    if (!candidates.length) {
+      if (!silent) { setSyncStatus("✅ No rows found", "var(--green)"); setTimeout(clearSyncStatus, 3000); }
+      return true;
+    }
+
+    // ── Step 6: POST parsed data to the import endpoint ───────────────────────
+    const result = await apiFetch("/hr/onboarding/import", {
       method: "POST",
-      body: JSON.stringify({ sheetUrl })
+      body: JSON.stringify({ candidates })
     });
     if (!silent) {
-      const msg = result.synced > 0
-        ? `✅ Synced ${result.synced} record${result.synced !== 1 ? "s" : ""} from sheet`
+      const synced = (result.results || []).filter(r => r.status !== "skipped").length;
+      const msg = synced > 0
+        ? `✅ Synced ${synced} record${synced !== 1 ? "s" : ""} from sheet`
         : "✅ Sheet up to date";
       setSyncStatus(msg, "var(--green)");
       setTimeout(clearSyncStatus, 4000);
