@@ -8,6 +8,12 @@ const {
 
 router.use(auth);
 
+// ── Orientation sessions — MUST be declared before /:id routes ───
+router.get   ("/orientation/sessions/all",                 listSessions);
+router.post  ("/orientation/sessions",                     createSession);
+router.patch ("/orientation/sessions/:sid",                updateSession);
+router.delete("/orientation/sessions/:sid",                deleteSession);
+
 // ── Orientation records (per candidate) ──────────────────────────
 router.get   ("/orientation",                              list);
 router.post  ("/orientation",                              create);
@@ -15,11 +21,5 @@ router.get   ("/orientation/:id",                          getOne);
 router.patch ("/orientation/:id",                          update);
 router.post  ("/orientation/:id/send-invite",              sendInvite);
 router.patch ("/orientation/:id/checklist/:itemId",        updateChecklist);
-
-// ── Orientation sessions (schedule / agenda) ─────────────────────
-router.get   ("/orientation/sessions/all",                 listSessions);
-router.post  ("/orientation/sessions",                     createSession);
-router.patch ("/orientation/sessions/:id",                 updateSession);
-router.delete("/orientation/sessions/:id",                 deleteSession);
 
 module.exports = router;

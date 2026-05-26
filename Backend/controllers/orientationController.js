@@ -1,5 +1,6 @@
 const Orientation        = require("../models/Orientation");
 const OrientationSession = require("../models/OrientationSession");
+const Onboarding         = require("../models/Onboarding");
 const User               = require("../models/user");
 const { notifyOrientationInvite } = require("../utils/candidateEmails");
 
@@ -35,10 +36,53 @@ exports.list = async (req, res) => {
       ];
     }
 
-    const records = await Orientation.find(query)
+    let records = await Orientation.find(query)
       .populate("mentorId", "name email designation department")
       .populate("sessionIds", "title scheduledDate startTime endTime mode venue facilitator isMandatory status")
       .sort({ createdAt: -1 });
+
+    // ── Auto-sync: create orientation records for any onboarded candidates
+    //    that don't have one yet (covers candidates onboarded before this
+    //    feature was introduced, or cases where autoCreate failed silently).
+    try {
+      const onboardedList = await Onboarding.find({ onboardingStatus: "onboarded" })
+        .select("_id candidateEmail candidateName position department joiningDate");
+
+      const existingEmails = new Set(records.map(r => r.candidateEmail.toLowerCase()));
+      const missing = onboardedList.filter(ob =>
+        ob.candidateEmail && !existingEmails.has(ob.candidateEmail.toLowerCase())
+      );
+
+      if (missing.length) {
+        const mandatory = await OrientationSession.find({ isMandatory: true, status: "upcoming" }).select("_id");
+        for (const ob of missing) {
+          try {
+            const newOr = await Orientation.create({
+              onboardingId:   ob._id,
+              candidateEmail: ob.candidateEmail.toLowerCase().trim(),
+              candidateName:  ob.candidateName  || "",
+              position:       ob.position       || "",
+              department:     ob.department     || "",
+              joiningDate:    ob.joiningDate    || "",
+            });
+            if (mandatory.length) {
+              newOr.sessionIds = mandatory.map(s => s._id);
+              await newOr.save();
+            }
+            console.log("[Orientation list] auto-synced:", ob.candidateEmail);
+          } catch (e) {
+            // Duplicate key or other — skip silently
+          }
+        }
+        // Re-fetch so the new records appear in the response
+        records = await Orientation.find(query)
+          .populate("mentorId", "name email designation department")
+          .populate("sessionIds", "title scheduledDate startTime endTime mode venue facilitator isMandatory status")
+          .sort({ createdAt: -1 });
+      }
+    } catch (syncErr) {
+      console.warn("[Orientation list] auto-sync failed:", syncErr.message);
+    }
 
     // Compute stats
     const all = await Orientation.find({});
@@ -148,6 +192,13 @@ exports.update = async (req, res) => {
       }
     }
 
+    // Allow direct mentor name / email update when no mentorId is provided
+    // (HR types the name manually or picks from a non-User list)
+    if (req.body.mentorId === undefined) {
+      if (req.body.mentorName  !== undefined) or.mentorName  = req.body.mentorName;
+      if (req.body.mentorEmail !== undefined) or.mentorEmail = req.body.mentorEmail;
+    }
+
     const simple = ["notes", "joiningDate", "orientationStatus"];
     simple.forEach(f => { if (req.body[f] !== undefined) or[f] = req.body[f]; });
 
@@ -244,8 +295,10 @@ exports.updateChecklist = async (req, res) => {
     const item = or.taskChecklist.id(req.params.itemId);
     if (!item) return res.status(404).json({ msg: "Checklist item not found" });
 
-    const { done, note } = req.body;
-    item.done   = !!done;
+    const { note } = req.body;
+    // If `done` is explicitly sent use it; otherwise toggle current state
+    const done = req.body.done !== undefined ? !!req.body.done : !item.done;
+    item.done   = done;
     item.doneAt = done ? new Date() : null;
     if (note !== undefined) item.note = String(note).slice(0, 300);
 
@@ -368,7 +421,7 @@ exports.updateSession = async (req, res) => {
     allowed.forEach(f => { if (req.body[f] !== undefined) update[f] = req.body[f]; });
 
     const session = await OrientationSession.findByIdAndUpdate(
-      req.params.id, update, { new: true, runValidators: true }
+      req.params.sid || req.params.id, update, { new: true, runValidators: true }
     );
     if (!session) return res.status(404).json({ msg: "Session not found" });
     return res.json({ msg: "Session updated", session });
@@ -386,7 +439,7 @@ exports.deleteSession = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    const session = await OrientationSession.findByIdAndDelete(req.params.id);
+    const session = await OrientationSession.findByIdAndDelete(req.params.sid || req.params.id);
     if (!session) return res.status(404).json({ msg: "Session not found" });
 
     // Remove from all enrolments

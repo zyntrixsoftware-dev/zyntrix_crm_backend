@@ -35,8 +35,7 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
 .nav-divider{height:1px;background:var(--border);margin:8px 10px}
 .sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
-.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
-.user-pill:hover{background:var(--border)}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
 .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
 .page-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
 .breadcrumb{font-size:12px;color:var(--text3)}
@@ -47,26 +46,26 @@ html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(-
 .topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
 .topbar-btn:hover{background:var(--navy3)}
 .topbar-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.topbar-btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.topbar-btn.primary:hover{background:var(--accent)}
 /* KPI */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:14px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:14px;animation:fadeUp .3s ease both}
 .kpi-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .kpi-val{font-size:26px;font-weight:600;line-height:1}
 .kpi-lbl{font-size:12px;color:var(--text3);margin-top:3px}
-/* Two-column layout */
+/* Layout */
 .two-col{display:grid;grid-template-columns:2fr 1fr;gap:16px}
 /* Card */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;animation:fadeUp .3s ease both}
 .card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px}
 .card-title{font-size:14px;font-weight:600;color:var(--text)}
 .card-sub{font-size:12px;color:var(--text3);margin-top:2px}
 /* Table */
 table{width:100%;border-collapse:collapse}
-th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:0 14px 10px;white-space:nowrap}
 td{padding:11px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
 tr:first-child td{border-top:none}
-tr:hover td{background:rgba(255,255,255,.02);cursor:pointer}
+tr.clickable:hover td{background:rgba(255,255,255,.025);cursor:pointer}
 .td-main{font-weight:500;color:var(--text)}
 /* Badge */
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
@@ -77,28 +76,27 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer}
 .b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
 .b-teal{background:rgba(45,212,191,0.13);color:var(--teal)}
 .b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
-/* Progress bar */
+/* Progress */
 .prog-bar{height:5px;background:var(--navy4);border-radius:3px;overflow:hidden;width:70px}
 .prog-fill{height:100%;border-radius:3px;transition:width .3s}
-/* Session panel */
+/* Session panel item */
 .session-item{padding:14px;border-radius:10px;background:var(--navy3);border:1px solid var(--border);margin-bottom:10px;cursor:pointer;transition:border-color .15s}
-.session-item:hover{border-color:rgba(59,130,246,0.35)}
+.session-item:hover{border-color:rgba(59,130,246,0.4)}
 .session-item-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px}
 .session-item-meta{font-size:11px;color:var(--text3);display:flex;flex-wrap:wrap;gap:8px}
-.session-item-meta span{display:flex;align-items:center;gap:3px}
-/* Overlay / Modal */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+/* Overlay/Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
 .overlay.open{display:flex}
-.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:600px;max-width:95vw;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column}
-.modal-lg{width:680px}
-.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--navy2);z-index:1}
-.modal-title{font-size:15px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:640px;max-width:96vw;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--navy2);z-index:2}
+.modal-title{font-size:15px;font-weight:600;color:var(--text)}
+.modal-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1;flex-shrink:0;padding:0 0 0 12px}
 .modal-close:hover{color:var(--text)}
 .modal-body{padding:22px 24px;flex:1}
-.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--navy2)}
+.modal-ft{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--navy2);z-index:2}
 /* Tabs */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
 .tab{padding:9px 18px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font)}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent2)}
 .tab-panel{display:none}
@@ -106,7 +104,6 @@ tr:hover td{background:rgba(255,255,255,.02);cursor:pointer}
 /* Form */
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.fg:last-child{margin-bottom:0}
 label{font-size:12px;font-weight:500;color:var(--text2)}
 input,select,textarea{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
@@ -116,57 +113,51 @@ textarea{resize:vertical;min-height:70px}
 .btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
 .btn:hover{background:var(--navy3)}
 .btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent)}
 .btn.danger{background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.3);color:var(--rose)}
 .btn.danger:hover{background:rgba(244,63,94,0.22)}
-.btn.success{background:rgba(34,197,94,0.13);border-color:rgba(34,197,94,0.3);color:var(--green)}
-.btn.success:hover{background:rgba(34,197,94,0.22)}
 .btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
-.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 /* Checklist */
-.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .15s}
+.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .15s;user-select:none}
 .checklist-item:last-child{border-bottom:none}
-.checklist-item.done{opacity:0.55}
-.checklist-cb{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);background:var(--navy3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:2px}
-.checklist-item.done .checklist-cb{background:var(--green);border-color:var(--green);color:#fff}
-.checklist-text{flex:1}
-.checklist-title{font-size:13px;font-weight:500;color:var(--text)}
-.checklist-item.done .checklist-title{text-decoration:line-through;color:var(--text3)}
-.checklist-cat{font-size:11px;color:var(--text3);margin-top:1px}
-/* Session select checkboxes */
-.session-check-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:var(--navy3);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:border-color .15s}
-.session-check-item:hover{border-color:var(--border2)}
-.session-check-item.selected{border-color:var(--accent2);background:rgba(59,130,246,0.07)}
+.checklist-item.done{opacity:.5}
+.chk-box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);background:var(--navy3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .2s;margin-top:2px}
+.checklist-item.done .chk-box{background:var(--green);border-color:var(--green);color:#fff}
+.chk-label{font-size:13px;font-weight:500;color:var(--text)}
+.checklist-item.done .chk-label{text-decoration:line-through;color:var(--text3)}
+.chk-cat{font-size:11px;color:var(--text3);margin-top:1px}
+/* Session enroll checkboxes */
+.sess-pick{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:var(--navy3);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:border-color .15s;user-select:none}
+.sess-pick:hover{border-color:var(--border2)}
+.sess-pick.on{border-color:var(--accent2);background:rgba(59,130,246,0.07)}
+.sess-pick-cb{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);background:var(--navy4);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .2s}
+.sess-pick.on .sess-pick-cb{background:var(--accent2);border-color:var(--accent2);color:#fff}
+/* Invite preview */
+.invite-preview{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:16px;font-size:12px;color:var(--text2);line-height:1.8;max-height:260px;overflow-y:auto}
+.invite-preview strong{color:var(--text)}
+/* Section label */
+.sec-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:18px 0 8px}
+.sec-lbl:first-child{margin-top:0}
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--navy3);border-radius:8px;border:1px solid var(--border);margin-bottom:14px}
+.tog{position:relative;width:40px;height:22px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tog-sl{position:absolute;inset:0;background:var(--navy4);border-radius:11px;cursor:pointer;transition:.2s}
+.tog-sl::before{content:'';position:absolute;height:16px;width:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.tog input:checked+.tog-sl{background:var(--accent2)}
+.tog input:checked+.tog-sl::before{transform:translateX(18px)}
 /* Toast */
 #toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
 .toast{padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;color:#fff;display:flex;align-items:center;gap:8px;animation:slideIn .25s ease;box-shadow:0 4px 16px rgba(0,0,0,.3)}
-.toast.success{background:#166534}
-.toast.error{background:#7f1d1d}
-.toast.info{background:#1e3a5f}
-@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
-/* Empty state */
-.empty{text-align:center;padding:40px 20px;color:var(--text3)}
-.empty-icon{font-size:40px;margin-bottom:12px}
+.toast.ok{background:#166534}.toast.err{background:#7f1d1d}.toast.info{background:#1e3a5f}
+/* Empty */
+.empty{text-align:center;padding:36px 20px;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:10px}
 /* Scrollbar */
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.card{animation:fadeUp .3s ease both}
-.kpi-card{animation:fadeUp .3s ease both}
-/* Send invite preview box */
-.invite-preview{background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:16px;font-size:12px;color:var(--text2);line-height:1.7;max-height:250px;overflow-y:auto}
-.invite-preview strong{color:var(--text)}
-/* Section divider */
-.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px}
-/* mandatory toggle */
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--navy3);border-radius:8px;border:1px solid var(--border)}
-.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:var(--navy4);border-radius:11px;cursor:pointer;transition:.2s}
-.toggle-slider::before{content:'';position:absolute;height:16px;width:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
-.toggle input:checked+.toggle-slider{background:var(--accent2)}
-.toggle input:checked+.toggle-slider::before{transform:translateX(18px)}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
 </style>
 <script src="../../../../assets/js/api.js"></script>
 <script src="../../../../assets/js/auth.js?v=3"></script>
@@ -174,11 +165,12 @@ textarea{resize:vertical;min-height:70px}
 <body>
 <script>requireAuth(); requireModuleAccess("hr");</script>
 <div class="shell">
-<!-- SIDEBAR -->
+
+<!-- ═══ SIDEBAR ═════════════════════════════════════════════════════ -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-icon">👥</div>
-    <div><div class="brand-name">HRMS Pro</div><div class="brand-ver">v2.5 · 2025</div></div>
+    <div><div class="brand-name">HRMS Pro</div><div class="brand-ver">v2.5</div></div>
   </div>
   <div class="nav-section">
     <div class="nav-label">Overview</div>
@@ -200,7 +192,7 @@ textarea{resize:vertical;min-height:70px}
     <div class="nav-label">Employee Lifecycle</div>
     <a class="nav-item" href="../offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
     <a class="nav-item" href="../onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
-    <a class="nav-item active" href="../orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
+    <a class="nav-item active" href="orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
     <a class="nav-item" href="../offboarding/offboarding.html"><span class="nav-icon">🚪</span> Offboarding</a>
   </div>
   <div class="nav-divider"></div>
@@ -210,27 +202,27 @@ textarea{resize:vertical;min-height:70px}
     <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
   <div class="sidebar-footer">
-    <div class="user-pill" id="user-pill">
+    <div class="user-pill">
       <div class="avatar" id="user-avatar">HR</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:500;color:var(--text);" id="user-name">Loading…</div>
         <div style="font-size:11px;color:var(--text3);" id="user-role">HR</div>
       </div>
-      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+      <button onclick="logout()" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;transition:all .15s" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
     </div>
   </div>
 </aside>
 
-<!-- MAIN -->
+<!-- ═══ MAIN ══════════════════════════════════════════════════════ -->
 <div class="main">
   <div class="topbar">
-    <div>
+    <div style="flex:1">
       <div class="page-title">Orientation Management</div>
-      <div class="breadcrumb">HRMS Pro <span>›</span> Employee Lifecycle <span>›</span> Orientations</div>
+      <div class="breadcrumb">HRMS <span>›</span> Employee Lifecycle <span>›</span> Orientations</div>
     </div>
     <div class="search-box">
       <span>🔍</span>
-      <input type="text" id="search-input" placeholder="Search by candidate name, email…" oninput="debounceSearch()">
+      <input type="text" id="search-input" placeholder="Search candidate name or email…" oninput="debounceSearch()">
     </div>
     <select id="status-filter" onchange="loadOrientations()" style="width:140px;background:var(--navy3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none">
       <option value="">All Statuses</option>
@@ -239,7 +231,7 @@ textarea{resize:vertical;min-height:70px}
       <option value="in_progress">In Progress</option>
       <option value="completed">Completed</option>
     </select>
-    <button class="topbar-btn primary" onclick="openSessionModal()">＋ Add Session</button>
+    <button class="topbar-btn primary" onclick="openSessionModal(null)">＋ Add Session</button>
   </div>
 
   <div class="content">
@@ -247,45 +239,33 @@ textarea{resize:vertical;min-height:70px}
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-icon" style="background:rgba(79,156,249,0.12);">🎓</div>
-        <div>
-          <div class="kpi-val" id="kpi-total" style="color:var(--accent);">—</div>
-          <div class="kpi-lbl">Total Orientations</div>
-        </div>
+        <div><div class="kpi-val" id="kpi-total" style="color:var(--accent);">—</div><div class="kpi-lbl">Total Orientations</div></div>
       </div>
       <div class="kpi-card">
         <div class="kpi-icon" style="background:rgba(245,158,11,0.12);">⏳</div>
-        <div>
-          <div class="kpi-val" id="kpi-pending" style="color:var(--amber);">—</div>
-          <div class="kpi-lbl">Pending Invite</div>
-        </div>
+        <div><div class="kpi-val" id="kpi-pending" style="color:var(--amber);">—</div><div class="kpi-lbl">Pending Invite</div></div>
       </div>
       <div class="kpi-card">
         <div class="kpi-icon" style="background:rgba(167,139,250,0.12);">📧</div>
-        <div>
-          <div class="kpi-val" id="kpi-invited" style="color:var(--purple);">—</div>
-          <div class="kpi-lbl">Invited</div>
-        </div>
+        <div><div class="kpi-val" id="kpi-invited" style="color:var(--purple);">—</div><div class="kpi-lbl">Invited / In Progress</div></div>
       </div>
       <div class="kpi-card">
         <div class="kpi-icon" style="background:rgba(34,197,94,0.12);">✅</div>
-        <div>
-          <div class="kpi-val" id="kpi-completed" style="color:var(--green);">—</div>
-          <div class="kpi-lbl">Completed</div>
-        </div>
+        <div><div class="kpi-val" id="kpi-completed" style="color:var(--green);">—</div><div class="kpi-lbl">Completed</div></div>
       </div>
     </div>
 
-    <!-- MAIN TWO-COLUMN -->
+    <!-- TWO-COLUMN -->
     <div class="two-col">
 
-      <!-- LEFT: Candidate Orientations Table -->
+      <!-- LEFT: Candidate table -->
       <div class="card" style="overflow:hidden;">
         <div class="card-hd">
           <div>
             <div class="card-title">Candidate Orientations</div>
-            <div class="card-sub">Auto-created when candidate is marked onboarded</div>
+            <div class="card-sub">Auto-populated from all onboarded candidates</div>
           </div>
-          <button class="btn btn-sm" onclick="loadOrientations()" title="Refresh">↻ Refresh</button>
+          <button class="btn btn-sm" onclick="loadOrientations()" id="refresh-btn">↻ Refresh</button>
         </div>
         <div style="overflow-x:auto;">
           <table>
@@ -293,12 +273,12 @@ textarea{resize:vertical;min-height:70px}
               <tr>
                 <th>Candidate</th>
                 <th>Position</th>
-                <th>Joining Date</th>
+                <th>Joining</th>
                 <th>Mentor</th>
                 <th>Sessions</th>
                 <th>Checklist</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="orient-tbody">
@@ -308,122 +288,129 @@ textarea{resize:vertical;min-height:70px}
         </div>
       </div>
 
-      <!-- RIGHT: Sessions Panel -->
+      <!-- RIGHT: Sessions panel -->
       <div>
         <div class="card-hd" style="margin-bottom:12px;">
           <div>
             <div class="card-title" style="font-size:15px;">Orientation Sessions</div>
-            <div class="card-sub">Reusable session library</div>
+            <div class="card-sub">Session library (click to edit)</div>
           </div>
-          <button class="btn btn-sm primary" onclick="openSessionModal()">＋ Add</button>
+          <button class="btn btn-sm primary" onclick="openSessionModal(null)">＋ Add</button>
         </div>
         <div id="sessions-panel">
-          <div class="empty"><div class="empty-icon">📚</div>Loading sessions…</div>
+          <div class="empty"><div class="empty-icon">📚</div>Loading…</div>
         </div>
       </div>
 
     </div>
   </div>
-</div>
-</div>
+</div><!-- /main -->
+</div><!-- /shell -->
 
-<!-- ═══════════════════════════════════════════════════════
-     DETAIL MODAL — 3 tabs: Mentor & Sessions | Checklist | Send Invite
-════════════════════════════════════════════════════════ -->
-<div class="overlay" id="detail-modal" onclick="closeDetailModal()">
-  <div class="modal modal-lg" onclick="event.stopPropagation()">
+<!-- ═══ DETAIL MODAL ══════════════════════════════════════════════ -->
+<div class="overlay" id="detail-modal" onclick="if(event.target===this)closeDetailModal()">
+  <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd">
       <div>
-        <div class="modal-title" id="dm-name">Orientation Details</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="dm-sub"></div>
+        <div class="modal-title" id="dm-name">—</div>
+        <div class="modal-sub" id="dm-sub"></div>
       </div>
       <button class="modal-close" onclick="closeDetailModal()">×</button>
     </div>
     <div class="modal-body">
       <!-- Tabs -->
       <div class="tabs">
-        <button class="tab active" onclick="switchTab(0)">👤 Mentor &amp; Sessions</button>
-        <button class="tab" onclick="switchTab(1)">✅ Checklist</button>
-        <button class="tab" onclick="switchTab(2)">📧 Send Invite</button>
+        <button class="tab active" id="tab-btn-0" onclick="switchTab(0)">👤 Mentor &amp; Sessions</button>
+        <button class="tab" id="tab-btn-1" onclick="switchTab(1)">✅ Checklist</button>
+        <button class="tab" id="tab-btn-2" onclick="switchTab(2)">📧 Send Invite</button>
       </div>
 
-      <!-- TAB 0: Mentor & Sessions -->
-      <div class="tab-panel active" id="tab-0">
-        <div class="section-label">Assign Mentor / Buddy</div>
-        <div class="frow" style="margin-bottom:0;">
-          <div class="fg">
+      <!-- TAB 0 -->
+      <div class="tab-panel active" id="tab-panel-0">
+        <div class="sec-lbl">Mentor / Buddy</div>
+        <div class="frow">
+          <div class="fg" style="margin-bottom:0">
             <label>Mentor Name</label>
-            <input id="dm-mentor-name" type="text" placeholder="Mentor's full name" list="employee-datalist">
-            <datalist id="employee-datalist"></datalist>
+            <input id="dm-mentor-name" type="text" placeholder="Full name" list="emp-dl">
+            <datalist id="emp-dl"></datalist>
           </div>
-          <div class="fg">
+          <div class="fg" style="margin-bottom:0">
             <label>Mentor Email</label>
             <input id="dm-mentor-email" type="email" placeholder="mentor@company.com">
           </div>
         </div>
-        <div class="fg">
-          <label>Joining Date</label>
-          <input id="dm-joining-date" type="date">
+        <div class="frow" style="margin-top:14px;">
+          <div class="fg" style="margin-bottom:0">
+            <label>Joining Date</label>
+            <input id="dm-joining" type="date">
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label>Orientation Status</label>
+            <select id="dm-status">
+              <option value="pending">Pending</option>
+              <option value="invited">Invited</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
         </div>
-        <div class="fg">
+        <div class="fg" style="margin-top:14px;">
           <label>Notes for Candidate</label>
-          <textarea id="dm-notes" rows="2" placeholder="Any specific notes or instructions…"></textarea>
+          <textarea id="dm-notes" rows="2" placeholder="Any instructions for the new joinee…"></textarea>
         </div>
-        <button class="btn primary btn-sm" onclick="saveMentorSessions()">💾 Save Changes</button>
+        <button class="btn primary btn-sm" id="save-mentor-btn" onclick="saveMentor()">💾 Save</button>
 
-        <div class="section-label" style="margin-top:18px;">Enroll in Sessions</div>
-        <div id="session-enroll-list">
-          <div style="color:var(--text3);font-size:13px;">Loading sessions…</div>
-        </div>
+        <div class="sec-lbl">Enrolled Sessions</div>
+        <div id="sess-enroll-list"><div style="color:var(--text3);font-size:13px;">Loading sessions…</div></div>
         <div style="margin-top:10px;">
-          <button class="btn btn-sm primary" onclick="saveSessionEnrollment()">💾 Update Session Enrollment</button>
+          <button class="btn btn-sm primary" id="save-sessions-btn" onclick="saveSessionEnroll()">💾 Update Enrollment</button>
         </div>
       </div>
 
-      <!-- TAB 1: Checklist -->
-      <div class="tab-panel" id="tab-1">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <!-- TAB 1 -->
+      <div class="tab-panel" id="tab-panel-1">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
           <div>
             <div style="font-size:13px;font-weight:500;color:var(--text);">Pre-Joining &amp; Day-1 Checklist</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:2px;" id="checklist-progress-text">0 of 0 completed</div>
+            <div id="chk-progress-txt" style="font-size:12px;color:var(--text3);margin-top:2px;">0 of 0 completed</div>
           </div>
-          <div class="prog-bar" style="width:100px;height:7px;">
-            <div class="prog-fill" id="checklist-progress-bar" style="width:0%;background:var(--accent2);"></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="prog-bar" style="width:100px;height:7px;">
+              <div class="prog-fill" id="chk-progress-bar" style="width:0%;background:var(--accent2);"></div>
+            </div>
+            <span id="chk-progress-pct" style="font-size:11px;color:var(--text3);">0%</span>
           </div>
         </div>
-        <div id="checklist-container">
-          <div style="color:var(--text3);font-size:13px;">Loading checklist…</div>
-        </div>
+        <div id="chk-container"><div style="color:var(--text3);">Loading…</div></div>
       </div>
 
-      <!-- TAB 2: Send Invite -->
-      <div class="tab-panel" id="tab-2">
-        <div class="section-label">Orientation Invite Email Preview</div>
-        <div class="invite-preview" id="invite-preview">
-          <!-- Generated dynamically -->
+      <!-- TAB 2 -->
+      <div class="tab-panel" id="tab-panel-2">
+        <div class="sec-lbl">Email Preview</div>
+        <div class="invite-preview" id="invite-preview">—</div>
+
+        <div style="margin-top:14px;padding:12px 16px;background:rgba(79,156,249,0.07);border:1px solid rgba(79,156,249,0.2);border-radius:8px;font-size:12px;color:var(--text2);">
+          📧 Will be sent to <strong id="invite-to">—</strong> via GAS/Gmail with the full session schedule.
         </div>
-        <div style="margin-top:16px;padding:14px;background:rgba(79,156,249,0.07);border:1px solid rgba(79,156,249,0.2);border-radius:8px;font-size:12px;color:var(--text2);">
-          <strong style="color:var(--accent);">📧 What gets sent:</strong> A branded HTML email via Gmail listing the full session schedule grouped by date, mentor info, and the pre-joining checklist. The email is sent to <strong id="invite-to-email">—</strong>.
+
+        <div id="invite-sent-row" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(34,197,94,0.08);border-radius:8px;font-size:12px;color:var(--green);">
+          ✅ Last sent: <span id="invite-sent-date"></span>
         </div>
-        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
-          <button class="btn primary" id="send-invite-btn" onclick="sendOrientationInvite()">📨 Send Orientation Invite</button>
-          <div id="invite-status" style="font-size:12px;color:var(--text3);"></div>
-        </div>
-        <div id="invite-sent-info" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(34,197,94,0.08);border-radius:8px;font-size:12px;color:var(--green);">
-          ✅ Invite previously sent on <span id="invite-sent-date"></span>
+
+        <div style="margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <button class="btn primary" id="send-invite-btn" onclick="sendInvite()">📨 Send Orientation Invite</button>
+          <span id="invite-msg" style="font-size:12px;"></span>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SESSION CREATE / EDIT MODAL
-════════════════════════════════════════════════════════ -->
-<div class="overlay" id="session-modal" onclick="closeModal('session-modal')">
-  <div class="modal" onclick="event.stopPropagation()">
+<!-- ═══ SESSION MODAL ════════════════════════════════════════════ -->
+<div class="overlay" id="session-modal" onclick="if(event.target===this)closeModal('session-modal')">
+  <div class="modal" onclick="event.stopPropagation()" style="width:580px">
     <div class="modal-hd">
-      <span class="modal-title" id="session-modal-title">Add Orientation Session</span>
+      <span class="modal-title" id="sm-title-label">Add Orientation Session</span>
       <button class="modal-close" onclick="closeModal('session-modal')">×</button>
     </div>
     <div class="modal-body">
@@ -434,10 +421,10 @@ textarea{resize:vertical;min-height:70px}
       </div>
       <div class="fg">
         <label>Description</label>
-        <textarea id="sm-desc" rows="2" placeholder="What will candidates learn in this session?"></textarea>
+        <textarea id="sm-desc" rows="2" placeholder="What will new joinees learn?"></textarea>
       </div>
       <div class="frow">
-        <div class="fg">
+        <div class="fg" style="margin-bottom:0">
           <label>Session Type</label>
           <select id="sm-type">
             <option value="company_culture">Company Culture &amp; Values</option>
@@ -449,7 +436,7 @@ textarea{resize:vertical;min-height:70px}
             <option value="custom">Custom</option>
           </select>
         </div>
-        <div class="fg">
+        <div class="fg" style="margin-bottom:0">
           <label>Mode</label>
           <select id="sm-mode">
             <option value="in_person">In-Person</option>
@@ -459,151 +446,154 @@ textarea{resize:vertical;min-height:70px}
           </select>
         </div>
       </div>
-      <div class="frow">
-        <div class="fg">
-          <label>Scheduled Date *</label>
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
+          <label>Scheduled Date</label>
           <input id="sm-date" type="date">
         </div>
-        <div class="fg">
+        <div class="fg" style="margin-bottom:0">
           <label>Duration (minutes)</label>
-          <input id="sm-duration" type="number" value="60" min="15" step="15">
+          <input id="sm-dur" type="number" value="60" min="15" step="15">
         </div>
       </div>
-      <div class="frow">
-        <div class="fg">
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
           <label>Start Time</label>
           <input id="sm-start" type="time" value="10:00">
         </div>
-        <div class="fg">
+        <div class="fg" style="margin-bottom:0">
           <label>End Time</label>
           <input id="sm-end" type="time" value="11:00">
         </div>
       </div>
-      <div class="frow">
-        <div class="fg">
+      <div class="frow" style="margin-top:14px;">
+        <div class="fg" style="margin-bottom:0">
           <label>Venue / Link</label>
-          <input id="sm-venue" placeholder="Hall A or Zoom link">
+          <input id="sm-venue" placeholder="Hall A or Zoom/Meet link">
         </div>
-        <div class="fg">
+        <div class="fg" style="margin-bottom:0">
           <label>Facilitator</label>
-          <input id="sm-facilitator" placeholder="e.g. HR Team, IT Lead">
+          <input id="sm-fac" placeholder="e.g. HR Team, IT Lead">
         </div>
       </div>
-      <div class="fg">
-        <label>Target Department (leave blank for all)</label>
-        <input id="sm-dept" placeholder="e.g. Engineering, Sales (or leave blank for all)">
+      <div class="fg" style="margin-top:14px;">
+        <label>Target Department (blank = all)</label>
+        <input id="sm-dept" placeholder="e.g. Engineering — leave blank for all departments">
       </div>
       <div class="toggle-row">
         <div>
           <div style="font-size:13px;font-weight:500;color:var(--text);">Mandatory Session</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Auto-enroll all pending/invited candidates if turned on</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Auto-enrolls all pending/invited candidates when created</div>
         </div>
-        <label class="toggle">
-          <input type="checkbox" id="sm-mandatory" checked>
-          <span class="toggle-slider"></span>
-        </label>
+        <label class="tog"><input type="checkbox" id="sm-mandatory" checked><span class="tog-sl"></span></label>
       </div>
     </div>
     <div class="modal-ft">
-      <button class="btn danger btn-sm" id="sm-delete-btn" style="margin-right:auto;display:none;" onclick="deleteSession()">🗑 Delete</button>
+      <button class="btn danger btn-sm" id="sm-del-btn" style="margin-right:auto;display:none" onclick="deleteSession()">🗑 Delete</button>
       <button class="btn" onclick="closeModal('session-modal')">Cancel</button>
-      <button class="btn primary" onclick="saveSession()" id="sm-save-btn">Save Session</button>
+      <button class="btn primary" id="sm-save-btn" onclick="saveSession()">Save Session</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast-wrap"></div>
 
+<!-- ═══ SCRIPT ════════════════════════════════════════════════════ -->
 <script>
 // ─── STATE ────────────────────────────────────────────────────────────────────
-let allOrientations = [];
-let allSessions     = [];
-let allEmployees    = [];
-let currentOrient   = null;
-let selectedSessionIds = [];
-let searchTimer     = null;
+let allSessions      = [];     // OrientationSession list
+let currentOrient    = null;   // orientation record open in detail modal
+let enrollSelected   = [];     // session IDs selected in enroll list
+let searchTimer      = null;
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-  loadUserInfo();
-  loadOrientations();
-  loadSessions();
-  loadEmployees();
-});
-
-function loadUserInfo() {
   const u = JSON.parse(localStorage.getItem("user") || "{}");
   if (u.name) {
     document.getElementById("user-name").textContent = u.name;
-    document.getElementById("user-avatar").textContent = u.name.split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase();
+    document.getElementById("user-avatar").textContent =
+      u.name.split(" ").map(p => p[0]).join("").slice(0,2).toUpperCase();
   }
   if (u.role) document.getElementById("user-role").textContent = u.role;
-}
+
+  loadSessions();        // load sessions first so enroll list is populated
+  loadOrientations();
+  loadEmployees();
+});
 
 // ─── LOAD ORIENTATIONS ────────────────────────────────────────────────────────
 async function loadOrientations() {
+  setRefreshing(true);
   const search = document.getElementById("search-input").value.trim();
   const status = document.getElementById("status-filter").value;
   let url = "/api/hr/orientation?";
-  if (search) url += `search=${encodeURIComponent(search)}&`;
-  if (status) url += `status=${encodeURIComponent(status)}&`;
+  if (search) url += "search=" + encodeURIComponent(search) + "&";
+  if (status) url += "status=" + encodeURIComponent(status) + "&";
 
   try {
     const data = await apiRequest(url);
-    allOrientations = data.orientations || data || [];
-    const stats     = data.stats || {};
+    const list  = data.orientations || [];
+    const stats = data.stats || {};
 
-    // KPI
-    document.getElementById("kpi-total").textContent     = stats.total     ?? allOrientations.length;
+    document.getElementById("kpi-total").textContent     = stats.total     ?? list.length;
     document.getElementById("kpi-pending").textContent   = stats.pending   ?? "—";
-    document.getElementById("kpi-invited").textContent   = (stats.invited ?? 0) + (stats.in_progress ?? 0);
+    document.getElementById("kpi-invited").textContent   = ((stats.invited ?? 0) + (stats.in_progress ?? 0));
     document.getElementById("kpi-completed").textContent = stats.completed ?? "—";
 
-    renderOrientTable(allOrientations);
+    renderTable(list);
   } catch (err) {
     document.getElementById("orient-tbody").innerHTML =
-      `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--rose);">Failed to load: ${err.message}</td></tr>`;
+      `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--rose);">Failed to load: ${esc(err.message)}</td></tr>`;
+  } finally {
+    setRefreshing(false);
   }
 }
 
-function renderOrientTable(list) {
+function setRefreshing(on) {
+  const btn = document.getElementById("refresh-btn");
+  btn.disabled  = on;
+  btn.textContent = on ? "↻ Loading…" : "↻ Refresh";
+}
+
+function renderTable(list) {
   const tbody = document.getElementById("orient-tbody");
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="empty-icon">🎓</div>No orientation records yet.<br><span style="font-size:12px;">They are auto-created when a candidate is marked <strong>Onboarded</strong>.</span></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="empty-icon">🎓</div>
+      No orientation records yet.<br>
+      <span style="font-size:12px;color:var(--text3);">Records appear automatically when a candidate is marked <strong style="color:var(--text2);">Onboarded</strong> on the Onboarding page.</span>
+      </div></td></tr>`;
     return;
   }
-  tbody.innerHTML = list.map(o => {
-    const done     = (o.taskChecklist || []).filter(t => t.done).length;
-    const total    = (o.taskChecklist || []).length;
-    const pct      = total ? Math.round(done / total * 100) : 0;
-    const joining  = o.joiningDate ? new Date(o.joiningDate).toLocaleDateString("en-IN", {day:"numeric",month:"short",year:"numeric"}) : "—";
-    const {cls, lbl} = statusBadge(o.orientationStatus);
-    const sessions = (o.sessionIds || []).length;
-    const mentor   = o.mentorName || `<span style="color:var(--text3);font-size:12px;">Not assigned</span>`;
 
-    return `<tr onclick="openDetailModal('${o._id}')">
+  tbody.innerHTML = list.map(o => {
+    const done  = (o.taskChecklist || []).filter(t => t.done).length;
+    const total = (o.taskChecklist || []).length;
+    const pct   = total ? Math.round(done / total * 100) : 0;
+    const join  = o.joiningDate ? new Date(o.joiningDate).toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "—";
+    const { cls, lbl } = statusBadge(o.orientationStatus);
+    const sessCount = (o.sessionIds || []).length;
+    const mentorCell = o.mentorName
+      ? `<span style="font-size:12px;">${esc(o.mentorName)}</span>`
+      : `<span style="font-size:11px;color:var(--text3);">—</span>`;
+
+    return `<tr class="clickable" onclick="openDetailModal('${o._id}')">
       <td>
         <div class="td-main">${esc(o.candidateName || "—")}</div>
         <div style="font-size:11px;color:var(--text3);">${esc(o.candidateEmail || "")}</div>
       </td>
       <td style="font-size:12px;">${esc(o.position || "—")}</td>
-      <td style="font-size:12px;font-family:var(--mono);">${joining}</td>
-      <td style="font-size:12px;">${mentor}</td>
-      <td style="text-align:center;">
-        <span class="badge b-blue">${sessions}</span>
-      </td>
+      <td style="font-size:12px;font-family:var(--mono);">${join}</td>
+      <td>${mentorCell}</td>
+      <td style="text-align:center;"><span class="badge b-blue">${sessCount}</span></td>
       <td>
         <div style="display:flex;align-items:center;gap:7px;">
-          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${pct===100?'var(--green)':pct>0?'var(--accent2)':'var(--border2)'}"></div></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${pct===100?'var(--green)':pct>0?'var(--accent2)':'var(--navy5)'}"></div></div>
           <span style="font-size:11px;color:var(--text3);">${done}/${total}</span>
         </div>
       </td>
       <td><span class="badge ${cls}">${lbl}</span></td>
       <td onclick="event.stopPropagation()">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-sm" onclick="openDetailModal('${o._id}')">✏️ Manage</button>
-        </div>
+        <button class="btn btn-sm primary" onclick="openDetailModal('${o._id}')">Manage</button>
       </td>
     </tr>`;
   }).join("");
@@ -614,101 +604,106 @@ async function loadSessions() {
   try {
     const data = await apiRequest("/api/hr/orientation/sessions/all");
     allSessions = data.sessions || data || [];
-    renderSessionsPanel(allSessions);
+    renderSessionsPanel();
   } catch (err) {
     document.getElementById("sessions-panel").innerHTML =
-      `<div class="empty"><div class="empty-icon">⚠️</div><div style="color:var(--rose);">Failed to load: ${err.message}</div></div>`;
+      `<div class="empty"><div class="empty-icon">⚠️</div><div style="color:var(--rose);">${esc(err.message)}</div></div>`;
   }
 }
 
-function renderSessionsPanel(list) {
+function renderSessionsPanel() {
   const panel = document.getElementById("sessions-panel");
-  if (!list.length) {
-    panel.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>No sessions yet.<br><span style="font-size:12px;">Add sessions to build your orientation schedule.</span></div>`;
+  if (!allSessions.length) {
+    panel.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>No sessions yet.<br><span style="font-size:12px;">Add sessions to build the orientation schedule.</span></div>`;
     return;
   }
-  panel.innerHTML = list.map(s => {
-    const date = s.scheduledDate ? new Date(s.scheduledDate).toLocaleDateString("en-IN", {day:"numeric",month:"short"}) : "TBD";
-    const modeIcon = {in_person:"🏛️", online_zoom:"💻", online_meet:"🎥", hybrid:"🔀"}[s.mode] || "📅";
-    const enrolled = s.enrolledCount ?? "—";
+  panel.innerHTML = allSessions.map(s => {
+    const date = s.scheduledDate
+      ? new Date(s.scheduledDate).toLocaleDateString("en-IN",{day:"numeric",month:"short"})
+      : "TBD";
+    const modeIco = {in_person:"🏛️",online_zoom:"💻",online_meet:"🎥",hybrid:"🔀"}[s.mode] || "📅";
     return `<div class="session-item" onclick="openSessionModal('${s._id}')">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
         <div class="session-item-title">${esc(s.title)}</div>
-        ${s.isMandatory ? '<span class="badge b-rose" style="font-size:10px;">Mandatory</span>' : '<span class="badge b-gray" style="font-size:10px;">Optional</span>'}
+        ${s.isMandatory
+          ? '<span class="badge b-rose" style="font-size:10px;flex-shrink:0">Mandatory</span>'
+          : '<span class="badge b-gray" style="font-size:10px;flex-shrink:0">Optional</span>'}
       </div>
       <div class="session-item-meta" style="margin-top:5px;">
         <span>📅 ${date}</span>
-        <span>${modeIcon} ${modeLabel(s.mode)}</span>
+        <span>${modeIco} ${modeLabel(s.mode)}</span>
         ${s.startTime ? `<span>🕐 ${s.startTime}</span>` : ""}
         ${s.facilitator ? `<span>👤 ${esc(s.facilitator)}</span>` : ""}
-        <span style="color:var(--accent);">👥 ${enrolled} enrolled</span>
+        <span style="color:var(--accent);">👥 ${s.enrolledCount ?? 0}</span>
       </div>
     </div>`;
   }).join("");
 }
 
-// ─── LOAD EMPLOYEES (for mentor datalist) ────────────────────────────────────
+// ─── LOAD EMPLOYEES (mentor datalist) ────────────────────────────────────────
 async function loadEmployees() {
   try {
     const data = await apiRequest("/api/hr/employees");
-    allEmployees = data.employees || data || [];
-    const dl = document.getElementById("employee-datalist");
-    dl.innerHTML = allEmployees.map(e =>
-      `<option value="${esc(e.name || e.fullName || "")}">${esc(e.email || "")}</option>`
+    const list = data.employees || data || [];
+    const dl = document.getElementById("emp-dl");
+    dl.innerHTML = list.map(e =>
+      `<option value="${esc(e.name||e.fullName||"")}">${esc(e.email||"")}</option>`
     ).join("");
-  } catch (_) {
-    // Employees list is optional — mentor can still be typed manually
-  }
+  } catch(_) { /* optional */ }
 }
 
 // ─── DETAIL MODAL ─────────────────────────────────────────────────────────────
 async function openDetailModal(id) {
   currentOrient = null;
+  enrollSelected = [];
   openModal("detail-modal");
+  switchTab(0);
   document.getElementById("dm-name").textContent = "Loading…";
   document.getElementById("dm-sub").textContent  = "";
-  switchTab(0);
 
   try {
-    const data = await apiRequest(`/api/hr/orientation/${id}`);
+    const data = await apiRequest("/api/hr/orientation/" + id);
     currentOrient = data.orientation || data;
-    populateDetailModal(currentOrient);
-  } catch (err) {
-    toast("Failed to load orientation: " + err.message, "error");
+    fillDetailModal(currentOrient);
+  } catch(err) {
+    toast("Failed to load: " + err.message, "err");
     closeDetailModal();
   }
 }
 
-function populateDetailModal(o) {
-  // Header
+function fillDetailModal(o) {
   document.getElementById("dm-name").textContent = o.candidateName || "Unnamed Candidate";
-  document.getElementById("dm-sub").textContent  = (o.position || "") + (o.department ? ` · ${o.department}` : "");
+  document.getElementById("dm-sub").textContent  =
+    [o.position, o.department].filter(Boolean).join(" · ");
 
-  // Tab 0: Mentor & Sessions
+  // Tab 0 fields
   document.getElementById("dm-mentor-name").value  = o.mentorName  || "";
   document.getElementById("dm-mentor-email").value = o.mentorEmail || "";
-  document.getElementById("dm-joining-date").value = o.joiningDate ? o.joiningDate.slice(0,10) : "";
-  document.getElementById("dm-notes").value        = o.notes || "";
+  document.getElementById("dm-joining").value       = o.joiningDate ? o.joiningDate.slice(0,10) : "";
+  document.getElementById("dm-status").value        = o.orientationStatus || "pending";
+  document.getElementById("dm-notes").value         = o.notes      || "";
 
-  // Session enrollment checkboxes
-  const enrolledIds = (o.sessionIds || []).map(s => typeof s === "object" ? s._id : s);
-  selectedSessionIds = [...enrolledIds];
-  renderSessionEnrollList(enrolledIds);
+  // Session enroll — sessionIds may be populated objects OR plain IDs
+  const enrolledIds = (o.sessionIds || []).map(s =>
+    typeof s === "object" && s !== null ? String(s._id) : String(s)
+  );
+  enrollSelected = [...enrolledIds];
+  renderEnrollList(enrolledIds);
 
-  // Tab 1: Checklist
+  // Tab 1
   renderChecklist(o.taskChecklist || []);
 
-  // Tab 2: Send Invite
-  document.getElementById("invite-to-email").textContent = o.candidateEmail || "—";
-  renderInvitePreview(o);
-
+  // Tab 2
+  document.getElementById("invite-to").textContent = o.candidateEmail || "—";
+  buildInvitePreview(o);
   if (o.inviteSentAt) {
-    document.getElementById("invite-sent-info").style.display = "block";
+    document.getElementById("invite-sent-row").style.display = "block";
     document.getElementById("invite-sent-date").textContent =
-      new Date(o.inviteSentAt).toLocaleDateString("en-IN", {day:"numeric",month:"long",year:"numeric"});
+      new Date(o.inviteSentAt).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});
   } else {
-    document.getElementById("invite-sent-info").style.display = "none";
+    document.getElementById("invite-sent-row").style.display = "none";
   }
+  document.getElementById("invite-msg").textContent = "";
 }
 
 function closeDetailModal() {
@@ -716,259 +711,315 @@ function closeDetailModal() {
   currentOrient = null;
 }
 
-// ─── TAB SWITCHING ────────────────────────────────────────────────────────────
+// ─── TABS ─────────────────────────────────────────────────────────────────────
 function switchTab(idx) {
-  document.querySelectorAll(".tab").forEach((t,i) => t.classList.toggle("active", i===idx));
-  document.querySelectorAll(".tab-panel").forEach((p,i) => p.classList.toggle("active", i===idx));
+  [0,1,2].forEach(i => {
+    document.getElementById("tab-btn-"+i).classList.toggle("active", i===idx);
+    document.getElementById("tab-panel-"+i).classList.toggle("active", i===idx);
+  });
 }
 
-// ─── SESSION ENROLLMENT LIST ─────────────────────────────────────────────────
-function renderSessionEnrollList(enrolledIds) {
-  const cont = document.getElementById("session-enroll-list");
+// ─── SESSION ENROLL LIST ──────────────────────────────────────────────────────
+function renderEnrollList(enrolledIds) {
+  const cont = document.getElementById("sess-enroll-list");
   if (!allSessions.length) {
-    cont.innerHTML = `<div style="font-size:13px;color:var(--text3);">No sessions available. Add sessions first.</div>`;
+    cont.innerHTML = `<div style="font-size:13px;color:var(--text3);">No sessions available yet. Create sessions using "＋ Add Session".</div>`;
     return;
   }
+  const idSet = new Set((enrolledIds || []).map(String));
   cont.innerHTML = allSessions.map(s => {
-    const isSelected = enrolledIds.includes(s._id);
-    const date = s.scheduledDate ? new Date(s.scheduledDate).toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "TBD";
-    return `<div class="session-check-item ${isSelected?'selected':''}" onclick="toggleSessionEnroll('${s._id}',this)">
-      <div style="width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);background:var(--navy4);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;" class="chk-icon">${isSelected?'✓':''}</div>
+    const on  = idSet.has(String(s._id));
+    const date = s.scheduledDate
+      ? new Date(s.scheduledDate).toLocaleDateString("en-IN",{day:"numeric",month:"short"})
+      : "TBD";
+    return `<div class="sess-pick ${on?"on":""}" id="sp-${s._id}" onclick="toggleEnroll('${s._id}')">
+      <div class="sess-pick-cb">${on?"✓":""}</div>
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:500;color:var(--text);">${esc(s.title)}</div>
-        <div style="font-size:11px;color:var(--text3);">${date} · ${modeLabel(s.mode)} · ${s.facilitator||'—'} ${s.isMandatory?'· <span style="color:var(--rose);">Mandatory</span>':''}</div>
+        <div style="font-size:11px;color:var(--text3);">${date} · ${modeLabel(s.mode)} · ${esc(s.facilitator||"—")}${s.isMandatory?' · <span style="color:var(--rose)">Mandatory</span>':''}</div>
       </div>
     </div>`;
   }).join("");
 }
 
-function toggleSessionEnroll(sid, el) {
-  const idx = selectedSessionIds.indexOf(sid);
+function toggleEnroll(sid) {
+  const idx = enrollSelected.indexOf(sid);
+  const el  = document.getElementById("sp-" + sid);
+  if (!el) return;
+  const cb = el.querySelector(".sess-pick-cb");
   if (idx === -1) {
-    selectedSessionIds.push(sid);
-    el.classList.add("selected");
-    el.querySelector(".chk-icon").textContent = "✓";
-    el.querySelector(".chk-icon").style.background = "var(--accent2)";
-    el.querySelector(".chk-icon").style.borderColor = "var(--accent2)";
-    el.querySelector(".chk-icon").style.color = "#fff";
+    enrollSelected.push(sid);
+    el.classList.add("on");
+    cb.textContent = "✓";
   } else {
-    selectedSessionIds.splice(idx, 1);
-    el.classList.remove("selected");
-    el.querySelector(".chk-icon").textContent = "";
-    el.querySelector(".chk-icon").style.background = "var(--navy4)";
-    el.querySelector(".chk-icon").style.borderColor = "var(--border2)";
+    enrollSelected.splice(idx, 1);
+    el.classList.remove("on");
+    cb.textContent = "";
   }
 }
 
-// ─── SAVE MENTOR + NOTES ─────────────────────────────────────────────────────
-async function saveMentorSessions() {
+// ─── SAVE MENTOR ──────────────────────────────────────────────────────────────
+async function saveMentor() {
   if (!currentOrient) return;
-  const mentorName  = document.getElementById("dm-mentor-name").value.trim();
-  const mentorEmail = document.getElementById("dm-mentor-email").value.trim();
-  const joiningDate = document.getElementById("dm-joining-date").value;
-  const notes       = document.getElementById("dm-notes").value.trim();
-
+  const btn = document.getElementById("save-mentor-btn");
+  btn.disabled = true; btn.textContent = "Saving…";
   try {
-    await apiRequest(`/api/hr/orientation/${currentOrient._id}`, "PATCH", {
-      mentorName, mentorEmail, joiningDate, notes
+    const payload = {
+      mentorName:        document.getElementById("dm-mentor-name").value.trim(),
+      mentorEmail:       document.getElementById("dm-mentor-email").value.trim(),
+      joiningDate:       document.getElementById("dm-joining").value || null,
+      orientationStatus: document.getElementById("dm-status").value,
+      notes:             document.getElementById("dm-notes").value.trim(),
+    };
+    const res = await apiRequest("/api/hr/orientation/" + currentOrient._id, "PATCH", payload);
+    const updated = res.orientation || res;
+    // Merge into currentOrient without losing populated sessionIds
+    Object.assign(currentOrient, {
+      mentorName:        updated.mentorName,
+      mentorEmail:       updated.mentorEmail,
+      joiningDate:       updated.joiningDate,
+      orientationStatus: updated.orientationStatus,
+      notes:             updated.notes,
     });
-    currentOrient.mentorName  = mentorName;
-    currentOrient.mentorEmail = mentorEmail;
-    currentOrient.joiningDate = joiningDate;
-    currentOrient.notes       = notes;
-    toast("Saved successfully!", "success");
+    buildInvitePreview(currentOrient);
+    toast("Saved ✓", "ok");
     loadOrientations();
-  } catch (err) {
-    toast("Save failed: " + err.message, "error");
+  } catch(err) {
+    toast("Save failed: " + err.message, "err");
+  } finally {
+    btn.disabled = false; btn.textContent = "💾 Save";
   }
 }
 
 // ─── SAVE SESSION ENROLLMENT ─────────────────────────────────────────────────
-async function saveSessionEnrollment() {
+async function saveSessionEnroll() {
   if (!currentOrient) return;
+  const btn = document.getElementById("save-sessions-btn");
+  btn.disabled = true; btn.textContent = "Saving…";
   try {
-    await apiRequest(`/api/hr/orientation/${currentOrient._id}`, "PATCH", {
-      sessionIds: selectedSessionIds
+    await apiRequest("/api/hr/orientation/" + currentOrient._id, "PATCH", {
+      sessionIds: enrollSelected
     });
-    currentOrient.sessionIds = selectedSessionIds;
-    toast("Session enrollment updated!", "success");
+    // Re-fetch the full orientation to get populated sessionIds for the invite preview
+    const fresh = await apiRequest("/api/hr/orientation/" + currentOrient._id);
+    currentOrient = fresh.orientation || fresh;
+    // Rebuild enroll list from fresh data
+    const enrolledIds = (currentOrient.sessionIds || []).map(s =>
+      typeof s === "object" && s !== null ? String(s._id) : String(s)
+    );
+    enrollSelected = [...enrolledIds];
+    renderEnrollList(enrolledIds);
+    buildInvitePreview(currentOrient);
+    toast("Enrollment updated ✓", "ok");
     loadOrientations();
-    loadSessions();
-    // Refresh invite preview
-    renderInvitePreview(currentOrient);
-  } catch (err) {
-    toast("Failed: " + err.message, "error");
+    loadSessions(); // refresh enroll counts
+  } catch(err) {
+    toast("Failed: " + err.message, "err");
+  } finally {
+    btn.disabled = false; btn.textContent = "💾 Update Enrollment";
   }
 }
 
 // ─── CHECKLIST ───────────────────────────────────────────────────────────────
 function renderChecklist(checklist) {
-  const cont = document.getElementById("checklist-container");
+  const cont = document.getElementById("chk-container");
   const done  = checklist.filter(t => t.done).length;
   const total = checklist.length;
-  const pct   = total ? Math.round(done / total * 100) : 0;
-
-  document.getElementById("checklist-progress-text").textContent = `${done} of ${total} completed`;
-  document.getElementById("checklist-progress-bar").style.width  = pct + "%";
-  document.getElementById("checklist-progress-bar").style.background = pct === 100 ? "var(--green)" : "var(--accent2)";
+  const pct   = total ? Math.round(done/total*100) : 0;
+  document.getElementById("chk-progress-txt").textContent = `${done} of ${total} completed`;
+  document.getElementById("chk-progress-pct").textContent = pct + "%";
+  const bar = document.getElementById("chk-progress-bar");
+  bar.style.width      = pct + "%";
+  bar.style.background = pct === 100 ? "var(--green)" : "var(--accent2)";
 
   if (!checklist.length) {
-    cont.innerHTML = `<div style="color:var(--text3);font-size:13px;">No checklist items.</div>`;
+    cont.innerHTML = `<div style="color:var(--text3);font-size:13px;">No checklist items found.</div>`;
     return;
   }
 
-  const catColors = {
-    HR: "var(--accent)", IT: "var(--teal)", Compliance: "var(--rose)",
-    Culture: "var(--purple)", Operations: "var(--amber)", General: "var(--text3)"
-  };
+  const catColor = { HR:"var(--accent)", IT:"var(--teal)", Compliance:"var(--rose)", Culture:"var(--purple)", General:"var(--text3)" };
 
-  cont.innerHTML = checklist.map((item, i) => {
-    const col = catColors[item.category] || "var(--text3)";
-    return `<div class="checklist-item ${item.done?'done':''}" onclick="toggleChecklistItem('${item._id}', ${i})">
-      <div class="checklist-cb">${item.done ? "✓" : ""}</div>
-      <div class="checklist-text">
-        <div class="checklist-title">${esc(item.title)}</div>
-        <div class="checklist-cat"><span style="color:${col};font-weight:500;">${esc(item.category || "General")}</span></div>
+  cont.innerHTML = checklist.map(item => {
+    const col = catColor[item.category] || "var(--text3)";
+    // Use item.label (correct model field); fall back to item.title for legacy data
+    const text = item.label || item.title || item.key || "—";
+    return `<div class="checklist-item ${item.done?"done":""}" id="ci-${item._id}" onclick="toggleChecklist('${item._id}', ${item.done})">
+      <div class="chk-box">${item.done?"✓":""}</div>
+      <div style="flex:1;">
+        <div class="chk-label">${esc(text)}</div>
+        <div class="chk-cat"><span style="color:${col};font-weight:500;">${esc(item.category||"General")}</span></div>
       </div>
     </div>`;
   }).join("");
 }
 
-async function toggleChecklistItem(itemId, idx) {
+async function toggleChecklist(itemId, currentDone) {
   if (!currentOrient) return;
+  // Optimistic UI update
+  const el   = document.getElementById("ci-" + itemId);
+  const item = (currentOrient.taskChecklist || []).find(t => String(t._id) === String(itemId));
+  if (!item || !el) return;
+  const newDone = !currentDone;
+
+  // Update DOM immediately
+  item.done = newDone;
+  el.classList.toggle("done", newDone);
+  el.querySelector(".chk-box").textContent = newDone ? "✓" : "";
+  el.onclick = () => toggleChecklist(itemId, newDone); // update for next click
+  // Update label strikethrough
+  const lbl = el.querySelector(".chk-label");
+  if (lbl) lbl.style.textDecoration = newDone ? "line-through" : "";
+
+  // Update progress bar
+  renderChecklistProgress(currentOrient.taskChecklist);
+
   try {
-    const res = await apiRequest(`/api/hr/orientation/${currentOrient._id}/checklist/${itemId}`, "PATCH", {});
-    // Update local state
+    // Send explicit done value — backend also supports toggle-if-absent
+    const res = await apiRequest(
+      `/api/hr/orientation/${currentOrient._id}/checklist/${itemId}`,
+      "PATCH",
+      { done: newDone }
+    );
     if (res.orientation) {
       currentOrient.taskChecklist    = res.orientation.taskChecklist;
       currentOrient.orientationStatus = res.orientation.orientationStatus;
-    } else {
-      // Toggle locally
-      const item = currentOrient.taskChecklist.find(t => t._id === itemId);
-      if (item) item.done = !item.done;
+      // Sync status dropdown if it changed
+      document.getElementById("dm-status").value = currentOrient.orientationStatus;
     }
-    renderChecklist(currentOrient.taskChecklist || []);
+    renderChecklistProgress(currentOrient.taskChecklist);
     loadOrientations();
-  } catch (err) {
-    toast("Checklist update failed: " + err.message, "error");
+  } catch(err) {
+    // Revert optimistic update on failure
+    item.done = currentDone;
+    renderChecklist(currentOrient.taskChecklist || []);
+    toast("Checklist update failed: " + err.message, "err");
   }
 }
 
+function renderChecklistProgress(checklist) {
+  const done  = (checklist||[]).filter(t => t.done).length;
+  const total = (checklist||[]).length;
+  const pct   = total ? Math.round(done/total*100) : 0;
+  document.getElementById("chk-progress-txt").textContent = `${done} of ${total} completed`;
+  document.getElementById("chk-progress-pct").textContent = pct + "%";
+  const bar = document.getElementById("chk-progress-bar");
+  bar.style.width      = pct + "%";
+  bar.style.background = pct === 100 ? "var(--green)" : "var(--accent2)";
+}
+
 // ─── INVITE PREVIEW ──────────────────────────────────────────────────────────
-function renderInvitePreview(o) {
-  const sessions = (o.sessionIds || []).filter(s => typeof s === "object");
+function buildInvitePreview(o) {
+  // sessionIds may be populated objects (from getOne) or plain IDs
+  const sessions = (o.sessionIds || []).filter(s => s && typeof s === "object" && s.title);
   const joining  = o.joiningDate
-    ? new Date(o.joiningDate).toLocaleDateString("en-IN", {day:"numeric",month:"long",year:"numeric"})
+    ? new Date(o.joiningDate).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})
     : "TBD";
 
-  let sessionTable = "";
+  let sesHtml = "";
   if (sessions.length) {
-    sessionTable = `<div style="margin:10px 0;">` +
-      sessions.map(s => {
-        const d = s.scheduledDate ? new Date(s.scheduledDate).toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "TBD";
-        return `<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-          <strong>${esc(s.title)}</strong><br>
-          <span style="color:var(--text3);">${d} · ${s.startTime||""} – ${s.endTime||""} · ${modeLabel(s.mode)} · ${esc(s.facilitator||"—")}</span>
-        </div>`;
-      }).join("") + "</div>";
+    sesHtml = sessions.map(s => {
+      const d = s.scheduledDate
+        ? new Date(s.scheduledDate).toLocaleDateString("en-IN",{day:"numeric",month:"short"})
+        : "TBD";
+      return `<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);">
+        <strong>${esc(s.title)}</strong>${s.isMandatory?' <span style="color:var(--rose);font-size:10px;">(Mandatory)</span>':''}
+        <br><span style="color:var(--text3);">${d}${s.startTime?" · "+s.startTime:""}${s.endTime?" – "+s.endTime:""} · ${modeLabel(s.mode)}${s.facilitator?" · "+esc(s.facilitator):""}</span>
+      </div>`;
+    }).join("");
+    sesHtml = `<div style="margin:10px 0;">${sesHtml}</div>`;
   } else {
-    sessionTable = `<div style="color:var(--text3);font-style:italic;">No sessions enrolled yet. Enroll sessions in the "Mentor &amp; Sessions" tab first.</div>`;
+    sesHtml = `<div style="color:var(--text3);font-style:italic;padding:6px 0;">No sessions enrolled yet — go to "Mentor &amp; Sessions" tab to enroll sessions first.</div>`;
   }
 
   document.getElementById("invite-preview").innerHTML = `
-    <div><strong>To:</strong> ${esc(o.candidateEmail || "—")}</div>
-    <div style="margin-top:4px;"><strong>Subject:</strong> Your Orientation Schedule — ${esc(o.position || "")}</div>
-    <hr style="border-color:var(--border);margin:10px 0;">
-    <div>Dear <strong>${esc(o.candidateName || "Candidate")}</strong>,</div>
-    <div style="margin-top:6px;">We are delighted to have you join us as <strong>${esc(o.position || "—")}</strong>. Your joining date is <strong>${joining}</strong>.</div>
-    ${o.mentorName ? `<div style="margin-top:6px;">Your mentor / buddy: <strong>${esc(o.mentorName)}</strong>${o.mentorEmail ? ` (${esc(o.mentorEmail)})` : ""}</div>` : ""}
-    <div style="margin-top:10px;"><strong>Your Orientation Schedule:</strong></div>
-    ${sessionTable}
-    <div style="margin-top:8px;">Please complete your pre-joining checklist and feel free to reach out to your mentor with any questions.</div>
+    <div><strong>To:</strong> ${esc(o.candidateEmail||"—")}</div>
+    <div style="margin-top:2px;"><strong>Subject:</strong> Your Orientation Schedule — ${esc(o.position||"New Joinee")}</div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:10px 0;">
+    <div>Dear <strong>${esc(o.candidateName||"Candidate")}</strong>,</div>
+    <div style="margin-top:6px;">Welcome to the team! Your joining date is <strong>${joining}</strong>.</div>
+    ${o.mentorName ? `<div style="margin-top:4px;">Your mentor/buddy: <strong>${esc(o.mentorName)}</strong>${o.mentorEmail?` (${esc(o.mentorEmail)})`:""}</div>` : ""}
+    <div style="margin-top:10px;"><strong>Orientation Schedule:</strong></div>
+    ${sesHtml}
+    <div style="margin-top:8px;">Please complete your pre-joining checklist and reach out to HR or your mentor with any questions.</div>
     <div style="margin-top:8px;color:var(--text3);font-size:11px;">Warm regards,<br>HR Team</div>
   `;
 }
 
 // ─── SEND INVITE ─────────────────────────────────────────────────────────────
-async function sendOrientationInvite() {
+async function sendInvite() {
   if (!currentOrient) return;
   const btn = document.getElementById("send-invite-btn");
-  const status = document.getElementById("invite-status");
-
-  btn.disabled = true;
-  btn.textContent = "📨 Sending…";
-  status.textContent = "";
+  const msg = document.getElementById("invite-msg");
+  btn.disabled = true; btn.textContent = "📨 Sending…";
+  msg.textContent = ""; msg.style.color = "";
 
   try {
-    const res = await apiRequest(`/api/hr/orientation/${currentOrient._id}/send-invite`, "POST", {});
-    toast("Orientation invite sent! ✓", "success");
-    status.textContent = "Sent ✓";
-    status.style.color = "var(--green)";
-
-    // Update local invite sent info
-    currentOrient.inviteSentAt = new Date().toISOString();
-    document.getElementById("invite-sent-info").style.display = "block";
+    await apiRequest("/api/hr/orientation/" + currentOrient._id + "/send-invite", "POST", {});
+    toast("Invite sent! ✓", "ok");
+    msg.textContent = "Sent ✓"; msg.style.color = "var(--green)";
+    currentOrient.inviteSentAt     = new Date().toISOString();
+    currentOrient.orientationStatus = currentOrient.orientationStatus === "pending"
+      ? "invited" : currentOrient.orientationStatus;
+    document.getElementById("dm-status").value = currentOrient.orientationStatus;
+    document.getElementById("invite-sent-row").style.display = "block";
     document.getElementById("invite-sent-date").textContent =
-      new Date().toLocaleDateString("en-IN", {day:"numeric",month:"long",year:"numeric"});
-
+      new Date().toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});
     loadOrientations();
-  } catch (err) {
-    toast("Failed to send invite: " + err.message, "error");
-    status.textContent = "Failed: " + err.message;
-    status.style.color = "var(--rose)";
+  } catch(err) {
+    toast("Failed: " + err.message, "err");
+    msg.textContent = "Failed — " + err.message; msg.style.color = "var(--rose)";
   } finally {
-    btn.disabled = false;
-    btn.textContent = "📨 Send Orientation Invite";
+    btn.disabled = false; btn.textContent = "📨 Send Orientation Invite";
   }
 }
 
 // ─── SESSION MODAL ────────────────────────────────────────────────────────────
 function openSessionModal(id) {
-  // Reset form
-  document.getElementById("sm-id").value         = id || "";
-  document.getElementById("sm-title").value       = "";
-  document.getElementById("sm-desc").value        = "";
-  document.getElementById("sm-type").value        = "company_culture";
-  document.getElementById("sm-mode").value        = "in_person";
-  document.getElementById("sm-date").value        = "";
-  document.getElementById("sm-duration").value    = "60";
-  document.getElementById("sm-start").value       = "10:00";
-  document.getElementById("sm-end").value         = "11:00";
-  document.getElementById("sm-venue").value       = "";
-  document.getElementById("sm-facilitator").value = "";
-  document.getElementById("sm-dept").value        = "";
+  // Reset
+  document.getElementById("sm-id").value    = id || "";
+  document.getElementById("sm-title").value = "";
+  document.getElementById("sm-desc").value  = "";
+  document.getElementById("sm-type").value  = "company_culture";
+  document.getElementById("sm-mode").value  = "in_person";
+  document.getElementById("sm-date").value  = "";
+  document.getElementById("sm-dur").value   = "60";
+  document.getElementById("sm-start").value = "10:00";
+  document.getElementById("sm-end").value   = "11:00";
+  document.getElementById("sm-venue").value = "";
+  document.getElementById("sm-fac").value   = "";
+  document.getElementById("sm-dept").value  = "";
   document.getElementById("sm-mandatory").checked = true;
-  document.getElementById("sm-delete-btn").style.display = "none";
-  document.getElementById("session-modal-title").textContent = "Add Orientation Session";
+  document.getElementById("sm-del-btn").style.display = "none";
+  document.getElementById("sm-title-label").textContent = "Add Orientation Session";
 
   if (id) {
-    // Edit mode — populate from existing
-    const session = allSessions.find(s => s._id === id);
-    if (session) {
-      document.getElementById("session-modal-title").textContent = "Edit Session";
-      document.getElementById("sm-title").value       = session.title       || "";
-      document.getElementById("sm-desc").value        = session.description || "";
-      document.getElementById("sm-type").value        = session.sessionType || "custom";
-      document.getElementById("sm-mode").value        = session.mode        || "in_person";
-      document.getElementById("sm-date").value        = session.scheduledDate ? session.scheduledDate.slice(0,10) : "";
-      document.getElementById("sm-duration").value    = session.durationMin  || 60;
-      document.getElementById("sm-start").value       = session.startTime   || "10:00";
-      document.getElementById("sm-end").value         = session.endTime     || "11:00";
-      document.getElementById("sm-venue").value       = session.venue       || "";
-      document.getElementById("sm-facilitator").value = session.facilitator || "";
-      document.getElementById("sm-dept").value        = session.targetDept  || "";
-      document.getElementById("sm-mandatory").checked = session.isMandatory !== false;
-      document.getElementById("sm-delete-btn").style.display = "inline-flex";
+    const s = allSessions.find(s => s._id === id);
+    if (s) {
+      document.getElementById("sm-title-label").textContent = "Edit Session";
+      document.getElementById("sm-title").value  = s.title       || "";
+      document.getElementById("sm-desc").value   = s.description || "";
+      document.getElementById("sm-type").value   = s.sessionType || "custom";
+      document.getElementById("sm-mode").value   = s.mode        || "in_person";
+      document.getElementById("sm-date").value   = s.scheduledDate ? s.scheduledDate.slice(0,10) : "";
+      document.getElementById("sm-dur").value    = s.durationMin  || 60;
+      document.getElementById("sm-start").value  = s.startTime   || "10:00";
+      document.getElementById("sm-end").value    = s.endTime     || "11:00";
+      document.getElementById("sm-venue").value  = s.venue       || "";
+      document.getElementById("sm-fac").value    = s.facilitator || "";
+      document.getElementById("sm-dept").value   = s.targetDept  || "";
+      document.getElementById("sm-mandatory").checked = s.isMandatory !== false;
+      document.getElementById("sm-del-btn").style.display = "inline-flex";
     }
   }
-
   openModal("session-modal");
 }
 
 async function saveSession() {
-  const id    = document.getElementById("sm-id").value;
   const title = document.getElementById("sm-title").value.trim();
-  if (!title) { toast("Session title is required.", "error"); return; }
+  if (!title) { toast("Session title is required.", "err"); return; }
+  const id  = document.getElementById("sm-id").value;
+  const btn = document.getElementById("sm-save-btn");
+  btn.disabled = true; btn.textContent = "Saving…";
 
   const payload = {
     title,
@@ -976,31 +1027,35 @@ async function saveSession() {
     sessionType  : document.getElementById("sm-type").value,
     mode         : document.getElementById("sm-mode").value,
     scheduledDate: document.getElementById("sm-date").value || null,
-    durationMin  : parseInt(document.getElementById("sm-duration").value) || 60,
+    durationMin  : parseInt(document.getElementById("sm-dur").value)  || 60,
     startTime    : document.getElementById("sm-start").value,
     endTime      : document.getElementById("sm-end").value,
     venue        : document.getElementById("sm-venue").value.trim(),
-    facilitator  : document.getElementById("sm-facilitator").value.trim(),
+    facilitator  : document.getElementById("sm-fac").value.trim(),
     targetDept   : document.getElementById("sm-dept").value.trim(),
     isMandatory  : document.getElementById("sm-mandatory").checked,
   };
 
-  const btn = document.getElementById("sm-save-btn");
-  btn.disabled = true; btn.textContent = "Saving…";
-
   try {
     if (id) {
-      await apiRequest(`/api/hr/orientation/sessions/${id}`, "PATCH", payload);
-      toast("Session updated!", "success");
+      await apiRequest("/api/hr/orientation/sessions/" + id, "PATCH", payload);
+      toast("Session updated ✓", "ok");
     } else {
       await apiRequest("/api/hr/orientation/sessions", "POST", payload);
-      toast("Session created!", "success");
+      toast("Session created ✓", "ok");
     }
     closeModal("session-modal");
-    loadSessions();
+    await loadSessions();
     loadOrientations();
-  } catch (err) {
-    toast("Save failed: " + err.message, "error");
+    // If detail modal is open, refresh its enroll list
+    if (currentOrient) {
+      const enrolledIds = (currentOrient.sessionIds || []).map(s =>
+        typeof s === "object" && s !== null ? String(s._id) : String(s)
+      );
+      renderEnrollList(enrolledIds);
+    }
+  } catch(err) {
+    toast("Save failed: " + err.message, "err");
   } finally {
     btn.disabled = false; btn.textContent = "Save Session";
   }
@@ -1009,31 +1064,30 @@ async function saveSession() {
 async function deleteSession() {
   const id = document.getElementById("sm-id").value;
   if (!id) return;
-  if (!confirm("Delete this session? It will be removed from all enrolled orientations.")) return;
-
+  if (!confirm("Delete this session? It will be removed from all enrolled candidates.")) return;
   try {
-    await apiRequest(`/api/hr/orientation/sessions/${id}`, "DELETE");
+    await apiRequest("/api/hr/orientation/sessions/" + id, "DELETE");
     toast("Session deleted.", "info");
     closeModal("session-modal");
-    loadSessions();
+    await loadSessions();
     loadOrientations();
-  } catch (err) {
-    toast("Delete failed: " + err.message, "error");
+  } catch(err) {
+    toast("Delete failed: " + err.message, "err");
   }
 }
 
-// ─── UTILITIES ────────────────────────────────────────────────────────────────
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
 function statusBadge(s) {
-  return {
-    pending    : { cls:"b-amber",  lbl:"Pending"    },
-    invited    : { cls:"b-purple", lbl:"Invited"    },
-    in_progress: { cls:"b-blue",   lbl:"In Progress"},
-    completed  : { cls:"b-green",  lbl:"Completed"  },
-  }[s] || { cls:"b-gray", lbl:s||"—" };
+  return ({
+    pending    : { cls:"b-amber",  lbl:"Pending"     },
+    invited    : { cls:"b-purple", lbl:"Invited"     },
+    in_progress: { cls:"b-blue",   lbl:"In Progress" },
+    completed  : { cls:"b-green",  lbl:"Completed"   },
+  })[s] || { cls:"b-gray", lbl: s || "—" };
 }
 
 function modeLabel(m) {
-  return { in_person:"In-Person", online_zoom:"Zoom", online_meet:"Meet", hybrid:"Hybrid" }[m] || m || "—";
+  return ({in_person:"In-Person",online_zoom:"Zoom",online_meet:"Meet",hybrid:"Hybrid"})[m] || m || "—";
 }
 
 function esc(s) {
@@ -1044,20 +1098,22 @@ function openModal(id)  { document.getElementById(id).classList.add("open"); }
 function closeModal(id) { document.getElementById(id).classList.remove("open"); }
 
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") document.querySelectorAll(".overlay.open").forEach(m => m.classList.remove("open"));
+  if (e.key === "Escape") {
+    document.querySelectorAll(".overlay.open").forEach(m => m.classList.remove("open"));
+  }
 });
 
 function debounceSearch() {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(loadOrientations, 350);
+  searchTimer = setTimeout(loadOrientations, 380);
 }
 
 function toast(msg, type = "info") {
-  const wrap = document.getElementById("toast-wrap");
+  const w = document.getElementById("toast-wrap");
   const t = document.createElement("div");
-  t.className = `toast ${type}`;
+  t.className = "toast " + type;
   t.textContent = msg;
-  wrap.appendChild(t);
+  w.appendChild(t);
   setTimeout(() => t.remove(), 4000);
 }
 </script>
