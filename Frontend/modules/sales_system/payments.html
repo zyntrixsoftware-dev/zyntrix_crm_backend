@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Payments — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);--blue:#3d8ef0;--blue-dim:rgba(61,142,240,.12);--amber:#f5a623;--amber-dim:rgba(245,166,35,.12);--rose:#ff4d6d;--rose-dim:rgba(255,77,109,.12);--purple:#b57bee;--purple-dim:rgba(181,123,238,.12);--teal:#22d3ee;--teal-dim:rgba(34,211,238,.12);--green:#22c55e;--green-dim:rgba(34,197,94,.12);--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg);flex-shrink:0}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-a.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;min-height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-hd{flex:1}.pg-title{font-family:var(--display);font-size:15px;font-weight:700}.pg-crumb{font-size:10px;color:var(--text3)}.pg-crumb span{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-prim:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-danger:hover{background:rgba(255,77,109,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.kpi-row{display:flex;border-bottom:1px solid var(--border);background:var(--bg2)}
+.kpi-c{flex:1;padding:12px 20px;border-right:1px solid var(--border)}.kpi-c:last-child{border-right:none}
+.kpi-v{font-family:var(--display);font-size:20px;font-weight:700}
+.kpi-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:2px}
+.filter-bar{padding:10px 22px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+select.fsel,input.fsel{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:12px;font-family:var(--font);padding:6px 9px;cursor:pointer}
+select.fsel:focus,input.fsel:focus{outline:none;border-color:var(--accent)}
+.content{flex:1;overflow-y:auto;padding:22px}
+.tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg3)}
+th{padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+td{padding:11px 14px;font-size:12.5px;border-top:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:var(--bg3)}
+.badge{display:inline-block;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}.overlay.show{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:460px;background:var(--bg2);border-left:1px solid var(--border2);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drw-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.drw-title{flex:1;font-family:var(--display);font-size:15px;font-weight:700}.drw-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:3px}.drw-close:hover{color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:20px 22px}.drw-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:10.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus{border-color:var(--accent)}.field textarea{resize:vertical;min-height:50px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.confirm-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;display:none}
+.confirm-modal.show{display:flex}
+.confirm-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:24px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.confirm-title{font-family:var(--display);font-size:15px;font-weight:700;margin-bottom:8px}
+.confirm-msg{font-size:12.5px;color:var(--text2);margin-bottom:16px}
+.confirm-actions{display:flex;gap:8px;justify-content:flex-end}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);animation:si .25s ease}
+.toast.ok{border-color:rgba(0,229,176,.3)}.toast.err{border-color:rgba(255,77,109,.3)}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.spin{animation:sp .8s linear infinite;display:inline-block}@keyframes sp{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:700">ZyntrixCRM</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">SALES SYSTEM</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Pipeline</div>
+    <a class="nav-a" href="leads.html"><span class="nav-ico">&#9776;</span>Leads Pipeline</a>
+    <a class="nav-a" href="demos.html"><span class="nav-ico">&#9654;</span>Demo Sessions</a>
+    <a class="nav-a" href="followups.html"><span class="nav-ico">&#128222;</span>Follow-Ups</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Catalogue</div>
+    <a class="nav-a" href="courses.html"><span class="nav-ico">&#9658;</span>Courses</a>
+    <a class="nav-a" href="batches.html"><span class="nav-ico">&#128467;</span>Batches</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Finance</div>
+    <a class="nav-a" href="enrollments.html"><span class="nav-ico">&#9654;</span>Enrollments</a>
+    <a class="nav-a on" href="payments.html"><span class="nav-ico">&#128179;</span>Payments</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Performance</div>
+    <a class="nav-a" href="targets.html"><span class="nav-ico">&#127919;</span>Targets</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">&#9741;</span>Reports</a>
+  </div>
+  <div class="sb-foot"><a class="nav-a" href="../../index.html"><span class="nav-ico">&#8592;</span>Back to CRM</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="pg-hd"><div class="pg-title">Payments</div><div class="pg-crumb">Finance &rsaquo; <span>Payments</span></div></div>
+    <button class="btn btn-prim" onclick="openRecordDrawer()">&#43; Record Payment</button>
+  </div>
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi-c"><div class="kpi-v" id="kToday">—</div><div class="kpi-l">Today's Collection</div></div>
+    <div class="kpi-c"><div class="kpi-v" id="kMonth">—</div><div class="kpi-l">This Month</div></div>
+    <div class="kpi-c"><div class="kpi-v" id="kTotal">—</div><div class="kpi-l">Total Collected</div></div>
+    <div class="kpi-c"><div class="kpi-v" id="kOverdue" style="color:var(--rose)">—</div><div class="kpi-l">Overdue Enrollments</div></div>
+  </div>
+  <div class="filter-bar">
+    <input type="date" class="fsel" id="fFrom" onchange="loadPayments()" placeholder="From">
+    <input type="date" class="fsel" id="fTo" onchange="loadPayments()" placeholder="To">
+    <select class="fsel" id="fMethod" onchange="loadPayments()">
+      <option value="">All Methods</option>
+      <option value="upi">UPI</option>
+      <option value="card">Card</option>
+      <option value="bank_transfer">Bank Transfer</option>
+      <option value="cash">Cash</option>
+      <option value="cheque">Cheque</option>
+      <option value="other">Other</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Clear</button>
+  </div>
+  <div class="content">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Student</th><th>Course</th><th>Amount</th><th>Method</th><th>Instalment</th><th>Date</th><th>Transaction ID</th><th></th>
+        </tr></thead>
+        <tbody id="tbody"><tr><td colspan="8" class="empty"><span class="spin">&#9696;</span> Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- Record Payment Drawer -->
+<div class="drawer" id="recordDrw">
+  <div class="drw-hdr">
+    <div class="drw-title">Record Payment</div>
+    <button class="drw-close" onclick="closeAll()">&#10005;</button>
+  </div>
+  <div class="drw-body">
+    <div class="field"><label>Enrollment *</label><select id="rEnrollment"><option value="">Select enrollment…</option></select></div>
+    <div class="frow">
+      <div class="field"><label>Amount (₹) *</label><input type="number" id="rAmt" placeholder="e.g. 5000"></div>
+      <div class="field"><label>Instalment #</label><input type="number" id="rInst" value="1" min="1"></div>
+    </div>
+    <div class="field"><label>Method *</label>
+      <select id="rMethod">
+        <option value="upi">UPI</option><option value="card">Card</option>
+        <option value="bank_transfer">Bank Transfer</option><option value="cash">Cash</option>
+        <option value="cheque">Cheque</option><option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Transaction ID</label><input type="text" id="rTxn" placeholder="Optional"></div>
+    <div class="field"><label>Remarks</label><textarea id="rRemarks" placeholder="Optional notes…"></textarea></div>
+  </div>
+  <div class="drw-foot">
+    <button class="btn btn-prim" onclick="submitPayment()">Save Payment</button>
+    <button class="btn btn-ghost" onclick="closeAll()">Cancel</button>
+  </div>
+</div>
+
+<!-- Void Confirm Modal -->
+<div class="confirm-modal" id="voidModal">
+  <div class="confirm-box">
+    <div class="confirm-title">Void Payment</div>
+    <div class="confirm-msg">Are you sure you want to void this payment? This cannot be undone.</div>
+    <div class="field"><label>Reason *</label><textarea id="voidReason" placeholder="State the reason for voiding…" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;width:100%;min-height:60px;resize:vertical"></textarea></div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeVoidModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmVoid()">Void Payment</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="tw"></div>
+<script src="../../assets/js/api.js"></script>
+<script>
+let pendingVoidId = null;
+let allEnrollments = [];
+
+async function init() {
+  await Promise.all([loadKPI(), loadPayments(), loadEnrollments()]);
+}
+
+async function loadKPI() {
+  const d = await apiRequest('/sales/payments/summary');
+  if (d.error) return;
+  const fmt = n => '₹' + (n||0).toLocaleString('en-IN');
+  document.getElementById('kToday').textContent = fmt(d.todayTotal);
+  document.getElementById('kMonth').textContent = fmt(d.monthTotal);
+  document.getElementById('kTotal').textContent = fmt(d.totalCollected);
+  document.getElementById('kOverdue').textContent = d.overdueCount || 0;
+}
+
+async function loadEnrollments() {
+  const d = await apiRequest('/sales/enrollments?limit=500');
+  allEnrollments = Array.isArray(d) ? d : (d.enrollments || []);
+  const sel = document.getElementById('rEnrollment');
+  sel.innerHTML = '<option value="">Select enrollment…</option>';
+  allEnrollments.forEach(e => {
+    const o = document.createElement('option');
+    o.value = e._id;
+    const lead = e.lead?.name || e.lead?.fullName || 'Student';
+    const course = e.course?.title || e.course?.name || 'Course';
+    o.textContent = `${lead} — ${course}`;
+    sel.appendChild(o);
+  });
+}
+
+async function loadPayments() {
+  const from = document.getElementById('fFrom').value;
+  const to = document.getElementById('fTo').value;
+  const method = document.getElementById('fMethod').value;
+  const qs = new URLSearchParams();
+  if (from) qs.set('from', from);
+  if (to) qs.set('to', to);
+  if (method) qs.set('method', method);
+  const data = await apiRequest('/sales/payments?' + qs.toString());
+  const rows = Array.isArray(data) ? data : (data.payments || []);
+  renderTable(rows);
+}
+
+const methodColor = {upi:'badge-blue',card:'badge-purple',bank_transfer:'badge-teal',cash:'badge-green',cheque:'badge-amber',other:'badge-ghost'};
+const badgeClass = {blue:'badge-blue',purple:'badge-purple',teal:'badge-teal',green:'badge-green',amber:'badge-amber'};
+
+function renderTable(rows) {
+  const tb = document.getElementById('tbody');
+  if (!rows.length) { tb.innerHTML='<tr><td colspan="8" class="empty">No payments found</td></tr>'; return; }
+  tb.innerHTML = rows.map(p => {
+    const lead = p.lead?.name || p.lead?.fullName || '—';
+    const course = p.course?.title || p.course?.name || '—';
+    const mcls = methodColor[p.method] || 'badge-blue';
+    const date = p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-IN') : '—';
+    const voided = p.voided || p.status === 'voided';
+    return `<tr style="${voided?'opacity:.5':''}">
+      <td><strong>${lead}</strong></td>
+      <td>${course}</td>
+      <td style="font-family:var(--mono);color:var(--accent)">₹${(p.amount||0).toLocaleString('en-IN')}</td>
+      <td><span class="badge ${mcls}">${p.method||'—'}</span>${voided?'<span class="badge" style="background:var(--rose-dim);color:var(--rose);margin-left:4px">VOID</span>':''}</td>
+      <td style="color:var(--text2)">#${p.instalmentNumber||1}</td>
+      <td style="color:var(--text2)">${date}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${p.transactionId||'—'}</td>
+      <td>${!voided ? `<button class="btn btn-danger btn-sm" onclick="openVoid('${p._id}',event)">Void</button>` : ''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openRecordDrawer() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('recordDrw').classList.add('open');
+}
+
+async function submitPayment() {
+  const enrollment = document.getElementById('rEnrollment').value;
+  const amt = parseFloat(document.getElementById('rAmt').value);
+  if (!enrollment || !amt) { toast('Enrollment and amount are required', 'err'); return; }
+  const enr = allEnrollments.find(e => e._id === enrollment);
+  const body = {
+    enrollment,
+    lead: enr?.lead?._id || enr?.lead,
+    course: enr?.course?._id || enr?.course,
+    amount: amt,
+    method: document.getElementById('rMethod').value,
+    instalmentNumber: parseInt(document.getElementById('rInst').value) || 1,
+    transactionId: document.getElementById('rTxn').value,
+    remarks: document.getElementById('rRemarks').value
+  };
+  const res = await apiRequest('/sales/payments', { method:'POST', body: JSON.stringify(body) });
+  if (res.error) { toast(res.msg || 'Failed', 'err'); return; }
+  toast('Payment recorded!', 'ok');
+  closeAll(); loadPayments(); loadKPI();
+}
+
+function openVoid(id, e) {
+  e.stopPropagation();
+  pendingVoidId = id;
+  document.getElementById('voidReason').value = '';
+  document.getElementById('voidModal').classList.add('show');
+}
+
+async function confirmVoid() {
+  const reason = document.getElementById('voidReason').value.trim();
+  if (!reason) { toast('Please state a reason', 'err'); return; }
+  const res = await apiRequest('/sales/payments/' + pendingVoidId, { method:'DELETE', body: JSON.stringify({ reason }) });
+  if (res.error) { toast(res.msg || 'Failed to void', 'err'); return; }
+  toast('Payment voided', 'ok');
+  closeVoidModal(); loadPayments(); loadKPI();
+}
+
+function closeVoidModal() {
+  document.getElementById('voidModal').classList.remove('show');
+  pendingVoidId = null;
+}
+
+function clearFilters() {
+  document.getElementById('fFrom').value = '';
+  document.getElementById('fTo').value = '';
+  document.getElementById('fMethod').value = '';
+  loadPayments();
+}
+
+function closeAll() {
+  document.getElementById('overlay').classList.remove('show');
+  document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
+}
+
+function toast(msg, t='info') {
+  const w = document.getElementById('tw');
+  const el = document.createElement('div');
+  el.className = `toast ${t}`; el.textContent = msg;
+  w.appendChild(el); setTimeout(() => el.remove(), 3500);
+}
+
+init();
+</script>
+</body>
+</html>

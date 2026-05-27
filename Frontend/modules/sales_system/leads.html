@@ -3,1301 +3,462 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Leads — Zyntrix CRM</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Student Leads Pipeline — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg:#080e18; --bg2:#0d1624; --bg3:#111e30; --bg4:#162436; --bg5:#1c2e42;
-  --surface:#0f1d2e;
-  --accent:#00e5b0; --accent2:#00c99a; --accent-dim:rgba(0,229,176,0.10); --accent-glow:rgba(0,229,176,0.22);
-  --blue:#3d8ef0; --blue-dim:rgba(61,142,240,0.12);
-  --amber:#f5a623; --amber-dim:rgba(245,166,35,0.12);
-  --rose:#ff4d6d; --rose-dim:rgba(255,77,109,0.12);
-  --purple:#b57bee; --purple-dim:rgba(181,123,238,0.12);
-  --orange:#ff7d40; --orange-dim:rgba(255,125,64,0.12);
-  --teal:#22d3ee; --teal-dim:rgba(34,211,238,0.12);
-  --text:#e8f0fe; --text2:#8ba3bf; --text3:#4e6680;
-  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.11);
-  --font:'Instrument Sans',sans-serif; --display:'Syne',sans-serif; --mono:'DM Mono',monospace;
-  --radius:14px; --sidebar:260px;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--bg5:#1c2e42;
+  --accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,0.10);
+  --blue:#3d8ef0;--blue-dim:rgba(61,142,240,0.12);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.12);
+  --rose:#ff4d6d;--rose-dim:rgba(255,77,109,0.12);
+  --purple:#b57bee;--purple-dim:rgba(181,123,238,0.12);
+  --orange:#ff7d40;--orange-dim:rgba(255,125,64,0.12);
+  --teal:#22d3ee;--teal-dim:rgba(34,211,238,0.12);
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+  --text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;
+  --radius:12px;--sidebar:230px;
 }
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden;}
-.shell{display:flex;height:100vh;}
-.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;position:relative;}
-.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:260px;background:radial-gradient(ellipse at 30% 0%,rgba(0,229,176,0.06) 0%,transparent 70%);pointer-events:none;}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.brand{padding:22px 20px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
-.brand-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:800;color:var(--bg);flex-shrink:0;box-shadow:0 0 20px rgba(0,229,176,0.3);}
-.brand-text{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
-.brand-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px;letter-spacing:0.5px;}
-.nav-group{padding:16px 12px 6px;}
-.nav-label{font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 8px;font-family:var(--display);}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all 0.18s;margin-bottom:2px;position:relative;font-weight:500;}
-.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
-.nav-item.active{background:var(--accent-dim);color:var(--accent);}
-.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--accent);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--accent);}
-.nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0;}
-.nav-count{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--mono);background:var(--bg4);color:var(--text2);padding:2px 7px;border-radius:6px;}
-.nav-count.hot{background:var(--rose-dim);color:var(--rose);}
-.nav-count.ok{background:var(--accent-dim);color:var(--accent);}
-.nav-divider{height:1px;background:var(--border);margin:8px 12px;}
-.sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);flex-shrink:0;}
-.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background 0.15s;}
-.user-card:hover{background:var(--border);}
-.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bg);flex-shrink:0;font-family:var(--display);}
-.user-name{font-size:13px;font-weight:600;color:var(--text);}
-.user-role{font-size:11px;color:var(--text3);}
-.topbar{height:64px;min-height:64px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;position:relative;}
-.topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,176,0.15),transparent);}
-.page-hd{flex:1;}
-.page-title{font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;}
-.page-crumb{font-size:11px;color:var(--text3);margin-top:1px;}
-.page-crumb span{color:var(--accent);}
-.search-wrap{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;min-width:220px;transition:border 0.2s;}
-.search-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
-.search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font);width:100%;}
-.search-wrap input::placeholder{color:var(--text3);}
-.tbtn{padding:8px 16px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:flex;align-items:center;gap:7px;transition:all 0.18s;white-space:nowrap;}
-.tbtn:hover{background:var(--bg3);}
-.tbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;box-shadow:0 0 20px rgba(0,229,176,0.25);}
-.tbtn.primary:hover{background:var(--accent2);}
-.sub-nav{display:flex;align-items:center;gap:4px;padding:16px 28px 0;background:var(--bg2);border-bottom:1px solid var(--border);}
-.snav-tab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;white-space:nowrap;font-family:var(--font);display:flex;align-items:center;gap:7px;background:none;border-top:none;border-left:none;border-right:none;}
-.snav-tab:hover{color:var(--text);}
-.snav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.snav-tab .tab-count{font-size:10px;font-family:var(--mono);background:var(--accent-dim);color:var(--accent);padding:1px 6px;border-radius:5px;}
-.snav-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
-.content{flex:1;overflow-y:auto;background:var(--bg);}
-.content::-webkit-scrollbar{width:5px;}
-.content::-webkit-scrollbar-track{background:transparent;}
-.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
-.section{padding:24px 28px;}
-.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s;}
-.kpi-card:hover{transform:translateY(-2px);border-color:var(--border2);}
-.kpi-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,var(--glow,rgba(0,229,176,0.06)) 0%,transparent 60%);pointer-events:none;}
-.kpi-icon{font-size:20px;margin-bottom:10px;display:block;}
-.kpi-val{font-family:var(--display);font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px;}
-.kpi-lbl{font-size:11px;color:var(--text3);margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
-.kpi-delta{font-size:11.5px;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:500;}
-.up{color:var(--accent);}.dn{color:var(--rose);}.neu{color:var(--text3);}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
-.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap;}
-.card-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.2px;}
-.card-sub{font-size:11.5px;color:var(--text3);margin-top:3px;}
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;font-family:var(--mono);}
-.b-accent{background:var(--accent-dim);color:var(--accent);}
-.b-blue{background:var(--blue-dim);color:var(--blue);}
-.b-amber{background:var(--amber-dim);color:var(--amber);}
-.b-rose{background:var(--rose-dim);color:var(--rose);}
-.b-purple{background:var(--purple-dim);color:var(--purple);}
-.b-teal{background:var(--teal-dim);color:var(--teal);}
-.b-gray{background:rgba(78,102,128,0.15);color:var(--text3);}
-.btn{padding:8px 16px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:7px;transition:all 0.18s;}
-.btn:hover{background:var(--bg4);}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
-.btn.primary:hover{background:var(--accent2);}
-.btn.danger{background:var(--rose-dim);border-color:transparent;color:var(--rose);}
-.btn-sm{padding:5px 12px;font-size:12px;border-radius:7px;}
-.btn-xs{padding:3px 9px;font-size:11px;border-radius:6px;}
-.btn-icon{width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border2);background:transparent;cursor:pointer;color:var(--text2);font-size:14px;transition:all 0.15s;}
-.btn-icon:hover{background:var(--bg4);color:var(--text);}
-.prog{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
-.prog-fill{height:100%;border-radius:3px;transition:width 0.8s cubic-bezier(.4,0,.2,1);}
-table{width:100%;border-collapse:collapse;}
-thead tr{border-bottom:1px solid var(--border2);}
-th{text-align:left;font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 14px 12px;white-space:nowrap;font-family:var(--display);}
-td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
-tbody tr{transition:background 0.12s;}
-tbody tr:hover td{background:rgba(255,255,255,0.015);}
-.td-main{font-weight:600;color:var(--text);font-size:13px;}
-.td-sub{font-size:11px;color:var(--text3);margin-top:2px;}
-select{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer;transition:border 0.15s;}
-select:focus{border-color:var(--accent);}
-select option{background:var(--bg2);}
-.filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all 0.15s;font-family:var(--font);white-space:nowrap;}
-.filter-chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
-.filter-chip:hover:not(.active){background:var(--bg3);color:var(--text);}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
-.ani{animation:fadeUp 0.35s ease both;}
-/* KANBAN */
-.leads-kanban{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;min-height:400px;}
-.leads-kanban::-webkit-scrollbar{height:5px;}
-.leads-kanban::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
-.lk-col{flex:0 0 210px;min-width:210px;}
-.lk-hd{padding:10px 12px;border-radius:10px 10px 0 0;border:1px solid var(--border);border-bottom:none;display:flex;align-items:center;justify-content:space-between;}
-.lk-body{border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:8px;background:var(--bg3);min-height:80px;display:flex;flex-direction:column;gap:8px;}
-.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px;cursor:pointer;transition:all 0.2s;}
-.lead-card:hover{border-color:var(--border2);transform:translateY(-2px);}
-.lc-name{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:3px;}
-.lc-co{font-size:11px;color:var(--text3);margin-bottom:8px;}
-.lc-foot{display:flex;justify-content:space-between;align-items:center;}
-/* OVERLAY / MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(4,8,16,0.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.overlay.open{display:flex;animation:overlayIn 0.2s ease;}
-@keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:680px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:modalUp 0.25s cubic-bezier(.34,1.56,.64,1);}
-@keyframes modalUp{from{opacity:0;transform:translateY(20px) scale(0.96);}to{opacity:1;transform:none;}}
-.modal::-webkit-scrollbar{width:4px;}
-.modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
-.modal-hd{padding:22px 26px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg2);z-index:1;}
-.modal-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);}
-.modal-close{background:var(--bg4);border:none;color:var(--text2);cursor:pointer;font-size:18px;width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-.modal-close:hover{background:var(--bg5);color:var(--text);}
-.modal-body{padding:24px 26px;}
-.modal-ft{padding:16px 26px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:var(--bg2);position:sticky;bottom:0;}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.fg{display:flex;flex-direction:column;gap:6px;}
-.fg.full{grid-column:1/-1;}
-label{font-size:11.5px;font-weight:600;color:var(--text2);letter-spacing:0.2px;font-family:var(--display);}
-input,textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100%;transition:border 0.15s,box-shadow 0.15s;}
-input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
-textarea{resize:vertical;min-height:80px;}
-.fg select{padding:10px 13px;}
-.dropdown{position:relative;}
-.dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--border2);border-radius:10px;min-width:170px;z-index:50;box-shadow:0 8px 32px rgba(0,0,0,0.4);overflow:hidden;}
-.dropdown-menu.open{display:block;animation:fadeUp 0.15s ease;}
-.dd-item{padding:10px 14px;font-size:13px;cursor:pointer;color:var(--text2);display:flex;align-items:center;gap:8px;transition:all 0.12s;}
-.dd-item:hover{background:var(--bg3);color:var(--text);}
-.dd-item.danger:hover{background:var(--rose-dim);color:var(--rose);}
-.dd-sep{height:1px;background:var(--border);margin:3px 0;}
-.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;}
-.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);max-width:320px;animation:toastIn 0.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
-.toast.success{border-color:rgba(0,229,176,0.3);}
-.toast.error{border-color:rgba(255,77,109,0.3);}
-@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(0.95);}to{opacity:1;transform:none;}}
-@keyframes toastOut{to{opacity:0;transform:translateY(6px) scale(0.96);}}
-.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(4,8,16,0.7);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
-.confirm-overlay.open{display:flex;}
-.confirm-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;width:380px;max-width:95vw;text-align:center;animation:modalUp 0.2s ease;}
-.confirm-icon{font-size:36px;margin-bottom:12px;}
-.confirm-title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;}
-.confirm-msg{font-size:13px;color:var(--text2);margin-bottom:22px;}
-.confirm-btns{display:flex;gap:10px;justify-content:center;}
-/* EMPTY STATE */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;gap:16px;text-align:center;}
-.empty-icon{font-size:48px;opacity:0.4;}
-.empty-title{font-family:var(--display);font-size:18px;font-weight:700;color:var(--text);}
-.empty-sub{font-size:13px;color:var(--text3);max-width:380px;line-height:1.7;}
-/* ANALYTICS GRID */
-.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.bar-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
-.bar-item:last-child{border-bottom:none;}
-.bar-label{font-size:12px;color:var(--text2);min-width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.bar-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
-.bar-fill{height:100%;border-radius:3px;background:var(--accent);transition:width 0.6s ease;}
-.bar-count{font-size:11px;font-family:var(--mono);color:var(--text3);min-width:28px;text-align:right;}
-/* SKELETON */
-.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;}
-@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-/* SCORE PILL */
-.score-pill{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px;}
-/* BULK BAR */
-.bulk-bar{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--accent);border-radius:12px;padding:12px 20px;gap:14px;align-items:center;z-index:100;box-shadow:0 8px 32px rgba(0,229,176,0.15);}
-.bulk-bar.open{display:flex;}
-/* FOLLOWUP BADGE */
-.followup-badge{font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:5px;display:inline-block;}
-.followup-today{background:var(--rose-dim);color:var(--rose);}
-.followup-soon{background:var(--amber-dim);color:var(--amber);}
-.followup-ok{background:var(--accent-dim);color:var(--accent);}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg);flex-shrink:0}
+.brand-info .name{font-family:var(--display);font-size:13px;font-weight:700}
+.brand-info .sub{font-size:9px;color:var(--text3);font-family:var(--mono);letter-spacing:.5px}
+.nav-grp{padding:12px 8px 4px}
+.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-a.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0}
+.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--bg);flex-shrink:0}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;min-height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-hd{flex:1}
+.pg-title{font-family:var(--display);font-size:15px;font-weight:700}
+.pg-crumb{font-size:10px;color:var(--text3)}
+.pg-crumb span{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s;text-decoration:none}
+.btn-prim{background:var(--accent);color:var(--bg)}
+.btn-prim:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(255,77,109,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+/* KPI */
+.kpi-row{display:flex;border-bottom:1px solid var(--border);background:var(--bg2)}
+.kpi-c{flex:1;padding:10px 18px;border-right:1px solid var(--border)}
+.kpi-c:last-child{border-right:none}
+.kpi-v{font-family:var(--display);font-size:19px;font-weight:700}
+.kpi-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:1px}
+/* FILTER */
+.filter-bar{padding:10px 22px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sw{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;min-width:180px}
+.sw:focus-within{border-color:var(--accent)}
+.sw input{background:none;border:none;outline:none;color:var(--text);font-size:12px;font-family:var(--font);width:100%}
+.sw input::placeholder{color:var(--text3)}
+select.fsel{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:12px;font-family:var(--font);padding:6px 9px;cursor:pointer}
+select.fsel:focus{outline:none;border-color:var(--accent)}
+/* BOARD */
+.board-wrap{flex:1;overflow-x:auto;overflow-y:hidden;padding:16px 22px}
+.board{display:flex;gap:12px;height:100%;min-width:max-content}
+.col{width:220px;flex-shrink:0;display:flex;flex-direction:column}
+.col-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:9px;margin-bottom:6px}
+.col-ttl{font-size:10.5px;font-weight:700;font-family:var(--display);text-transform:uppercase;letter-spacing:.5px}
+.col-cnt{font-family:var(--mono);font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:5px}
+.card-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:2px}
+.card-list::-webkit-scrollbar{width:3px}
+.card-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+/* CARDS */
+.lcard{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;position:relative}
+.lcard:hover{border-color:var(--border2);background:var(--bg4);transform:translateY(-1px)}
+.lcard.dragging{opacity:.45;border-style:dashed}
+.drop-over{border-color:var(--accent)!important;background:var(--accent-dim)!important}
+.lname{font-size:12.5px;font-weight:600;color:var(--text)}
+.lcourse{font-size:10px;color:var(--accent);margin:2px 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lmeta{font-size:10px;color:var(--text3)}
+.lfoot{display:flex;align-items:center;justify-content:space-between;margin-top:7px;padding-top:7px;border-top:1px solid var(--border)}
+.sbadge{font-size:8.5px;font-weight:600;padding:2px 6px;border-radius:4px;text-transform:uppercase}
+.ldate{font-size:9px;color:var(--text3);font-family:var(--mono)}
+.fu-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);position:absolute;top:9px;right:9px}
+.col-empty{display:flex;align-items:center;justify-content:center;min-height:70px;border:1px dashed var(--border);border-radius:8px;font-size:11px;color:var(--text3)}
+/* DRAWER */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}
+.overlay.show{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:460px;background:var(--bg2);border-left:1px solid var(--border2);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drw-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.drw-title{flex:1;font-family:var(--display);font-size:15px;font-weight:700}
+.drw-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;line-height:1;padding:3px;margin-top:2px}
+.drw-close:hover{color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:20px 22px}
+.drw-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px}
+/* FORM */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgrid.full{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:10.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field select option{background:var(--bg3)}
+.field textarea{resize:vertical;min-height:60px}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding-bottom:8px;border-bottom:1px solid var(--border);margin:16px 0 12px}
+/* TABS */
+.tabs{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.tab{padding:10px 14px;font-size:11.5px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+/* STAGE PILLS */
+.spill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.info-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.info-row .lbl{color:var(--text2)}
+.info-row .val{color:var(--text);font-weight:500;text-align:right}
+/* TOAST */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);animation:slideIn .25s ease;display:flex;align-items:center;gap:8px}
+.toast.ok{border-color:rgba(0,229,176,.3)}
+.toast.err{border-color:rgba(255,77,109,.3)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.spin{animation:spinning .8s linear infinite;display:inline-block}
+@keyframes spinning{to{transform:rotate(360deg)}}
+.ls{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px;gap:8px}
 </style>
 </head>
 <body>
 <div class="shell">
-
-<!-- ─── SIDEBAR ─────────────────────────────────────────────────────────── -->
+<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-mark">Z</div>
-    <div><div class="brand-text">Zyntrix CRM</div><div class="brand-sub">Student Sales Suite</div></div>
+    <div class="brand-info"><div class="name">ZyntrixCRM</div><div class="sub">SALES SYSTEM</div></div>
   </div>
-  <div class="nav-group">
-    <div class="nav-label">Overview</div>
-    <a class="nav-item" href="dashboard.html"><span class="nav-icon">⌂</span> Dashboard</a>
+  <div class="nav-grp">
+    <div class="nav-lbl">Pipeline</div>
+    <a class="nav-a on" href="leads.html"><span class="nav-ico">&#9776;</span>Leads Pipeline</a>
+    <a class="nav-a" href="demos.html"><span class="nav-ico">&#9654;</span>Demo Sessions</a>
+    <a class="nav-a" href="followups.html"><span class="nav-ico">&#128222;</span>Follow-Ups</a>
   </div>
-  <div class="nav-group">
-    <div class="nav-label">Pipeline</div>
-    <a class="nav-item" href="pipeline.html"><span class="nav-icon">◈</span> Pipeline Board</a>
-    <a class="nav-item" href="deals.html"><span class="nav-icon">⟐</span> Enrollments</a>
-    <a class="nav-item active" href="leads.html"><span class="nav-icon">◎</span> Student Leads <span class="nav-count hot" id="nav-hot-count">—</span></a>
+  <div class="nav-grp">
+    <div class="nav-lbl">Catalogue</div>
+    <a class="nav-a" href="courses.html"><span class="nav-ico">&#9658;</span>Courses</a>
+    <a class="nav-a" href="batches.html"><span class="nav-ico">&#128467;</span>Batches</a>
   </div>
-  <div class="nav-group">
-    <div class="nav-label">Engagement</div>
-    <a class="nav-item" href="activities.html"><span class="nav-icon">☏</span> Activities</a>
-    <a class="nav-item" href="emails.html"><span class="nav-icon">✉</span> Emails &amp; Proposals</a>
-    <a class="nav-item" href="meetings.html"><span class="nav-icon">◷</span> Meetings</a>
+  <div class="nav-grp">
+    <div class="nav-lbl">Finance</div>
+    <a class="nav-a" href="enrollments.html"><span class="nav-ico">&#9654;</span>Enrollments</a>
+    <a class="nav-a" href="payments.html"><span class="nav-ico">&#128179;</span>Payments</a>
   </div>
-  <div class="nav-group">
-    <div class="nav-label">Insights</div>
-    <a class="nav-item" href="reports.html"><span class="nav-icon">↗</span> Revenue Reports</a>
-    <a class="nav-item" href="leaderboard.html"><span class="nav-icon">⬡</span> Leaderboard</a>
+  <div class="nav-grp">
+    <div class="nav-lbl">Performance</div>
+    <a class="nav-a" href="targets.html"><span class="nav-ico">&#127919;</span>Targets</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">&#9741;</span>Reports</a>
   </div>
-  <div class="nav-divider"></div>
-  <div class="nav-group">
-    <div class="nav-label">Admin</div>
-    <a class="nav-item" href="settings.html"><span class="nav-icon">⊙</span> Settings</a>
-    <a class="nav-item" href="../import.html"><span class="nav-icon">↑</span> Import Data</a>
-  </div>
-  <div class="sidebar-footer">
-    <div class="user-card">
-      <div class="avatar" id="user-avatar">?</div>
-      <div><div class="user-name" id="user-name">Loading…</div><div class="user-role">Sales Executive</div></div>
+  <div class="sb-foot">
+    <div class="user-row">
+      <div class="av" id="navAv">?</div>
+      <div><div style="font-size:12px;font-weight:600" id="navName">...</div><div style="font-size:10px;color:var(--text3)" id="navRole"></div></div>
     </div>
   </div>
 </aside>
-
-<!-- ─── MAIN ──────────────────────────────────────────────────────────────── -->
+<!-- MAIN -->
 <div class="main">
-  <!-- TOPBAR -->
   <div class="topbar">
-    <div class="page-hd">
-      <div class="page-title">Student Leads</div>
-      <div class="page-crumb">Sales Suite → <span>Leads</span></div>
-    </div>
-    <div class="search-wrap">
-      <span style="color:var(--text3);font-size:14px;">⌕</span>
-      <input type="text" id="global-search" placeholder="Search students…" oninput="applyFilters()">
-    </div>
-    <button class="tbtn" onclick="openModal('import-prompt-overlay')" title="Import student Excel">↑ Import</button>
-    <button class="tbtn primary" id="add-btn" onclick="openAddModal()" style="display:none;">+ Add Student</button>
-    <button class="tbtn" onclick="loadData()" title="Refresh">↺</button>
+    <div class="pg-hd"><div class="pg-title">Student Leads Pipeline</div><div class="pg-crumb">Sales &rsaquo; <span>Pipeline</span></div></div>
+    <button class="btn btn-ghost btn-sm" onclick="loadBoard()">&#8635; Refresh</button>
+    <button class="btn btn-prim" onclick="openAdd()">+ Add Lead</button>
   </div>
+  <div class="kpi-row">
+    <div class="kpi-c"><div class="kpi-v" id="kTotal">—</div><div class="kpi-l">Total Leads</div></div>
+    <div class="kpi-c"><div class="kpi-v" style="color:var(--teal)" id="kNew">—</div><div class="kpi-l">New</div></div>
+    <div class="kpi-c"><div class="kpi-v" style="color:var(--blue)" id="kDemo">—</div><div class="kpi-l">Demo Stage</div></div>
+    <div class="kpi-c"><div class="kpi-v" style="color:var(--accent)" id="kEnrolled">—</div><div class="kpi-l">Enrolled</div></div>
+    <div class="kpi-c"><div class="kpi-v" style="color:var(--rose)" id="kDropped">—</div><div class="kpi-l">Dropped</div></div>
+  </div>
+  <div class="filter-bar">
+    <div class="sw"><span style="color:var(--text3);font-size:12px">&#128269;</span><input id="sInput" placeholder="Search name / email / phone..." oninput="applyFilter()"></div>
+    <select class="fsel" id="fSrc" onchange="applyFilter()">
+      <option value="">All Sources</option>
+      <option value="website">Website</option><option value="social_media">Social Media</option>
+      <option value="referral">Referral</option><option value="cold_call">Cold Call</option>
+      <option value="walk_in">Walk-in</option><option value="other">Other</option>
+    </select>
+    <select class="fsel" id="fEdu" onchange="applyFilter()">
+      <option value="">All Education</option>
+      <option value="high_school">High School</option><option value="undergraduate">Undergraduate</option>
+      <option value="graduate">Graduate</option><option value="working_professional">Working Professional</option>
+    </select>
+  </div>
+  <div class="board-wrap"><div class="board" id="board"><div class="ls"><span class="spin">&#9696;</span>Loading leads...</div></div></div>
+</div>
+</div>
 
-  <!-- SUB-NAV TABS -->
-  <div class="sub-nav">
-    <button class="snav-tab active" onclick="switchView('table',this)">⊟ All Leads <span class="tab-count" id="tc-all">—</span></button>
-    <button class="snav-tab" onclick="switchView('kanban',this)">◈ Kanban</button>
-    <button class="snav-tab" onclick="switchView('hot',this)">🔥 Hot Leads <span class="tab-count" style="background:var(--rose-dim);color:var(--rose);" id="tc-hot">—</span></button>
-    <button class="snav-tab" onclick="switchView('followup',this)">📅 Follow-ups <span class="tab-count" style="background:var(--amber-dim);color:var(--amber);" id="tc-followup">—</span></button>
-    <button class="snav-tab" onclick="switchView('analytics',this)">↗ Analytics</button>
-    <div class="snav-right">
-      <select id="owner-filter" onchange="applyFilters()" style="font-size:12px;padding:5px 10px;">
-        <option value="">All Counsellors</option>
-      </select>
-      <select id="sort-sel" onchange="applyFilters()" style="font-size:12px;padding:5px 10px;">
-        <option value="created-desc">Newest First</option>
-        <option value="created-asc">Oldest First</option>
-        <option value="score-desc">Highest Score</option>
-        <option value="name-asc">Name A–Z</option>
-      </select>
+<!-- OVERLAY -->
+<div class="overlay" id="ov" onclick="closeDrawers()"></div>
+
+<!-- ADD DRAWER -->
+<div class="drawer" id="addDrw">
+  <div class="drw-hdr"><div class="drw-title">Add New Lead</div><button class="drw-close" onclick="closeDrawers()">&#10005;</button></div>
+  <div class="drw-body">
+    <div class="fgrid">
+      <div class="field" style="grid-column:1/-1"><label>Full Name *</label><input id="fName" placeholder="Student full name"></div>
+      <div class="field"><label>Email</label><input id="fEmail" type="email" placeholder="email@example.com"></div>
+      <div class="field"><label>Phone</label><input id="fPhone" placeholder="+91 9876543210"></div>
+      <div class="field"><label>City</label><input id="fCity" placeholder="Mumbai"></div>
+      <div class="field"><label>Budget (INR)</label><input id="fBudget" type="number" placeholder="0"></div>
+      <div class="field"><label>Education Level</label>
+        <select id="fEduL"><option value="undergraduate">Undergraduate</option><option value="high_school">High School</option><option value="graduate">Graduate</option><option value="working_professional">Working Professional</option></select>
+      </div>
+      <div class="field"><label>Source</label>
+        <select id="fSrcL"><option value="website">Website</option><option value="social_media">Social Media</option><option value="referral">Referral</option><option value="cold_call">Cold Call</option><option value="walk_in">Walk-in</option><option value="other">Other</option></select>
+      </div>
+      <div class="field" style="grid-column:1/-1"><label>Course Interest</label><select id="fCourse"><option value="">-- Select Course --</option></select></div>
+      <div class="field"><label>Follow-up Date</label><input id="fFU" type="date"></div>
+      <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="fNotes" placeholder="Additional info..."></textarea></div>
     </div>
   </div>
-
-  <!-- CONTENT -->
-  <div class="content">
-    <!-- LOADING SKELETON -->
-    <div id="loading-state" class="section">
-      <div class="kpi-row" style="margin-bottom:22px;">
-        <div class="kpi-card skeleton" style="height:90px;"></div>
-        <div class="kpi-card skeleton" style="height:90px;"></div>
-        <div class="kpi-card skeleton" style="height:90px;"></div>
-        <div class="kpi-card skeleton" style="height:90px;"></div>
-        <div class="kpi-card skeleton" style="height:90px;"></div>
-      </div>
-      <div class="card skeleton" style="height:400px;"></div>
-    </div>
-
-    <!-- NO SCHEMA STATE -->
-    <div id="empty-state" style="display:none;">
-      <div class="empty-state">
-        <div class="empty-icon">📊</div>
-        <div class="empty-title">No Student Data Yet</div>
-        <div class="empty-sub">Import your student Excel sheet to get started. The system will automatically map your columns and display everything here.</div>
-        <button class="btn primary" onclick="openModal('import-prompt-overlay')" style="margin-top:8px;">↑ Import Student Excel</button>
-      </div>
-    </div>
-
-    <!-- MAIN DATA AREA (shown after schema loads) -->
-    <div id="data-area" style="display:none;">
-      <!-- KPI CARDS -->
-      <div class="section" style="padding-bottom:0;">
-        <div class="kpi-row" id="kpi-row"></div>
-
-        <!-- STATUS FILTER CHIPS -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;" id="status-chips">
-          <button class="filter-chip active" onclick="setStatusFilter('',this)">All</button>
-        </div>
-
-        <!-- ── ALL LEADS TABLE VIEW ── -->
-        <div id="view-table">
-          <div class="card" style="padding:0;overflow:hidden;">
-            <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-              <div>
-                <div class="card-title" id="table-title">Student Leads</div>
-                <div class="card-sub" id="table-sub"></div>
-              </div>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-sm" id="bulk-status-btn" style="display:none;" onclick="openBulkStatus()">⚡ Bulk Update Status</button>
-                <button class="btn btn-sm danger" id="bulk-del-btn" style="display:none;" onclick="bulkDelete()">✗ Delete Selected</button>
-              </div>
-            </div>
-            <div style="overflow-x:auto;">
-              <table>
-                <thead><tr id="leads-thead"></tr></thead>
-                <tbody id="leads-tbody"></tbody>
-              </table>
-            </div>
-            <div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
-              <div style="font-size:12px;color:var(--text3);" id="table-footer"></div>
-              <div style="display:flex;gap:6px;" id="pagination"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── KANBAN VIEW ── -->
-        <div id="view-kanban" style="display:none;">
-          <div class="leads-kanban" id="leads-kanban"></div>
-        </div>
-
-        <!-- ── HOT LEADS VIEW ── -->
-        <div id="view-hot" style="display:none;">
-          <div class="card" style="padding:0;overflow:hidden;">
-            <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
-              <div class="card-title">🔥 Hot Leads</div>
-              <div class="card-sub">Students with highest interest scores</div>
-            </div>
-            <div style="overflow-x:auto;">
-              <table>
-                <thead><tr id="hot-thead"></tr></thead>
-                <tbody id="hot-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── FOLLOW-UPS VIEW ── -->
-        <div id="view-followup" style="display:none;">
-          <div class="card" style="padding:0;overflow:hidden;">
-            <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
-              <div class="card-title">📅 Pending Follow-Ups</div>
-              <div class="card-sub">Students due for follow-up today and this week</div>
-            </div>
-            <div style="overflow-x:auto;">
-              <table>
-                <thead><tr id="fu-thead"></tr></thead>
-                <tbody id="fu-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── ANALYTICS VIEW ── -->
-        <div id="view-analytics" style="display:none;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div class="card" id="analytics-status"></div>
-            <div class="card" id="analytics-source"></div>
-            <div class="card" id="analytics-counsellor"></div>
-            <div class="card" id="analytics-course"></div>
-            <div class="card" id="analytics-city" style="grid-column:1/-1;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /shell -->
-
-<!-- ═══ MODALS ═══════════════════════════════════════════════════════════════ -->
-
-<!-- ADD / EDIT LEAD -->
-<div class="overlay" id="lead-modal-overlay">
-  <div class="modal" style="width:740px;">
-    <div class="modal-hd">
-      <div class="modal-title" id="lead-modal-title">Add Student Lead</div>
-      <button class="modal-close" onclick="closeModal('lead-modal-overlay')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="fgrid" id="lead-form-fields"></div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('lead-modal-overlay')">Cancel</button>
-      <button class="btn primary" onclick="saveLead()">Save Lead</button>
-    </div>
+  <div class="drw-foot">
+    <button class="btn btn-prim" onclick="saveLead()">Save Lead</button>
+    <button class="btn btn-ghost" onclick="closeDrawers()">Cancel</button>
   </div>
 </div>
 
-<!-- DETAIL VIEW -->
-<div class="overlay" id="detail-overlay">
-  <div class="modal" style="width:760px;">
-    <div class="modal-hd">
-      <div>
-        <div class="modal-title" id="det-name">Student Detail</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:3px;" id="det-sub"></div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <button class="btn btn-sm" id="det-edit-btn" onclick="openEditFromDetail()">✎ Edit</button>
-        <button class="modal-close" onclick="closeModal('detail-overlay')">✕</button>
-      </div>
-    </div>
-    <div class="modal-body" id="detail-body"></div>
-    <div class="modal-ft" id="detail-footer"></div>
+<!-- DETAIL DRAWER -->
+<div class="drawer" id="detDrw" style="width:500px">
+  <div class="drw-hdr">
+    <div><div class="drw-title" id="dName">Lead</div><div id="dPill" style="margin-top:3px"></div></div>
+    <button class="drw-close" onclick="closeDrawers()">&#10005;</button>
   </div>
+  <div class="tabs">
+    <div class="tab on" onclick="switchTab('info')">Info</div>
+    <div class="tab" onclick="switchTab('activity')">Activity</div>
+    <div class="tab" onclick="switchTab('actions')">Actions</div>
+  </div>
+  <div class="drw-body" id="dBody"></div>
+  <div class="drw-foot"><button class="btn btn-ghost btn-sm" onclick="closeDrawers()">Close</button></div>
 </div>
 
-<!-- IMPORT PROMPT -->
-<div class="overlay" id="import-prompt-overlay">
-  <div class="modal" style="width:480px;">
-    <div class="modal-hd">
-      <div class="modal-title">Import Student Data</div>
-      <button class="modal-close" onclick="closeModal('import-prompt-overlay')">✕</button>
-    </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
-      <div style="background:var(--accent-dim);border:1px solid var(--accent);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--accent);">
-        ✦ The system auto-detects your column names and maps them to student fields (Name, Course, Phone, Status, etc.)
-      </div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.7;">
-        Head to the <strong style="color:var(--text);">Import page</strong>, upload your Excel (.xlsx) with student data, and it will auto-configure all columns for the Leads and Deals sections.
-      </div>
-      <div style="background:var(--bg3);border-radius:10px;padding:14px 16px;">
-        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Common columns auto-detected:</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;">
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Student Name</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Email</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Phone</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Course</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">College</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">City</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Counsellor</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Status</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Lead Score</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Follow-up Date</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Source</span>
-          <span style="background:var(--bg4);padding:3px 10px;border-radius:6px;font-size:11px;color:var(--text2);">Budget</span>
-        </div>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('import-prompt-overlay')">Close</button>
-      <a class="btn primary" href="../import.html">Go to Import ↗</a>
-    </div>
-  </div>
-</div>
-
-<!-- BULK STATUS MODAL -->
-<div class="overlay" id="bulk-status-overlay">
-  <div class="modal" style="width:380px;">
-    <div class="modal-hd">
-      <div class="modal-title">Update Status</div>
-      <button class="modal-close" onclick="closeModal('bulk-status-overlay')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="fg">
-        <label>Set status for selected leads</label>
-        <select id="bulk-status-val"></select>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('bulk-status-overlay')">Cancel</button>
-      <button class="btn primary" onclick="applyBulkStatus()">Apply</button>
-    </div>
-  </div>
-</div>
-
-<!-- CONFIRM -->
-<div class="confirm-overlay" id="confirm-overlay">
-  <div class="confirm-box">
-    <div class="confirm-icon" id="ci">⚠️</div>
-    <div class="confirm-title" id="ct">Confirm</div>
-    <div class="confirm-msg" id="cm"></div>
-    <div class="confirm-btns">
-      <button class="btn" onclick="resolveConfirm(false)">Cancel</button>
-      <button class="btn danger" id="c-ok" onclick="resolveConfirm(true)">Confirm</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast-wrap" id="toast-wrap"></div>
-
+<div class="toast-wrap" id="tw"></div>
+<script src="../../assets/js/api.js"></script>
 <script>
-/* ═══════════════════════════════════════════════════════════════════
-   STUDENT LEADS — DYNAMIC SCHEMA-DRIVEN CRM PAGE
-   Reads column definitions from the backend SchemaConfig,
-   then adapts the entire UI (table, kanban, forms, KPIs, analytics)
-   to match exactly what was imported in the Excel sheet.
-═══════════════════════════════════════════════════════════════════ */
-
-// ── CONFIG ────────────────────────────────────────────────────────
-const API_BASE  = window.CRM_CONFIG?.apiBase || 'https://zyntrixcrmbackend-production.up.railway.app/api';
-const SYSTEM    = 'sales';
-const DATA_TYPE = 'leads';
-
-// ── STATE ─────────────────────────────────────────────────────────
-let SCHEMA    = null;   // { fields: [{excelHeader, systemKey, label, dataType}], configured }
-let RECORDS   = [];     // raw records from API
-let LEADS     = [];     // normalized (with _smart fields)
-let curView   = 'table';
-let statusFilter = '';
-let sortKey   = 'created', sortDir = 'desc';
-let page      = 1;
-const PAGE    = 12;
-let selectedIds = new Set();
-let editingId   = null;
-let confirmResolve = null;
-
-// Smart field keys detected from schema
-let KEYS = {
-  name: null, email: null, phone: null, status: null, score: null,
-  source: null, counsellor: null, followup: null, course: null,
-  college: null, city: null, budget: null, notes: null,
-};
-
-// Status color cycling
-const STATUS_COLORS = [
-  {cls:'b-blue',    col:'#3d8ef0', bg:'rgba(61,142,240,0.12)'},
-  {cls:'b-purple',  col:'#b57bee', bg:'rgba(181,123,238,0.12)'},
-  {cls:'b-accent',  col:'#00e5b0', bg:'rgba(0,229,176,0.12)'},
-  {cls:'b-amber',   col:'#f5a623', bg:'rgba(245,166,35,0.12)'},
-  {cls:'b-rose',    col:'#ff4d6d', bg:'rgba(255,77,109,0.12)'},
-  {cls:'b-teal',    col:'#22d3ee', bg:'rgba(34,211,238,0.12)'},
+const STAGES=[
+  {key:"new_lead",       label:"New Lead",       col:"var(--teal)",   bg:"var(--teal-dim)"},
+  {key:"contacted",      label:"Contacted",       col:"var(--blue)",   bg:"var(--blue-dim)"},
+  {key:"demo_scheduled", label:"Demo Scheduled",  col:"var(--purple)", bg:"var(--purple-dim)"},
+  {key:"demo_attended",  label:"Demo Attended",   col:"var(--amber)",  bg:"var(--amber-dim)"},
+  {key:"enrolled",       label:"Enrolled",        col:"var(--accent)", bg:"var(--accent-dim)"},
+  {key:"dropped",        label:"Dropped",         col:"var(--rose)",   bg:"var(--rose-dim)"},
+  {key:"completed",      label:"Completed",       col:"var(--green)",  bg:"var(--green-dim)"}
 ];
-let statusColorMap = {};
+const SRCCOL={website:"var(--blue-dim)",social_media:"var(--purple-dim)",referral:"var(--accent-dim)",cold_call:"var(--amber-dim)",walk_in:"var(--teal-dim)",other:"var(--bg4)"};
+let allLeads=[],curLead=null,curTab="info",dragId=null;
 
-// ── AUTH HELPERS ──────────────────────────────────────────────────
-const getToken = () => localStorage.getItem('crm_token') || localStorage.getItem('token') || '';
+(async()=>{
+  const u=JSON.parse(localStorage.getItem("user")||"{}");
+  if(u.name){document.getElementById("navName").textContent=u.name;document.getElementById("navRole").textContent=u.role||"";document.getElementById("navAv").textContent=u.name[0].toUpperCase();}
+  await Promise.all([loadBoard(),loadCourses()]);
+})();
 
-async function apiFetch(path, opts = {}) {
-  const res = await fetch(API_BASE + path, {
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-    ...opts,
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ msg: res.statusText }));
-    throw new Error(err.msg || res.statusText);
+async function loadCourses(){
+  const d=await apiRequest("/sales/courses");
+  if(d.error)return;
+  const sel=document.getElementById("fCourse");
+  (d.courses||[]).forEach(c=>{const o=document.createElement("option");o.value=c._id;o.textContent=c.title;sel.appendChild(o);});
+}
+
+async function loadBoard(){
+  document.getElementById("board").innerHTML='<div class="ls"><span class="spin">&#9696;</span>Loading...</div>';
+  const[ld,st]=await Promise.all([apiRequest("/sales/leads?archived=false&limit=300"),apiRequest("/sales/leads/stats")]);
+  if(ld.error){toast(ld.msg,"err");return;}
+  allLeads=ld.leads||[];
+  if(!st.error){
+    const sm={};(st.stages||[]).forEach(s=>sm[s._id]=s.count);
+    document.getElementById("kTotal").textContent=st.total||0;
+    document.getElementById("kNew").textContent=sm["new_lead"]||0;
+    document.getElementById("kDemo").textContent=(sm["demo_scheduled"]||0)+(sm["demo_attended"]||0);
+    document.getElementById("kEnrolled").textContent=sm["enrolled"]||0;
+    document.getElementById("kDropped").textContent=sm["dropped"]||0;
   }
-  return res.json();
+  renderBoard();
 }
 
-// ── UTILITIES ─────────────────────────────────────────────────────
-const fmtDate = d => {
-  if (!d) return '—';
-  const dt = new Date(d);
-  if (isNaN(dt)) return String(d);
-  return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-};
-const fmtMoney = n => {
-  const v = parseFloat(n);
-  if (isNaN(v)) return '—';
-  if (v >= 10000000) return '₹' + (v/10000000).toFixed(2) + 'Cr';
-  if (v >= 100000)   return '₹' + (v/100000).toFixed(1) + 'L';
-  return '₹' + v.toLocaleString();
-};
-const initials = n => n ? n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '?';
-const daysSince = d => {
-  if (!d) return 999;
-  return Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
-};
-const daysUntil = d => {
-  if (!d) return 999;
-  return Math.floor((new Date(d).getTime() - Date.now()) / 86400000);
-};
-const scoreColor = s => s >= 70 ? 'var(--accent)' : s >= 40 ? 'var(--amber)' : 'var(--rose)';
-const scoreBg    = s => s >= 70 ? 'var(--accent-dim)' : s >= 40 ? 'var(--amber-dim)' : 'var(--rose-dim)';
-
-function statusCfg(statusVal) {
-  if (!statusColorMap[statusVal]) {
-    const idx = Object.keys(statusColorMap).length % STATUS_COLORS.length;
-    statusColorMap[statusVal] = STATUS_COLORS[idx];
-  }
-  return statusColorMap[statusVal];
+function applyFilter(){
+  const s=document.getElementById("sInput").value.toLowerCase();
+  const src=document.getElementById("fSrc").value;
+  const edu=document.getElementById("fEdu").value;
+  renderBoard(allLeads.filter(l=>{
+    const ms=!s||(l.fullName||"").toLowerCase().includes(s)||(l.email||"").toLowerCase().includes(s)||(l.phone||"").includes(s);
+    return ms&&(!src||l.source===src)&&(!edu||l.educationLevel===edu);
+  }));
 }
 
-function getVal(lead, key) {
-  if (!key) return null;
-  return lead[key] ?? null;
-}
-
-function toast(msg, type = 'success') {
-  const tw = document.getElementById('toast-wrap');
-  const t  = document.createElement('div');
-  t.className = `toast ${type}`;
-  const ic  = type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ';
-  const col = type === 'success' ? 'var(--accent)' : type === 'error' ? 'var(--rose)' : 'var(--blue)';
-  t.innerHTML = `<span style="color:${col};font-size:16px;">${ic}</span>${msg}`;
-  tw.appendChild(t);
-  setTimeout(() => { t.style.animation = 'toastOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3200);
-}
-function openModal(id)  { document.getElementById(id).classList.add('open');    document.body.style.overflow = 'hidden'; }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { document.querySelectorAll('.overlay.open').forEach(m => m.classList.remove('open')); document.body.style.overflow = ''; }
-});
-function confirm2(title, msg, okLabel = 'Delete', icon = '⚠️') {
-  return new Promise(resolve => {
-    confirmResolve = resolve;
-    document.getElementById('ci').textContent = icon;
-    document.getElementById('ct').textContent = title;
-    document.getElementById('cm').textContent = msg;
-    document.getElementById('c-ok').textContent = okLabel;
-    document.getElementById('confirm-overlay').classList.add('open');
-  });
-}
-function resolveConfirm(v) { document.getElementById('confirm-overlay').classList.remove('open'); if (confirmResolve) { confirmResolve(v); confirmResolve = null; } }
-
-// ── BOOT ──────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  loadUserInfo();
-  loadData();
-});
-
-function loadUserInfo() {
-  const raw = localStorage.getItem('crm_user') || localStorage.getItem('user');
-  if (!raw) return;
-  try {
-    const u = JSON.parse(raw);
-    const nm = u.name || u.username || 'User';
-    document.getElementById('user-name').textContent = nm;
-    document.getElementById('user-avatar').textContent = initials(nm);
-  } catch {}
-}
-
-async function loadData() {
-  showLoading(true);
-  try {
-    // 1. Load schema
-    const schemaRes = await apiFetch(`/import/schema?system=${SYSTEM}&type=${DATA_TYPE}`);
-    SCHEMA = schemaRes;
-
-    if (!SCHEMA.configured || !SCHEMA.fields?.length) {
-      showLoading(false);
-      document.getElementById('empty-state').style.display = '';
-      document.getElementById('data-area').style.display = 'none';
-      return;
-    }
-
-    // 2. Detect smart field keys
-    detectSmartKeys();
-
-    // 3. Load records
-    const recRes = await apiFetch(`/import/records?system=${SYSTEM}&type=${DATA_TYPE}&limit=500`);
-    RECORDS = recRes.records || [];
-    LEADS = RECORDS;
-
-    // 4. Build status color map
-    if (KEYS.status) {
-      const statuses = [...new Set(LEADS.map(l => l[KEYS.status]).filter(Boolean))];
-      statuses.forEach(s => statusCfg(s));
-    }
-
-    // 5. Build filter dropdowns
-    buildOwnerFilter();
-    buildStatusChips();
-    buildBulkStatusOptions();
-
-    // 6. Show data area
-    showLoading(false);
-    document.getElementById('empty-state').style.display = 'none';
-    document.getElementById('data-area').style.display = '';
-    document.getElementById('add-btn').style.display = '';
-
-    // 7. Build dynamic table headers
-    buildTableHeaders();
-
-    // 8. Render
-    renderCurrentView();
-
-  } catch (err) {
-    showLoading(false);
-    if (err.message?.includes('401') || err.message?.includes('unauthorized')) {
-      toast('Session expired. Please log in again.', 'error');
-    } else {
-      toast('Failed to load data: ' + err.message, 'error');
-      document.getElementById('empty-state').style.display = '';
-    }
-  }
-}
-
-function showLoading(v) {
-  document.getElementById('loading-state').style.display = v ? '' : 'none';
-  if (v) {
-    document.getElementById('empty-state').style.display = 'none';
-    document.getElementById('data-area').style.display = 'none';
-  }
-}
-
-// ── SMART KEY DETECTION ───────────────────────────────────────────
-const KEY_PATTERNS = {
-  name:       ['student_name','name','full_name','student','candidate_name','applicant'],
-  email:      ['email','email_id','email_address','mail'],
-  phone:      ['phone','mobile','contact','phone_number','mobile_no','contact_no'],
-  status:     ['status','lead_status','stage','lead_stage','current_status'],
-  score:      ['score','lead_score','priority','priority_score','rating','interest_level'],
-  source:     ['source','lead_source','channel','medium','platform','campaign'],
-  counsellor: ['counsellor','owner','assigned_to','sales_rep','executive','counselor','advisor'],
-  followup:   ['followup_date','followup','follow_up_date','callback','next_contact','follow_up'],
-  course:     ['course','course_interested','program','subject','stream','programme','product'],
-  college:    ['college','institution','university','school','institute'],
-  city:       ['city','location','district','place'],
-  budget:     ['value','budget','fees','course_fees','amount','fee','deal_value'],
-  notes:      ['notes','remarks','comments','observation'],
-};
-
-function detectSmartKeys() {
-  if (!SCHEMA?.fields) return;
-  const fieldKeys = SCHEMA.fields.map(f => f.systemKey);
-  for (const [smartKey, patterns] of Object.entries(KEY_PATTERNS)) {
-    KEYS[smartKey] = patterns.find(p => fieldKeys.includes(p)) || null;
-  }
-}
-
-// ── FILTER & SORT ─────────────────────────────────────────────────
-function getFiltered() {
-  const search  = document.getElementById('global-search')?.value.toLowerCase() || '';
-  const owner   = document.getElementById('owner-filter')?.value || '';
-
-  let data = [...LEADS].filter(l => {
-    if (statusFilter && getVal(l, KEYS.status) !== statusFilter) return false;
-    if (owner && getVal(l, KEYS.counsellor) !== owner) return false;
-    if (search) {
-      const nm  = (getVal(l, KEYS.name)    || '').toLowerCase();
-      const co  = (getVal(l, KEYS.college) || '').toLowerCase();
-      const cr  = (getVal(l, KEYS.course)  || '').toLowerCase();
-      const ph  = (getVal(l, KEYS.phone)   || '').toLowerCase();
-      if (!nm.includes(search) && !co.includes(search) && !cr.includes(search) && !ph.includes(search)) return false;
-    }
-    if (curView === 'hot') {
-      if (KEYS.score) { if ((parseFloat(getVal(l, KEYS.score)) || 0) < 70) return false; }
-      else { return false; }
-    }
-    if (curView === 'followup') {
-      if (!KEYS.followup) return false;
-      const d = daysUntil(getVal(l, KEYS.followup));
-      return d <= 7 && d >= -1;
-    }
-    return true;
-  });
-
-  data.sort((a, b) => {
-    if (sortKey === 'score')   { const av = parseFloat(getVal(a, KEYS.score)) || 0; const bv = parseFloat(getVal(b, KEYS.score)) || 0; return sortDir === 'desc' ? bv - av : av - bv; }
-    if (sortKey === 'name')    { return (getVal(a, KEYS.name) || '').localeCompare(getVal(b, KEYS.name) || ''); }
-    if (sortKey === 'created') { return sortDir === 'desc' ? new Date(b.createdAt||0) - new Date(a.createdAt||0) : new Date(a.createdAt||0) - new Date(b.createdAt||0); }
-    return 0;
-  });
-  return data;
-}
-
-function applyFilters() {
-  const sv = document.getElementById('sort-sel')?.value || 'created-desc';
-  const [k, d] = sv.split('-'); sortKey = k; sortDir = d;
-  page = 1;
-  renderCurrentView();
-}
-
-function setStatusFilter(s, el) {
-  statusFilter = s;
-  document.querySelectorAll('#status-chips .filter-chip').forEach(c => c.classList.remove('active'));
-  el?.classList.add('active');
-  page = 1;
-  renderCurrentView();
-}
-
-// ── VIEWS ─────────────────────────────────────────────────────────
-function switchView(v, el) {
-  curView = v;
-  ['table','kanban','hot','followup','analytics'].forEach(id => {
-    const e = document.getElementById('view-' + id);
-    if (e) e.style.display = v === id ? '' : 'none';
-  });
-  document.querySelectorAll('.snav-tab').forEach(t => t.classList.remove('active'));
-  el?.classList.add('active');
-  renderCurrentView();
-}
-
-function renderCurrentView() {
-  updateTabCounts();
-  updateKPIs();
-  if (curView === 'table')     renderTable();
-  if (curView === 'kanban')    renderKanban();
-  if (curView === 'hot')       renderHot();
-  if (curView === 'followup')  renderFollowup();
-  if (curView === 'analytics') renderAnalytics();
-}
-
-// ── KPIs ──────────────────────────────────────────────────────────
-function updateKPIs() {
-  const total      = LEADS.length;
-  const hotCount   = KEYS.score ? LEADS.filter(l => (parseFloat(getVal(l, KEYS.score)) || 0) >= 70).length : 0;
-  const followupCount = KEYS.followup ? LEADS.filter(l => { const d = daysUntil(getVal(l, KEYS.followup)); return d <= 1 && d >= -1; }).length : 0;
-  const wonStatuses = ['converted','enrolled','admitted','closed won','paid','admission confirmed'];
-  const convertedCount = KEYS.status ? LEADS.filter(l => wonStatuses.includes((getVal(l, KEYS.status) || '').toLowerCase())).length : 0;
-  const convRate = total > 0 ? Math.round(convertedCount / total * 100) : 0;
-
-  document.getElementById('kpi-row').innerHTML = `
-    <div class="kpi-card ani">
-      <span class="kpi-icon">◎</span>
-      <div class="kpi-val">${total}</div>
-      <div class="kpi-lbl">Total Leads</div>
-    </div>
-    <div class="kpi-card ani" style="--glow:rgba(255,77,109,0.08);">
-      <span class="kpi-icon">🔥</span>
-      <div class="kpi-val" style="color:var(--rose);">${hotCount}</div>
-      <div class="kpi-lbl">Hot Leads</div>
-    </div>
-    <div class="kpi-card ani" style="--glow:rgba(0,229,176,0.08);">
-      <span class="kpi-icon">✓</span>
-      <div class="kpi-val" style="color:var(--accent);">${convertedCount}</div>
-      <div class="kpi-lbl">${KEYS.status ? 'Converted' : 'Records'}</div>
-      <div class="kpi-delta ${convRate > 0 ? 'up' : 'neu'}">${convRate}% rate</div>
-    </div>
-    <div class="kpi-card ani" style="--glow:rgba(245,166,35,0.08);">
-      <span class="kpi-icon">📅</span>
-      <div class="kpi-val" style="color:var(--amber);">${followupCount}</div>
-      <div class="kpi-lbl">Follow-ups Today</div>
-    </div>
-    <div class="kpi-card ani" style="--glow:rgba(61,142,240,0.08);">
-      <span class="kpi-icon">⊞</span>
-      <div class="kpi-val" style="color:var(--blue);">${SCHEMA.fields.length}</div>
-      <div class="kpi-lbl">Data Columns</div>
-      <div class="kpi-delta neu">From Excel</div>
-    </div>`;
-}
-
-function updateTabCounts() {
-  const total = LEADS.length;
-  const hot   = KEYS.score ? LEADS.filter(l => (parseFloat(getVal(l, KEYS.score)) || 0) >= 70).length : 0;
-  const fu    = KEYS.followup ? LEADS.filter(l => { const d = daysUntil(getVal(l, KEYS.followup)); return d <= 7 && d >= -1; }).length : 0;
-  document.getElementById('tc-all').textContent    = total;
-  document.getElementById('tc-hot').textContent    = hot;
-  document.getElementById('tc-followup').textContent = fu;
-  document.getElementById('nav-hot-count').textContent = hot;
-}
-
-// ── TABLE ─────────────────────────────────────────────────────────
-function buildTableHeaders() {
-  const fields = SCHEMA.fields;
-  // Decide which columns to show (limit to ~7 for readability; always show name, status, score, counsellor, followup)
-  const priority = ['student_name','name','full_name','status','lead_status','score','lead_score','counsellor','owner','followup_date','followup','source','course','phone','email'];
-  
-  // Pick up to 7 fields; prioritised ones first
-  const shown = [];
-  priority.forEach(pk => {
-    const f = fields.find(x => x.systemKey === pk);
-    if (f && !shown.includes(f)) shown.push(f);
-  });
-  fields.forEach(f => { if (!shown.includes(f) && shown.length < 8) shown.push(f); });
-
-  // Store visible field list globally
-  window._TABLE_FIELDS = shown;
-  
-  const buildTH = (list, extra = '') =>
-    `<th style="width:36px;"><input type="checkbox" id="sel-all" onchange="toggleAllSel(this)"></th>` +
-    list.map(f => `<th>${f.label}</th>`).join('') +
-    `<th>Actions</th>`;
-
-  ['leads-thead','hot-thead','fu-thead'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = buildTH(shown);
-  });
-}
-
-function renderTable() {
-  const data   = getFiltered();
-  const total  = data.length;
-  const pages  = Math.max(1, Math.ceil(total / PAGE));
-  if (page > pages) page = 1;
-  const paged  = data.slice((page - 1) * PAGE, page * PAGE);
-  document.getElementById('table-sub').textContent = `${total} student${total !== 1 ? 's' : ''}`;
-  document.getElementById('table-footer').textContent = `Page ${page} of ${pages} · ${total} leads`;
-
-  document.getElementById('leads-tbody').innerHTML = paged.map(l => buildRow(l)).join('');
-  renderPagination(pages);
-  updateBulkBar();
-}
-
-function buildRow(l) {
-  const fields = window._TABLE_FIELDS || SCHEMA.fields.slice(0, 7);
-  const cells = fields.map(f => renderCell(l, f)).join('');
-  const id = l._id;
-  return `<tr>
-    <td><input type="checkbox" class="rck" value="${id}" ${selectedIds.has(id) ? 'checked' : ''} onchange="rowSel(this)"></td>
-    ${cells}
-    <td>
-      <div style="display:flex;gap:5px;">
-        <button class="btn btn-xs" onclick="showDetail('${id}')">View</button>
-        <button class="btn btn-xs primary" onclick="openEditModal('${id}')">Edit</button>
-        <button class="btn btn-xs danger" onclick="deleteRecord('${id}')">✗</button>
+function renderBoard(leads){
+  leads=leads||allLeads;
+  const board=document.getElementById("board");
+  board.innerHTML="";
+  STAGES.forEach(st=>{
+    const sl=leads.filter(l=>l.pipelineStage===st.key);
+    const col=document.createElement("div");col.className="col";col.dataset.stage=st.key;
+    col.innerHTML=`
+      <div class="col-hdr" style="background:${st.bg}30;border:1px solid ${st.col}25">
+        <span class="col-ttl" style="color:${st.col}">${st.label}</span>
+        <span class="col-cnt" style="background:${st.bg};color:${st.col}">${sl.length}</span>
       </div>
-    </td>
-  </tr>`;
-}
-
-function renderCell(l, f) {
-  const val = l[f.systemKey];
-  if (val === undefined || val === null || val === '') return `<td style="color:var(--text3);">—</td>`;
-
-  // Special rendering by systemKey
-  if (f.systemKey === KEYS.name || ['student_name','name','full_name'].includes(f.systemKey)) {
-    const sub = KEYS.course ? `<div class="td-sub">${getVal(l, KEYS.course) || ''}</div>` : '';
-    return `<td><div class="td-main" style="cursor:pointer;" onclick="showDetail('${l._id}')">${val}</div>${sub}</td>`;
-  }
-  if (f.systemKey === KEYS.status || ['status','lead_status','stage'].includes(f.systemKey)) {
-    const cfg = statusCfg(val);
-    return `<td><span class="badge ${cfg.cls}">${val}</span></td>`;
-  }
-  if (f.systemKey === KEYS.score || ['score','lead_score','priority_score'].includes(f.systemKey)) {
-    const s = parseFloat(val) || 0;
-    return `<td><div style="display:flex;align-items:center;gap:6px;"><div style="width:32px;height:32px;border-radius:50%;background:${scoreBg(s)};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;color:${scoreColor(s)};">${s}</div><div class="prog" style="width:44px;"><div class="prog-fill" style="width:${Math.min(s,100)}%;background:${scoreColor(s)};"></div></div></div></td>`;
-  }
-  if (f.systemKey === KEYS.counsellor || ['counsellor','owner','assigned_to'].includes(f.systemKey)) {
-    return `<td><div style="display:flex;align-items:center;gap:6px;"><div style="width:24px;height:24px;border-radius:50%;background:var(--blue-dim);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--blue);">${initials(String(val))}</div><span style="font-size:12px;">${String(val).split(' ')[0]}</span></div></td>`;
-  }
-  if (f.systemKey === KEYS.followup || ['followup_date','followup','follow_up_date'].includes(f.systemKey)) {
-    const du = daysUntil(val);
-    let cls = 'followup-ok', lbl = '';
-    if (du < 0) { cls = 'followup-today'; lbl = `${Math.abs(du)}d overdue`; }
-    else if (du === 0) { cls = 'followup-today'; lbl = 'Today'; }
-    else if (du <= 3) { cls = 'followup-soon'; lbl = `In ${du}d`; }
-    else { lbl = fmtDate(val); }
-    return `<td><span class="followup-badge ${cls}">${lbl || fmtDate(val)}</span></td>`;
-  }
-  if (f.dataType === 'date') return `<td style="font-size:12px;color:var(--text3);">${fmtDate(val)}</td>`;
-  if (f.dataType === 'number') {
-    const isMoneyKey = ['budget','fees','deal_value','amount'].some(k => f.systemKey.includes(k));
-    return isMoneyKey
-      ? `<td style="font-family:var(--mono);font-size:12px;color:var(--accent);">${fmtMoney(val)}</td>`
-      : `<td style="font-family:var(--mono);font-size:12px;">${val}</td>`;
-  }
-  return `<td style="font-size:12px;">${val}</td>`;
-}
-
-function renderPagination(pages) {
-  const pg = document.getElementById('pagination');
-  pg.innerHTML = '';
-  for (let i = 1; i <= pages; i++) {
-    const b = document.createElement('button');
-    b.className = 'btn btn-xs' + (i === page ? ' primary' : '');
-    b.textContent = i;
-    b.onclick = () => { page = i; renderTable(); };
-    pg.appendChild(b);
-  }
-}
-
-// ── KANBAN ────────────────────────────────────────────────────────
-function renderKanban() {
-  const kanban = document.getElementById('leads-kanban');
-  if (!KEYS.status) {
-    kanban.innerHTML = `<div style="padding:40px;color:var(--text3);font-size:13px;">No "Status" column detected in your Excel. Import a sheet with a Status column to use Kanban view.</div>`;
-    return;
-  }
-  const statuses = [...new Set(LEADS.map(l => getVal(l, KEYS.status) || 'Unknown'))];
-  kanban.innerHTML = statuses.map(s => {
-    const cfg   = statusCfg(s);
-    const leads = LEADS.filter(l => (getVal(l, KEYS.status) || 'Unknown') === s);
-    return `<div class="lk-col">
-      <div class="lk-hd" style="background:${cfg.bg};">
-        <span style="font-size:12px;font-weight:600;color:${cfg.col};font-family:var(--display);">${s}</span>
-        <span style="font-size:10px;font-family:var(--mono);color:${cfg.col};background:${cfg.bg};padding:2px 7px;border-radius:5px;">${leads.length}</span>
-      </div>
-      <div class="lk-body">
-        ${leads.map(l => `<div class="lead-card" onclick="showDetail('${l._id}')">
-          <div class="lc-name">${getVal(l, KEYS.name) || '—'}</div>
-          <div class="lc-co">${[getVal(l, KEYS.course), getVal(l, KEYS.college)].filter(Boolean).join(' · ') || '—'}</div>
-          <div class="lc-foot">
-            ${KEYS.score ? `<div style="width:26px;height:26px;border-radius:50%;background:${scoreBg(parseFloat(getVal(l, KEYS.score))||0)};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:${scoreColor(parseFloat(getVal(l, KEYS.score))||0)};">${getVal(l, KEYS.score) || 0}</div>` : '<span></span>'}
-            <span style="font-size:10px;background:var(--bg4);padding:1px 7px;border-radius:4px;color:var(--text3);">${getVal(l, KEYS.source) || ''}</span>
-          </div>
-        </div>`).join('')}
-        ${leads.length === 0 ? `<div style="text-align:center;padding:20px;color:var(--text3);font-size:11px;">Empty</div>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── HOT LEADS ─────────────────────────────────────────────────────
-function renderHot() {
-  if (!KEYS.score) {
-    document.getElementById('hot-tbody').innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:40px;">No "Score" or "Lead Score" column in your Excel sheet.</td></tr>`;
-    return;
-  }
-  const data = getFiltered().sort((a, b) => (parseFloat(getVal(b, KEYS.score)) || 0) - (parseFloat(getVal(a, KEYS.score)) || 0));
-  document.getElementById('hot-tbody').innerHTML = data.map(l => buildRow(l)).join('');
-}
-
-// ── FOLLOW-UPS ────────────────────────────────────────────────────
-function renderFollowup() {
-  if (!KEYS.followup) {
-    document.getElementById('fu-tbody').innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:40px;">No "Follow-up Date" or "Followup" column detected in your Excel sheet.</td></tr>`;
-    return;
-  }
-  const data = getFiltered().sort((a, b) => {
-    return daysUntil(getVal(a, KEYS.followup)) - daysUntil(getVal(b, KEYS.followup));
+      <div class="card-list" id="cl-${st.key}" ondragover="dOver(event,'${st.key}')" ondragleave="dLeave(event)" ondrop="dDrop(event,'${st.key}')">
+        ${sl.length===0?'<div class="col-empty">Drop here</div>':sl.map(l=>renderCard(l,st)).join("")}
+      </div>`;
+    board.appendChild(col);
   });
-  document.getElementById('fu-tbody').innerHTML = data.map(l => buildRow(l)).join('');
 }
 
-// ── ANALYTICS ─────────────────────────────────────────────────────
-function renderAnalytics() {
-  renderAnalyticsCard('analytics-status',     KEYS.status     || 'status',     'By Status',      'var(--blue)');
-  renderAnalyticsCard('analytics-source',     KEYS.source     || 'source',     'By Lead Source', 'var(--purple)');
-  renderAnalyticsCard('analytics-counsellor', KEYS.counsellor || 'counsellor', 'By Counsellor',  'var(--amber)');
-  renderAnalyticsCard('analytics-course',     KEYS.course     || 'course',     'By Course',      'var(--teal)');
-  renderAnalyticsCard('analytics-city',       KEYS.city       || 'city',       'By City',        'var(--accent)', true);
-}
-
-function renderAnalyticsCard(containerId, fieldKey, title, color, wide = false) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-
-  const grouped = {};
-  LEADS.forEach(l => {
-    const v = l[fieldKey] || 'Unknown';
-    grouped[v] = (grouped[v] || 0) + 1;
-  });
-  const entries = Object.entries(grouped).sort((a, b) => b[1] - a[1]).slice(0, wide ? 15 : 8);
-  const max = entries[0]?.[1] || 1;
-
-  if (!entries.length || !fieldKey || !SCHEMA.fields.find(f => f.systemKey === fieldKey)) {
-    el.innerHTML = `<div class="card-hd"><div><div class="card-title">${title}</div><div class="card-sub" style="color:var(--rose);">Column not in Excel</div></div></div>`;
-    return;
-  }
-
-  el.innerHTML = `
-    <div class="card-hd"><div><div class="card-title">${title}</div><div class="card-sub">${entries.length} unique values</div></div></div>
-    <div ${wide ? 'style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;"' : ''}>
-      ${entries.map(([k, v]) => `
-        <div class="bar-item">
-          <div class="bar-label" title="${k}">${k}</div>
-          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/max*100)}%;background:${color};"></div></div>
-          <div class="bar-count">${v}</div>
-        </div>`).join('')}
-    </div>`;
-}
-
-// ── SELECTION ─────────────────────────────────────────────────────
-function rowSel(cb) {
-  if (cb.checked) selectedIds.add(cb.value);
-  else selectedIds.delete(cb.value);
-  updateBulkBar();
-}
-function toggleAllSel(cb) {
-  const cbs = document.querySelectorAll('.rck');
-  cbs.forEach(c => { c.checked = cb.checked; if (cb.checked) selectedIds.add(c.value); else selectedIds.delete(c.value); });
-  updateBulkBar();
-}
-function updateBulkBar() {
-  const n = selectedIds.size;
-  const bd = document.getElementById('bulk-del-btn');
-  const bs = document.getElementById('bulk-status-btn');
-  if (bd) bd.style.display = n > 0 ? '' : 'none';
-  if (bs) bs.style.display = (n > 0 && KEYS.status) ? '' : 'none';
-}
-
-// ── BULK STATUS ───────────────────────────────────────────────────
-function buildBulkStatusOptions() {
-  const sel = document.getElementById('bulk-status-val');
-  if (!sel || !KEYS.status) return;
-  const statuses = [...new Set(LEADS.map(l => getVal(l, KEYS.status)).filter(Boolean))];
-  sel.innerHTML = statuses.map(s => `<option>${s}</option>`).join('');
-}
-
-function openBulkStatus() { openModal('bulk-status-overlay'); }
-
-async function applyBulkStatus() {
-  const newStatus = document.getElementById('bulk-status-val').value;
-  if (!newStatus || !selectedIds.size) return;
-  try {
-    await apiFetch('/import/bulk-update', {
-      method: 'PATCH',
-      body: JSON.stringify({ ids: [...selectedIds], updates: { [KEYS.status]: newStatus }, system: SYSTEM, type: DATA_TYPE }),
-    });
-    selectedIds.clear();
-    closeModal('bulk-status-overlay');
-    toast(`Updated ${selectedIds.size || 'selected'} leads to "${newStatus}"`);
-    await loadData();
-  } catch (err) {
-    toast('Bulk update failed: ' + err.message, 'error');
-  }
-}
-
-async function bulkDelete() {
-  if (!selectedIds.size) return;
-  const ok = await confirm2('Delete Selected Leads', `Delete ${selectedIds.size} selected student records? This cannot be undone.`, 'Delete All');
-  if (!ok) return;
-  try {
-    await Promise.all([...selectedIds].map(id => apiFetch(`/import/record/${id}`, { method: 'DELETE' })));
-    selectedIds.clear();
-    toast('Deleted selected leads');
-    await loadData();
-  } catch (err) {
-    toast('Delete failed: ' + err.message, 'error');
-  }
-}
-
-// ── FILTER BUILDERS ───────────────────────────────────────────────
-function buildOwnerFilter() {
-  const sel = document.getElementById('owner-filter');
-  if (!sel || !KEYS.counsellor) return;
-  const owners = [...new Set(LEADS.map(l => getVal(l, KEYS.counsellor)).filter(Boolean))].sort();
-  sel.innerHTML = '<option value="">All Counsellors</option>' + owners.map(o => `<option>${o}</option>`).join('');
-}
-
-function buildStatusChips() {
-  const container = document.getElementById('status-chips');
-  if (!container || !KEYS.status) return;
-  const statuses = [...new Set(LEADS.map(l => getVal(l, KEYS.status)).filter(Boolean))];
-  container.innerHTML = `<button class="filter-chip active" onclick="setStatusFilter('',this)">All</button>` +
-    statuses.map(s => {
-      const cfg = statusCfg(s);
-      return `<button class="filter-chip" style="--fc:${cfg.col}" onclick="setStatusFilter('${s}',this)">${s}</button>`;
-    }).join('');
-}
-
-// ── DETAIL MODAL ──────────────────────────────────────────────────
-function showDetail(id) {
-  const l = LEADS.find(x => x._id === id);
-  if (!l) return;
-  editingId = id;
-
-  const name = getVal(l, KEYS.name) || 'Student';
-  document.getElementById('det-name').textContent = name;
-  document.getElementById('det-sub').textContent = [getVal(l, KEYS.course), getVal(l, KEYS.college)].filter(Boolean).join(' · ') || '';
-
-  // Render all fields in a grid
-  const fields = SCHEMA.fields;
-  document.getElementById('detail-body').innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
-      ${fields.map(f => {
-        const val = l[f.systemKey];
-        let display = val ?? '—';
-        if (f.dataType === 'date' && val) display = fmtDate(val);
-        if (f.dataType === 'number' && val) {
-          const isMoneyKey = ['budget','fees','deal_value','amount'].some(k => f.systemKey.includes(k));
-          display = isMoneyKey ? fmtMoney(val) : val;
-        }
-        if (f.systemKey === KEYS.status && val) {
-          const cfg = statusCfg(val);
-          display = `<span class="badge ${cfg.cls}">${val}</span>`;
-        }
-        if (f.systemKey === KEYS.followup && val) {
-          const du = daysUntil(val);
-          const cls = du < 0 ? 'followup-today' : du <= 3 ? 'followup-soon' : 'followup-ok';
-          display = `${fmtDate(val)} <span class="followup-badge ${cls}">${du < 0 ? 'Overdue' : du === 0 ? 'Today' : `In ${du}d`}</span>`;
-        }
-        return `<div style="padding:12px;background:var(--bg3);border-radius:9px;">
-          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px;font-family:var(--display);">${f.label}</div>
-          <div style="font-size:13px;color:var(--text);font-weight:500;">${display}</div>
-        </div>`;
-      }).join('')}
+function renderCard(l,st){
+  const days=Math.floor((Date.now()-new Date(l.createdAt))/86400000);
+  const fuOv=l.followUpDate&&new Date(l.followUpDate)<new Date();
+  return`<div class="lcard" data-id="${l._id}" draggable="true" ondragstart="dStart(event,'${l._id}')" ondragend="dEnd(event)" onclick="openDetail('${l._id}')">
+    ${fuOv?'<div class="fu-dot" title="Follow-up overdue"></div>':""}
+    <div class="lname">${esc(l.fullName)}</div>
+    ${l.courseInterest?.title?`<div class="lcourse">${esc(l.courseInterest.title)}</div>`:""}
+    <div class="lmeta">${[l.phone,l.city,l.budget?"&#8377;"+l.budget.toLocaleString():""].filter(Boolean).join(" &bull; ")}</div>
+    <div class="lfoot">
+      <span class="sbadge" style="background:${SRCCOL[l.source]||"var(--bg4)"};color:var(--text2)">${l.source||"other"}</span>
+      <span class="ldate">${days===0?"Today":days+"d ago"}</span>
     </div>
-    <div style="margin-top:12px;padding:12px;background:var(--bg3);border-radius:9px;font-size:11px;color:var(--text3);">
-      Created: ${fmtDate(l.createdAt)} · ID: ${id}
-    </div>`;
-
-  document.getElementById('detail-footer').innerHTML = `
-    <button class="btn" onclick="closeModal('detail-overlay')">Close</button>
-    <button class="btn" onclick="closeModal('detail-overlay');openEditModal('${id}')">✎ Edit</button>
-    <button class="btn danger" onclick="deleteRecord('${id}');closeModal('detail-overlay')">✗ Delete</button>`;
-
-  openModal('detail-overlay');
+  </div>`;
 }
 
-function openEditFromDetail() {
-  closeModal('detail-overlay');
-  if (editingId) openEditModal(editingId);
+function dStart(e,id){dragId=id;e.currentTarget.classList.add("dragging")}
+function dEnd(e){e.currentTarget.classList.remove("dragging")}
+function dOver(e,s){e.preventDefault();document.getElementById("cl-"+s)?.classList.add("drop-over")}
+function dLeave(e){e.currentTarget.classList.remove("drop-over")}
+async function dDrop(e,stage){
+  e.preventDefault();e.currentTarget.classList.remove("drop-over");
+  if(!dragId)return;
+  const l=allLeads.find(x=>x._id===dragId);
+  if(!l||l.pipelineStage===stage)return;
+  l.pipelineStage=stage;renderBoard();
+  const d=await apiRequest(`/sales/leads/${dragId}/stage`,"PATCH",{stage});
+  if(d.error){toast(d.msg,"err");await loadBoard();}
+  else{toast(`Moved to ${STAGES.find(s=>s.key===stage)?.label}`,"ok");if(d.lead)Object.assign(l,d.lead);renderBoard();}
+  dragId=null;
 }
 
-// ── ADD / EDIT MODAL ──────────────────────────────────────────────
-function openAddModal() {
-  editingId = null;
-  document.getElementById('lead-modal-title').textContent = 'Add Student Lead';
-  buildLeadForm({});
-  openModal('lead-modal-overlay');
+function openAdd(){
+  ["fName","fEmail","fPhone","fCity","fNotes"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("fBudget").value="";
+  document.getElementById("fFU").value="";
+  showDrw("addDrw");
 }
-
-function openEditModal(id) {
-  const l = LEADS.find(x => x._id === id);
-  if (!l) return;
-  editingId = id;
-  document.getElementById('lead-modal-title').textContent = 'Edit Student Lead';
-  buildLeadForm(l);
-  openModal('lead-modal-overlay');
-}
-
-function buildLeadForm(lead) {
-  const fields = SCHEMA.fields;
-  const statusOptions = KEYS.status ? [...new Set(LEADS.map(l => getVal(l, KEYS.status)).filter(Boolean))] : [];
-  const counsellorOptions = KEYS.counsellor ? [...new Set(LEADS.map(l => getVal(l, KEYS.counsellor)).filter(Boolean))] : [];
-  const courseOptions = KEYS.course ? [...new Set(LEADS.map(l => getVal(l, KEYS.course)).filter(Boolean))] : [];
-
-  document.getElementById('lead-form-fields').innerHTML = fields.map(f => {
-    const val = lead[f.systemKey] ?? '';
-    const isStatus     = ['status','lead_status','stage'].includes(f.systemKey);
-    const isCounsellor = ['counsellor','owner','assigned_to','counselor'].includes(f.systemKey);
-    const isCourse     = ['course','course_interested','program','subject'].includes(f.systemKey);
-
-    let input;
-    if (isStatus && statusOptions.length) {
-      input = `<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${statusOptions.map(o => `<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
-    } else if (isCounsellor && counsellorOptions.length) {
-      input = `<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${counsellorOptions.map(o => `<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
-    } else if (isCourse && courseOptions.length > 2) {
-      input = `<select name="${f.systemKey}" style="padding:10px 13px;"><option value="">Select…</option>${courseOptions.map(o => `<option ${o===val?'selected':''}>${o}</option>`).join('')}</select>`;
-    } else if (f.dataType === 'date') {
-      const dv = val ? new Date(val).toISOString().slice(0,10) : '';
-      input = `<input type="date" name="${f.systemKey}" value="${dv}">`;
-    } else if (f.dataType === 'number') {
-      input = `<input type="number" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
-    } else if (f.dataType === 'email') {
-      input = `<input type="email" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
-    } else if (f.dataType === 'phone') {
-      input = `<input type="tel" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
-    } else if (f.systemKey === KEYS.notes || ['notes','remarks','comments'].includes(f.systemKey)) {
-      input = `<textarea name="${f.systemKey}" placeholder="${f.label}">${val}</textarea>`;
-    } else {
-      input = `<input type="text" name="${f.systemKey}" value="${val}" placeholder="${f.label}">`;
-    }
-
-    return `<div class="fg${['notes','remarks','comments'].includes(f.systemKey) ? ' full' : ''}">
-      <label>${f.label}${f.required ? ' <span style="color:var(--rose)">*</span>' : ''}</label>
-      ${input}
-    </div>`;
-  }).join('');
-}
-
-async function saveLead() {
-  const data = {};
-  document.querySelectorAll('#lead-form-fields [name]').forEach(el => {
-    if (el.value !== '') data[el.name] = el.value;
+async function saveLead(){
+  const name=document.getElementById("fName").value.trim();
+  if(!name){toast("Name is required","err");return;}
+  const d=await apiRequest("/sales/leads","POST",{
+    fullName:name,email:document.getElementById("fEmail").value.trim(),phone:document.getElementById("fPhone").value.trim(),
+    city:document.getElementById("fCity").value.trim(),budget:parseFloat(document.getElementById("fBudget").value)||0,
+    educationLevel:document.getElementById("fEduL").value,source:document.getElementById("fSrcL").value,
+    courseInterest:document.getElementById("fCourse").value||null,
+    followUpDate:document.getElementById("fFU").value||null,notes:document.getElementById("fNotes").value.trim()
   });
+  if(d.error){toast(d.msg,"err");return;}
+  toast("Lead added!","ok");closeDrawers();await loadBoard();
+}
 
-  try {
-    if (editingId) {
-      await apiFetch(`/import/record/${editingId}`, { method: 'PUT', body: JSON.stringify(data) });
-      toast('Lead updated');
-    } else {
-      await apiFetch('/import/record', { method: 'POST', body: JSON.stringify({ system: SYSTEM, type: DATA_TYPE, data }) });
-      toast('Lead added');
-    }
-    closeModal('lead-modal-overlay');
-    await loadData();
-  } catch (err) {
-    toast('Save failed: ' + err.message, 'error');
+async function openDetail(id){
+  const d=await apiRequest(`/sales/leads/${id}`);
+  if(d.error){toast(d.msg,"err");return;}
+  curLead=d.lead;renderDetail();showDrw("detDrw");
+}
+function renderDetail(){
+  if(!curLead)return;
+  const l=curLead,st=STAGES.find(s=>s.key===l.pipelineStage)||STAGES[0];
+  document.getElementById("dName").textContent=l.fullName;
+  document.getElementById("dPill").innerHTML=`<span class="spill" style="background:${st.bg};color:${st.col}">${st.label}</span>`;
+  switchTab(curTab);
+}
+function switchTab(tab){
+  curTab=tab;
+  document.querySelectorAll(".tab").forEach((t,i)=>t.classList.toggle("on",["info","activity","actions"][i]===tab));
+  const l=curLead,b=document.getElementById("dBody");
+  if(tab==="info"){
+    b.innerHTML=`
+      <div class="info-row"><span class="lbl">Email</span><span class="val">${esc(l.email||"—")}</span></div>
+      <div class="info-row"><span class="lbl">Phone</span><span class="val">${esc(l.phone||"—")}</span></div>
+      <div class="info-row"><span class="lbl">City</span><span class="val">${esc(l.city||"—")}</span></div>
+      <div class="info-row"><span class="lbl">Education</span><span class="val">${fmt(l.educationLevel)}</span></div>
+      <div class="info-row"><span class="lbl">Source</span><span class="val">${fmt(l.source)}</span></div>
+      <div class="info-row"><span class="lbl">Budget</span><span class="val">${l.budget?"&#8377;"+l.budget.toLocaleString():"—"}</span></div>
+      <div class="info-row"><span class="lbl">Course Interest</span><span class="val">${esc(l.courseInterest?.title||"—")}</span></div>
+      <div class="info-row"><span class="lbl">Follow-up</span><span class="val">${l.followUpDate?new Date(l.followUpDate).toLocaleDateString():"—"}</span></div>
+      <div class="info-row"><span class="lbl">Last Contacted</span><span class="val">${l.lastContactedAt?new Date(l.lastContactedAt).toLocaleString():"—"}</span></div>
+      <div class="info-row"><span class="lbl">Added</span><span class="val">${new Date(l.createdAt).toLocaleDateString()}</span></div>
+      ${l.notes?`<div style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2)">${esc(l.notes)}</div>`:""}
+      <div style="margin-top:16px;display:flex;gap:7px;flex-wrap:wrap">
+        <a class="btn btn-ghost btn-sm" href="demos.html?lead=${l._id}">Book Demo</a>
+        <a class="btn btn-ghost btn-sm" href="followups.html?lead=${l._id}">Add Follow-Up</a>
+        ${l.pipelineStage==="demo_attended"?`<a class="btn btn-prim btn-sm" href="enrollments.html?lead=${l._id}">Enroll</a>`:""}
+      </div>`;
+  }else if(tab==="activity"){
+    const hist=[...(l.stageHistory||[])].reverse();
+    b.innerHTML=hist.length===0?`<div style="color:var(--text3);font-size:12px;padding:20px 0">No stage history yet.</div>`:hist.map(h=>`
+      <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:5px"></div>
+        <div>
+          <div style="font-size:12px">${fmt(h.from)} &rarr; <strong>${fmt(h.to)}</strong></div>
+          ${h.note?`<div style="font-size:11px;color:var(--text2)">${esc(h.note)}</div>`:""}
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${h.changedAt?new Date(h.changedAt).toLocaleString():""}</div>
+        </div>
+      </div>`).join("");
+  }else{
+    b.innerHTML=`
+      <div class="sec-lbl">Move Stage</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px">
+        ${STAGES.map(s=>`<button class="btn btn-sm" onclick="qStage('${s.key}')" style="${l.pipelineStage===s.key?`background:${s.bg};color:${s.col};border:1px solid ${s.col}30`:"background:var(--bg3);color:var(--text2);border:1px solid var(--border)"}">${s.label}</button>`).join("")}
+      </div>
+      <div class="sec-lbl">Quick Edit</div>
+      <div class="fgrid">
+        <div class="field"><label>Follow-up Date</label><input type="date" id="eFU" value="${l.followUpDate?l.followUpDate.slice(0,10):""}"></div>
+        <div class="field"><label>Budget</label><input type="number" id="eBudget" value="${l.budget||0}"></div>
+        <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="eNotes">${esc(l.notes||"")}</textarea></div>
+      </div>
+      <button class="btn btn-prim btn-sm" style="margin-top:10px" onclick="qSave()">Save</button>
+      <div style="margin-top:18px"><button class="btn btn-danger btn-sm" onclick="archiveLead()">Archive Lead</button></div>`;
   }
 }
-
-// ── DELETE ────────────────────────────────────────────────────────
-async function deleteRecord(id) {
-  const l = LEADS.find(x => x._id === id);
-  const name = KEYS.name ? getVal(l, KEYS.name) : id;
-  const ok = await confirm2('Delete Lead', `Delete "${name}"? This cannot be undone.`);
-  if (!ok) return;
-  try {
-    await apiFetch(`/import/record/${id}`, { method: 'DELETE' });
-    toast('Lead deleted');
-    await loadData();
-  } catch (err) {
-    toast('Delete failed: ' + err.message, 'error');
-  }
+async function qStage(stage){
+  const d=await apiRequest(`/sales/leads/${curLead._id}/stage`,"PATCH",{stage});
+  if(d.error){toast(d.msg,"err");return;}
+  Object.assign(curLead,d.lead);renderDetail();
+  const i=allLeads.findIndex(l=>l._id===curLead._id);if(i>=0)allLeads[i]=curLead;
+  renderBoard();toast("Stage updated","ok");
 }
-
-// ── DROPDOWN TOGGLE ───────────────────────────────────────────────
-function toggleDD(e, id) {
-  e.stopPropagation();
-  document.querySelectorAll('.dropdown-menu').forEach(m => { if (m.id !== id) m.classList.remove('open'); });
-  document.getElementById(id)?.classList.toggle('open');
+async function qSave(){
+  const d=await apiRequest(`/sales/leads/${curLead._id}`,"PATCH",{
+    followUpDate:document.getElementById("eFU").value||null,
+    budget:parseFloat(document.getElementById("eBudget").value)||0,
+    notes:document.getElementById("eNotes").value.trim()
+  });
+  if(d.error){toast(d.msg,"err");return;}
+  Object.assign(curLead,d.lead);
+  const i=allLeads.findIndex(l=>l._id===curLead._id);if(i>=0)allLeads[i]=curLead;
+  renderBoard();toast("Saved!","ok");
 }
-document.addEventListener('click', () => document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open')));
+async function archiveLead(){
+  if(!confirm("Archive this lead?"))return;
+  const d=await apiRequest(`/sales/leads/${curLead._id}`,"DELETE");
+  if(d.error){toast(d.msg,"err");return;}
+  toast("Archived","ok");closeDrawers();await loadBoard();
+}
+function showDrw(id){document.getElementById("ov").classList.add("show");document.getElementById(id).classList.add("open");}
+function closeDrawers(){document.getElementById("ov").classList.remove("show");document.querySelectorAll(".drawer").forEach(d=>d.classList.remove("open"));}
+function toast(msg,type="info"){const w=document.getElementById("tw");const el=document.createElement("div");el.className=`toast ${type}`;el.innerHTML=(type==="ok"?"&#10003;":type==="err"?"&#10007;":"&#9432;")+" "+esc(msg);w.appendChild(el);setTimeout(()=>el.remove(),3500);}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function fmt(s){return String(s||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
 </script>
 </body>
 </html>

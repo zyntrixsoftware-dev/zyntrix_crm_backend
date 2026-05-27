@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Batches — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);--blue:#3d8ef0;--blue-dim:rgba(61,142,240,.12);--amber:#f5a623;--amber-dim:rgba(245,166,35,.12);--rose:#ff4d6d;--rose-dim:rgba(255,77,109,.12);--purple:#b57bee;--purple-dim:rgba(181,123,238,.12);--teal:#22d3ee;--teal-dim:rgba(34,211,238,.12);--green:#22c55e;--green-dim:rgba(34,197,94,.12);--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg);flex-shrink:0}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-a.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;min-height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-hd{flex:1}.pg-title{font-family:var(--display);font-size:15px;font-weight:700}.pg-crumb{font-size:10px;color:var(--text3)}.pg-crumb span{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s;text-decoration:none}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-prim:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-sm{padding:5px 10px;font-size:11px}
+.filter-bar{padding:10px 22px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+select.fsel{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:12px;font-family:var(--font);padding:6px 9px;cursor:pointer}
+select.fsel:focus{outline:none;border-color:var(--accent)}
+.content{flex:1;overflow-y:auto;padding:22px}
+/* TABLE */
+.tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg3)}
+th{padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+td{padding:12px 14px;font-size:12.5px;border-top:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:var(--bg3)}
+.badge{display:inline-block;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase}
+.seat-bar{display:flex;align-items:center;gap:6px}
+.bar{height:4px;border-radius:2px;background:var(--bg3);flex:1;max-width:60px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;background:var(--accent)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}.overlay.show{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:460px;background:var(--bg2);border-left:1px solid var(--border2);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}.drw-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.drw-title{flex:1;font-family:var(--display);font-size:15px;font-weight:700}.drw-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:3px}.drw-close:hover{color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:20px 22px}.drw-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:10.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus{border-color:var(--accent)}.field textarea{resize:vertical;min-height:60px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding-bottom:8px;border-bottom:1px solid var(--border);margin:14px 0 10px}
+.info-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.info-row .lbl{color:var(--text2)}.info-row .val{color:var(--text);font-weight:500}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);animation:si .25s ease}
+.toast.ok{border-color:rgba(0,229,176,.3)}.toast.err{border-color:rgba(255,77,109,.3)}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.spin{animation:sp .8s linear infinite;display:inline-block}@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:700">ZyntrixCRM</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">SALES SYSTEM</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Pipeline</div>
+    <a class="nav-a" href="leads.html"><span class="nav-ico">&#9776;</span>Leads Pipeline</a>
+    <a class="nav-a" href="demos.html"><span class="nav-ico">&#9654;</span>Demo Sessions</a>
+    <a class="nav-a" href="followups.html"><span class="nav-ico">&#128222;</span>Follow-Ups</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Catalogue</div>
+    <a class="nav-a" href="courses.html"><span class="nav-ico">&#9658;</span>Courses</a>
+    <a class="nav-a on" href="batches.html"><span class="nav-ico">&#128467;</span>Batches</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Finance</div>
+    <a class="nav-a" href="enrollments.html"><span class="nav-ico">&#9654;</span>Enrollments</a>
+    <a class="nav-a" href="payments.html"><span class="nav-ico">&#128179;</span>Payments</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Performance</div>
+    <a class="nav-a" href="targets.html"><span class="nav-ico">&#127919;</span>Targets</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">&#9741;</span>Reports</a>
+  </div>
+  <div class="sb-foot"><div style="display:flex;align-items:center;gap:8px;padding:8px 10px"><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--bg)" id="navAv">?</div><div><div style="font-size:12px;font-weight:600" id="navName">...</div><div style="font-size:10px;color:var(--text3)" id="navRole"></div></div></div></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="pg-hd"><div class="pg-title">Batch Manager</div><div class="pg-crumb">Sales &rsaquo; <span>Batches</span></div></div>
+    <button class="btn btn-ghost btn-sm" onclick="load()">&#8635;</button>
+    <button class="btn btn-prim" onclick="openAdd()">+ New Batch</button>
+  </div>
+  <div class="filter-bar">
+    <select class="fsel" id="fCourse" onchange="load()"><option value="">All Courses</option></select>
+    <select class="fsel" id="fStatus" onchange="load()">
+      <option value="">All Statuses</option><option value="upcoming">Upcoming</option>
+      <option value="ongoing">Ongoing</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+    </select>
+  </div>
+  <div class="content">
+    <div class="tbl-wrap">
+      <table><thead><tr><th>Batch Code</th><th>Course</th><th>Dates</th><th>Schedule</th><th>Mode</th><th>Seats</th><th>Status</th><th></th></tr></thead>
+      <tbody id="tbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)"><span class="spin">&#9696;</span> Loading...</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+</div>
+<div class="overlay" id="ov" onclick="closeDrw()"></div>
+<!-- ADD/EDIT -->
+<div class="drawer" id="formDrw">
+  <div class="drw-hdr"><div class="drw-title" id="formTitle">New Batch</div><button class="drw-close" onclick="closeDrw()">&#10005;</button></div>
+  <div class="drw-body">
+    <div class="frow">
+      <div class="field" style="grid-column:1/-1"><label>Course *</label><select id="bCourse"></select></div>
+      <div class="field" style="grid-column:1/-1"><label>Batch Code *</label><input id="bCode" placeholder="e.g. WD-JUN-2026"></div>
+      <div class="field"><label>Start Date</label><input type="date" id="bStart"></div>
+      <div class="field"><label>End Date</label><input type="date" id="bEnd"></div>
+      <div class="field"><label>Total Seats</label><input type="number" id="bSeats" value="30"></div>
+      <div class="field"><label>Mode</label>
+        <select id="bMode"><option value="online">Online</option><option value="offline">Offline</option><option value="hybrid">Hybrid</option></select>
+      </div>
+      <div class="field" style="grid-column:1/-1"><label>Schedule</label><input id="bSched" placeholder="Mon/Wed/Fri 7-9 PM"></div>
+      <div class="field" style="grid-column:1/-1"><label>Instructor</label><input id="bInstr" placeholder="Instructor name"></div>
+      <div class="field" style="grid-column:1/-1"><label>Meeting Link / Venue</label><input id="bLink" placeholder="https://zoom.us/... or Room A101"></div>
+      <div class="field"><label>Status</label>
+        <select id="bStatus"><option value="upcoming">Upcoming</option><option value="ongoing">Ongoing</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+      </div>
+    </div>
+  </div>
+  <div class="drw-foot"><button class="btn btn-prim" onclick="saveBatch()">Save Batch</button><button class="btn btn-ghost" onclick="closeDrw()">Cancel</button></div>
+</div>
+<!-- DETAIL -->
+<div class="drawer" id="detDrw" style="width:500px">
+  <div class="drw-hdr"><div class="drw-title" id="detTitle">Batch Detail</div><button class="drw-close" onclick="closeDrw()">&#10005;</button></div>
+  <div class="drw-body" id="detBody"></div>
+  <div class="drw-foot" id="detFoot"></div>
+</div>
+<div class="toast-wrap" id="tw"></div>
+<script src="../../assets/js/api.js"></script>
+<script>
+const STATCOL={upcoming:"var(--blue)",ongoing:"var(--accent)",completed:"var(--green)",cancelled:"var(--rose)"};
+const STATBG={upcoming:"var(--blue-dim)",ongoing:"var(--accent-dim)",completed:"var(--green-dim)",cancelled:"var(--rose-dim)"};
+let courses=[],batches=[],editId=null;
+(async()=>{
+  const u=JSON.parse(localStorage.getItem("user")||"{}");
+  if(u.name){document.getElementById("navName").textContent=u.name;document.getElementById("navRole").textContent=u.role||"";document.getElementById("navAv").textContent=u.name[0].toUpperCase();}
+  await loadCourses();await load();
+})();
+async function loadCourses(){
+  const d=await apiRequest("/sales/courses");
+  if(d.error)return;courses=d.courses||[];
+  ["fCourse","bCourse"].forEach(id=>{
+    const sel=document.getElementById(id);
+    if(sel.id==="fCourse")sel.innerHTML='<option value="">All Courses</option>';else sel.innerHTML='<option value="">-- Select Course --</option>';
+    courses.forEach(c=>{const o=document.createElement("option");o.value=c._id;o.textContent=c.title;sel.appendChild(o);});
+  });
+}
+async function load(){
+  const cid=document.getElementById("fCourse").value;
+  const st=document.getElementById("fStatus").value;
+  let url="/sales/batches?";
+  if(cid)url+=`course=${cid}&`;
+  if(st)url+=`status=${st}`;
+  const d=await apiRequest(url);
+  if(d.error){toast(d.msg,"err");return;}
+  batches=d.batches||[];renderTable();
+}
+function renderTable(){
+  const tbody=document.getElementById("tbody");
+  if(!batches.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)">No batches found. <button class="btn btn-prim btn-sm" onclick="openAdd()">Create one</button></td></tr>';return;}
+  tbody.innerHTML=batches.map(b=>{
+    const pct=b.totalSeats?Math.round((b.seatsBooked/b.totalSeats)*100):0;
+    const barCol=pct>90?"var(--rose)":pct>70?"var(--amber)":"var(--accent)";
+    return`<tr>
+      <td style="font-family:var(--mono);font-weight:600;color:var(--accent)">${esc(b.batchCode)}</td>
+      <td>${esc(b.course?.title||"—")}</td>
+      <td style="font-size:11px;color:var(--text2)">${b.startDate?new Date(b.startDate).toLocaleDateString():"—"}<br>${b.endDate?new Date(b.endDate).toLocaleDateString():"—"}</td>
+      <td style="font-size:11px;color:var(--text2)">${esc(b.schedule||"—")}</td>
+      <td><span class="badge" style="background:var(--bg3);color:var(--text2)">${b.mode||"online"}</span></td>
+      <td><div class="seat-bar"><span style="font-size:11px;color:var(--text2)">${b.seatsBooked||0}/${b.totalSeats||0}</span><div class="bar"><div class="bar-fill" style="width:${pct}%;background:${barCol}"></div></div></div></td>
+      <td><span class="badge" style="background:${STATBG[b.status]};color:${STATCOL[b.status]}">${b.status}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openDetail('${b._id}')">View</button></td>
+    </tr>`;
+  }).join("");
+}
+function openAdd(){
+  editId=null;document.getElementById("formTitle").textContent="New Batch";
+  ["bCode","bSched","bInstr","bLink"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("bSeats").value=30;
+  document.getElementById("bStart").value="";document.getElementById("bEnd").value="";
+  showDrw("formDrw");
+}
+async function saveBatch(){
+  const code=document.getElementById("bCode").value.trim();
+  const cid=document.getElementById("bCourse").value;
+  if(!code||!cid){toast("Course and batch code required","err");return;}
+  const body={course:cid,batchCode:code,startDate:document.getElementById("bStart").value||null,endDate:document.getElementById("bEnd").value||null,
+    totalSeats:parseInt(document.getElementById("bSeats").value)||30,mode:document.getElementById("bMode").value,
+    schedule:document.getElementById("bSched").value.trim(),instructor:document.getElementById("bInstr").value.trim(),
+    meetingLink:document.getElementById("bLink").value.trim(),status:document.getElementById("bStatus").value};
+  const url=editId?`/sales/batches/${editId}`:"/sales/batches";
+  const d=await apiRequest(url,editId?"PATCH":"POST",body);
+  if(d.error){toast(d.msg,"err");return;}
+  toast(editId?"Updated!":"Batch created!","ok");closeDrw();await load();
+}
+async function openDetail(id){
+  const b=batches.find(x=>x._id===id);if(!b)return;
+  const pct=b.totalSeats?Math.round((b.seatsBooked/b.totalSeats)*100):0;
+  document.getElementById("detTitle").textContent=b.batchCode;
+  document.getElementById("detBody").innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <span class="badge" style="background:${STATBG[b.status]};color:${STATCOL[b.status]}">${b.status}</span>
+      <span class="badge" style="background:var(--bg3);color:var(--text2)">${b.mode}</span>
+    </div>
+    <div class="info-row"><span class="lbl">Course</span><span class="val">${esc(b.course?.title||"—")}</span></div>
+    <div class="info-row"><span class="lbl">Start Date</span><span class="val">${b.startDate?new Date(b.startDate).toLocaleDateString():"—"}</span></div>
+    <div class="info-row"><span class="lbl">End Date</span><span class="val">${b.endDate?new Date(b.endDate).toLocaleDateString():"—"}</span></div>
+    <div class="info-row"><span class="lbl">Schedule</span><span class="val">${esc(b.schedule||"—")}</span></div>
+    <div class="info-row"><span class="lbl">Instructor</span><span class="val">${esc(b.instructor||"—")}</span></div>
+    <div class="info-row"><span class="lbl">Link / Venue</span><span class="val" style="word-break:break-all">${esc(b.meetingLink||b.venue||"—")}</span></div>
+    <div class="info-row"><span class="lbl">Seats Booked</span><span class="val">${b.seatsBooked||0} / ${b.totalSeats||0} (${pct}%)</span></div>
+    <div style="margin-top:10px"><div class="bar" style="max-width:100%;height:6px"><div class="bar-fill" style="width:${pct}%;background:${pct>90?"var(--rose)":pct>70?"var(--amber)":"var(--accent)"}"></div></div></div>`;
+  document.getElementById("detFoot").innerHTML=`
+    <button class="btn btn-ghost btn-sm" onclick="openEditBatch('${id}')">Edit</button>
+    <a class="btn btn-ghost btn-sm" href="enrollments.html?batch=${id}">Enrollments</a>
+    <button class="btn btn-danger btn-sm" onclick="cancelBatch('${id}')">Cancel Batch</button>
+    <button class="btn btn-ghost btn-sm" onclick="closeDrw()">Close</button>`;
+  showDrw("detDrw");
+}
+function openEditBatch(id){
+  editId=id;const b=batches.find(x=>x._id===id);if(!b)return;
+  document.getElementById("formTitle").textContent="Edit Batch";
+  document.getElementById("bCode").value=b.batchCode||"";
+  document.getElementById("bCourse").value=b.course?._id||b.course||"";
+  document.getElementById("bStart").value=b.startDate?b.startDate.slice(0,10):"";
+  document.getElementById("bEnd").value=b.endDate?b.endDate.slice(0,10):"";
+  document.getElementById("bSeats").value=b.totalSeats||30;
+  document.getElementById("bMode").value=b.mode||"online";
+  document.getElementById("bSched").value=b.schedule||"";
+  document.getElementById("bInstr").value=b.instructor||"";
+  document.getElementById("bLink").value=b.meetingLink||"";
+  document.getElementById("bStatus").value=b.status||"upcoming";
+  closeDrw();showDrw("formDrw");
+}
+async function cancelBatch(id){
+  if(!confirm("Cancel this batch?"))return;
+  const d=await apiRequest(`/sales/batches/${id}`,"DELETE");
+  if(d.error){toast(d.msg,"err");return;}
+  toast("Batch cancelled","ok");closeDrw();await load();
+}
+function showDrw(id){document.getElementById("ov").classList.add("show");document.getElementById(id).classList.add("open");}
+function closeDrw(){document.getElementById("ov").classList.remove("show");document.querySelectorAll(".drawer").forEach(d=>d.classList.remove("open"));}
+function toast(msg,t="info"){const w=document.getElementById("tw");const el=document.createElement("div");el.className=`toast ${t}`;el.textContent=msg;w.appendChild(el);setTimeout(()=>el.remove(),3500);}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+</script>
+</body>
+</html>

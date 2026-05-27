@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Enrollments — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);--blue:#3d8ef0;--blue-dim:rgba(61,142,240,.12);--amber:#f5a623;--amber-dim:rgba(245,166,35,.12);--rose:#ff4d6d;--rose-dim:rgba(255,77,109,.12);--purple:#b57bee;--purple-dim:rgba(181,123,238,.12);--teal:#22d3ee;--teal-dim:rgba(34,211,238,.12);--green:#22c55e;--green-dim:rgba(34,197,94,.12);--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg);flex-shrink:0}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-a.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;min-height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-hd{flex:1}.pg-title{font-family:var(--display);font-size:15px;font-weight:700}.pg-crumb{font-size:10px;color:var(--text3)}.pg-crumb span{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s;text-decoration:none}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-prim:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,.2)}.btn-amber:hover{background:rgba(245,166,35,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.filter-bar{padding:10px 22px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+select.fsel,input.fsel{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:12px;font-family:var(--font);padding:6px 9px;cursor:pointer}
+select.fsel:focus,input.fsel:focus{outline:none;border-color:var(--accent)}
+.content{flex:1;overflow-y:auto;padding:22px}
+.tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg3)}
+th{padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+td{padding:11px 14px;font-size:12.5px;border-top:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:var(--bg3)}
+.badge{display:inline-block;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase}
+.badge-paid{background:var(--green-dim);color:var(--green)}
+.badge-partial{background:var(--amber-dim);color:var(--amber)}
+.badge-unpaid{background:var(--rose-dim);color:var(--rose)}
+.badge-blue{background:var(--blue-dim);color:var(--blue)}
+.badge-purple{background:var(--purple-dim);color:var(--purple)}
+.badge-teal{background:var(--teal-dim);color:var(--teal)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}.overlay.show{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:500px;background:var(--bg2);border-left:1px solid var(--border2);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drw-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.drw-title{flex:1;font-family:var(--display);font-size:15px;font-weight:700}.drw-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:3px}.drw-close:hover{color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:20px 22px}.drw-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:10.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}.field textarea{resize:vertical;min-height:60px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.info-row .lbl{color:var(--text2)}.info-row .val{color:var(--text);font-weight:500}
+.section-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px}
+.pay-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.pay-item .pa{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent)}
+.pay-item .pm{font-size:11px;color:var(--text3)}
+.cert-row{background:var(--green-dim);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--green)}
+.mini-form{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-top:10px}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);animation:si .25s ease}
+.toast.ok{border-color:rgba(0,229,176,.3)}.toast.err{border-color:rgba(255,77,109,.3)}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.spin{animation:sp .8s linear infinite;display:inline-block}@keyframes sp{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.fee-bar{display:flex;flex-direction:column;gap:2px}
+.fee-bar .fb-track{height:4px;background:var(--bg4);border-radius:2px;margin-top:4px}
+.fee-bar .fb-fill{height:4px;border-radius:2px;transition:width .3s}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:700">ZyntrixCRM</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">SALES SYSTEM</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Pipeline</div>
+    <a class="nav-a" href="leads.html"><span class="nav-ico">&#9776;</span>Leads Pipeline</a>
+    <a class="nav-a" href="demos.html"><span class="nav-ico">&#9654;</span>Demo Sessions</a>
+    <a class="nav-a" href="followups.html"><span class="nav-ico">&#128222;</span>Follow-Ups</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Catalogue</div>
+    <a class="nav-a" href="courses.html"><span class="nav-ico">&#9658;</span>Courses</a>
+    <a class="nav-a" href="batches.html"><span class="nav-ico">&#128467;</span>Batches</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Finance</div>
+    <a class="nav-a on" href="enrollments.html"><span class="nav-ico">&#9654;</span>Enrollments</a>
+    <a class="nav-a" href="payments.html"><span class="nav-ico">&#128179;</span>Payments</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Performance</div>
+    <a class="nav-a" href="targets.html"><span class="nav-ico">&#127919;</span>Targets</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">&#9741;</span>Reports</a>
+  </div>
+  <div class="sb-foot"><a class="nav-a" href="../../index.html"><span class="nav-ico">&#8592;</span>Back to CRM</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="pg-hd"><div class="pg-title">Enrollments</div><div class="pg-crumb">Finance &rsaquo; <span>Enrollments</span></div></div>
+    <button class="btn btn-prim" onclick="openAdd()">&#43; Enroll Student</button>
+  </div>
+  <div class="filter-bar">
+    <select class="fsel" id="fStatus" onchange="loadEnrollments()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="completed">Completed</option>
+      <option value="dropped">Dropped</option>
+      <option value="on_hold">On Hold</option>
+    </select>
+    <select class="fsel" id="fCourse" onchange="loadEnrollments()"><option value="">All Courses</option></select>
+    <select class="fsel" id="fBatch" onchange="loadEnrollments()"><option value="">All Batches</option></select>
+  </div>
+  <div class="content">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Student</th><th>Course</th><th>Batch</th><th>Plan</th><th>Fee Progress</th><th>Payment Status</th><th>Status</th>
+        </tr></thead>
+        <tbody id="tbody"><tr><td colspan="7" class="empty"><span class="spin">&#9696;</span> Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- Detail Drawer -->
+<div class="drawer" id="detailDrw">
+  <div class="drw-hdr">
+    <div class="drw-title" id="detailTitle">Enrollment Detail</div>
+    <button class="drw-close" onclick="closeAll()">&#10005;</button>
+  </div>
+  <div class="drw-body" id="detailBody"></div>
+  <div class="drw-foot" id="detailFoot"></div>
+</div>
+
+<!-- Add/Enroll Drawer -->
+<div class="drawer" id="addDrw">
+  <div class="drw-hdr">
+    <div class="drw-title">Enroll Student</div>
+    <button class="drw-close" onclick="closeAll()">&#10005;</button>
+  </div>
+  <div class="drw-body">
+    <div class="field"><label>Student Lead *</label><select id="aLead"><option value="">Select lead…</option></select></div>
+    <div class="field"><label>Course *</label><select id="aCourse" onchange="loadBatchesForAdd()"><option value="">Select course…</option></select></div>
+    <div class="field"><label>Batch *</label><select id="aBatch"><option value="">Select batch…</option></select></div>
+    <div class="frow">
+      <div class="field"><label>Payment Plan *</label>
+        <select id="aPayPlan">
+          <option value="full">Full Payment</option>
+          <option value="emi_2">EMI – 2 months</option>
+          <option value="emi_3">EMI – 3 months</option>
+          <option value="emi_6">EMI – 6 months</option>
+          <option value="scholarship">Scholarship</option>
+        </select>
+      </div>
+      <div class="field"><label>Total Fee (₹) *</label><input type="number" id="aTotalFee" placeholder="e.g. 25000"></div>
+    </div>
+    <div class="field"><label>EMI Months (if EMI plan)</label><input type="number" id="aEmiMonths" placeholder="e.g. 3" min="1"></div>
+    <div class="field"><label>Notes</label><textarea id="aNotes" placeholder="Any enrollment notes…"></textarea></div>
+  </div>
+  <div class="drw-foot">
+    <button class="btn btn-prim" onclick="submitEnroll()">Enroll Student</button>
+    <button class="btn btn-ghost" onclick="closeAll()">Cancel</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="tw"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script>
+let allLeads=[], allCourses=[], allBatches=[], currentEnrollment=null;
+
+const params = new URLSearchParams(location.search);
+const filterLead = params.get('lead') || '';
+const filterBatch = params.get('batch') || '';
+
+async function init() {
+  await Promise.all([loadMeta(), loadEnrollments()]);
+}
+
+async function loadMeta() {
+  const [ld, cs, bs] = await Promise.all([
+    apiRequest('/sales/leads?limit=200'),
+    apiRequest('/sales/courses?limit=200'),
+    apiRequest('/sales/batches?limit=200')
+  ]);
+  allLeads = Array.isArray(ld) ? ld : (ld.leads || []);
+  allCourses = Array.isArray(cs) ? cs : (cs.courses || []);
+  allBatches = Array.isArray(bs) ? bs : (bs.batches || []);
+
+  // Populate filter selects
+  const fc = document.getElementById('fCourse');
+  allCourses.forEach(c => { const o=document.createElement('option'); o.value=c._id; o.textContent=c.title||c.name; fc.appendChild(o); });
+  const fb = document.getElementById('fBatch');
+  allBatches.forEach(b => { const o=document.createElement('option'); o.value=b._id; o.textContent=b.batchCode||b.code||b.name; fb.appendChild(o); });
+
+  // Populate add drawer
+  const al = document.getElementById('aLead');
+  allLeads.forEach(l => { const o=document.createElement('option'); o.value=l._id; o.textContent=l.name||l.fullName; al.appendChild(o); });
+  const ac = document.getElementById('aCourse');
+  allCourses.forEach(c => { const o=document.createElement('option'); o.value=c._id; o.textContent=c.title||c.name; ac.appendChild(o); });
+
+  if (filterBatch) { document.getElementById('fBatch').value = filterBatch; }
+}
+
+async function loadBatchesForAdd() {
+  const cid = document.getElementById('aCourse').value;
+  const ab = document.getElementById('aBatch');
+  ab.innerHTML = '<option value="">Select batch…</option>';
+  if (!cid) return;
+  const filtered = allBatches.filter(b => (b.course?._id || b.course) === cid);
+  filtered.forEach(b => { const o=document.createElement('option'); o.value=b._id; o.textContent=b.batchCode||b.code||b.name; ab.appendChild(o); });
+}
+
+async function loadEnrollments() {
+  const status = document.getElementById('fStatus').value;
+  const course = document.getElementById('fCourse').value;
+  const batch = document.getElementById('fBatch').value || filterBatch;
+  const qs = new URLSearchParams();
+  if (status) qs.set('status', status);
+  if (course) qs.set('course', course);
+  if (batch) qs.set('batch', batch);
+  if (filterLead) qs.set('lead', filterLead);
+  const data = await apiRequest('/sales/enrollments?' + qs.toString());
+  const rows = Array.isArray(data) ? data : (data.enrollments || []);
+  renderTable(rows);
+}
+
+function payStatus(e) {
+  const paid = e.feePaid || 0, total = e.totalFee || 0;
+  if (paid >= total && total > 0) return {label:'Paid', cls:'badge-paid', pct:100};
+  if (paid > 0) return {label:'Partial', cls:'badge-partial', pct: Math.round(paid/total*100)};
+  return {label:'Unpaid', cls:'badge-unpaid', pct:0};
+}
+
+function planLabel(p) {
+  const map = {full:'Full',emi_2:'EMI×2',emi_3:'EMI×3',emi_6:'EMI×6',scholarship:'Scholar'};
+  return map[p] || p;
+}
+
+function statusBadge(s) {
+  const map = {active:'badge-blue',completed:'badge-teal',dropped:'badge-unpaid',on_hold:'badge-amber'};
+  return map[s] || 'badge-blue';
+}
+
+function renderTable(rows) {
+  const tb = document.getElementById('tbody');
+  if (!rows.length) { tb.innerHTML='<tr><td colspan="7" class="empty">No enrollments found</td></tr>'; return; }
+  tb.innerHTML = rows.map(e => {
+    const ps = payStatus(e);
+    const lead = e.lead?.name || e.lead?.fullName || '—';
+    const course = e.course?.title || e.course?.name || '—';
+    const batch = e.batch?.batchCode || e.batch?.code || e.batch?.name || '—';
+    const paid = (e.feePaid||0).toLocaleString('en-IN');
+    const total = (e.totalFee||0).toLocaleString('en-IN');
+    const barColor = ps.label==='Paid' ? 'var(--green)' : ps.label==='Partial' ? 'var(--amber)' : 'var(--rose)';
+    return `<tr style="cursor:pointer" onclick="openDetail('${e._id}')">
+      <td><strong>${lead}</strong></td>
+      <td>${course}</td>
+      <td><span style="font-family:var(--mono);font-size:11px">${batch}</span></td>
+      <td><span class="badge badge-purple">${planLabel(e.paymentPlan)}</span></td>
+      <td>
+        <div class="fee-bar">
+          <span style="font-size:11px;color:var(--text2)">₹${paid} / ₹${total}</span>
+          <div class="fb-track"><div class="fb-fill" style="width:${ps.pct}%;background:${barColor}"></div></div>
+        </div>
+      </td>
+      <td><span class="badge ${ps.cls}">${ps.label}</span></td>
+      <td><span class="badge ${statusBadge(e.completionStatus||e.status||'active')}">${e.completionStatus||e.status||'active'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+async function openDetail(id) {
+  const overlay = document.getElementById('overlay');
+  const drw = document.getElementById('detailDrw');
+  document.getElementById('detailBody').innerHTML = '<div class="empty"><span class="spin">&#9696;</span></div>';
+  document.getElementById('detailFoot').innerHTML = '';
+  overlay.classList.add('show'); drw.classList.add('open');
+  const e = await apiRequest('/sales/enrollments/' + id);
+  currentEnrollment = e;
+  if (e.error) { document.getElementById('detailBody').innerHTML='<div class="empty">Failed to load</div>'; return; }
+  document.getElementById('detailTitle').textContent = (e.lead?.name || 'Enrollment');
+  const ps = payStatus(e);
+  const payments = e.payments || [];
+  document.getElementById('detailBody').innerHTML = `
+    <div class="info-row"><span class="lbl">Student</span><span class="val">${e.lead?.name||e.lead?.fullName||'—'}</span></div>
+    <div class="info-row"><span class="lbl">Course</span><span class="val">${e.course?.title||e.course?.name||'—'}</span></div>
+    <div class="info-row"><span class="lbl">Batch</span><span class="val">${e.batch?.batchCode||e.batch?.code||e.batch?.name||'—'}</span></div>
+    <div class="info-row"><span class="lbl">Payment Plan</span><span class="val">${planLabel(e.paymentPlan)}</span></div>
+    <div class="info-row"><span class="lbl">Total Fee</span><span class="val">₹${(e.totalFee||0).toLocaleString('en-IN')}</span></div>
+    <div class="info-row"><span class="lbl">Fee Paid</span><span class="val" style="color:var(--${ps.label==='Paid'?'green':ps.label==='Partial'?'amber':'rose'})">₹${(e.feePaid||0).toLocaleString('en-IN')}</span></div>
+    <div class="info-row"><span class="lbl">Status</span><span class="val"><span class="badge ${statusBadge(e.completionStatus||'active')}">${e.completionStatus||'active'}</span></span></div>
+    <div class="info-row"><span class="lbl">Certificate</span><span class="val">${e.certificateIssued ? '✅ Issued' : 'Not issued'}</span></div>
+    ${e.certificateUrl ? `<div class="info-row"><span class="lbl">Certificate URL</span><span class="val"><a href="${e.certificateUrl}" target="_blank" style="color:var(--accent)">View</a></span></div>` : ''}
+
+    <div class="section-title">Payment History (${payments.length})</div>
+    ${payments.length ? payments.map(p=>`
+      <div class="pay-item">
+        <div>
+          <div class="pa">₹${(p.amount||0).toLocaleString('en-IN')}</div>
+          <div class="pm">${p.method||'—'} &middot; Instalment #${p.instalmentNumber||1} &middot; ${p.transactionId||'No TxnID'}</div>
+          ${p.remarks?`<div class="pm">${p.remarks}</div>`:''}
+        </div>
+        <div style="font-size:11px;color:var(--text3)">${p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-IN') : ''}</div>
+      </div>`).join('') : '<div style="color:var(--text3);font-size:12px">No payments recorded yet.</div>'}
+
+    <div id="payFormArea"></div>
+    <div id="certFormArea"></div>
+  `;
+
+  document.getElementById('detailFoot').innerHTML = `
+    <button class="btn btn-prim btn-sm" onclick="togglePayForm()">&#43; Record Payment</button>
+    ${!e.certificateIssued ? `<button class="btn btn-amber btn-sm" onclick="toggleCertForm()">&#127891; Issue Certificate</button>` : ''}
+    <button class="btn btn-ghost btn-sm" onclick="closeAll()">Close</button>
+  `;
+}
+
+function togglePayForm() {
+  const area = document.getElementById('payFormArea');
+  if (area.innerHTML) { area.innerHTML=''; return; }
+  area.innerHTML = `
+    <div class="mini-form">
+      <div class="section-title">Record Payment</div>
+      <div class="frow">
+        <div class="field"><label>Amount (₹) *</label><input type="number" id="pAmt" placeholder="e.g. 5000"></div>
+        <div class="field"><label>Instalment #</label><input type="number" id="pInst" value="1" min="1"></div>
+      </div>
+      <div class="field"><label>Method *</label>
+        <select id="pMethod">
+          <option value="upi">UPI</option><option value="card">Card</option>
+          <option value="bank_transfer">Bank Transfer</option><option value="cash">Cash</option>
+          <option value="cheque">Cheque</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Transaction ID</label><input type="text" id="pTxn" placeholder="Optional"></div>
+      <div class="field"><label>Remarks</label><textarea id="pRemarks" placeholder="Optional notes…" style="min-height:46px"></textarea></div>
+      <button class="btn btn-prim btn-sm" onclick="submitPayment()">Save Payment</button>
+    </div>`;
+}
+
+function toggleCertForm() {
+  const area = document.getElementById('certFormArea');
+  if (area.innerHTML) { area.innerHTML=''; return; }
+  area.innerHTML = `
+    <div class="mini-form">
+      <div class="section-title">Issue Certificate</div>
+      <div class="field"><label>Certificate URL</label><input type="text" id="certUrl" placeholder="https://…"></div>
+      <button class="btn btn-amber btn-sm" onclick="submitCert()">Issue Certificate</button>
+    </div>`;
+}
+
+async function submitPayment() {
+  const e = currentEnrollment;
+  if (!e) return;
+  const amt = parseFloat(document.getElementById('pAmt').value);
+  if (!amt || amt <= 0) { toast('Enter a valid amount', 'err'); return; }
+  const body = {
+    enrollment: e._id,
+    lead: e.lead?._id || e.lead,
+    course: e.course?._id || e.course,
+    amount: amt,
+    method: document.getElementById('pMethod').value,
+    instalmentNumber: parseInt(document.getElementById('pInst').value) || 1,
+    transactionId: document.getElementById('pTxn').value,
+    remarks: document.getElementById('pRemarks').value
+  };
+  const res = await apiRequest('/sales/payments', { method:'POST', body: JSON.stringify(body) });
+  if (res.error) { toast(res.msg || 'Failed to record payment', 'err'); return; }
+  toast('Payment recorded!', 'ok');
+  openDetail(e._id);
+  loadEnrollments();
+}
+
+async function submitCert() {
+  const e = currentEnrollment;
+  if (!e) return;
+  const url = document.getElementById('certUrl').value.trim();
+  const res = await apiRequest('/sales/enrollments/' + e._id, { method:'PATCH', body: JSON.stringify({ certificateIssued: true, certificateUrl: url }) });
+  if (res.error) { toast(res.msg || 'Failed', 'err'); return; }
+  toast('Certificate issued!', 'ok');
+  openDetail(e._id);
+}
+
+function openAdd() {
+  closeAll();
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('addDrw').classList.add('open');
+}
+
+async function submitEnroll() {
+  const lead = document.getElementById('aLead').value;
+  const course = document.getElementById('aCourse').value;
+  const batch = document.getElementById('aBatch').value;
+  const paymentPlan = document.getElementById('aPayPlan').value;
+  const totalFee = parseFloat(document.getElementById('aTotalFee').value);
+  if (!lead || !course || !batch || !totalFee) { toast('Fill in all required fields', 'err'); return; }
+  const body = { lead, course, batch, paymentPlan, totalFee, emiMonths: parseInt(document.getElementById('aEmiMonths').value)||undefined, notes: document.getElementById('aNotes').value };
+  const res = await apiRequest('/sales/enrollments', { method:'POST', body: JSON.stringify(body) });
+  if (res.error) { toast(res.msg || 'Failed to enroll', 'err'); return; }
+  toast('Student enrolled!', 'ok');
+  closeAll(); loadEnrollments();
+}
+
+function closeAll() {
+  document.getElementById('overlay').classList.remove('show');
+  document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
+}
+
+function toast(msg, t='info') {
+  const w = document.getElementById('tw');
+  const el = document.createElement('div');
+  el.className = `toast ${t}`; el.textContent = msg;
+  w.appendChild(el); setTimeout(() => el.remove(), 3500);
+}
+
+init();
+</script>
+</body>
+</html>

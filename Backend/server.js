@@ -21,6 +21,7 @@ const offboardingRoutes     = require("./routes/offboardingRoutes");
 const onboardingRoutes      = require("./routes/onboardingRoutes");
 const orientationRoutes     = require("./routes/orientationRoutes");
 const deploymentRoutes      = require("./routes/deploymentRoutes");
+const salesRoutes           = require("./routes/salesRoutes");
 
 const app = express();
 
@@ -110,6 +111,7 @@ app.use("/api/hr",         offboardingRoutes);      // employee offboarding / se
 app.use("/api/hr",         onboardingRoutes);       // candidate onboarding + doc webhook
 app.use("/api/hr",         orientationRoutes);      // candidate orientation + session schedule
 app.use("/api/hr",         deploymentRoutes);       // team deployment after orientation
+app.use("/api",            salesRoutes);             // student course sales system
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────
 app.get("/", (req, res) => {

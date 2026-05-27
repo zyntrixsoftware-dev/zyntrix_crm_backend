@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Targets — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);--blue:#3d8ef0;--blue-dim:rgba(61,142,240,.12);--amber:#f5a623;--amber-dim:rgba(245,166,35,.12);--rose:#ff4d6d;--rose-dim:rgba(255,77,109,.12);--purple:#b57bee;--purple-dim:rgba(181,123,238,.12);--teal:#22d3ee;--teal-dim:rgba(34,211,238,.12);--green:#22c55e;--green-dim:rgba(34,197,94,.12);--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg);flex-shrink:0}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-a.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;min-height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-hd{flex:1}.pg-title{font-family:var(--display);font-size:15px;font-weight:700}.pg-crumb{font-size:10px;color:var(--text3)}.pg-crumb span{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-prim:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.picker-bar{padding:12px 22px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+select.fsel{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:12px;font-family:var(--font);padding:6px 9px;cursor:pointer}
+select.fsel:focus{outline:none;border-color:var(--accent)}
+.content{flex:1;overflow-y:auto;padding:22px}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.rep-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative}
+.rep-card:nth-child(1){border-color:rgba(245,166,35,.3)}
+.rep-card:nth-child(2){border-color:rgba(255,255,255,.1)}
+.rep-card:nth-child(3){border-color:rgba(0,229,176,.2)}
+.rep-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.rep-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:15px;font-weight:800;color:var(--bg);flex-shrink:0}
+.rep-name{font-family:var(--display);font-size:14px;font-weight:700}
+.rep-score{margin-left:auto;font-family:var(--display);font-size:18px;font-weight:800;color:var(--accent)}
+.rep-score-lbl{font-size:9px;color:var(--text3);text-align:right}
+.prog-item{margin-bottom:10px}
+.prog-hdr{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.prog-lbl{color:var(--text2)}
+.prog-nums{color:var(--text3);font-family:var(--mono)}
+.prog-track{height:6px;background:var(--bg4);border-radius:3px}
+.prog-fill{height:6px;border-radius:3px;transition:width .4s ease}
+.rank-badge{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}.overlay.show{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:500px;background:var(--bg2);border-left:1px solid var(--border2);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drw-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.drw-title{flex:1;font-family:var(--display);font-size:15px;font-weight:700}.drw-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:3px}.drw-close:hover{color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:20px 22px}.drw-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:10.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rep-section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.rep-sec-name{font-weight:600;font-size:13px;margin-bottom:10px;color:var(--accent)}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);animation:si .25s ease}
+.toast.ok{border-color:rgba(0,229,176,.3)}.toast.err{border-color:rgba(255,77,109,.3)}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.spin{animation:sp .8s linear infinite;display:inline-block}@keyframes sp{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:700">ZyntrixCRM</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">SALES SYSTEM</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Pipeline</div>
+    <a class="nav-a" href="leads.html"><span class="nav-ico">&#9776;</span>Leads Pipeline</a>
+    <a class="nav-a" href="demos.html"><span class="nav-ico">&#9654;</span>Demo Sessions</a>
+    <a class="nav-a" href="followups.html"><span class="nav-ico">&#128222;</span>Follow-Ups</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Catalogue</div>
+    <a class="nav-a" href="courses.html"><span class="nav-ico">&#9658;</span>Courses</a>
+    <a class="nav-a" href="batches.html"><span class="nav-ico">&#128467;</span>Batches</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Finance</div>
+    <a class="nav-a" href="enrollments.html"><span class="nav-ico">&#9654;</span>Enrollments</a>
+    <a class="nav-a" href="payments.html"><span class="nav-ico">&#128179;</span>Payments</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Performance</div>
+    <a class="nav-a on" href="targets.html"><span class="nav-ico">&#127919;</span>Targets</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">&#9741;</span>Reports</a>
+  </div>
+  <div class="sb-foot"><a class="nav-a" href="../../index.html"><span class="nav-ico">&#8592;</span>Back to CRM</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="pg-hd"><div class="pg-title">Sales Targets</div><div class="pg-crumb">Performance &rsaquo; <span>Targets</span></div></div>
+    <button class="btn btn-prim" onclick="openSetTargets()">&#127919; Set Targets</button>
+  </div>
+  <div class="picker-bar">
+    <select class="fsel" id="pMonth" onchange="loadTargets()">
+      <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+      <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+      <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+      <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+    </select>
+    <select class="fsel" id="pYear" onchange="loadTargets()"></select>
+    <span style="font-size:11px;color:var(--text3);margin-left:4px">Sorted by revenue achievement</span>
+  </div>
+  <div class="content">
+    <div class="cards-grid" id="cardsGrid">
+      <div class="empty" style="grid-column:1/-1"><span class="spin">&#9696;</span> Loading…</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- Set Targets Drawer -->
+<div class="drawer" id="setDrw">
+  <div class="drw-hdr">
+    <div class="drw-title">Set Targets</div>
+    <button class="drw-close" onclick="closeAll()">&#10005;</button>
+  </div>
+  <div class="drw-body" id="setDrwBody">Loading reps…</div>
+  <div class="drw-foot">
+    <button class="btn btn-prim" onclick="submitTargets()">Save All Targets</button>
+    <button class="btn btn-ghost" onclick="closeAll()">Cancel</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="tw"></div>
+<script src="../../assets/js/api.js"></script>
+<script>
+let allReps = [];
+let currentTargets = [];
+
+const now = new Date();
+
+function initPicker() {
+  const ySel = document.getElementById('pYear');
+  for (let y = now.getFullYear() - 1; y <= now.getFullYear() + 1; y++) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    ySel.appendChild(o);
+  }
+  document.getElementById('pMonth').value = now.getMonth() + 1;
+  document.getElementById('pYear').value = now.getFullYear();
+}
+
+async function init() {
+  initPicker();
+  await loadTargets();
+}
+
+async function loadTargets() {
+  const month = document.getElementById('pMonth').value;
+  const year = document.getElementById('pYear').value;
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><span class="spin">&#9696;</span></div>';
+  const data = await apiRequest(`/sales/targets/dashboard?month=${month}&year=${year}`);
+  const targets = Array.isArray(data) ? data : (data.targets || []);
+  currentTargets = targets;
+  // collect reps for set drawer
+  allReps = targets.map(t => ({ _id: t.user?._id || t.user, name: t.user?.name || t.userName || 'Rep' }));
+  renderCards(targets);
+}
+
+function pct(achieved, target) {
+  if (!target || target === 0) return 0;
+  return Math.min(100, Math.round(achieved / target * 100));
+}
+
+function progColor(p) {
+  if (p >= 100) return 'var(--green)';
+  if (p >= 60) return 'var(--accent)';
+  if (p >= 30) return 'var(--amber)';
+  return 'var(--rose)';
+}
+
+function renderCards(targets) {
+  // Sort by revenue achievement desc
+  const sorted = [...targets].sort((a, b) => {
+    const ap = pct(a.achievedRevenue||0, a.targetRevenue||1);
+    const bp = pct(b.achievedRevenue||0, b.targetRevenue||1);
+    return bp - ap;
+  });
+
+  const grid = document.getElementById('cardsGrid');
+  if (!sorted.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No targets set for this period.<br><button class="btn btn-prim btn-sm" style="margin-top:12px" onclick="openSetTargets()">Set Targets</button></div>'; return; }
+
+  const rankIcons = ['🥇','🥈','🥉'];
+
+  grid.innerHTML = sorted.map((t, i) => {
+    const name = t.user?.name || t.userName || 'Rep';
+    const initial = name.charAt(0).toUpperCase();
+    const lPct = pct(t.achievedLeads||0, t.targetLeads||1);
+    const dPct = pct(t.achievedDemos||0, t.targetDemos||1);
+    const ePct = pct(t.achievedEnrollments||0, t.targetEnrollments||1);
+    const rPct = pct(t.achievedRevenue||0, t.targetRevenue||1);
+    const overall = Math.round((lPct + dPct + ePct + rPct) / 4);
+    const overallColor = progColor(overall);
+
+    return `<div class="rep-card">
+      ${i < 3 ? `<div style="position:absolute;top:12px;right:12px;font-size:18px">${rankIcons[i]}</div>` : ''}
+      <div class="rep-top">
+        <div class="rep-avatar">${initial}</div>
+        <div>
+          <div class="rep-name">${name}</div>
+          <div style="font-size:11px;color:var(--text3)">${t.user?.email||''}</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div class="rep-score" style="color:${overallColor}">${overall}%</div>
+          <div class="rep-score-lbl">Overall</div>
+        </div>
+      </div>
+      ${progBar('Leads', t.achievedLeads||0, t.targetLeads||0, lPct, '')}
+      ${progBar('Demos', t.achievedDemos||0, t.targetDemos||0, dPct, '')}
+      ${progBar('Enrollments', t.achievedEnrollments||0, t.targetEnrollments||0, ePct, '')}
+      ${progBar('Revenue', '₹'+(t.achievedRevenue||0).toLocaleString('en-IN'), '₹'+(t.targetRevenue||0).toLocaleString('en-IN'), rPct, 'var(--purple)')}
+    </div>`;
+  }).join('');
+}
+
+function progBar(label, achieved, target, p, forceColor) {
+  const color = forceColor || progColor(p);
+  return `<div class="prog-item">
+    <div class="prog-hdr"><span class="prog-lbl">${label}</span><span class="prog-nums">${achieved} / ${target} (${p}%)</span></div>
+    <div class="prog-track"><div class="prog-fill" style="width:${p}%;background:${color}"></div></div>
+  </div>`;
+}
+
+async function openSetTargets() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('setDrw').classList.add('open');
+  // Load users list
+  const d = await apiRequest('/sales/targets/dashboard?month=' + document.getElementById('pMonth').value + '&year=' + document.getElementById('pYear').value);
+  const targets = Array.isArray(d) ? d : (d.targets || []);
+  const body = document.getElementById('setDrwBody');
+
+  if (!targets.length) {
+    body.innerHTML = '<div style="color:var(--text3);font-size:12px">No reps found. Add users to the system first.</div>';
+    return;
+  }
+
+  body.innerHTML = targets.map((t, i) => {
+    const name = t.user?.name || t.userName || 'Rep';
+    return `<div class="rep-section">
+      <div class="rep-sec-name">${name}</div>
+      <input type="hidden" class="t-user" value="${t.user?._id || t.user}">
+      <div class="frow">
+        <div class="field"><label>Leads</label><input type="number" class="t-leads" value="${t.targetLeads||0}" min="0"></div>
+        <div class="field"><label>Demos</label><input type="number" class="t-demos" value="${t.targetDemos||0}" min="0"></div>
+      </div>
+      <div class="frow">
+        <div class="field"><label>Enrollments</label><input type="number" class="t-enrollments" value="${t.targetEnrollments||0}" min="0"></div>
+        <div class="field"><label>Revenue (₹)</label><input type="number" class="t-revenue" value="${t.targetRevenue||0}" min="0"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function submitTargets() {
+  const month = parseInt(document.getElementById('pMonth').value);
+  const year = parseInt(document.getElementById('pYear').value);
+  const sections = document.querySelectorAll('.rep-section');
+  let errors = 0;
+  const calls = Array.from(sections).map(sec => {
+    const user = sec.querySelector('.t-user').value;
+    const body = {
+      user, month, year,
+      targetLeads: parseInt(sec.querySelector('.t-leads').value) || 0,
+      targetDemos: parseInt(sec.querySelector('.t-demos').value) || 0,
+      targetEnrollments: parseInt(sec.querySelector('.t-enrollments').value) || 0,
+      targetRevenue: parseFloat(sec.querySelector('.t-revenue').value) || 0
+    };
+    return apiRequest('/sales/targets', { method:'POST', body: JSON.stringify(body) });
+  });
+  const results = await Promise.all(calls);
+  results.forEach(r => { if (r.error) errors++; });
+  if (errors) { toast(`${errors} targets failed to save`, 'err'); return; }
+  toast('All targets saved!', 'ok');
+  closeAll(); loadTargets();
+}
+
+function closeAll() {
+  document.getElementById('overlay').classList.remove('show');
+  document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
+}
+
+function toast(msg, t='info') {
+  const w = document.getElementById('tw');
+  const el = document.createElement('div');
+  el.className = `toast ${t}`; el.textContent = msg;
+  w.appendChild(el); setTimeout(() => el.remove(), 3500);
+}
+
+init();
+</script>
+</body>
+</html>

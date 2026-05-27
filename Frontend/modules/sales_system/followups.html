@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Follow-Ups — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);--blue:#3d8ef0;--blue-dim:rgba(61,142,240,.12);--amber:#f5a623;--amber-dim:rgba(245,166,35,.12);--rose:#ff4d6d;--rose-dim:rgba(255,77,109,.12);--purple:#b57bee;--purple-dim:rgba(181,123,238,.12);--teal:#22d3ee;--teal-dim:rgba(34,211,238,.12);--green:#22c55e;--green-dim:rgba(34,197,94,.12);--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg);flex-shrink:0}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-a.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;min-height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-hd{flex:1}.pg-title{font-family:var(--display);font-size:15px;font-weight:700}.pg-crumb{font-size:10px;color:var(--text3)}.pg-crumb span{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-prim:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,.2)}.btn-amber:hover{background:rgba(245,166,35,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.content{flex:1;overflow-y:auto;padding:22px}
+.today-section{background:var(--bg2);border:1px solid rgba(245,166,35,.3);border-radius:12px;padding:16px 20px;margin-bottom:20px}
+.today-title{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:13px;font-weight:700;color:var(--amber);margin-bottom:12px}
+.today-chip{background:var(--amber-dim);color:var(--amber);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.today-empty{font-size:12px;color:var(--text3);padding:8px 0}
+.tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg3)}
+th{padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+td{padding:11px 14px;font-size:12.5px;border-top:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:var(--bg3)}
+.badge{display:inline-block;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}.overlay.show{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:460px;background:var(--bg2);border-left:1px solid var(--border2);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drw-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.drw-title{flex:1;font-family:var(--display);font-size:15px;font-weight:700}.drw-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:3px}.drw-close:hover{color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:20px 22px}.drw-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:10.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}.field textarea{resize:vertical;min-height:60px}
+.popup{position:fixed;z-index:250;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:18px;width:320px;box-shadow:0 16px 50px rgba(0,0,0,.5);display:none}
+.popup.show{display:block}
+.popup-title{font-family:var(--display);font-size:13px;font-weight:700;margin-bottom:12px}
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);animation:si .25s ease}
+.toast.ok{border-color:rgba(0,229,176,.3)}.toast.err{border-color:rgba(255,77,109,.3)}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.spin{animation:sp .8s linear infinite;display:inline-block}@keyframes sp{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.section-hdr{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:0 0 10px}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:700">ZyntrixCRM</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">SALES SYSTEM</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Pipeline</div>
+    <a class="nav-a" href="leads.html"><span class="nav-ico">&#9776;</span>Leads Pipeline</a>
+    <a class="nav-a" href="demos.html"><span class="nav-ico">&#9654;</span>Demo Sessions</a>
+    <a class="nav-a on" href="followups.html"><span class="nav-ico">&#128222;</span>Follow-Ups</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Catalogue</div>
+    <a class="nav-a" href="courses.html"><span class="nav-ico">&#9658;</span>Courses</a>
+    <a class="nav-a" href="batches.html"><span class="nav-ico">&#128467;</span>Batches</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Finance</div>
+    <a class="nav-a" href="enrollments.html"><span class="nav-ico">&#9654;</span>Enrollments</a>
+    <a class="nav-a" href="payments.html"><span class="nav-ico">&#128179;</span>Payments</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Performance</div>
+    <a class="nav-a" href="targets.html"><span class="nav-ico">&#127919;</span>Targets</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">&#9741;</span>Reports</a>
+  </div>
+  <div class="sb-foot"><a class="nav-a" href="../../index.html"><span class="nav-ico">&#8592;</span>Back to CRM</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="pg-hd"><div class="pg-title">Follow-Ups</div><div class="pg-crumb">Pipeline &rsaquo; <span>Follow-Ups</span></div></div>
+    <button class="btn btn-prim" onclick="openAddDrawer()">&#43; Add Follow-Up</button>
+  </div>
+  <div class="content" id="content">
+    <div style="text-align:center;padding:60px;color:var(--text3)"><span class="spin">&#9696;</span></div>
+  </div>
+</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- Add Follow-Up Drawer -->
+<div class="drawer" id="addDrw">
+  <div class="drw-hdr">
+    <div class="drw-title">Add Follow-Up</div>
+    <button class="drw-close" onclick="closeAll()">&#10005;</button>
+  </div>
+  <div class="drw-body">
+    <div class="field"><label>Student Lead *</label><select id="aLead"><option value="">Select lead…</option></select></div>
+    <div class="field"><label>Scheduled At *</label><input type="datetime-local" id="aScheduled"></div>
+    <div class="field"><label>Type *</label>
+      <select id="aType">
+        <option value="call">Call</option>
+        <option value="whatsapp">WhatsApp</option>
+        <option value="email">Email</option>
+        <option value="meeting">Meeting</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="aNotes" placeholder="What to discuss…"></textarea></div>
+  </div>
+  <div class="drw-foot">
+    <button class="btn btn-prim" onclick="submitAdd()">Schedule Follow-Up</button>
+    <button class="btn btn-ghost" onclick="closeAll()">Cancel</button>
+  </div>
+</div>
+
+<!-- Mark Complete Popup -->
+<div class="popup" id="completePopup">
+  <div class="popup-title">&#10003; Mark Complete</div>
+  <div class="field"><label>Outcome *</label>
+    <select id="pOutcome">
+      <option value="no_answer">No Answer</option>
+      <option value="callback">Callback Requested</option>
+      <option value="interested">Interested</option>
+      <option value="not_interested">Not Interested</option>
+      <option value="demo_booked">Demo Booked</option>
+      <option value="enrolled">Enrolled</option>
+      <option value="dropped">Dropped</option>
+    </select>
+  </div>
+  <div class="field"><label>Notes</label><textarea id="pNotes" placeholder="How did it go…" style="min-height:50px"></textarea></div>
+  <div class="field"><label>Next Follow-Up</label><input type="datetime-local" id="pNext"></div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn btn-prim btn-sm" onclick="submitComplete()">Save</button>
+    <button class="btn btn-ghost btn-sm" onclick="closePopup()">Cancel</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="tw"></div>
+<script src="../../assets/js/api.js"></script>
+<script>
+let pendingCompleteId = null;
+
+async function init() {
+  await Promise.all([loadContent(), loadLeads()]);
+}
+
+async function loadLeads() {
+  const d = await apiRequest('/sales/leads?limit=200');
+  const leads = Array.isArray(d) ? d : (d.leads || []);
+  const sel = document.getElementById('aLead');
+  leads.forEach(l => {
+    const o = document.createElement('option');
+    o.value = l._id; o.textContent = l.name || l.fullName;
+    sel.appendChild(o);
+  });
+}
+
+async function loadContent() {
+  const [todayData, allData] = await Promise.all([
+    apiRequest('/sales/followups/today'),
+    apiRequest('/sales/followups?completed=false')
+  ]);
+  const todayItems = Array.isArray(todayData) ? todayData : (todayData.followups || []);
+  const allItems = Array.isArray(allData) ? allData : (allData.followups || []);
+  renderContent(todayItems, allItems);
+}
+
+function typeIcon(t) {
+  const map = {call:'📞',whatsapp:'💬',email:'✉️',meeting:'🤝',other:'📌'};
+  return map[t] || '📌';
+}
+
+function typeBadge(t) {
+  const map = {call:'badge-blue',whatsapp:'badge-green',email:'badge-teal',meeting:'badge-purple',other:'badge-amber'};
+  return map[t] || 'badge-blue';
+}
+
+function dateStatus(scheduledAt) {
+  const now = new Date();
+  const d = new Date(scheduledAt);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if (dDay < today) return {label:'Overdue', cls:'badge-unpaid', color:'var(--rose)'};
+  if (dDay.getTime() === today.getTime()) return {label:'Today', cls:'badge-amber', color:'var(--amber)'};
+  return {label:'Upcoming', cls:'badge-blue', color:'var(--blue)'};
+}
+
+function badgeCls(cls) {
+  const map = {'badge-unpaid':'var(--rose-dim)','badge-amber':'var(--amber-dim)','badge-blue':'var(--blue-dim)'};
+  return map[cls] || '';
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleString('en-IN', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+function renderContent(todayItems, allItems) {
+  const c = document.getElementById('content');
+  const todayHtml = todayItems.length
+    ? `<table style="width:100%;border-collapse:collapse">${todayItems.map(f => rowHtml(f)).join('')}</table>`
+    : '<div class="today-empty">No follow-ups due today 🎉</div>';
+
+  const allHtml = allItems.length
+    ? `<div class="tbl-wrap"><table>
+        <thead><tr><th>Student</th><th>Type</th><th>Scheduled</th><th>Status</th><th></th></tr></thead>
+        <tbody>${allItems.map(f => rowHtml(f)).join('')}</tbody>
+      </table></div>`
+    : '<div class="empty">All caught up! No pending follow-ups.</div>';
+
+  c.innerHTML = `
+    <div class="today-section">
+      <div class="today-title">&#9201; Due Today <span class="today-chip">${todayItems.length}</span></div>
+      ${todayHtml}
+    </div>
+    <div class="section-hdr">All Pending Follow-Ups</div>
+    ${allHtml}
+  `;
+}
+
+function rowHtml(f) {
+  const lead = f.lead?.name || f.lead?.fullName || '—';
+  const ds = dateStatus(f.scheduledAt);
+  return `<tr>
+    <td style="padding:9px 0 9px 4px"><strong>${lead}</strong></td>
+    <td style="padding:9px 4px"><span class="badge ${typeBadge(f.type)}">${typeIcon(f.type)} ${f.type||'—'}</span></td>
+    <td style="padding:9px 4px;font-size:12px;color:var(--text2)">${fmtDate(f.scheduledAt)}</td>
+    <td style="padding:9px 4px"><span class="badge ${ds.cls}">${ds.label}</span></td>
+    <td style="padding:9px 4px"><button class="btn btn-ghost btn-sm" onclick="openComplete('${f._id}',event)">Mark Done</button></td>
+  </tr>`;
+}
+
+function openAddDrawer() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('addDrw').classList.add('open');
+}
+
+async function submitAdd() {
+  const lead = document.getElementById('aLead').value;
+  const scheduledAt = document.getElementById('aScheduled').value;
+  const type = document.getElementById('aType').value;
+  if (!lead || !scheduledAt) { toast('Lead and scheduled time are required', 'err'); return; }
+  const body = { lead, scheduledAt, type, notes: document.getElementById('aNotes').value };
+  const res = await apiRequest('/sales/followups', { method:'POST', body: JSON.stringify(body) });
+  if (res.error) { toast(res.msg || 'Failed', 'err'); return; }
+  toast('Follow-up scheduled!', 'ok');
+  closeAll(); loadContent();
+}
+
+function openComplete(id, e) {
+  e.stopPropagation();
+  pendingCompleteId = id;
+  const popup = document.getElementById('completePopup');
+  const btn = e.target;
+  const rect = btn.getBoundingClientRect();
+  popup.style.top = (rect.bottom + 8) + 'px';
+  popup.style.right = (window.innerWidth - rect.right) + 'px';
+  popup.classList.add('show');
+}
+
+async function submitComplete() {
+  if (!pendingCompleteId) return;
+  const outcome = document.getElementById('pOutcome').value;
+  const notes = document.getElementById('pNotes').value;
+  const nextFollowUp = document.getElementById('pNext').value;
+  const body = { isCompleted: true, outcome, notes };
+  if (nextFollowUp) body.nextFollowUp = nextFollowUp;
+  const res = await apiRequest('/sales/followups/' + pendingCompleteId, { method:'PATCH', body: JSON.stringify(body) });
+  if (res.error) { toast(res.msg || 'Failed', 'err'); return; }
+  toast('Follow-up completed!', 'ok');
+  closePopup(); loadContent();
+}
+
+function closePopup() {
+  document.getElementById('completePopup').classList.remove('show');
+  pendingCompleteId = null;
+}
+
+function closeAll() {
+  document.getElementById('overlay').classList.remove('show');
+  document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
+  closePopup();
+}
+
+function toast(msg, t='info') {
+  const w = document.getElementById('tw');
+  const el = document.createElement('div');
+  el.className = `toast ${t}`; el.textContent = msg;
+  w.appendChild(el); setTimeout(() => el.remove(), 3500);
+}
+
+init();
+</script>
+</body>
+</html>
