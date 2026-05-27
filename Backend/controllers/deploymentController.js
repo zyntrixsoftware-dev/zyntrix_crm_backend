@@ -1,6 +1,7 @@
 const Deployment     = require("../models/Deployment");
 const DeploymentTeam = require("../models/DeploymentTeam");
 const Orientation    = require("../models/Orientation");
+const { notifyDeployed } = require("../utils/candidateEmails");
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -170,7 +171,18 @@ exports.deploy = async (req, res) => {
     });
 
     const populated = await Deployment.findById(dep._id)
-      .populate("teamId", "name department teamLead location officeLocation");
+      .populate("teamId", "name department teamLead teamLeadEmail location officeLocation");
+
+    // Send deployment email to candidate (fire-and-forget)
+    notifyDeployed(populated, populated.teamId).then(result => {
+      if (result.sent) {
+        console.log(`[deploy] deployment email sent → ${populated.candidateEmail}`);
+      } else {
+        console.error(`[deploy] deployment email FAILED → ${populated.candidateEmail} | reason: ${result.reason}`);
+      }
+    }).catch(err =>
+      console.error("[deploy] deployment email exception:", err.message)
+    );
 
     return res.status(201).json({ msg: "Candidate deployed successfully", deployment: populated });
   } catch (err) {

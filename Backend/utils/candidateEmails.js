@@ -225,6 +225,40 @@ async function notifyOrientationInvite(orientation, sessions) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+//  9. DEPLOYED — assigned to a team
+//  dep: Deployment model doc  |  team: DeploymentTeam doc (populated)
+// ════════════════════════════════════════════════════════════════════════════
+async function notifyDeployed(dep, team) {
+  const deployedDate = dep.deployedDate
+    ? new Date(dep.deployedDate).toLocaleDateString("en-IN", {
+        day: "numeric", month: "long", year: "numeric",
+      })
+    : "";
+  const joiningDate = dep.joiningDate
+    ? new Date(dep.joiningDate).toLocaleDateString("en-IN", {
+        day: "numeric", month: "long", year: "numeric",
+      })
+    : "";
+
+  return _callGAS("sendDeployed", {
+    email           : dep.candidateEmail,
+    fullName        : dep.candidateName      || "Candidate",
+    position        : dep.position           || "the role",
+    teamName        : dep.teamName           || (team && team.name) || "",
+    department      : dep.department         || (team && team.department) || "",
+    roleInTeam      : dep.roleInTeam         || "",
+    reportingManager: dep.reportingManager   || (team && team.teamLead) || "",
+    workLocation    : dep.workLocation       || "office",
+    officeLocation  : dep.officeLocation     || (team && team.officeLocation) || "",
+    shift           : dep.shift              || "",
+    domainEmail     : dep.domainEmail        || "",
+    deployedDate,
+    joiningDate,
+    teamLeadEmail   : (team && team.teamLeadEmail) || "",
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 module.exports = {
   notifyApplicationReceived,
   notifyShortlisted,
@@ -235,4 +269,5 @@ module.exports = {
   notifyRejected,
   notifyOnboarded,
   notifyOrientationInvite,
+  notifyDeployed,
 };
