@@ -1,44 +1,88 @@
 /**
  * candidateEmails.js
  *
- * Lifecycle emails sent to candidates as they progress through the HRMS:
+ * All candidate lifecycle emails are routed through Google Apps Script (GAS).
+ * The backend POSTs to GAS_WEBAPP_URL with an `action` field; GAS handles
+ * branding, templating, and delivery via GmailApp (500/day Workspace quota).
  *
- *   1.  Application Received
- *   2.  Resume Shortlisted
- *   3a. Round Qualified
- *   3b. Round Not Qualified
- *   4.  Marked for Offer
- *   5.  Offer Letter (PDF attached)
- *   6.  Rejected
- *   7.  Onboarded (documents verified, ready to join)
- *   8.  Orientation Invite (session schedule)
+ * GAS action → email type mapping
+ *   sendApplicationReceived  — application confirmed
+ *   updateCandidate          — resume shortlisted
+ *   sendRoundQualified       — interview round cleared
+ *   sendRoundNotQualified    — interview round failed
+ *   sendOffered              — marked for offer (all rounds cleared)
+ *   sendOfferLetter          — formal offer letter (PDF attached)
+ *   sendRejected             — application rejected
+ *   sendOnboarded            — documents verified, ready to join
+ *   sendOrientationInvite    — orientation session schedule
  *
- * All emails are sent via nodemailer SMTP (Gmail: 500/day).
- * GAS / GmailApp is no longer used — it had a 100/day quota
- * that was routinely exhausted.
- *
- * Required env vars:
- *   EMAIL_USER        e.g. kolasanidinesh875@gmail.com
- *   EMAIL_PASS        Gmail App Password (16-char)
- *   EMAIL_FROM        (optional) defaults to EMAIL_USER
- *   EMAIL_SENDER_NAME (optional) defaults to company name
- *   EMAIL_HOST        smtp.gmail.com
- *   EMAIL_PORT        587
+ * Required env var (Railway):
+ *   GAS_WEBAPP_URL  — the /exec URL of the deployed GAS web app
  */
 
-const sendEmail = require("./sendEmail");
-const T         = require("./emailTemplates");
+const https = require("https");
+const http  = require("http");
 
-const HR_EMAIL    = "hr@zyntrixsoftware.com";
-const SENDER_NAME = process.env.EMAIL_SENDER_NAME || "Zyntrix Software Solution — HR";
+// ── GAS HTTP caller ───────────────────────────────────────────────────────────
+// GAS web apps return a 302 redirect on every POST. We must follow it while
+// keeping the POST method (standard fetch changes POST→GET on 302, breaking
+// doPost). We use the raw https module and recurse on redirect responses.
+function _postToGAS(url, payload, redirectCount) {
+  redirectCount = redirectCount || 0;
+  return new Promise(function (resolve, reject) {
+    if (redirectCount > 5) return reject(new Error("Too many GAS redirects"));
 
-// ── Wrapper: sends an HTML email and normalises the return value ─────────────
-async function _send(to, subject, html, opts = {}) {
+    const body   = JSON.stringify(payload);
+    const urlObj = new URL(url);
+    const lib    = urlObj.protocol === "https:" ? https : http;
+
+    const options = {
+      hostname: urlObj.hostname,
+      path    : urlObj.pathname + urlObj.search,
+      method  : "POST",
+      headers : {
+        "Content-Type"  : "application/json",
+        "Content-Length": Buffer.byteLength(body),
+      },
+    };
+
+    const req = lib.request(options, function (res) {
+      // Follow redirects with POST preserved
+      if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
+        return _postToGAS(res.headers.location, payload, redirectCount + 1)
+          .then(resolve)
+          .catch(reject);
+      }
+      let data = "";
+      res.on("data", function (chunk) { data += chunk; });
+      res.on("end", function () {
+        try   { resolve(JSON.parse(data)); }
+        catch { resolve({ ok: true });     } // GAS returned non-JSON — treat as ok
+      });
+    });
+
+    req.on("error", reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+async function _callGAS(action, payload) {
+  const GAS_URL = process.env.GAS_WEBAPP_URL;
+  if (!GAS_URL) {
+    console.warn(`[candidateEmails] GAS_WEBAPP_URL not set — skipping "${action}"`);
+    return { sent: false, reason: "GAS_WEBAPP_URL not configured" };
+  }
   try {
-    await sendEmail(to, subject, "", { html, ...opts });
-    return { sent: true, reason: "via_smtp" };
+    const result = await _postToGAS(GAS_URL, { action, ...payload });
+    if (result.ok === false) {
+      console.error(`[candidateEmails] GAS "${action}" error:`, result.error);
+      return { sent: false, reason: result.error || "GAS returned ok:false" };
+    }
+    console.log(`[candidateEmails] GAS "${action}" sent → ${payload.email}`);
+    return { sent: true, reason: "via_gas" };
   } catch (err) {
-    console.error(`[candidateEmails] send failed → ${to} | ${subject} | ${err.message}`);
+    console.error(`[candidateEmails] GAS "${action}" failed:`, err.message);
     return { sent: false, reason: err.message };
   }
 }
@@ -47,94 +91,84 @@ async function _send(to, subject, html, opts = {}) {
 //  1. APPLICATION RECEIVED
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyApplicationReceived(candidate) {
-  const { subject, html } = T.applicationReceived({
+  return _callGAS("sendApplicationReceived", {
+    email   : candidate.email,
     fullName: candidate.name       || "Candidate",
     position: candidate.appliedFor || "the role",
   });
-  return _send(candidate.email, subject, html);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
 //  2. RESUME SHORTLISTED
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyShortlisted(interview) {
-  const { subject, html } = T.resumeShortlisted({
+  return _callGAS("updateCandidate", {
+    email   : interview.candidateEmail,
     fullName: interview.candidateName  || "Candidate",
     position: interview.appliedFor     || "the role",
     phone   : interview.candidatePhone || "",
-    email   : interview.candidateEmail,
   });
-  return _send(interview.candidateEmail, subject, html);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
 //  3a. ROUND QUALIFIED
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyRoundQualified(interview, roundNumber) {
-  const { subject, html } = T.roundQualified({
+  return _callGAS("sendRoundQualified", {
+    email      : interview.candidateEmail,
     fullName   : interview.candidateName || "Candidate",
     position   : interview.appliedFor    || "the role",
     roundNumber: roundNumber,
   });
-  return _send(interview.candidateEmail, subject, html);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
 //  3b. ROUND NOT QUALIFIED
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyRoundNotQualified(interview, roundNumber) {
-  const { subject, html } = T.roundNotQualified({
+  return _callGAS("sendRoundNotQualified", {
+    email      : interview.candidateEmail,
     fullName   : interview.candidateName || "Candidate",
     position   : interview.appliedFor    || "the role",
     roundNumber: roundNumber,
   });
-  return _send(interview.candidateEmail, subject, html);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
 //  4. MARKED FOR OFFER
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyMarkedForOffer(interview) {
-  const { subject, html } = T.markedForOffer({
+  return _callGAS("sendOffered", {
+    email   : interview.candidateEmail,
     fullName: interview.candidateName || "Candidate",
     position: interview.appliedFor    || "the role",
   });
-  return _send(interview.candidateEmail, subject, html);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  5. OFFER LETTER (PDF attached)
-//  payload: { email, fullName, position, phone?, hrName?, offerPdfBase64, offerPdfName }
+//  5. OFFER LETTER  (PDF attached)
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyOfferLetter(payload) {
-  const { subject, html } = T.offerLetter({
-    fullName        : payload.fullName || "Candidate",
-    position        : payload.position || "the role",
-    hasAttachment   : !!payload.offerPdfBase64,
-    onboardingFormUrl: process.env.ONBOARDING_FORM_URL || "",
+  return _callGAS("sendOfferLetter", {
+    email          : payload.email,
+    fullName       : payload.fullName       || "Candidate",
+    position       : payload.position       || "the role",
+    phone          : payload.phone          || "",
+    hrName         : payload.hrName         || "",
+    offerPdfBase64 : payload.offerPdfBase64 || "",
+    offerPdfName   : payload.offerPdfName   || "",
   });
-
-  const opts = {};
-  if (payload.offerPdfBase64 && payload.offerPdfName) {
-    opts.attachments = [{
-      filename   : payload.offerPdfName,
-      content    : Buffer.from(payload.offerPdfBase64, "base64"),
-      contentType: "application/pdf",
-    }];
-  }
-
-  return _send(payload.email, subject, html, opts);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
 //  6. REJECTED
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyRejected(candidate) {
-  const { subject, html } = T.rejected({
+  return _callGAS("sendRejected", {
+    email   : candidate.email,
     fullName: candidate.name       || "Candidate",
     position: candidate.appliedFor || "the role",
   });
-  return _send(candidate.email, subject, html);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -142,48 +176,52 @@ async function notifyRejected(candidate) {
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyOnboarded(ob) {
   const joiningDate = ob.joiningDate
-    ? new Date(ob.joiningDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    ? new Date(ob.joiningDate).toLocaleDateString("en-IN", {
+        day: "numeric", month: "long", year: "numeric",
+      })
     : "";
-  const { subject, html } = T.onboarded({
+  return _callGAS("sendOnboarded", {
+    email      : ob.candidateEmail,
     fullName   : ob.candidateName || "Candidate",
     position   : ob.position      || "the role",
     joiningDate,
   });
-  return _send(ob.candidateEmail, subject, html);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-//  8. ORIENTATION INVITE — full session schedule
+//  8. ORIENTATION INVITE — session schedule
 //  orientation: Orientation model doc
-//  sessions: [OrientationSession docs]
+//  sessions   : [OrientationSession docs]
 // ════════════════════════════════════════════════════════════════════════════
 async function notifyOrientationInvite(orientation, sessions) {
   const joiningDate = orientation.joiningDate
-    ? new Date(orientation.joiningDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    ? new Date(orientation.joiningDate).toLocaleDateString("en-IN", {
+        day: "numeric", month: "long", year: "numeric",
+      })
     : "";
 
-  // Normalise session objects for the template
-  const sessionList = (sessions || []).map(s => ({
-    title        : s.title         || "Orientation Session",
-    scheduledDate: s.scheduledDate || "",
-    startTime    : s.startTime     || "",
-    endTime      : s.endTime       || "",
-    mode         : s.mode          || "in_person",
-    venue        : s.venue         || "",
-    facilitator  : s.facilitator   || "",
-    isMandatory  : s.isMandatory !== false,
-  }));
-
-  const { subject, html } = T.orientationInvite({
-    fullName    : orientation.candidateName  || "Candidate",
-    position    : orientation.position       || "the role",
-    joiningDate,
-    mentorName  : orientation.mentorName     || "",
-    mentorEmail : orientation.mentorEmail    || "",
-    sessions    : sessionList,
+  const sessionList = (sessions || []).map(function (s) {
+    return {
+      title        : s.title         || "Orientation Session",
+      scheduledDate: s.scheduledDate || "",
+      startTime    : s.startTime     || "",
+      endTime      : s.endTime       || "",
+      mode         : s.mode          || "in_person",
+      venue        : s.venue         || "",
+      facilitator  : s.facilitator   || "",
+      isMandatory  : s.isMandatory !== false,
+    };
   });
 
-  return _send(orientation.candidateEmail, subject, html);
+  return _callGAS("sendOrientationInvite", {
+    email      : orientation.candidateEmail,
+    fullName   : orientation.candidateName || "Candidate",
+    position   : orientation.position      || "the role",
+    joiningDate,
+    mentorName : orientation.mentorName  || "",
+    mentorEmail: orientation.mentorEmail || "",
+    sessions   : sessionList,
+  });
 }
 
 // ════════════════════════════════════════════════════════════════════════════
