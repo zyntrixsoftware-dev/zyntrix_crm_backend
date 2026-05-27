@@ -73,7 +73,7 @@ function redirectByRole(role) {
       window.location.href = base + "/crm/modules/HRMS/dashboard/hr.html";
       break;
     case "sales":
-      window.location.href = base + "/crm/modules/sales_system/dashboard.html";
+      window.location.href = base + "/crm/modules/sales_system/leads.html";
       break;
     case "marketing":
       window.location.href = base + "/crm/modules/marketing.html";
