@@ -222,8 +222,14 @@ exports.updateStatus = async (req, res) => {
 
     // Fire onboarding-complete email + auto-create orientation record
     if (status === "onboarded") {
-      notifyOnboarded(ob).catch(err =>
-        console.warn("[updateStatus] onboarded email failed:", err.message)
+      notifyOnboarded(ob).then(result => {
+        if (result.sent) {
+          console.log(`[updateStatus] onboarded email sent → ${ob.candidateEmail}`);
+        } else {
+          console.error(`[updateStatus] onboarded email FAILED → ${ob.candidateEmail} | reason: ${result.reason}`);
+        }
+      }).catch(err =>
+        console.error("[updateStatus] onboarded email exception:", err.message)
       );
       // Auto-create orientation record for this candidate (fire-and-forget)
       _autoCreateOrientation(ob, req.user.id).catch(err =>

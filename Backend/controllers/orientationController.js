@@ -255,23 +255,24 @@ exports.sendInvite = async (req, res) => {
         return da.localeCompare(db);
       })
       .map(s => ({
-        title       : s.title,
-        description : s.description,
-        date        : s.scheduledDate,
-        startTime   : s.startTime,
-        endTime     : s.endTime,
-        durationMin : s.durationMin,
-        mode        : s.mode,
-        venue       : s.venue,
-        facilitator : s.facilitator,
-        isMandatory : s.isMandatory,
+        title        : s.title,
+        description  : s.description,
+        scheduledDate: s.scheduledDate,   // must match GAS field name
+        startTime    : s.startTime,
+        endTime      : s.endTime,
+        durationMin  : s.durationMin,
+        mode         : s.mode,
+        venue        : s.venue,
+        facilitator  : s.facilitator,
+        isMandatory  : s.isMandatory,
       }));
 
     const result = await notifyOrientationInvite(or, sessions);
 
     if (!result.sent) {
       return res.status(502).json({
-        msg: "Orientation invite could not be sent — email delivery failed. Check SMTP credentials (EMAIL_USER / EMAIL_PASS) in server environment.",
+        msg: "Orientation invite could not be sent. Reason: " + (result.reason || "unknown") +
+             ". Check that GAS_WEBAPP_URL is set in Railway and the GAS script is deployed as a new version.",
         reason: result.reason
       });
     }
