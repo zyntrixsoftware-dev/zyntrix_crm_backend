@@ -22,6 +22,17 @@ function isPayrollUser(user) {
   return !!user && PAYROLL_EMAILS.includes(String(user.email || "").trim().toLowerCase());
 }
 
+// ── SALES SECTION ACCESS (account-based) ─────────────────────────────────────
+// sales@zyntrixsoftware.com always lands on the Sales Leads page regardless of
+// the role stored in MongoDB (it may be super_admin). This mirrors the payroll
+// pattern and takes priority over role-based routing below.
+const SALES_EMAILS = [
+  "sales@zyntrixsoftware.com"
+];
+function isSalesUser(user) {
+  return !!user && SALES_EMAILS.includes(String(user.email || "").trim().toLowerCase());
+}
+
 // ── SESSION HELPERS ───────────────────────────────────────────────────────────
 function setSession(data) {
   localStorage.setItem("token", data.token);
@@ -62,6 +73,13 @@ function redirectByRole(role) {
   const u = getUser();
   if (isPayrollUser(u) || role === "payroll") {
     window.location.href = base + "/crm/modules/payroll_system/payroll.html";
+    return;
+  }
+
+  // sales@zyntrixsoftware.com always opens the Sales Leads page regardless of
+  // the role stored in MongoDB. Takes priority over role-based routing.
+  if (isSalesUser(u)) {
+    window.location.href = base + "/crm/modules/sales_system/leads.html";
     return;
   }
 
