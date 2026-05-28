@@ -88,12 +88,6 @@ tr:hover td { background:rgba(255,255,255,0.02); }
 .td-main { font-weight:500; color:var(--text); }
 .td-sub  { font-size:11px; color:var(--text3); margin-top:1px; }
 
-/* TABS */
-.tabs    { display:flex; gap:2px; background:var(--navy3); padding:4px; border-radius:10px; margin-bottom:18px; }
-.tab     { padding:7px 16px; border-radius:7px; cursor:pointer; font-size:13px; color:var(--text2); transition:all 0.15s; white-space:nowrap; }
-.tab.active { background:var(--navy2); color:var(--text); font-weight:500; }
-.tab:hover:not(.active) { color:var(--text); }
-
 /* CHIPS */
 .chips   { display:flex; gap:6px; flex-wrap:wrap; }
 .chip    { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; background:var(--navy3); border:1px solid var(--border); border-radius:20px; font-size:12px; color:var(--text2); cursor:pointer; transition:all 0.15s; }
@@ -120,45 +114,36 @@ textarea { resize:vertical; min-height:90px; }
 .btn:hover { background:var(--navy3); }
 .btn.primary { background:var(--accent2); border-color:var(--accent2); color:#fff; }
 .btn.primary:hover { background:var(--accent); border-color:var(--accent); }
-.btn.danger  { background:var(--rose); border-color:var(--rose); color:#fff; }
 .btn-sm { padding:5px 12px; font-size:12px; border-radius:6px; }
 
 /* PROGRESS */
 .prog-bar  { height:5px; background:var(--navy4); border-radius:3px; overflow:hidden; margin-top:4px; }
 .prog-fill { height:100%; border-radius:3px; }
 
-/* STAT MINI */
-.stat-mini { text-align:center; }
-.stat-mini .val { font-size:26px; font-weight:600; line-height:1; }
-.stat-mini .lbl { font-size:11px; color:var(--text3); margin-top:4px; }
-
 /* SCROLLBAR */
 ::-webkit-scrollbar { width:5px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
 
-/* JOB DETAIL PANEL */
-.job-detail { background:var(--navy3); border:1px solid var(--border2); border-radius:12px; padding:20px; margin-bottom:16px; display:none; }
-.job-detail.show { display:block; }
-.jd-hd { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
-.jd-title { font-size:17px; font-weight:600; color:var(--text); }
-.jd-meta  { display:flex; gap:12px; margin-top:6px; flex-wrap:wrap; }
-.jd-meta-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text3); }
-.jd-section { margin-top:14px; }
-.jd-section-title { font-size:12px; font-weight:500; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
-.jd-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
-.jd-tag  { display:inline-flex; padding:4px 10px; background:var(--navy4); border:1px solid var(--border); border-radius:6px; font-size:12px; color:var(--text2); }
-
-/* CANDIDATE MINI CARD */
-.cand-mini { display:flex; align-items:center; gap:10px; padding:10px; background:var(--navy4); border-radius:8px; margin-bottom:8px; }
-.cand-av   { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#fff; flex-shrink:0; }
-
 /* NOTIF DOT */
 .notif-wrap { position:relative; }
 .notif-dot  { position:absolute; top:6px; right:14px; width:7px; height:7px; background:var(--rose); border-radius:50%; border:2px solid var(--navy2); }
 
+/* SYNC STATUS BAR */
+.sync-bar { display:flex; align-items:center; gap:10px; padding:10px 16px; background:var(--navy3); border:1px solid var(--border); border-radius:8px; margin-bottom:20px; font-size:12px; }
+.sync-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.sync-dot.ok   { background:var(--green); box-shadow:0 0 6px rgba(34,197,94,0.5); }
+.sync-dot.err  { background:var(--rose); }
+.sync-dot.spin { background:var(--amber); animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
 .card { animation:fadeUp 0.3s ease both; }
+
+/* TYPE BADGE COLORS */
+.type-fulltime   { background:rgba(34,197,94,0.12);   color:var(--green); }
+.type-internship { background:rgba(245,158,11,0.12);  color:var(--amber); }
+.type-both       { background:rgba(79,156,249,0.12);  color:var(--accent); }
+.type-contract   { background:rgba(167,139,250,0.12); color:var(--purple); }
 </style>
 <script src="../../../../assets/js/api.js"></script>
 <script src="../../../../assets/js/auth.js?v=3"></script>
@@ -173,7 +158,7 @@ textarea { resize:vertical; min-height:90px; }
     <div class="brand-icon">👥</div>
     <div>
       <div class="brand-name">HRMS Pro</div>
-      <div class="brand-ver">v2.5 · 2025</div>
+      <div class="brand-ver">v2.5 · 2026</div>
     </div>
   </div>
   <div class="nav-section">
@@ -185,7 +170,6 @@ textarea { resize:vertical; min-height:90px; }
     <a class="nav-item" href="../../employees/employees.html"><span class="nav-icon">👥</span> All Employees</a>
     <a class="nav-item" href="../../employees/attendance.html"><span class="nav-icon">📅</span> Attendance</a>
   </div>
-  
   <div class="nav-section">
     <div class="nav-label">Talent Acquisition</div>
     <a class="nav-item active" href="careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
@@ -211,10 +195,10 @@ textarea { resize:vertical; min-height:90px; }
   </div>
   <div class="sidebar-footer">
     <div class="user-pill">
-      <div class="avatar">AR</div>
+      <div class="avatar" id="sidebar-avatar">HR</div>
       <div style="flex:1;min-width:0;">
-        <div class="user-name">Arjun Rao</div>
-        <div class="user-role">HR Manager</div>
+        <div class="user-name" id="sidebar-name">HR Manager</div>
+        <div class="user-role" id="sidebar-role">Administrator</div>
       </div>
       <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
     </div>
@@ -230,38 +214,42 @@ textarea { resize:vertical; min-height:90px; }
     </div>
     <div class="search-box">
       <span>🔍</span>
-      <input type="text" id="job-search" placeholder="Search job titles, departments…" oninput="filterJobs()">
+      <input type="text" id="job-search" placeholder="Search job titles, departments…" oninput="renderJobs()">
     </div>
-    <div class="notif-wrap">
-      <button class="topbar-btn" onclick="openModal('notif-modal')">🔔</button>
-      <span class="notif-dot"></span>
-    </div>
-    <button class="topbar-btn primary" onclick="openModal('job-modal')">＋ Post New Job</button>
+    <button class="topbar-btn" onclick="loadJobs(true)" id="refresh-btn" title="Refresh from website">↻ Refresh</button>
+    <button class="topbar-btn primary" onclick="window.open('https://zyntrixsoftware.com/careers/','_blank')">🌐 View on Website</button>
   </div>
 
   <div class="content">
 
+    <!-- SYNC STATUS -->
+    <div class="sync-bar" id="sync-bar">
+      <div class="sync-dot spin" id="sync-dot"></div>
+      <span id="sync-msg">Fetching live jobs from zyntrixsoftware.com…</span>
+      <span style="margin-left:auto;color:var(--text3);font-family:var(--mono);" id="sync-time"></span>
+    </div>
+
     <!-- KPI STRIP -->
     <div class="grid g4" style="margin-bottom:20px;">
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:28px;font-weight:600;color:var(--accent);">12</div>
+        <div style="font-size:28px;font-weight:600;color:var(--accent);" id="kpi-open">—</div>
         <div style="font-size:12px;color:var(--text3);margin-top:4px;">Open Positions</div>
-        <div style="font-size:11px;color:var(--green);margin-top:4px;">▲ 3 added this month</div>
+        <div style="font-size:11px;color:var(--green);margin-top:4px;">Live from website</div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:28px;font-weight:600;color:var(--green);">4</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Positions Filled</div>
-        <div style="font-size:11px;color:var(--green);margin-top:4px;">This month</div>
+        <div style="font-size:28px;font-weight:600;color:var(--green);" id="kpi-fulltime">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Full-time Roles</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="kpi-intern-sub"></div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:28px;font-weight:600;color:var(--amber);">28</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Avg. Days to Hire</div>
-        <div style="font-size:11px;color:var(--rose);margin-top:4px;">▲ 2 days vs last month</div>
+        <div style="font-size:28px;font-weight:600;color:var(--amber);" id="kpi-depts">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Departments Hiring</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="kpi-dept-list"></div>
       </div>
       <div class="card card-sm" style="text-align:center;">
-        <div style="font-size:28px;font-weight:600;color:var(--purple);">142</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Total Applications</div>
-        <div style="font-size:11px;color:var(--green);margin-top:4px;">▲ 24 this week</div>
+        <div style="font-size:28px;font-weight:600;color:var(--purple);" id="kpi-remote">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Remote-Eligible</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Roles with remote option</div>
       </div>
     </div>
 
@@ -269,37 +257,32 @@ textarea { resize:vertical; min-height:90px; }
     <div class="grid g21" style="margin-bottom:20px;">
       <div class="card">
         <div class="card-hd">
-          <div><div class="card-title">Hiring Funnel — All Open Roles</div><div class="card-sub">Application → Hired conversion</div></div>
+          <div><div class="card-title">Jobs by Type</div><div class="card-sub">Full-time vs Internship breakdown</div></div>
         </div>
-        <div style="height:200px;position:relative;"><canvas id="funnelChart"></canvas></div>
+        <div style="height:180px;position:relative;"><canvas id="typeChart"></canvas></div>
       </div>
       <div class="card">
         <div class="card-hd"><div class="card-title">Jobs by Department</div></div>
-        <div style="height:200px;position:relative;"><canvas id="deptChart"></canvas></div>
+        <div style="height:180px;position:relative;"><canvas id="deptChart"></canvas></div>
       </div>
     </div>
 
-    <!-- FILTER TABS + JOB TABLE -->
+    <!-- JOB LISTINGS -->
     <div class="card">
       <div class="card-hd">
-        <div><div class="card-title">All Job Listings</div><div class="card-sub" id="job-count">Showing 5 of 12 positions</div></div>
-        <div class="chips" id="dept-chips">
-          <span class="chip active" onclick="setDeptFilter(this,'all')">All (12)</span>
-          <span class="chip" onclick="setDeptFilter(this,'Engineering')">Engineering (5)</span>
-          <span class="chip" onclick="setDeptFilter(this,'Product')">Product (3)</span>
-          <span class="chip" onclick="setDeptFilter(this,'Sales')">Sales (4)</span>
-        </div>
+        <div><div class="card-title">All Job Listings</div><div class="card-sub" id="job-count">Loading…</div></div>
+        <div class="chips" id="dept-chips"></div>
         <div style="display:flex;gap:8px;">
           <button class="btn btn-sm" onclick="toggleView('table')" id="btn-table">☰ Table</button>
-          <button class="btn btn-sm" onclick="toggleView('card')" id="btn-card" style="background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);">⊞ Cards</button>
+          <button class="btn btn-sm" onclick="toggleView('card')" id="btn-card">⊞ Cards</button>
         </div>
       </div>
 
       <!-- TABLE VIEW -->
       <div id="table-view" style="display:none;">
-        <table id="jobs-table">
+        <table>
           <thead><tr>
-            <th>Job Title</th><th>Department</th><th>Location</th><th>Type</th><th>CTC Range</th><th>Applications</th><th>Deadline</th><th>Status</th><th>Actions</th>
+            <th>Job Title</th><th>Department</th><th>Location</th><th>Type</th><th>Description</th><th>Actions</th>
           </tr></thead>
           <tbody id="jobs-tbody"></tbody>
         </table>
@@ -307,13 +290,23 @@ textarea { resize:vertical; min-height:90px; }
 
       <!-- CARD VIEW -->
       <div id="card-view" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;"></div>
+
+      <!-- LOADING / EMPTY STATES -->
+      <div id="jobs-loading" style="text-align:center;padding:48px;color:var(--text3);">
+        <div style="font-size:28px;margin-bottom:12px;">⟳</div>
+        <div>Fetching live job listings…</div>
+      </div>
+      <div id="jobs-empty" style="display:none;text-align:center;padding:48px;color:var(--text3);">
+        <div style="font-size:28px;margin-bottom:12px;">🔍</div>
+        <div>No jobs match your filter.</div>
+      </div>
     </div>
 
   </div><!-- /content -->
 </div><!-- /main -->
 </div><!-- /shell -->
 
-<!-- ═══ JOB DETAIL PANEL (overlay) ═══ -->
+<!-- ═══ JOB DETAIL MODAL ═══ -->
 <div class="overlay" id="detail-overlay" onclick="closeModal('detail-overlay')">
   <div class="modal" style="width:620px;" onclick="event.stopPropagation()">
     <div class="modal-hd">
@@ -325,66 +318,18 @@ textarea { resize:vertical; min-height:90px; }
     </div>
     <div class="modal-body">
       <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;" id="detail-badges"></div>
-      <div class="jd-section">
-        <div class="jd-section-title">Compensation</div>
-        <div style="font-size:18px;font-weight:600;color:var(--green);" id="detail-ctc"></div>
-      </div>
-      <div class="jd-section">
-        <div class="jd-section-title">Job Description</div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">About This Role</div>
         <p style="font-size:13px;color:var(--text2);line-height:1.7;" id="detail-desc"></p>
       </div>
-      <div class="jd-section">
-        <div class="jd-section-title">Required Skills</div>
-        <div class="jd-tags" id="detail-skills"></div>
-      </div>
-      <div class="jd-section" style="margin-top:16px;">
-        <div class="jd-section-title">Recent Applicants</div>
-        <div id="detail-cands"></div>
+      <div style="padding:14px;background:var(--navy3);border-radius:8px;border:1px solid var(--border);">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Full job details are on the Zyntrix website:</div>
+        <a id="detail-link" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--accent2);color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;">🔗 View Full Job Description →</a>
       </div>
     </div>
     <div class="modal-ft">
       <button class="btn" onclick="closeModal('detail-overlay')">Close</button>
-      <button class="btn" onclick="closeModal('detail-overlay');openModal('edit-modal')">Edit Job</button>
-      <button class="btn primary" onclick="window.location.href='../candidates/candidates.html'">View All Applicants →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ POST JOB MODAL ═══ -->
-<div class="overlay" id="job-modal" onclick="closeModal('job-modal')">
-  <div class="modal" style="width:580px;" onclick="event.stopPropagation()">
-    <div class="modal-hd">
-      <span class="modal-title">Post New Job</span>
-      <button class="modal-close" onclick="closeModal('job-modal')">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="fg" style="margin-bottom:14px;"><label>Job Title *</label><input id="nj-title" placeholder="e.g. Senior Backend Engineer"></div>
-      <div class="frow">
-        <div class="fg"><label>Department *</label>
-          <select id="nj-dept"><option>Engineering</option><option>Product</option><option>Sales</option><option>Operations</option><option>HR / Admin</option></select>
-        </div>
-        <div class="fg"><label>Location *</label><input id="nj-loc" placeholder="Bangalore / Remote / Hyderabad"></div>
-      </div>
-      <div class="frow">
-        <div class="fg"><label>Job Type</label>
-          <select id="nj-type"><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option></select>
-        </div>
-        <div class="fg"><label>Experience Required</label><input id="nj-exp" placeholder="e.g. 4–8 years"></div>
-      </div>
-      <div class="frow">
-        <div class="fg"><label>Min CTC (₹ LPA)</label><input id="nj-min" type="number" placeholder="12"></div>
-        <div class="fg"><label>Max CTC (₹ LPA)</label><input id="nj-max" type="number" placeholder="20"></div>
-      </div>
-      <div class="fg" style="margin-bottom:14px;"><label>Job Description *</label><textarea id="nj-desc" rows="4" placeholder="Describe responsibilities, requirements, qualifications…"></textarea></div>
-      <div class="frow">
-        <div class="fg"><label>Skills (comma separated)</label><input id="nj-skills" placeholder="Node.js, PostgreSQL, Docker…"></div>
-        <div class="fg"><label>Application Deadline</label><input id="nj-deadline" type="date"></div>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('job-modal')">Cancel</button>
-      <button class="btn" onclick="saveDraft()">Save Draft</button>
-      <button class="btn primary" onclick="postJob()">Publish Job</button>
+      <button class="btn primary" onclick="window.location.href='../candidates/candidates.html'">View Candidates →</button>
     </div>
   </div>
 </div>
@@ -396,10 +341,12 @@ textarea { resize:vertical; min-height:90px; }
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div style="display:flex;gap:10px;padding:12px;background:rgba(34,197,94,0.08);border-radius:8px;border-left:3px solid var(--green);">
-          <span style="font-size:16px;">📋</span><div><div style="font-size:13px;font-weight:500;">Sr. Backend Engineer — 3 new applications</div><div style="font-size:12px;color:var(--text3);">2 hours ago</div></div>
+          <span style="font-size:16px;">🌐</span>
+          <div><div style="font-size:13px;font-weight:500;">Live sync active — jobs update automatically</div><div style="font-size:12px;color:var(--text3);">Data fetched from zyntrixsoftware.com/careers/</div></div>
         </div>
         <div style="display:flex;gap:10px;padding:12px;background:var(--navy3);border-radius:8px;">
-          <span style="font-size:16px;">⚠️</span><div><div style="font-size:13px;font-weight:500;">DevOps Engineer — deadline in 3 days</div><div style="font-size:12px;color:var(--text3);">Application period closing soon</div></div>
+          <span style="font-size:16px;">📋</span>
+          <div><div style="font-size:13px;font-weight:500;">Click "Refresh" to pull the latest postings</div><div style="font-size:12px;color:var(--text3);">Any changes to the website appear here instantly</div></div>
         </div>
       </div>
     </div>
@@ -407,80 +354,205 @@ textarea { resize:vertical; min-height:90px; }
 </div>
 
 <script>
-/* ─────────────────────── DATA ─────────────────────── */
-const JOBS = [
-  { id:1, title:'Senior Backend Engineer', dept:'Engineering', loc:'Bangalore / Remote', type:'Full-time', exp:'4–8 years', minCtc:20, maxCtc:28, apps:23, deadline:'2025-05-20', status:'Active',
-    desc:'We are looking for a senior backend engineer to design, build, and maintain scalable APIs and microservices. You will work closely with the product and frontend teams to deliver high-quality solutions.',
-    skills:['Node.js','PostgreSQL','Redis','Docker','Kubernetes','REST APIs','GraphQL'],
-    candidates:[{name:'Abhishek Kumar Singh',init:'AS',col:'#ec4899',stage:'Shortlisted'},{name:'Kumar Gourav',init:'KG',col:'#2dd4bf',stage:'Interviewing'},{name:'Sahil Bhuwalka',init:'SB',col:'#f59e0b',stage:'Applied'}]
-  },
-  { id:2, title:'Product Manager — Growth', dept:'Product', loc:'Hyderabad', type:'Full-time', exp:'5–9 years', minCtc:24, maxCtc:32, apps:18, deadline:'2025-05-25', status:'Active',
-    desc:'Own the growth roadmap and drive product strategy to increase user acquisition and retention. You will collaborate with engineering, marketing, and design teams.',
-    skills:['Product Strategy','A/B Testing','Analytics','Roadmapping','SQL','Stakeholder Mgmt'],
-    candidates:[{name:'Sneha Mishra',init:'SM',col:'#f59e0b',stage:'Shortlisted'},{name:'Karan Bose',init:'KB',col:'#22c55e',stage:'Applied'}]
-  },
-  { id:3, title:'Sales Development Rep', dept:'Sales', loc:'Mumbai', type:'Full-time', exp:'1–3 years', minCtc:8, maxCtc:12, apps:41, deadline:'2025-05-15', status:'Active',
-    desc:'Qualify inbound leads, prospect outbound accounts, and set up demos for AEs. You will own the top of the funnel and help drive revenue growth.',
-    skills:['CRM (Salesforce)','Cold Calling','Email Outreach','LinkedIn Sales Navigator','Communication'],
-    candidates:[{name:'Amit Patel',init:'AP',col:'#f43f5e',stage:'Applied'},{name:'Riya Singh',init:'RS',col:'#a78bfa',stage:'Screening'}]
-  },
-  { id:4, title:'DevOps / Cloud Engineer', dept:'Engineering', loc:'Remote', type:'Full-time', exp:'3–6 years', minCtc:18, maxCtc:25, apps:15, deadline:'2025-06-01', status:'Draft',
-    desc:'Build and manage cloud infrastructure on AWS. Implement CI/CD pipelines, monitoring and alerting systems, and ensure 99.9% uptime SLAs.',
-    skills:['AWS','Terraform','Jenkins','Kubernetes','Prometheus','Bash','Linux'],
-    candidates:[]
-  },
-  { id:5, title:'UX / Product Designer', dept:'Product', loc:'Bangalore', type:'Full-time', exp:'3–6 years', minCtc:14, maxCtc:20, apps:29, deadline:'2025-04-30', status:'Closed',
-    desc:'Create world-class user experiences across web and mobile. Own the full design process from user research to high-fidelity prototypes.',
-    skills:['Figma','User Research','Prototyping','Design Systems','Usability Testing','Adobe XD'],
-    candidates:[{name:'Nisha Joshi',init:'NJ',col:'#f43f5e',stage:'Rejected'},{name:'Priya M.',init:'PM',col:'#2dd4bf',stage:'Hired'}]
-  },
-];
-
+/* ──────────────────────────────────────────────────────────────
+   STATE
+────────────────────────────────────────────────────────────── */
+let JOBS = [];
 let deptFilter = 'all';
 let currentView = 'card';
+let typeChart = null;
+let deptChartInst = null;
 
-/* ─────────────────────── RENDER ─────────────────────── */
+/* ──────────────────────────────────────────────────────────────
+   FETCH LIVE JOBS FROM BACKEND
+────────────────────────────────────────────────────────────── */
+async function loadJobs(manual = false) {
+  setSyncState('spin', manual ? 'Refreshing from zyntrixsoftware.com…' : 'Fetching live jobs from zyntrixsoftware.com…');
+  document.getElementById('jobs-loading').style.display = 'block';
+  document.getElementById('jobs-empty').style.display   = 'none';
+  document.getElementById('table-view').style.display   = 'none';
+  document.getElementById('card-view').style.display    = 'none';
+
+  try {
+    const data = await apiRequest('/hr/careers/live');
+    if (!data || data.error || !data.jobs) {
+      throw new Error(data?.msg || 'Invalid response from server');
+    }
+    JOBS = data.jobs || [];
+    const ts = data.fetchedAt ? new Date(data.fetchedAt) : new Date();
+    setSyncState('ok', `Live — ${JOBS.length} positions fetched`);
+    document.getElementById('sync-time').textContent = 'Synced ' + ts.toLocaleTimeString();
+    updateKPIs();
+    buildDeptChips();
+    drawCharts();
+    renderJobs();
+  } catch (err) {
+    setSyncState('err', 'Could not reach careers page — showing last known data');
+    document.getElementById('sync-time').textContent = 'Sync failed';
+    // If we already have data, still render it
+    if (JOBS.length > 0) renderJobs();
+    else {
+      document.getElementById('jobs-loading').style.display = 'none';
+      document.getElementById('jobs-empty').style.display = 'block';
+    }
+  }
+}
+
+function setSyncState(state, msg) {
+  const dot = document.getElementById('sync-dot');
+  dot.className = `sync-dot ${state}`;
+  document.getElementById('sync-msg').textContent = msg;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   KPI CARDS
+────────────────────────────────────────────────────────────── */
+function updateKPIs() {
+  document.getElementById('kpi-open').textContent = JOBS.length;
+
+  const fulltime   = JOBS.filter(j => /full.?time/i.test(j.type)).length;
+  const internship = JOBS.filter(j => /intern/i.test(j.type)).length;
+  document.getElementById('kpi-fulltime').textContent = fulltime;
+  document.getElementById('kpi-intern-sub').textContent = `+ ${internship} internship${internship!==1?'s':''}`;
+
+  const depts = [...new Set(JOBS.map(j => j.dept).filter(Boolean))];
+  document.getElementById('kpi-depts').textContent = depts.length;
+  document.getElementById('kpi-dept-list').textContent = depts.slice(0,3).join(', ') + (depts.length>3?'…':'');
+
+  const remote = JOBS.filter(j => /remote/i.test(j.location)).length;
+  document.getElementById('kpi-remote').textContent = remote;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   DEPT CHIPS
+────────────────────────────────────────────────────────────── */
+function buildDeptChips() {
+  const depts = ['all', ...new Set(JOBS.map(j=>j.dept).filter(Boolean))];
+  const container = document.getElementById('dept-chips');
+  container.innerHTML = depts.map(d => {
+    const count = d === 'all' ? JOBS.length : JOBS.filter(j=>j.dept===d).length;
+    const label = d === 'all' ? `All (${count})` : `${d} (${count})`;
+    return `<span class="chip ${d===deptFilter?'active':''}" onclick="setDeptFilter(this,'${d}')">${label}</span>`;
+  }).join('');
+}
+
+/* ──────────────────────────────────────────────────────────────
+   CHARTS
+────────────────────────────────────────────────────────────── */
+const ctd = {
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}},
+  scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11},stepSize:1}}}
+};
+
+function drawCharts() {
+  // Type breakdown
+  const typeMap = {};
+  for (const j of JOBS) {
+    const key = j.type || 'Other';
+    typeMap[key] = (typeMap[key]||0) + 1;
+  }
+  const typeLabels = Object.keys(typeMap);
+  const typeData   = Object.values(typeMap);
+  const typeColors = ['#22c55e','#f59e0b','#3b82f6','#a78bfa','#2dd4bf'];
+
+  if (typeChart) typeChart.destroy();
+  typeChart = new Chart(document.getElementById('typeChart'), {
+    type: 'bar',
+    data: {
+      labels: typeLabels,
+      datasets: [{ data: typeData, backgroundColor: typeColors.slice(0, typeLabels.length), borderRadius:6, borderSkipped:false }]
+    },
+    options: { ...ctd, responsive:true, maintainAspectRatio:false, scales: { x: ctd.scales.x, y: { ...ctd.scales.y, beginAtZero:true } } }
+  });
+
+  // Dept doughnut
+  const deptMap = {};
+  for (const j of JOBS) {
+    const k = j.dept || 'Other';
+    deptMap[k] = (deptMap[k]||0) + 1;
+  }
+  const deptLabels = Object.keys(deptMap);
+  const deptData   = Object.values(deptMap);
+  const deptColors = ['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#22c55e','#f43f5e'];
+
+  if (deptChartInst) deptChartInst.destroy();
+  deptChartInst = new Chart(document.getElementById('deptChart'), {
+    type: 'doughnut',
+    data: {
+      labels: deptLabels,
+      datasets: [{ data: deptData, backgroundColor: deptColors.slice(0, deptLabels.length), borderWidth:0, hoverOffset:4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '65%',
+      plugins: {
+        legend: { display:true, position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:10, padding:8 } },
+        tooltip: ctd.plugins.tooltip
+      }
+    }
+  });
+}
+
+/* ──────────────────────────────────────────────────────────────
+   RENDER
+────────────────────────────────────────────────────────────── */
 function renderJobs() {
-  const q = document.getElementById('job-search').value.toLowerCase();
-  let jobs = JOBS.filter(j => {
-    const matchDept = deptFilter==='all' || j.dept===deptFilter;
-    const matchQ    = !q || j.title.toLowerCase().includes(q) || j.dept.toLowerCase().includes(q) || j.loc.toLowerCase().includes(q);
+  const q = (document.getElementById('job-search').value || '').toLowerCase();
+  const filtered = JOBS.filter(j => {
+    const matchDept = deptFilter === 'all' || j.dept === deptFilter;
+    const matchQ    = !q || j.title.toLowerCase().includes(q)
+                         || (j.dept||'').toLowerCase().includes(q)
+                         || (j.location||'').toLowerCase().includes(q)
+                         || (j.type||'').toLowerCase().includes(q);
     return matchDept && matchQ;
   });
 
-  document.getElementById('job-count').textContent = `Showing ${jobs.length} of ${JOBS.length} positions`;
+  document.getElementById('job-count').textContent = `Showing ${filtered.length} of ${JOBS.length} positions — live from zyntrixsoftware.com`;
+  document.getElementById('jobs-loading').style.display = 'none';
 
-  if (currentView === 'table') renderTable(jobs);
-  else renderCards(jobs);
+  if (filtered.length === 0) {
+    document.getElementById('jobs-empty').style.display = 'block';
+    document.getElementById('table-view').style.display = 'none';
+    document.getElementById('card-view').style.display  = 'none';
+    return;
+  }
+  document.getElementById('jobs-empty').style.display = 'none';
+
+  if (currentView === 'table') {
+    document.getElementById('table-view').style.display = 'block';
+    document.getElementById('card-view').style.display  = 'none';
+    renderTable(filtered);
+  } else {
+    document.getElementById('card-view').style.display  = 'grid';
+    document.getElementById('table-view').style.display = 'none';
+    renderCards(filtered);
+  }
 }
 
-function statusBadge(s) {
-  const map = {Active:'b-green',Draft:'b-amber',Closed:'b-rose'};
-  return `<span class="badge ${map[s]||'b-gray'}">${s}</span>`;
+function typeBadge(type) {
+  if (!type) return '';
+  let cls = 'b-gray';
+  if (/full.?time/i.test(type) && /intern/i.test(type)) cls = 'type-both b-blue';
+  else if (/full.?time/i.test(type)) cls = 'type-fulltime b-green';
+  else if (/intern/i.test(type)) cls = 'type-internship b-amber';
+  else if (/contract/i.test(type)) cls = 'type-contract b-purple';
+  return `<span class="badge ${cls}">${type}</span>`;
 }
 
 function renderTable(jobs) {
-  const tb = document.getElementById('jobs-tbody');
-  tb.innerHTML = jobs.map(j => `
+  document.getElementById('jobs-tbody').innerHTML = jobs.map((j, i) => `
     <tr>
       <td>
         <div class="td-main">${j.title}</div>
-        <div class="td-sub">${j.exp} experience</div>
+        <div class="td-sub" style="margin-top:2px;">${j.dept || ''}</div>
       </td>
-      <td>${j.dept}</td>
-      <td>${j.loc}</td>
-      <td>${j.type}</td>
-      <td>₹${j.minCtc}–${j.maxCtc} LPA</td>
-      <td>
-        <div style="font-weight:500;color:var(--text);">${j.apps}</div>
-        <div class="prog-bar" style="width:70px;margin-top:4px;"><div class="prog-fill" style="width:${Math.min(j.apps/50*100,100)}%;background:var(--accent2);"></div></div>
-      </td>
-      <td style="font-family:var(--mono);font-size:12px;">${j.deadline}</td>
-      <td>${statusBadge(j.status)}</td>
+      <td>${j.dept || '—'}</td>
+      <td style="font-size:12px;">📍 ${j.location || '—'}</td>
+      <td>${typeBadge(j.type)}</td>
+      <td style="max-width:220px;"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--text3);">${j.desc || '—'}</div></td>
       <td>
         <div style="display:flex;gap:6px;">
-          <button class="btn btn-sm" onclick="viewJob(${j.id})">View</button>
-          ${j.status!=='Closed'?`<button class="btn btn-sm" style="color:var(--rose);border-color:rgba(244,63,94,0.3);" onclick="closeJob(${j.id})">Close</button>`:''}
+          <button class="btn btn-sm" onclick="viewJob(${i})">Details</button>
+          <a href="${j.url}" target="_blank" class="btn btn-sm" style="color:var(--accent);border-color:rgba(79,156,249,0.3);">Website ↗</a>
         </div>
       </td>
     </tr>
@@ -488,125 +560,73 @@ function renderTable(jobs) {
 }
 
 function renderCards(jobs) {
-  const cv = document.getElementById('card-view');
-  cv.innerHTML = jobs.map(j => `
-    <div style="background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all 0.15s;" onmouseenter="this.style.borderColor='rgba(59,130,246,0.4)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.07)'" onclick="viewJob(${j.id})">
+  document.getElementById('card-view').innerHTML = jobs.map((j, i) => `
+    <div style="background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:0;" onmouseenter="this.style.borderColor='rgba(59,130,246,0.4)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.07)'" onclick="viewJob(${i})">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-        <div style="font-size:15px;font-weight:600;color:var(--text);">${j.title}</div>
-        ${statusBadge(j.status)}
+        <div style="font-size:15px;font-weight:600;color:var(--text);flex:1;padding-right:8px;">${j.title}</div>
+        ${typeBadge(j.type)}
       </div>
-      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-        <span style="font-size:12px;color:var(--text3);">🏢 ${j.dept}</span>
-        <span style="font-size:12px;color:var(--text3);">📍 ${j.loc}</span>
-        <span style="font-size:12px;color:var(--text3);">⏱ ${j.type}</span>
+      <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+        ${j.dept     ? `<span style="font-size:12px;color:var(--text3);">🏢 ${j.dept}</span>` : ''}
+        ${j.location ? `<span style="font-size:12px;color:var(--text3);">📍 ${j.location}</span>` : ''}
       </div>
-      <div style="font-size:16px;font-weight:600;color:var(--green);margin-bottom:12px;">₹${j.minCtc}–${j.maxCtc} LPA</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
-        ${j.skills.slice(0,4).map(s=>`<span style="display:inline-flex;padding:3px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text2);">${s}</span>`).join('')}
-        ${j.skills.length>4?`<span style="display:inline-flex;padding:3px 8px;background:var(--navy4);border-radius:5px;font-size:11px;color:var(--text3);">+${j.skills.length-4}</span>`:''}
-      </div>
+      ${j.desc ? `<div style="font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:12px;flex:1;">${j.desc}</div>` : '<div style="flex:1;"></div>'}
       <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border);">
-        <div style="font-size:12px;color:var(--text3);">👥 ${j.apps} applicants</div>
-        <div style="font-size:12px;color:var(--text3);">📅 Closes ${j.deadline}</div>
+        <span style="font-size:12px;color:var(--accent);">View Details →</span>
+        <a href="${j.url}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:var(--text3);text-decoration:none;" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text3)'">🌐 Website ↗</a>
       </div>
     </div>
   `).join('');
 }
 
-/* ─────────────────────── ACTIONS ─────────────────────── */
-function viewJob(id) {
-  const j = JOBS.find(x=>x.id===id);
+/* ──────────────────────────────────────────────────────────────
+   ACTIONS
+────────────────────────────────────────────────────────────── */
+function viewJob(idx) {
+  // idx is the index in the currently filtered array if called from renderCards/Table
+  // We pass the global index instead — let's resolve by matching
+  const j = JOBS[idx];
   if (!j) return;
   document.getElementById('detail-title').textContent = j.title;
-  document.getElementById('detail-sub').textContent   = `${j.dept} · ${j.loc} · ${j.type}`;
-  document.getElementById('detail-ctc').textContent   = `₹${j.minCtc}–${j.maxCtc} LPA`;
-  document.getElementById('detail-desc').textContent  = j.desc;
+  document.getElementById('detail-sub').textContent   = [j.dept, j.location, j.type].filter(Boolean).join(' · ');
   document.getElementById('detail-badges').innerHTML  =
-    statusBadge(j.status) + `<span class="badge b-blue">${j.apps} Applicants</span><span class="badge b-gray">${j.exp}</span><span class="badge b-gray">Deadline: ${j.deadline}</span>`;
-  document.getElementById('detail-skills').innerHTML  = j.skills.map(s=>`<span class="jd-tag">${s}</span>`).join('');
-  document.getElementById('detail-cands').innerHTML   = j.candidates.length
-    ? j.candidates.map(c=>`<div class="cand-mini"><div class="cand-av" style="background:${c.col};">${c.init}</div><div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--text);">${c.name}</div></div><span class="badge b-blue">${c.stage}</span></div>`).join('')
-    : `<div style="font-size:13px;color:var(--text3);padding:10px 0;">No applicants yet.</div>`;
+    typeBadge(j.type) +
+    (j.dept ? `<span class="badge b-blue">${j.dept}</span>` : '') +
+    (j.location ? `<span class="badge b-gray">📍 ${j.location}</span>` : '');
+  document.getElementById('detail-desc').textContent  = j.desc || 'View full details on the Zyntrix website.';
+  document.getElementById('detail-link').href         = j.url;
   openModal('detail-overlay');
-}
-
-function closeJob(id) {
-  const j = JOBS.find(x=>x.id===id);
-  if (j && confirm(`Close the job posting for "${j.title}"?`)) {
-    j.status = 'Closed'; renderJobs();
-  }
 }
 
 function setDeptFilter(el, dept) {
   deptFilter = dept;
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#dept-chips .chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   renderJobs();
 }
 
-function filterJobs() { renderJobs(); }
-
 function toggleView(v) {
   currentView = v;
-  document.getElementById('table-view').style.display = v==='table' ? 'block' : 'none';
-  document.getElementById('card-view').style.display  = v==='card'  ? 'grid'  : 'none';
-  document.getElementById('btn-table').style.cssText  = v==='table' ? 'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;' : '';
-  document.getElementById('btn-card').style.cssText   = v==='card'  ? 'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;' : '';
+  const tBtn = document.getElementById('btn-table');
+  const cBtn = document.getElementById('btn-card');
+  const activeStyle = 'background:var(--accent-dim);border-color:var(--accent2);color:var(--accent);padding:5px 12px;font-size:12px;border-radius:6px;';
+  const defStyle    = '';
+  tBtn.style.cssText = v === 'table' ? activeStyle : defStyle;
+  cBtn.style.cssText = v === 'card'  ? activeStyle : defStyle;
   renderJobs();
-}
-
-function postJob() {
-  const title = document.getElementById('nj-title').value.trim();
-  if (!title) { alert('Please enter a job title.'); return; }
-  const newJob = {
-    id: JOBS.length+1,
-    title, dept: document.getElementById('nj-dept').value,
-    loc:  document.getElementById('nj-loc').value || 'TBD',
-    type: document.getElementById('nj-type').value,
-    exp:  document.getElementById('nj-exp').value || 'Open',
-    minCtc: +document.getElementById('nj-min').value || 0,
-    maxCtc: +document.getElementById('nj-max').value || 0,
-    apps: 0, deadline: document.getElementById('nj-deadline').value || '—', status: 'Active',
-    desc: document.getElementById('nj-desc').value,
-    skills: document.getElementById('nj-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
-    candidates: []
-  };
-  JOBS.unshift(newJob);
-  closeModal('job-modal');
-  renderJobs();
-}
-
-function saveDraft() {
-  const title = document.getElementById('nj-title').value.trim();
-  if (!title) { alert('Please enter a job title.'); return; }
-  alert(`Draft saved for: "${title}"`);
-  closeModal('job-modal');
 }
 
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open')); });
-
-/* ─────────────────────── CHARTS ─────────────────────── */
-const ctd = {
-  plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}},
-  scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11}}}}
-};
-
-new Chart(document.getElementById('funnelChart'),{
-  type:'bar',
-  data:{labels:['Applied','Screened','Shortlisted','Interviewed','Offered','Hired'],datasets:[{data:[142,98,54,28,14,8],backgroundColor:['rgba(59,130,246,0.8)','rgba(99,102,241,0.7)','rgba(167,139,250,0.7)','rgba(45,212,191,0.7)','rgba(245,158,11,0.7)','rgba(34,197,94,0.8)'],borderRadius:6,borderSkipped:false}]},
-  options:{...ctd,responsive:true,maintainAspectRatio:false,scales:{x:{...ctd.scales.x},y:{...ctd.scales.y,beginAtZero:true}}}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.overlay.open').forEach(m => m.classList.remove('open'));
 });
 
-new Chart(document.getElementById('deptChart'),{
-  type:'doughnut',
-  data:{labels:['Engineering','Product','Sales'],datasets:[{data:[5,3,4],backgroundColor:['#3b82f6','#a78bfa','#2dd4bf'],borderWidth:0,hoverOffset:4}]},
-  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#94a3b8',font:{size:11},boxWidth:10,padding:8}},tooltip:{...ctd.plugins.tooltip}}}
-});
-
-/* ─────────────────────── INIT ─────────────────────── */
+/* ──────────────────────────────────────────────────────────────
+   INIT
+────────────────────────────────────────────────────────────── */
 toggleView('card');
+loadJobs();
 </script>
 </body>
 </html>
