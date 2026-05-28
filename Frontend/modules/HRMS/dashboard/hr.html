@@ -6,296 +6,212 @@
 <title>HRMS — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<!-- SVG ICON SPRITE -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ic-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/>
+  </symbol>
+  <symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+  </symbol>
+  <symbol id="ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+  </symbol>
+  <symbol id="ic-briefcase" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+  </symbol>
+  <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </symbol>
+  <symbol id="ic-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>
+  </symbol>
+  <symbol id="ic-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+  </symbol>
+  <symbol id="ic-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2l2.5-2.5-5-5-2.5 2.5z"/><path d="M11 5.5l7 7-4 4-7-7"/><path d="M14.5 2c2 0 5.5 1 6.5 2.5S23 9 23 9l-9.5 9.5S10 16 9.5 14l5-12z"/>
+  </symbol>
+  <symbol id="ic-graduation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+  </symbol>
+  <symbol id="ic-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+  </symbol>
+  <symbol id="ic-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/>
+  </symbol>
+  <symbol id="ic-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+  </symbol>
+  <symbol id="ic-swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/>
+  </symbol>
+  <symbol id="ic-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+  </symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+  </symbol>
+  <symbol id="ic-bar-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+  </symbol>
+  <symbol id="ic-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+  </symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+  </symbol>
+  <symbol id="ic-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/>
+  </symbol>
+  <symbol id="ic-x-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+  </symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+  </symbol>
+  <symbol id="ic-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="12,2 2,7 12,12 22,7 12,2"/><polyline points="2,17 12,22 22,17"/><polyline points="2,12 12,17 22,12"/>
+  </symbol>
+  <symbol id="ic-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+  </symbol>
+  <symbol id="ic-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18.36 6.64a9 9 0 11-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
+  </symbol>
+  <symbol id="ic-door" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 4H6a2 2 0 00-2 2v14"/><path d="M18 20H6"/><rect x="11" y="3" width="9" height="18" rx="1"/><circle cx="16" cy="12" r="1" fill="currentColor"/>
+  </symbol>
+</svg>
+
 <style>
-/* ═══════════════════════════════════════════════════════
-   TOKENS
-═══════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  /* Backgrounds */
-  --bg:       #060d17;
-  --bg2:      #091422;
-  --bg3:      #0d1b2e;
-  --bg4:      #122035;
-  --bg5:      #18293d;
-  /* Surfaces */
-  --surface:  #0d1b2e;
-  --surface2: #112234;
-  --surface3: #162942;
-  /* Borders */
-  --b1: rgba(255,255,255,0.05);
-  --b2: rgba(255,255,255,0.09);
-  --b3: rgba(255,255,255,0.14);
-  /* Accent palette */
-  --blue:   #3b82f6;
-  --blue2:  #60a5fa;
-  --indigo: #6366f1;
-  --violet: #8b5cf6;
-  --purple: #a78bfa;
-  --pink:   #ec4899;
-  --rose:   #f43f5e;
-  --amber:  #f59e0b;
-  --orange: #f97316;
-  --teal:   #14b8a6;
-  --green:  #22c55e;
-  --cyan:   #06b6d4;
-  /* Text */
-  --t1: #f0f6ff;
-  --t2: #94a3b8;
-  --t3: #4e637a;
-  --t4: #2e4258;
-  /* Sidebar */
-  --sb-w: 256px;
-  /* Font */
-  --font: 'Inter', sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-  /* Radius */
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
-  --r-xl: 20px;
+  --bg:#060d17; --bg2:#091422; --bg3:#0d1b2e; --bg4:#122035; --bg5:#18293d;
+  --surface:#0d1b2e; --surface2:#112234; --surface3:#162942;
+  --b1:rgba(255,255,255,0.05); --b2:rgba(255,255,255,0.09); --b3:rgba(255,255,255,0.15);
+  --blue:#3b82f6; --blue2:#60a5fa; --indigo:#6366f1;
+  --violet:#8b5cf6; --purple:#a78bfa;
+  --rose:#f43f5e; --amber:#f59e0b;
+  --teal:#14b8a6; --green:#22c55e;
+  --t1:#f0f6ff; --t2:#94a3b8; --t3:#4e637a; --t4:#2e4258;
+  --sb-w:256px;
+  --font:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px;
 }
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--font);font-size:13px;line-height:1.5;overflow:hidden;-webkit-font-smoothing:antialiased}
 
-html,body{
-  height:100%;background:var(--bg);color:var(--t1);
-  font-family:var(--font);font-size:13px;line-height:1.5;
-  overflow:hidden;-webkit-font-smoothing:antialiased;
-}
-
-/* ═══════════════════════════════════════════════════════
-   LAYOUT
-═══════════════════════════════════════════════════════ */
+/* LAYOUT */
 .shell{display:flex;height:100vh;overflow:hidden}
-.sidebar{
-  width:var(--sb-w);min-width:var(--sb-w);
-  background:var(--bg2);
-  border-right:1px solid var(--b1);
-  display:flex;flex-direction:column;overflow-y:auto;
-}
+.sidebar{width:var(--sb-w);min-width:var(--sb-w);background:var(--bg2);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow-y:auto}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{
-  height:60px;min-height:60px;
-  background:rgba(6,13,23,0.85);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--b1);
-  display:flex;align-items:center;padding:0 24px;gap:12px;
-  position:sticky;top:0;z-index:50;
-}
-.content{flex:1;overflow-y:auto;padding:24px 28px 40px;background:var(--bg)}
+.topbar{height:60px;min-height:60px;background:rgba(6,13,23,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:50}
+.content{flex:1;overflow-y:auto;padding:0;background:var(--bg)}
 
-/* ═══════════════════════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════════════════════ */
-.brand{
-  padding:22px 20px 18px;
-  display:flex;align-items:center;gap:12px;
-  border-bottom:1px solid var(--b1);flex-shrink:0;
-}
-.brand-logo{
-  width:38px;height:38px;flex-shrink:0;border-radius:11px;
-  background:linear-gradient(135deg,#3b82f6,#6366f1);
-  display:flex;align-items:center;justify-content:center;font-size:17px;
-  box-shadow:0 4px 16px rgba(59,130,246,0.35);
-}
-.brand-name{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-0.4px}
-.brand-tag{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:1px}
+/* SIDEBAR */
+.brand{padding:0 20px;height:60px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.brand-mark{width:32px;height:32px;flex-shrink:0;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(59,130,246,0.3)}
+.brand-mark svg{width:16px;height:16px;color:#fff}
+.brand-name{font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-0.3px}
+.brand-tag{font-size:10px;color:var(--t3);font-family:var(--mono)}
 
-.nav-section{padding:16px 12px 4px}
-.nav-section-label{
-  font-size:10px;font-weight:600;color:var(--t3);
-  text-transform:uppercase;letter-spacing:1.2px;
-  padding:0 8px 8px;
-}
-.nav-link{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:var(--r-sm);
-  cursor:pointer;color:var(--t2);font-size:13px;font-weight:400;
-  text-decoration:none;transition:all .15s;margin-bottom:2px;position:relative;
-}
-.nav-link:hover{background:rgba(59,130,246,0.08);color:var(--t1)}
-.nav-link.active{
-  background:linear-gradient(90deg,rgba(59,130,246,0.15),rgba(99,102,241,0.06));
-  color:var(--blue2);font-weight:500;
-}
-.nav-link.active::before{
-  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
-  width:3px;height:18px;background:linear-gradient(to bottom,var(--blue),var(--indigo));
-  border-radius:0 3px 3px 0;
-}
-.nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0;opacity:.85}
-.nav-badge{
-  margin-left:auto;background:var(--rose);color:#fff;
-  font-size:10px;font-weight:600;padding:1px 6px;
-  border-radius:20px;line-height:1.4;
-}
-.nav-divider{height:1px;background:var(--b1);margin:8px 12px}
-.sb-footer{
-  margin-top:auto;padding:14px 12px;
-  border-top:1px solid var(--b1);flex-shrink:0;
-}
-.sb-user{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:var(--r-sm);
-}
-.sb-avatar{
-  width:34px;height:34px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#fff;
-}
-.sb-uname{font-size:13px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-urole{font-size:11px;color:var(--t3)}
-.sb-logout{
-  background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.2);
-  color:var(--rose);font-size:11px;font-weight:600;padding:5px 10px;
-  border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;
-}
-.sb-logout:hover{background:rgba(244,63,94,0.2)}
+.nav-section{padding:16px 10px 4px}
+.nav-lbl{font-size:9.5px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:1.4px;padding:0 8px 8px}
+.nav-link{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r-sm);color:var(--t3);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-link:hover{background:rgba(59,130,246,0.07);color:var(--t2)}
+.nav-link.active{background:rgba(59,130,246,0.1);color:var(--blue2);font-weight:500}
+.nav-link.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;background:linear-gradient(to bottom,var(--blue),var(--indigo));border-radius:0 3px 3px 0}
+.nav-ic{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-link.active .nav-ic{opacity:1}
+.nav-link:hover .nav-ic{opacity:.9}
+.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;line-height:1.3}
+.nav-div{height:1px;background:var(--b1);margin:6px 10px}
+.sb-foot{margin-top:auto;padding:12px 10px;border-top:1px solid var(--b1);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm)}
+.sb-av{width:32px;height:32px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.sb-uname{font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-urole{font-size:10px;color:var(--t4)}
+.sb-logout-btn{background:none;border:none;cursor:pointer;color:var(--t3);display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;transition:all .15s;flex-shrink:0}
+.sb-logout-btn:hover{background:rgba(244,63,94,0.12);color:var(--rose)}
+.sb-logout-btn svg{width:14px;height:14px}
 
-/* ═══════════════════════════════════════════════════════
-   TOPBAR
-═══════════════════════════════════════════════════════ */
-.topbar-title{
-  font-size:16px;font-weight:700;color:var(--t1);
-  background:linear-gradient(90deg,#f0f6ff,#94a3b8);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-.topbar-bc{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px}
-.topbar-bc span{color:var(--t2)}
-.tb-search{
-  display:flex;align-items:center;gap:8px;
-  background:var(--surface);border:1px solid var(--b2);
-  border-radius:var(--r-sm);padding:7px 14px;
-  color:var(--t2);min-width:200px;transition:border .15s;
-}
-.tb-search:focus-within{border-color:rgba(59,130,246,0.5);box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
+/* TOPBAR */
+.tb-title{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-0.3px}
+.tb-bc{font-size:11px;color:var(--t4);margin-top:1px}
+.tb-bc span{color:var(--t3)}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--b2);border-radius:var(--r-sm);padding:7px 12px;min-width:200px;transition:border .15s}
+.tb-search:focus-within{border-color:rgba(59,130,246,0.5);box-shadow:0 0 0 3px rgba(59,130,246,0.08)}
+.tb-search svg{width:13px;height:13px;color:var(--t3);flex-shrink:0}
 .tb-search input{background:none;border:none;outline:none;color:var(--t1);font-size:12px;font-family:var(--font);width:100%}
 .tb-search input::placeholder{color:var(--t3)}
-.tb-btn{
-  padding:7px 14px;border-radius:var(--r-sm);
-  border:1px solid var(--b2);background:var(--surface);
-  color:var(--t2);cursor:pointer;font-size:12px;font-family:var(--font);font-weight:500;
-  display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;
-}
+.tb-btn{padding:6px 14px;border-radius:var(--r-sm);border:1px solid var(--b2);background:var(--surface);color:var(--t2);cursor:pointer;font-size:12px;font-family:var(--font);font-weight:500;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
 .tb-btn:hover{background:var(--surface2);color:var(--t1);border-color:var(--b3)}
-.tb-notif-badge{
-  background:var(--rose);color:#fff;font-size:10px;
-  padding:1px 5px;border-radius:10px;display:none;font-weight:600;
-}
-#ts-chip{font-size:11px;color:var(--t3);font-family:var(--mono)}
+.tb-btn svg{width:13px;height:13px}
+.tb-notif-badge{background:var(--rose);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;display:none;font-weight:700}
+#ts-chip{font-size:10px;color:var(--t4);font-family:var(--mono)}
 
-/* ═══════════════════════════════════════════════════════
-   SECTION HEADERS
-═══════════════════════════════════════════════════════ */
-.section-hd{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;
-}
-.section-label{
-  font-size:11px;font-weight:600;color:var(--t3);
-  text-transform:uppercase;letter-spacing:1.1px;
-  display:flex;align-items:center;gap:7px;
-}
-.section-label::before{
-  content:'';width:3px;height:13px;
-  background:linear-gradient(to bottom,var(--blue),var(--indigo));
-  border-radius:2px;display:block;
-}
-.view-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500;opacity:.8;transition:opacity .15s}
-.view-link:hover{opacity:1}
+/* WELCOME STRIP */
+.welcome{background:var(--bg2);border-bottom:1px solid var(--b1);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.welcome-left{display:flex;flex-direction:column;gap:2px}
+.welcome-eyebrow{font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;letter-spacing:1.2px}
+.welcome-name{font-size:18px;font-weight:700;color:var(--t1);letter-spacing:-0.5px}
+.welcome-date{font-size:11px;color:var(--t3);margin-top:1px}
+.welcome-right{display:flex;align-items:center;gap:10px}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.18);color:#4ade80;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;letter-spacing:.2px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:livepulse 2.5s ease infinite}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* ═══════════════════════════════════════════════════════
-   KPI STRIP  — gradient top-border cells
-═══════════════════════════════════════════════════════ */
-.kpi-strip{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:12px;margin-bottom:24px;
-}
-.kpi-card{
-  background:var(--surface);border:1px solid var(--b2);
-  border-radius:var(--r-lg);padding:18px 20px;
-  position:relative;overflow:hidden;
-}
-.kpi-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:var(--kpi-grad);
-}
-.kpi-card-icon{
-  width:40px;height:40px;border-radius:10px;
-  background:var(--kpi-bg);
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;margin-bottom:14px;
-}
-.kpi-val{
-  font-size:28px;font-weight:700;line-height:1;
-  letter-spacing:-1px;color:var(--t1);
-  font-variant-numeric:tabular-nums;
-}
-.kpi-lbl{font-size:12px;color:var(--t3);margin-top:5px;font-weight:500}
-.kpi-sub{font-size:11px;color:var(--t3);margin-top:6px}
-.kpi-glow{
-  position:absolute;right:-20px;bottom:-20px;
-  width:80px;height:80px;border-radius:50%;
-  background:var(--kpi-glow);filter:blur(30px);opacity:.25;pointer-events:none;
-}
+/* CONTENT PADDING */
+.content-inner{padding:24px 28px 48px}
 
-/* ═══════════════════════════════════════════════════════
-   PIPELINE  — connected flow strip
-═══════════════════════════════════════════════════════ */
-.pipeline-wrap{
-  background:var(--surface);border:1px solid var(--b2);
-  border-radius:var(--r-lg);padding:6px;
-  margin-bottom:24px;display:flex;
-}
-.pipe-cell{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:14px 8px;border-radius:10px;text-decoration:none;
-  cursor:pointer;transition:background .15s;position:relative;
-  text-align:center;
-}
-.pipe-cell:hover{background:rgba(255,255,255,0.04)}
-.pipe-cell:not(:last-child)::after{
-  content:'›';position:absolute;right:-6px;top:50%;transform:translateY(-50%);
-  font-size:16px;color:var(--t4);z-index:2;line-height:1;
-}
-.pipe-icon{
-  width:40px;height:40px;border-radius:10px;
-  background:var(--p-bg);border:1px solid var(--p-border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:17px;margin-bottom:8px;
-}
-.pipe-num{font-size:22px;font-weight:700;color:var(--p-color);line-height:1;letter-spacing:-0.5px}
-.pipe-lbl{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+/* SECTION HEADER */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--b1)}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;display:flex;align-items:center;gap:7px}
+.sec-lbl::before{content:'';width:3px;height:12px;background:linear-gradient(to bottom,var(--blue),var(--indigo));border-radius:2px;display:block}
+.sec-link{font-size:11px;color:var(--blue2);text-decoration:none;font-weight:500;opacity:.8;transition:opacity .15s}
+.sec-link:hover{opacity:1}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--b1);border-radius:var(--r-lg);padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s}
+.kpi:hover{border-color:var(--b3);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.25)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc)}
+.kpi-ic{width:36px;height:36px;border-radius:9px;background:var(--kb);display:flex;align-items:center;justify-content:center;margin-bottom:14px;flex-shrink:0}
+.kpi-ic svg{width:16px;height:16px;color:var(--ks)}
+.kpi-val{font-size:28px;font-weight:700;line-height:1;letter-spacing:-1px;color:var(--t1);font-variant-numeric:tabular-nums}
+.kpi-lbl{font-size:11px;color:var(--t3);margin-top:5px;font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.kpi-sub{font-size:11px;color:var(--t3);margin-top:5px}
+.kpi-glow{position:absolute;right:-20px;bottom:-20px;width:80px;height:80px;border-radius:50%;background:var(--kg);filter:blur(28px);opacity:.18;pointer-events:none}
+
+/* PIPELINE */
+.pipeline{background:var(--surface);border:1px solid var(--b1);border-radius:var(--r-lg);padding:6px;margin-bottom:24px;display:flex}
+.pipe{flex:1;display:flex;flex-direction:column;align-items:center;padding:14px 8px;border-radius:10px;text-decoration:none;cursor:pointer;transition:background .15s;position:relative;text-align:center}
+.pipe:hover{background:rgba(255,255,255,0.04)}
+.pipe:not(:last-child)::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:1px;height:28px;background:var(--b2)}
+.pipe-ic{width:36px;height:36px;border-radius:9px;background:var(--pb);border:1px solid var(--pd);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.pipe-ic svg{width:15px;height:15px;color:var(--pc)}
+.pipe-num{font-size:22px;font-weight:700;color:var(--pc);line-height:1;letter-spacing:-0.5px;font-variant-numeric:tabular-nums}
+.pipe-lbl{font-size:9px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.7px;margin-top:3px}
 .pipe-sub{font-size:10px;color:var(--t4);margin-top:2px}
 
-/* ═══════════════════════════════════════════════════════
-   STAT CARDS  — gradient background
-═══════════════════════════════════════════════════════ */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.stat-card{
-  border-radius:var(--r-lg);padding:20px;position:relative;overflow:hidden;
-  background:var(--sc-bg);border:1px solid var(--sc-border);
-}
-.stat-card-shine{
-  position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;
-  background:var(--sc-glow);opacity:.18;filter:blur(35px);pointer-events:none;
-}
-.sc-icon{font-size:24px;margin-bottom:12px;display:block}
-.sc-val{font-size:32px;font-weight:700;color:var(--t1);line-height:1;letter-spacing:-1.5px}
-.sc-lbl{font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;font-weight:500}
-.sc-delta{font-size:11px;margin-top:10px;color:rgba(255,255,255,0.4);line-height:1.4}
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat{border-radius:var(--r-lg);padding:20px;position:relative;overflow:hidden;background:var(--sb);border:1px solid var(--sd);transition:transform .2s,box-shadow .2s}
+.stat:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.35)}
+.stat-shine{position:absolute;top:-40px;right:-40px;width:100px;height:100px;border-radius:50%;background:var(--sg);opacity:.15;filter:blur(32px);pointer-events:none}
+.stat-ic{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.stat-ic svg{width:15px;height:15px;color:rgba(255,255,255,0.7)}
+.stat-val{font-size:30px;font-weight:700;color:var(--t1);line-height:1;letter-spacing:-1.2px;font-variant-numeric:tabular-nums}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,0.45);margin-top:6px;font-weight:500}
+.stat-delta{font-size:11px;margin-top:10px;color:rgba(255,255,255,0.35);line-height:1.4}
 
-/* ═══════════════════════════════════════════════════════
-   CARDS  — generic
-═══════════════════════════════════════════════════════ */
-.card{
-  background:var(--surface);border:1px solid var(--b1);
-  border-radius:var(--r-lg);padding:20px;
-}
-.card-sm{padding:16px}
+/* GENERIC CARD */
+.card{background:var(--surface);border:1px solid var(--b1);border-radius:var(--r-lg);padding:20px;transition:border-color .2s}
+.card:hover{border-color:var(--b2)}
 .card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px}
-.card-title{font-size:14px;font-weight:600;color:var(--t1)}
+.card-title{font-size:13px;font-weight:600;color:var(--t1)}
 .card-sub{font-size:11px;color:var(--t3);margin-top:2px}
 .grid{display:grid;gap:16px}
 .g4{grid-template-columns:repeat(4,1fr)}
@@ -303,198 +219,112 @@ html,body{
 .g2{grid-template-columns:repeat(2,1fr)}
 .g21{grid-template-columns:2fr 1fr}
 
-/* ═══════════════════════════════════════════════════════
-   BREAKDOWN CARDS
-═══════════════════════════════════════════════════════ */
-.bkd-card{
-  background:var(--surface);border:1px solid var(--b1);
-  border-radius:var(--r-lg);padding:18px;
-  position:relative;overflow:hidden;
-}
-.bkd-card::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--bc-color),transparent);
-  opacity:.4;
-}
-.bkd-card-top{
-  display:flex;align-items:center;gap:10px;margin-bottom:14px;
-  padding-bottom:12px;border-bottom:1px solid var(--b1);
-}
-.bkd-card-dot{
-  width:8px;height:8px;border-radius:50%;background:var(--bc-color);flex-shrink:0;
-  box-shadow:0 0 8px var(--bc-color);
-}
-.bkd-card-label{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.8px}
+/* BREAKDOWN CARDS */
+.bkd{background:var(--surface);border:1px solid var(--b1);border-radius:var(--r-lg);padding:18px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.bkd:hover{border-color:rgba(255,255,255,0.11);box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+.bkd::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--bc),transparent);opacity:.35}
+.bkd-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--b1)}
+.bkd-dot{width:7px;height:7px;border-radius:50%;background:var(--bc);flex-shrink:0;box-shadow:0 0 7px var(--bc)}
+.bkd-lbl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.9px}
 .bkd-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0}
-.bkd-lbl{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:7px}
-.bkd-dot{width:6px;height:6px;border-radius:50%;background:var(--bd-c);flex-shrink:0}
-.bkd-val{font-size:13px;font-weight:600;color:var(--t1);font-variant-numeric:tabular-nums}
+.bkd-row-lbl{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:6px}
+.bkd-row-dot{width:5px;height:5px;border-radius:50%;background:var(--bdc);flex-shrink:0}
+.bkd-row-val{font-size:12px;font-weight:600;color:var(--t1);font-variant-numeric:tabular-nums}
 
-/* ═══════════════════════════════════════════════════════
-   TABLES
-═══════════════════════════════════════════════════════ */
+/* TABLE */
 .tbl{width:100%;border-collapse:collapse}
-.tbl th{
-  text-align:left;font-size:10px;font-weight:600;
-  color:var(--t3);text-transform:uppercase;letter-spacing:.8px;
-  padding:0 12px 10px;
-}
-.tbl td{
-  padding:10px 12px;border-top:1px solid var(--b1);
-  font-size:12px;color:var(--t2);vertical-align:middle;
-}
+.tbl th{text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;letter-spacing:.8px;padding:0 12px 10px}
+.tbl td{padding:10px 12px;border-top:1px solid var(--b1);font-size:12px;color:var(--t2);vertical-align:middle}
 .tbl tr:first-child td{border-top:none}
-.tbl tr:hover td{background:rgba(255,255,255,0.018);transition:background .1s}
-.td-bold{font-weight:600;color:var(--t1);font-size:12px}
-.td-sub{font-size:10px;color:var(--t3);margin-top:2px}
-.tbl-empty{text-align:center;padding:22px 12px !important;color:var(--t3) !important}
+.tbl tr:hover td{background:rgba(255,255,255,0.015);transition:background .1s}
+.td-b{font-weight:600;color:var(--t1);font-size:12px}
+.td-s{font-size:10px;color:var(--t3);margin-top:2px}
+.tbl-empty{text-align:center;padding:24px 12px !important;color:var(--t3) !important}
 
-/* ═══════════════════════════════════════════════════════
-   BADGES
-═══════════════════════════════════════════════════════ */
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap;letter-spacing:.2px}
-.bg{background:rgba(34,197,94,.12);color:#4ade80}
-.ba{background:rgba(245,158,11,.12);color:#fbbf24}
-.br{background:rgba(244,63,94,.12);color:#fb7185}
-.bb{background:rgba(59,130,246,.12);color:#60a5fa}
-.bp{background:rgba(167,139,250,.12);color:#c4b5fd}
-.bt{background:rgba(20,184,166,.12);color:#2dd4bf}
-.bgy{background:rgba(100,116,139,.12);color:#94a3b8}
-.bind{background:rgba(99,102,241,.12);color:#a5b4fc}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:600;white-space:nowrap;letter-spacing:.2px}
+.bg{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.15)}
+.ba{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.15)}
+.br{background:rgba(244,63,94,.1);color:#fb7185;border:1px solid rgba(244,63,94,.15)}
+.bb{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.15)}
+.bp{background:rgba(167,139,250,.1);color:#c4b5fd;border:1px solid rgba(167,139,250,.15)}
+.bt{background:rgba(20,184,166,.1);color:#2dd4bf;border:1px solid rgba(20,184,166,.15)}
+.bgy{background:rgba(100,116,139,.1);color:#94a3b8;border:1px solid rgba(100,116,139,.15)}
+.bind{background:rgba(99,102,241,.1);color:#a5b4fc;border:1px solid rgba(99,102,241,.15)}
 
-/* ═══════════════════════════════════════════════════════
-   AVATAR
-═══════════════════════════════════════════════════════ */
-.av{
-  width:30px;height:30px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;color:#fff;
-}
-.av-sm{width:26px;height:26px;font-size:9px}
+/* AVATAR */
+.av{width:28px;height:28px;border-radius:6px;flex-shrink:0;background:linear-gradient(135deg,#1e3a5f,#2d4a6e);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t2);border:1px solid var(--b2)}
+.av-sm{width:24px;height:24px;font-size:9px}
 
-/* ═══════════════════════════════════════════════════════
-   ACTIVITY FEED
-═══════════════════════════════════════════════════════ */
+/* ACTIVITY FEED */
 .tl{display:flex;flex-direction:column}
 .tl-item{display:flex;gap:12px;padding-bottom:14px;position:relative}
 .tl-item:last-child{padding-bottom:0}
-.tl-item:not(:last-child)::before{
-  content:'';position:absolute;left:14px;top:30px;bottom:0;
-  width:1px;background:linear-gradient(to bottom,var(--b2),transparent);
-}
-.tl-icon{
-  width:30px;height:30px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;flex-shrink:0;position:relative;z-index:1;
-}
-.tl-body{flex:1;padding-top:2px}
+.tl-item:not(:last-child)::before{content:'';position:absolute;left:13px;top:28px;bottom:0;width:1px;background:linear-gradient(to bottom,var(--b2),transparent)}
+.tl-dot{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1}
+.tl-dot svg{width:13px;height:13px}
+.tl-body{flex:1;padding-top:3px}
 .tl-title{font-size:12px;font-weight:500;color:var(--t1)}
 .tl-desc{font-size:11px;color:var(--t3);margin-top:2px}
-.tl-time{font-size:10px;color:var(--t4);margin-top:4px;font-family:var(--mono)}
+.tl-time{font-size:10px;color:var(--t4);margin-top:3px;font-family:var(--mono)}
 
-/* ═══════════════════════════════════════════════════════
-   PROGRESS BARS
-═══════════════════════════════════════════════════════ */
-.pbar{height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-top:5px}
+/* PROGRESS */
+.pbar{height:3px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-top:5px}
 .pbar-fill{height:100%;border-radius:2px;background:var(--pbar-c,var(--blue))}
 
-/* ═══════════════════════════════════════════════════════
-   DONUT LEGEND
-═══════════════════════════════════════════════════════ */
+/* DONUT LEGEND */
 .dleg{display:flex;flex-direction:column;gap:8px;flex:1}
 .dleg-row{display:flex;align-items:center;gap:8px}
-.dleg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.dleg-dot{width:8px;height:3px;border-radius:2px;flex-shrink:0}
 .dleg-lbl{flex:1;font-size:11px;color:var(--t2)}
-.dleg-val{font-size:12px;font-weight:600;color:var(--t1)}
+.dleg-val{font-size:12px;font-weight:600;color:var(--t1);font-variant-numeric:tabular-nums}
 
-/* ═══════════════════════════════════════════════════════
-   MODAL
-═══════════════════════════════════════════════════════ */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
 .overlay.open{display:flex}
-.modal{background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r-xl);width:520px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.modal{background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r-xl);width:520px;max-width:92vw;max-height:88vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.55)}
 .modal-hd{padding:22px 24px 0;display:flex;justify-content:space-between;align-items:center}
-.modal-title{font-size:15px;font-weight:700;color:var(--t1)}
-.modal-close{background:var(--surface2);border:1px solid var(--b2);color:var(--t3);cursor:pointer;font-size:16px;line-height:1;padding:4px 9px;border-radius:6px;transition:all .15s}
+.modal-title{font-size:14px;font-weight:700;color:var(--t1)}
+.modal-close{background:var(--surface2);border:1px solid var(--b2);color:var(--t3);cursor:pointer;font-size:14px;line-height:1;padding:5px 9px;border-radius:6px;transition:all .15s}
 .modal-close:hover{color:var(--t1)}
 .modal-body{padding:20px 24px 24px}
 
-/* ═══════════════════════════════════════════════════════
-   SCROLLBAR
-═══════════════════════════════════════════════════════ */
+/* SCROLLBAR */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--b3);border-radius:4px}
 
-/* ═══════════════════════════════════════════════════════
-   SKELETON
-═══════════════════════════════════════════════════════ */
-@keyframes shimmer{
-  0%{background-position:-400px 0}
-  100%{background-position:400px 0}
-}
-.skel{
-  background:linear-gradient(90deg,var(--bg4) 25%,var(--bg5) 50%,var(--bg4) 75%);
-  background-size:800px 100%;
-  animation:shimmer 1.6s infinite linear;
-  border-radius:6px;
-}
+/* SKELETON */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skel{background:linear-gradient(90deg,var(--bg4) 25%,var(--bg5) 50%,var(--bg4) 75%);background-size:800px 100%;animation:shimmer 1.6s infinite linear;border-radius:5px}
 
-/* ═══════════════════════════════════════════════════════
-   ANIMATIONS
-═══════════════════════════════════════════════════════ */
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.fade-in{animation:fadeUp .4s ease both}
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.fi{animation:fadeUp .35s ease both}
 .d0{animation-delay:0s}.d1{animation-delay:.05s}.d2{animation-delay:.10s}.d3{animation-delay:.15s}
 .d4{animation-delay:.20s}.d5{animation-delay:.25s}.d6{animation-delay:.30s}.d7{animation-delay:.35s}
 
-/* ═══════════════════════════════════════════════════════
-   CHIP  — small info tag
-═══════════════════════════════════════════════════════ */
-.chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface3);border:1px solid var(--b2);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--t2);font-weight:500}
+/* CHIP */
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface3);border:1px solid var(--b2);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--t2);font-weight:500}
 
-/* ═══════════════════════════════════════════════════════
-   TEAM CARD
-═══════════════════════════════════════════════════════ */
+/* TEAM / JOIN ROWS */
 .team-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--b1)}
 .team-row:first-child{border-top:none}
-.team-logo{
-  width:36px;height:36px;border-radius:9px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:700;color:#fff;
-}
-.team-name{font-size:13px;font-weight:600;color:var(--t1)}
+.team-mark{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.team-name{font-size:12px;font-weight:600;color:var(--t1)}
 .team-dept{font-size:11px;color:var(--t3);margin-top:1px}
-.team-count{
-  margin-left:auto;font-size:20px;font-weight:700;
-  color:var(--green);flex-shrink:0;letter-spacing:-0.5px;
-}
+.team-count{margin-left:auto;font-size:20px;font-weight:700;color:var(--green);flex-shrink:0;letter-spacing:-0.5px;font-variant-numeric:tabular-nums}
 .team-count-lbl{font-size:10px;color:var(--t3);text-align:right}
-
-/* ═══════════════════════════════════════════════════════
-   JOIN ROW
-═══════════════════════════════════════════════════════ */
 .join-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--b1)}
 .join-row:first-child{border-top:none}
-.join-day{
-  width:42px;height:42px;border-radius:9px;flex-shrink:0;
-  background:var(--surface3);border:1px solid var(--b2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-}
-.join-day-n{font-size:16px;font-weight:700;color:var(--t1);line-height:1}
-.join-day-m{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.join-cal{width:40px;height:40px;border-radius:8px;flex-shrink:0;background:var(--surface3);border:1px solid var(--b2);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.join-day{font-size:15px;font-weight:700;color:var(--t1);line-height:1}
+.join-mon{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
 .join-name{font-size:12px;font-weight:600;color:var(--t1)}
 .join-role{font-size:11px;color:var(--t3)}
-.join-badge{margin-left:auto;flex-shrink:0}
 
-/* ═══════════════════════════════════════════════════════
-   RESPONSIVE clamp to prevent overflow on mid-width screens
-═══════════════════════════════════════════════════════ */
-@media(max-width:1280px){
-  .g4{grid-template-columns:repeat(2,1fr)}
-  .stat-grid{grid-template-columns:repeat(2,1fr)}
-}
+/* RESPONSIVE */
+@media(max-width:1280px){.kpi-strip{grid-template-columns:repeat(2,1fr)}.stat-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 <script src="../../../assets/js/api.js"></script>
 <script src="../../../assets/js/auth.js?v=4"></script>
@@ -503,128 +333,166 @@ html,body{
 <script>requireAuth(); requireModuleAccess("hr");</script>
 <div class="shell">
 
-<!-- ══════════════════════════ SIDEBAR ══════════════════════════ -->
+<!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
   <div class="brand">
-    <div class="brand-logo">👥</div>
+    <div class="brand-mark"><svg><use href="#ic-users"/></svg></div>
     <div>
       <div class="brand-name">HRMS Pro</div>
-      <div class="brand-tag" id="ver-ts">Live · —</div>
+      <div class="brand-tag" id="ver-ts">v2.5</div>
     </div>
   </div>
 
   <div class="nav-section">
-    <div class="nav-section-label">Overview</div>
-    <a class="nav-link active" href="hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
+    <div class="nav-lbl">Overview</div>
+    <a class="nav-link active" href="hr.html">
+      <svg class="nav-ic"><use href="#ic-home"/></svg> Dashboard
+    </a>
   </div>
 
   <div class="nav-section">
-    <div class="nav-section-label">Employees</div>
-    <a class="nav-link" href="../employees/employees.html"><span class="nav-icon">👥</span> All Employees</a>
-    <a class="nav-link" href="../employees/attendance.html"><span class="nav-icon">📅</span> Attendance</a>
+    <div class="nav-lbl">Employees</div>
+    <a class="nav-link" href="../employees/employees.html">
+      <svg class="nav-ic"><use href="#ic-users"/></svg> All Employees
+    </a>
+    <a class="nav-link" href="../employees/attendance.html">
+      <svg class="nav-ic"><use href="#ic-calendar"/></svg> Attendance
+    </a>
   </div>
 
   <div class="nav-section">
-    <div class="nav-section-label">Talent Acquisition</div>
-    <a class="nav-link" href="../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Jobs</a>
+    <div class="nav-lbl">Talent Acquisition</div>
+    <a class="nav-link" href="../talent_acquisition/careers_and_job_posts/careers.html">
+      <svg class="nav-ic"><use href="#ic-briefcase"/></svg> Careers &amp; Jobs
+    </a>
     <a class="nav-link" href="../talent_acquisition/candidates/candidates.html">
-      <span class="nav-icon">👤</span> Candidates
+      <svg class="nav-ic"><use href="#ic-user"/></svg> Candidates
       <span class="nav-badge" id="cand-badge" style="display:none">0</span>
     </a>
-    <a class="nav-link" href="../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
+    <a class="nav-link" href="../talent_acquisition/interview_panel/interviews.html">
+      <svg class="nav-ic"><use href="#ic-mic"/></svg> Interview Panel
+    </a>
   </div>
 
-  <div class="nav-divider"></div>
+  <div class="nav-div"></div>
 
   <div class="nav-section">
-    <div class="nav-section-label">Employee Lifecycle</div>
-    <a class="nav-link" href="../employee_lifecycle/offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
-    <a class="nav-link" href="../employee_lifecycle/onboarding/onboarding.html"><span class="nav-icon">🚀</span> Onboarding</a>
-    <a class="nav-link" href="../employee_lifecycle/orientation_sessions/orientations.html"><span class="nav-icon">🎓</span> Orientations</a>
-    <a class="nav-link" href="../employee_lifecycle/deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
-    <a class="nav-link" href="../employee_lifecycle/offboarding/offboarding.html"><span class="nav-icon">🚪</span> Offboarding</a>
+    <div class="nav-lbl">Employee Lifecycle</div>
+    <a class="nav-link" href="../employee_lifecycle/offer_letters/offer_letters.html">
+      <svg class="nav-ic"><use href="#ic-file-text"/></svg> Offer Letters
+    </a>
+    <a class="nav-link" href="../employee_lifecycle/onboarding/onboarding.html">
+      <svg class="nav-ic"><use href="#ic-rocket"/></svg> Onboarding
+    </a>
+    <a class="nav-link" href="../employee_lifecycle/orientation_sessions/orientations.html">
+      <svg class="nav-ic"><use href="#ic-graduation"/></svg> Orientations
+    </a>
+    <a class="nav-link" href="../employee_lifecycle/deployment/deployment.html">
+      <svg class="nav-ic"><use href="#ic-grid"/></svg> Deployment
+    </a>
+    <a class="nav-link" href="../employee_lifecycle/offboarding/offboarding.html">
+      <svg class="nav-ic"><use href="#ic-door"/></svg> Offboarding
+    </a>
   </div>
 
-  <div class="nav-divider"></div>
+  <div class="nav-div"></div>
 
   <div class="nav-section">
-    <div class="nav-section-label">Operations</div>
+    <div class="nav-lbl">Operations</div>
     <a class="nav-link" href="../employees/shift-requests.html">
-      <span class="nav-icon">🔄</span> Shift Requests
+      <svg class="nav-ic"><use href="#ic-swap"/></svg> Shift Requests
       <span class="nav-badge" id="shift-badge" style="display:none">0</span>
     </a>
-    <a class="nav-link" href="../employees/requests.html"><span class="nav-icon">📨</span> Leave &amp; Requests</a>
-    <a class="nav-link" href="../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations</a>
-    <a class="nav-link" href="../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
+    <a class="nav-link" href="../employees/requests.html">
+      <svg class="nav-ic"><use href="#ic-mail"/></svg> Leave &amp; Requests
+    </a>
+    <a class="nav-link" href="../operations/escalations.html">
+      <svg class="nav-ic"><use href="#ic-alert"/></svg> Escalations
+    </a>
+    <a class="nav-link" href="../operations/performance.html">
+      <svg class="nav-ic"><use href="#ic-bar-chart"/></svg> Performance
+    </a>
   </div>
 
-  <div class="sb-footer">
+  <div class="sb-foot">
     <div class="sb-user">
-      <div class="sb-avatar" id="user-avatar">HR</div>
+      <div class="sb-av" id="user-avatar">HR</div>
       <div style="flex:1;min-width:0">
         <div class="sb-uname" id="user-name">—</div>
         <div class="sb-urole" id="user-role">HR Manager</div>
       </div>
-      <button class="sb-logout" onclick="logout()">⏻</button>
+      <button class="sb-logout-btn" onclick="logout()" title="Sign out">
+        <svg><use href="#ic-power"/></svg>
+      </button>
     </div>
   </div>
 </aside>
 
-<!-- ══════════════════════════ MAIN ══════════════════════════ -->
+<!-- ══ MAIN ══ -->
 <div class="main">
 
   <!-- TOPBAR -->
   <div class="topbar">
     <div style="flex:1">
-      <div class="topbar-title">Dashboard</div>
-      <div class="topbar-bc">HRMS Pro <span>›</span> Overview</div>
+      <div class="tb-title">Dashboard</div>
+      <div class="tb-bc">HRMS Pro <span>›</span> Overview</div>
     </div>
     <span id="ts-chip"></span>
     <div class="tb-search">
-      <span style="color:var(--t3);font-size:13px">🔍</span>
-      <input type="text" placeholder="Search…">
+      <svg><use href="#ic-search"/></svg>
+      <input type="text" placeholder="Search employees, candidates…">
     </div>
     <button class="tb-btn" onclick="openModal('notif-modal')">
-      🔔
+      <svg><use href="#ic-bell"/></svg>
       <span id="notif-count" class="tb-notif-badge">0</span>
     </button>
-    <button class="tb-btn" onclick="loadAll()" style="gap:5px">
-      <span style="font-size:14px">↻</span> Refresh
+    <button class="tb-btn" onclick="loadAll()">
+      <svg><use href="#ic-refresh"/></svg> Refresh
     </button>
   </div>
 
-  <!-- ══════ CONTENT ══════ -->
-  <div class="content">
+  <!-- WELCOME STRIP -->
+  <div class="welcome">
+    <div class="welcome-left">
+      <div class="welcome-eyebrow" id="wb-greeting">Good morning</div>
+      <div class="welcome-name">Welcome back, <span id="wb-name" style="background:linear-gradient(90deg,var(--blue2),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">—</span></div>
+      <div class="welcome-date" id="wb-date">Loading…</div>
+    </div>
+    <div class="welcome-right">
+      <div class="live-badge"><div class="live-dot"></div> Live Data</div>
+      <button class="tb-btn" onclick="loadAll()"><svg><use href="#ic-refresh"/></svg> Refresh</button>
+    </div>
+  </div>
 
-    <!-- ── KPI STRIP ── -->
+  <!-- CONTENT -->
+  <div class="content">
+  <div class="content-inner">
+
+    <!-- KPI STRIP -->
     <div class="kpi-strip">
-      <!-- Total Employees -->
-      <div class="kpi-card fade-in d0" style="--kpi-grad:linear-gradient(90deg,#3b82f6,#6366f1);--kpi-bg:rgba(59,130,246,.1);--kpi-glow:#3b82f6">
-        <div class="kpi-card-icon">👥</div>
+      <div class="kpi fi d0" style="--kc:linear-gradient(90deg,#3b82f6,#6366f1);--kb:rgba(59,130,246,.1);--ks:#60a5fa;--kg:#3b82f6">
+        <div class="kpi-ic"><svg><use href="#ic-users"/></svg></div>
         <div class="kpi-val" id="kpi-total">—</div>
         <div class="kpi-lbl">Total Employees</div>
         <div class="kpi-sub" id="kpi-total-sub">—</div>
         <div class="kpi-glow"></div>
       </div>
-      <!-- Present Today -->
-      <div class="kpi-card fade-in d1" style="--kpi-grad:linear-gradient(90deg,#22c55e,#14b8a6);--kpi-bg:rgba(34,197,94,.1);--kpi-glow:#22c55e">
-        <div class="kpi-card-icon">✅</div>
+      <div class="kpi fi d1" style="--kc:linear-gradient(90deg,#22c55e,#14b8a6);--kb:rgba(34,197,94,.1);--ks:#4ade80;--kg:#22c55e">
+        <div class="kpi-ic"><svg><use href="#ic-check-circle"/></svg></div>
         <div class="kpi-val" id="kpi-present">—</div>
         <div class="kpi-lbl">Present Today</div>
         <div class="kpi-sub" id="kpi-present-sub">—</div>
         <div class="kpi-glow"></div>
       </div>
-      <!-- Absent Today -->
-      <div class="kpi-card fade-in d2" style="--kpi-grad:linear-gradient(90deg,#f59e0b,#f97316);--kpi-bg:rgba(245,158,11,.1);--kpi-glow:#f59e0b">
-        <div class="kpi-card-icon">🏠</div>
+      <div class="kpi fi d2" style="--kc:linear-gradient(90deg,#f59e0b,#f97316);--kb:rgba(245,158,11,.1);--ks:#fbbf24;--kg:#f59e0b">
+        <div class="kpi-ic"><svg><use href="#ic-x-circle"/></svg></div>
         <div class="kpi-val" id="kpi-absent">—</div>
         <div class="kpi-lbl">Absent Today</div>
         <div class="kpi-sub" id="kpi-absent-sub">—</div>
         <div class="kpi-glow"></div>
       </div>
-      <!-- Pending Requests -->
-      <div class="kpi-card fade-in d3" style="--kpi-grad:linear-gradient(90deg,#f43f5e,#ec4899);--kpi-bg:rgba(244,63,94,.1);--kpi-glow:#f43f5e">
-        <div class="kpi-card-icon">📨</div>
+      <div class="kpi fi d3" style="--kc:linear-gradient(90deg,#f43f5e,#ec4899);--kb:rgba(244,63,94,.1);--ks:#fb7185;--kg:#f43f5e">
+        <div class="kpi-ic"><svg><use href="#ic-clock"/></svg></div>
         <div class="kpi-val" id="kpi-pending">—</div>
         <div class="kpi-lbl">Pending Requests</div>
         <div class="kpi-sub">Shift &amp; leave</div>
@@ -632,152 +500,128 @@ html,body{
       </div>
     </div>
 
-    <!-- ── PIPELINE FLOW ── -->
-    <div style="margin-bottom:6px" class="section-hd">
-      <div class="section-label">Talent Pipeline</div>
-      <span id="ts-chip2" style="font-size:11px;color:var(--t3);font-family:var(--mono)"></span>
+    <!-- PIPELINE -->
+    <div class="sec-hd">
+      <div class="sec-lbl">Talent Pipeline</div>
+      <span id="ts-chip2" style="font-size:10px;color:var(--t4);font-family:var(--mono)"></span>
     </div>
-    <div class="pipeline-wrap fade-in d1">
-      <a class="pipe-cell" href="../talent_acquisition/candidates/candidates.html"
-         style="--p-bg:rgba(59,130,246,.1);--p-border:rgba(59,130,246,.2);--p-color:#60a5fa">
-        <div class="pipe-icon">👤</div>
+    <div class="pipeline fi d1">
+      <a class="pipe" href="../talent_acquisition/candidates/candidates.html"
+         style="--pb:rgba(59,130,246,.08);--pd:rgba(59,130,246,.18);--pc:#60a5fa">
+        <div class="pipe-ic"><svg><use href="#ic-user"/></svg></div>
         <div class="pipe-num" id="pp-candidates">—</div>
         <div class="pipe-lbl">Candidates</div>
         <div class="pipe-sub" id="pp-candidates-s">total</div>
       </a>
-      <a class="pipe-cell" href="../talent_acquisition/candidates/candidates.html"
-         style="--p-bg:rgba(139,92,246,.1);--p-border:rgba(139,92,246,.2);--p-color:#c4b5fd">
-        <div class="pipe-icon">📋</div>
+      <a class="pipe" href="../talent_acquisition/candidates/candidates.html"
+         style="--pb:rgba(139,92,246,.08);--pd:rgba(139,92,246,.18);--pc:#c4b5fd">
+        <div class="pipe-ic"><svg><use href="#ic-layers"/></svg></div>
         <div class="pipe-num" id="pp-shortlisted">—</div>
         <div class="pipe-lbl">Shortlisted</div>
         <div class="pipe-sub" id="pp-shortlisted-s">—</div>
       </a>
-      <a class="pipe-cell" href="../talent_acquisition/interview_panel/interviews.html"
-         style="--p-bg:rgba(245,158,11,.1);--p-border:rgba(245,158,11,.2);--p-color:#fbbf24">
-        <div class="pipe-icon">🎤</div>
+      <a class="pipe" href="../talent_acquisition/interview_panel/interviews.html"
+         style="--pb:rgba(245,158,11,.08);--pd:rgba(245,158,11,.18);--pc:#fbbf24">
+        <div class="pipe-ic"><svg><use href="#ic-mic"/></svg></div>
         <div class="pipe-num" id="pp-interviews">—</div>
         <div class="pipe-lbl">Interviews</div>
         <div class="pipe-sub" id="pp-interviews-s">in progress</div>
       </a>
-      <a class="pipe-cell" href="../employee_lifecycle/offer_letters/offer_letters.html"
-         style="--p-bg:rgba(20,184,166,.1);--p-border:rgba(20,184,166,.2);--p-color:#2dd4bf">
-        <div class="pipe-icon">📝</div>
+      <a class="pipe" href="../employee_lifecycle/offer_letters/offer_letters.html"
+         style="--pb:rgba(20,184,166,.08);--pd:rgba(20,184,166,.18);--pc:#2dd4bf">
+        <div class="pipe-ic"><svg><use href="#ic-file-text"/></svg></div>
         <div class="pipe-num" id="pp-offers">—</div>
         <div class="pipe-lbl">Offers</div>
         <div class="pipe-sub" id="pp-offers-s">sent</div>
       </a>
-      <a class="pipe-cell" href="../employee_lifecycle/onboarding/onboarding.html"
-         style="--p-bg:rgba(167,139,250,.1);--p-border:rgba(167,139,250,.2);--p-color:#a78bfa">
-        <div class="pipe-icon">🚀</div>
+      <a class="pipe" href="../employee_lifecycle/onboarding/onboarding.html"
+         style="--pb:rgba(99,102,241,.08);--pd:rgba(99,102,241,.18);--pc:#a5b4fc">
+        <div class="pipe-ic"><svg><use href="#ic-rocket"/></svg></div>
         <div class="pipe-num" id="pp-onboarding">—</div>
         <div class="pipe-lbl">Onboarding</div>
         <div class="pipe-sub" id="pp-onboarding-s">active</div>
       </a>
-      <a class="pipe-cell" href="../employee_lifecycle/orientation_sessions/orientations.html"
-         style="--p-bg:rgba(6,182,212,.1);--p-border:rgba(6,182,212,.2);--p-color:#22d3ee">
-        <div class="pipe-icon">🎓</div>
+      <a class="pipe" href="../employee_lifecycle/orientation_sessions/orientations.html"
+         style="--pb:rgba(6,182,212,.08);--pd:rgba(6,182,212,.18);--pc:#22d3ee">
+        <div class="pipe-ic"><svg><use href="#ic-graduation"/></svg></div>
         <div class="pipe-num" id="pp-orientation">—</div>
         <div class="pipe-lbl">Orientation</div>
         <div class="pipe-sub" id="pp-orientation-s">active</div>
       </a>
-      <a class="pipe-cell" href="../employee_lifecycle/deployment/deployment.html"
-         style="--p-bg:rgba(34,197,94,.1);--p-border:rgba(34,197,94,.2);--p-color:#4ade80">
-        <div class="pipe-icon">🗂️</div>
+      <a class="pipe" href="../employee_lifecycle/deployment/deployment.html"
+         style="--pb:rgba(34,197,94,.08);--pd:rgba(34,197,94,.18);--pc:#4ade80">
+        <div class="pipe-ic"><svg><use href="#ic-grid"/></svg></div>
         <div class="pipe-num" id="pp-deployed">—</div>
         <div class="pipe-lbl">Deployed</div>
         <div class="pipe-sub" id="pp-deployed-s">in teams</div>
       </a>
     </div>
 
-    <!-- ── STAT CARDS ── -->
-    <div class="stat-grid" style="margin-bottom:20px">
-      <div class="stat-card fade-in d0" style="--sc-bg:linear-gradient(135deg,#0f2040,#0d1b2e);--sc-border:rgba(59,130,246,.2);--sc-glow:#3b82f6">
-        <div class="stat-card-shine"></div>
-        <span class="sc-icon">👤</span>
-        <div class="sc-val" id="sc-candidates">—</div>
-        <div class="sc-lbl">Total Candidates</div>
-        <div class="sc-delta" id="sc-candidates-d">Loading…</div>
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+      <div class="stat fi d0" style="--sb:linear-gradient(135deg,#0b1e3d,#0d1b2e);--sd:rgba(59,130,246,.2);--sg:#3b82f6">
+        <div class="stat-shine"></div>
+        <div class="stat-ic"><svg><use href="#ic-user"/></svg></div>
+        <div class="stat-val" id="sc-candidates">—</div>
+        <div class="stat-lbl">Total Candidates</div>
+        <div class="stat-delta" id="sc-candidates-d">Loading…</div>
       </div>
-      <div class="stat-card fade-in d1" style="--sc-bg:linear-gradient(135deg,#1a1208,#0d1b2e);--sc-border:rgba(245,158,11,.2);--sc-glow:#f59e0b">
-        <div class="stat-card-shine"></div>
-        <span class="sc-icon">🎤</span>
-        <div class="sc-val" id="sc-interviews">—</div>
-        <div class="sc-lbl">Active Interviews</div>
-        <div class="sc-delta" id="sc-interviews-d">Loading…</div>
+      <div class="stat fi d1" style="--sb:linear-gradient(135deg,#1c1204,#0d1b2e);--sd:rgba(245,158,11,.2);--sg:#f59e0b">
+        <div class="stat-shine"></div>
+        <div class="stat-ic"><svg><use href="#ic-mic"/></svg></div>
+        <div class="stat-val" id="sc-interviews">—</div>
+        <div class="stat-lbl">Active Interviews</div>
+        <div class="stat-delta" id="sc-interviews-d">Loading…</div>
       </div>
-      <div class="stat-card fade-in d2" style="--sc-bg:linear-gradient(135deg,#140b28,#0d1b2e);--sc-border:rgba(139,92,246,.2);--sc-glow:#8b5cf6">
-        <div class="stat-card-shine"></div>
-        <span class="sc-icon">🚀</span>
-        <div class="sc-val" id="sc-onboarding">—</div>
-        <div class="sc-lbl">In Onboarding</div>
-        <div class="sc-delta" id="sc-onboarding-d">Loading…</div>
+      <div class="stat fi d2" style="--sb:linear-gradient(135deg,#130a28,#0d1b2e);--sd:rgba(139,92,246,.2);--sg:#8b5cf6">
+        <div class="stat-shine"></div>
+        <div class="stat-ic"><svg><use href="#ic-rocket"/></svg></div>
+        <div class="stat-val" id="sc-onboarding">—</div>
+        <div class="stat-lbl">In Onboarding</div>
+        <div class="stat-delta" id="sc-onboarding-d">Loading…</div>
       </div>
-      <div class="stat-card fade-in d3" style="--sc-bg:linear-gradient(135deg,#061a10,#0d1b2e);--sc-border:rgba(34,197,94,.2);--sc-glow:#22c55e">
-        <div class="stat-card-shine"></div>
-        <span class="sc-icon">🗂️</span>
-        <div class="sc-val" id="sc-deployed">—</div>
-        <div class="sc-lbl">Deployed in Teams</div>
-        <div class="sc-delta" id="sc-deployed-d">Loading…</div>
+      <div class="stat fi d3" style="--sb:linear-gradient(135deg,#061a10,#0d1b2e);--sd:rgba(34,197,94,.2);--sg:#22c55e">
+        <div class="stat-shine"></div>
+        <div class="stat-ic"><svg><use href="#ic-grid"/></svg></div>
+        <div class="stat-val" id="sc-deployed">—</div>
+        <div class="stat-lbl">Deployed in Teams</div>
+        <div class="stat-delta" id="sc-deployed-d">Loading…</div>
       </div>
     </div>
 
-    <!-- ── BREAKDOWN CARDS ── -->
-    <div class="section-hd"><div class="section-label">Module Breakdown</div></div>
-    <div class="grid g4" style="margin-bottom:20px">
-      <div class="bkd-card fade-in d0" style="--bc-color:var(--blue)">
-        <div class="bkd-card-top">
-          <div class="bkd-card-dot"></div>
-          <div class="bkd-card-label">Candidates</div>
-          <a href="../talent_acquisition/candidates/candidates.html" class="view-link" style="margin-left:auto">View →</a>
-        </div>
+    <!-- BREAKDOWN -->
+    <div class="sec-hd"><div class="sec-lbl">Module Breakdown</div></div>
+    <div class="grid g4" style="margin-bottom:24px">
+      <div class="bkd fi d0" style="--bc:var(--blue)">
+        <div class="bkd-top"><div class="bkd-dot"></div><div class="bkd-lbl">Candidates</div><a href="../talent_acquisition/candidates/candidates.html" class="sec-link" style="margin-left:auto;font-size:11px">View</a></div>
         <div id="bkd-candidates"><div class="skel" style="height:80px"></div></div>
       </div>
-      <div class="bkd-card fade-in d1" style="--bc-color:var(--amber)">
-        <div class="bkd-card-top">
-          <div class="bkd-card-dot"></div>
-          <div class="bkd-card-label">Interviews &amp; Offers</div>
-          <a href="../talent_acquisition/interview_panel/interviews.html" class="view-link" style="margin-left:auto">View →</a>
-        </div>
+      <div class="bkd fi d1" style="--bc:var(--amber)">
+        <div class="bkd-top"><div class="bkd-dot"></div><div class="bkd-lbl">Interviews &amp; Offers</div><a href="../talent_acquisition/interview_panel/interviews.html" class="sec-link" style="margin-left:auto;font-size:11px">View</a></div>
         <div id="bkd-interviews"><div class="skel" style="height:80px"></div></div>
       </div>
-      <div class="bkd-card fade-in d2" style="--bc-color:var(--purple)">
-        <div class="bkd-card-top">
-          <div class="bkd-card-dot"></div>
-          <div class="bkd-card-label">Onboarding</div>
-          <a href="../employee_lifecycle/onboarding/onboarding.html" class="view-link" style="margin-left:auto">View →</a>
-        </div>
+      <div class="bkd fi d2" style="--bc:var(--violet)">
+        <div class="bkd-top"><div class="bkd-dot"></div><div class="bkd-lbl">Onboarding</div><a href="../employee_lifecycle/onboarding/onboarding.html" class="sec-link" style="margin-left:auto;font-size:11px">View</a></div>
         <div id="bkd-onboarding"><div class="skel" style="height:80px"></div></div>
       </div>
-      <div class="bkd-card fade-in d3" style="--bc-color:var(--green)">
-        <div class="bkd-card-top">
-          <div class="bkd-card-dot"></div>
-          <div class="bkd-card-label">Orientation &amp; Deployment</div>
-          <a href="../employee_lifecycle/deployment/deployment.html" class="view-link" style="margin-left:auto">View →</a>
-        </div>
+      <div class="bkd fi d3" style="--bc:var(--green)">
+        <div class="bkd-top"><div class="bkd-dot"></div><div class="bkd-lbl">Orientation &amp; Deployment</div><a href="../employee_lifecycle/deployment/deployment.html" class="sec-link" style="margin-left:auto;font-size:11px">View</a></div>
         <div id="bkd-deploy"><div class="skel" style="height:80px"></div></div>
       </div>
     </div>
 
-    <!-- ── FUNNEL + DONUT ── -->
-    <div class="section-hd"><div class="section-label">Analytics</div></div>
-    <div class="grid g21" style="margin-bottom:20px">
-      <div class="card fade-in d0">
+    <!-- CHARTS -->
+    <div class="sec-hd"><div class="sec-lbl">Analytics</div></div>
+    <div class="grid g21" style="margin-bottom:24px">
+      <div class="card fi d0">
         <div class="card-hd">
-          <div>
-            <div class="card-title">Hiring Funnel</div>
-            <div class="card-sub">Live pipeline — all stages</div>
-          </div>
+          <div><div class="card-title">Hiring Funnel</div><div class="card-sub">Live pipeline — all stages</div></div>
           <span class="chip" id="funnel-total-chip">— candidates</span>
         </div>
         <div style="height:210px;position:relative"><canvas id="funnelChart"></canvas></div>
       </div>
-      <div class="card fade-in d1">
-        <div class="card-hd">
-          <div>
-            <div class="card-title">Dept. Distribution</div>
-            <div class="card-sub">By headcount</div>
-          </div>
-        </div>
+      <div class="card fi d1">
+        <div class="card-hd"><div><div class="card-title">Dept. Distribution</div><div class="card-sub">By headcount</div></div></div>
         <div style="display:flex;gap:18px;align-items:center">
           <div style="width:110px;height:110px;flex-shrink:0"><canvas id="deptChart"></canvas></div>
           <div class="dleg" id="dept-legend"><div class="skel" style="height:80px;flex:1"></div></div>
@@ -785,12 +629,10 @@ html,body{
       </div>
     </div>
 
-    <!-- ── RECENT EMPLOYEES + ACTIVITY ── -->
-    <div class="section-hd">
-      <div class="section-label">People &amp; Activity</div>
-    </div>
-    <div class="grid g2" style="margin-bottom:20px">
-      <div class="card fade-in d0">
+    <!-- EMPLOYEES + ACTIVITY -->
+    <div class="sec-hd"><div class="sec-lbl">People &amp; Activity</div></div>
+    <div class="grid g2" style="margin-bottom:24px">
+      <div class="card fi d0">
         <div class="card-hd">
           <div><div class="card-title">Recent Employees</div><div class="card-sub">Latest additions</div></div>
           <span class="chip" id="hires-chip">—</span>
@@ -799,40 +641,38 @@ html,body{
           <thead><tr><th>Name</th><th>Designation</th><th>Department</th><th>Status</th></tr></thead>
           <tbody id="tb-hires"><tr><td colspan="4" class="tbl-empty">Loading…</td></tr></tbody>
         </table>
-        <div style="margin-top:12px;text-align:right">
-          <a href="../employees/employees.html" class="view-link">View all employees →</a>
-        </div>
+        <div style="margin-top:12px;text-align:right"><a href="../employees/employees.html" class="sec-link">View all employees →</a></div>
       </div>
-      <div class="card fade-in d1">
+      <div class="card fi d1">
         <div class="card-hd">
           <div><div class="card-title">Activity Feed</div><div class="card-sub">Recent HR actions</div></div>
-          <button onclick="loadAll()" style="background:var(--surface2);border:1px solid var(--b2);color:var(--t3);cursor:pointer;font-size:11px;padding:4px 9px;border-radius:6px;transition:all .15s" onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t3)'">↻</button>
+          <button onclick="loadAll()" style="background:var(--surface2);border:1px solid var(--b2);color:var(--t3);cursor:pointer;font-size:11px;padding:4px 8px;border-radius:5px;transition:all .15s;font-family:var(--font)" onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t3)'">Refresh</button>
         </div>
         <div class="tl" id="activity-feed">
-          <div class="tl-item"><div class="tl-icon skel" style="width:30px;height:30px"></div><div class="tl-body"><div class="skel" style="height:12px;width:75%;margin-bottom:6px"></div><div class="skel" style="height:10px;width:50%"></div></div></div>
-          <div class="tl-item"><div class="tl-icon skel" style="width:30px;height:30px"></div><div class="tl-body"><div class="skel" style="height:12px;width:60%;margin-bottom:6px"></div><div class="skel" style="height:10px;width:40%"></div></div></div>
-          <div class="tl-item"><div class="tl-icon skel" style="width:30px;height:30px"></div><div class="tl-body"><div class="skel" style="height:12px;width:65%;margin-bottom:6px"></div><div class="skel" style="height:10px;width:45%"></div></div></div>
+          <div class="tl-item"><div class="tl-dot skel" style="width:28px;height:28px"></div><div class="tl-body"><div class="skel" style="height:11px;width:75%;margin-bottom:6px"></div><div class="skel" style="height:10px;width:50%"></div></div></div>
+          <div class="tl-item"><div class="tl-dot skel" style="width:28px;height:28px"></div><div class="tl-body"><div class="skel" style="height:11px;width:60%;margin-bottom:6px"></div><div class="skel" style="height:10px;width:40%"></div></div></div>
+          <div class="tl-item"><div class="tl-dot skel" style="width:28px;height:28px"></div><div class="tl-body"><div class="skel" style="height:11px;width:65%;margin-bottom:6px"></div><div class="skel" style="height:10px;width:45%"></div></div></div>
         </div>
       </div>
     </div>
 
-    <!-- ── INTERVIEW PANEL + OFFER LETTERS ── -->
-    <div class="section-hd"><div class="section-label">Interviews &amp; Offers</div><a href="../talent_acquisition/interview_panel/interviews.html" class="view-link">View all →</a></div>
-    <div class="grid g2" style="margin-bottom:20px">
-      <div class="card fade-in d0">
+    <!-- INTERVIEWS + OFFERS -->
+    <div class="sec-hd"><div class="sec-lbl">Interviews &amp; Offers</div><a href="../talent_acquisition/interview_panel/interviews.html" class="sec-link">View all</a></div>
+    <div class="grid g2" style="margin-bottom:24px">
+      <div class="card fi d0">
         <div class="card-hd">
           <div><div class="card-title">Interview Panel</div><div class="card-sub">Active candidates</div></div>
-          <a href="../talent_acquisition/interview_panel/interviews.html" style="text-decoration:none"><span class="badge ba">View all →</span></a>
+          <a href="../talent_acquisition/interview_panel/interviews.html" style="text-decoration:none"><span class="badge ba">View all</span></a>
         </div>
         <table class="tbl">
           <thead><tr><th>Candidate</th><th>Role</th><th>Rounds</th><th>Status</th></tr></thead>
           <tbody id="tb-interviews"><tr><td colspan="4" class="tbl-empty">Loading…</td></tr></tbody>
         </table>
       </div>
-      <div class="card fade-in d1">
+      <div class="card fi d1">
         <div class="card-hd">
           <div><div class="card-title">Offer Letters</div><div class="card-sub">All statuses</div></div>
-          <a href="../employee_lifecycle/offer_letters/offer_letters.html" style="text-decoration:none"><span class="badge bt">View all →</span></a>
+          <a href="../employee_lifecycle/offer_letters/offer_letters.html" style="text-decoration:none"><span class="badge bt">View all</span></a>
         </div>
         <table class="tbl">
           <thead><tr><th>Candidate</th><th>Role</th><th>Salary</th><th>Status</th></tr></thead>
@@ -841,23 +681,23 @@ html,body{
       </div>
     </div>
 
-    <!-- ── ONBOARDING + ORIENTATION ── -->
-    <div class="section-hd"><div class="section-label">Onboarding &amp; Orientation</div></div>
-    <div class="grid g2" style="margin-bottom:20px">
-      <div class="card fade-in d0">
+    <!-- ONBOARDING + ORIENTATION -->
+    <div class="sec-hd"><div class="sec-lbl">Onboarding &amp; Orientation</div></div>
+    <div class="grid g2" style="margin-bottom:24px">
+      <div class="card fi d0">
         <div class="card-hd">
           <div><div class="card-title">Onboarding Queue</div><div class="card-sub">Pending verification</div></div>
-          <a href="../employee_lifecycle/onboarding/onboarding.html" style="text-decoration:none"><span class="badge bp">View all →</span></a>
+          <a href="../employee_lifecycle/onboarding/onboarding.html" style="text-decoration:none"><span class="badge bp">View all</span></a>
         </div>
         <table class="tbl">
           <thead><tr><th>Candidate</th><th>Position</th><th>Stage</th></tr></thead>
           <tbody id="tb-onboarding"><tr><td colspan="3" class="tbl-empty">Loading…</td></tr></tbody>
         </table>
       </div>
-      <div class="card fade-in d1">
+      <div class="card fi d1">
         <div class="card-hd">
           <div><div class="card-title">Orientation Pipeline</div><div class="card-sub">Active records</div></div>
-          <a href="../employee_lifecycle/orientation_sessions/orientations.html" style="text-decoration:none"><span class="badge bb">View all →</span></a>
+          <a href="../employee_lifecycle/orientation_sessions/orientations.html" style="text-decoration:none"><span class="badge bb">View all</span></a>
         </div>
         <table class="tbl">
           <thead><tr><th>Candidate</th><th>Position</th><th>Status</th></tr></thead>
@@ -866,23 +706,23 @@ html,body{
       </div>
     </div>
 
-    <!-- ── DEPLOYMENTS ── -->
-    <div class="section-hd"><div class="section-label">Deployment</div></div>
-    <div class="grid g2" style="margin-bottom:20px">
-      <div class="card fade-in d0">
+    <!-- DEPLOYMENTS -->
+    <div class="sec-hd"><div class="sec-lbl">Deployment</div></div>
+    <div class="grid g2" style="margin-bottom:24px">
+      <div class="card fi d0">
         <div class="card-hd">
           <div><div class="card-title">Recent Deployments</div><div class="card-sub">Latest team assignments</div></div>
-          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge bg">View all →</span></a>
+          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge bg">View all</span></a>
         </div>
         <table class="tbl">
           <thead><tr><th>Candidate</th><th>Team</th><th>Role</th><th>Status</th></tr></thead>
           <tbody id="tb-deployments"><tr><td colspan="4" class="tbl-empty">Loading…</td></tr></tbody>
         </table>
       </div>
-      <div class="card fade-in d1">
+      <div class="card fi d1">
         <div class="card-hd">
           <div><div class="card-title">Ready to Deploy</div><div class="card-sub">Completed orientation</div></div>
-          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge br">Deploy now →</span></a>
+          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge br">Deploy now</span></a>
         </div>
         <table class="tbl">
           <thead><tr><th>Candidate</th><th>Position</th><th>Department</th></tr></thead>
@@ -891,17 +731,17 @@ html,body{
       </div>
     </div>
 
-    <!-- ── TEAMS + JOINING DATES ── -->
-    <div class="section-hd"><div class="section-label">Teams &amp; Joining Dates</div></div>
+    <!-- TEAMS + JOINS -->
+    <div class="sec-hd"><div class="sec-lbl">Teams &amp; Joining Dates</div></div>
     <div class="grid g2">
-      <div class="card fade-in d0">
+      <div class="card fi d0">
         <div class="card-hd">
           <div><div class="card-title">Deployment Teams</div><div class="card-sub">Active teams &amp; headcount</div></div>
-          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge bt">Manage →</span></a>
+          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge bt">Manage</span></a>
         </div>
         <div id="teams-list"><div class="skel" style="height:120px"></div></div>
       </div>
-      <div class="card fade-in d1">
+      <div class="card fi d1">
         <div class="card-hd">
           <div><div class="card-title">Upcoming Joining Dates</div><div class="card-sub">Candidates joining soon</div></div>
           <span class="chip" id="joins-chip">—</span>
@@ -910,6 +750,7 @@ html,body{
       </div>
     </div>
 
+  </div><!-- /content-inner -->
   </div><!-- /content -->
 </div><!-- /main -->
 </div><!-- /shell -->
@@ -927,17 +768,36 @@ html,body{
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════
-     JAVASCRIPT — all data logic
-══════════════════════════════════════════════════════ -->
 <script>
-/* ──────────────── UTILITIES ──────────────── */
+/* ── UTILITIES ── */
 const $ = id => document.getElementById(id);
 function setText(id,v){const e=$(id);if(e)e.textContent=(v===null||v===undefined)?'—':v;}
 function openModal(id){$(id).classList.add('open');}
 function closeModal(id){$(id).classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open'));});
 
+/* ── COUNT-UP ── */
+function countUp(id,target){
+  const el=$(id);if(!el)return;
+  const n=parseInt(target);
+  if(isNaN(n)){el.textContent=target;return;}
+  let cur=0;const steps=20;const step=Math.max(1,Math.ceil(n/steps));
+  const t=setInterval(()=>{cur=Math.min(cur+step,n);el.textContent=cur;if(cur>=n)clearInterval(t);},600/steps);
+}
+
+/* ── WELCOME BANNER ── */
+function initWelcome(){
+  const user=typeof getUser==='function'?getUser():null;
+  const name=(user?.name||'').split(' ')[0]||'Manager';
+  setText('wb-name',name);
+  const h=new Date().getHours();
+  const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  setText('wb-greeting',g);
+  const d=new Date();
+  setText('wb-date',d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+}
+
+/* ── HELPERS ── */
 function timeAgo(d){
   if(!d)return'';
   const diff=Date.now()-new Date(d).getTime();
@@ -952,13 +812,8 @@ function timeAgo(d){
   return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
 }
 function initials(n){return(n||'?').split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
-function fmtSalary(n,cur){
-  if(!n)return'—';
-  const sym=(cur==='INR'?'₹':'');
-  return sym+Number(n).toLocaleString('en-IN');
-}
+function fmtSalary(n,cur){if(!n)return'—';const sym=(cur==='INR'?'₹':'');return sym+Number(n).toLocaleString('en-IN');}
 
-/* Badge helper — maps exact model enum values */
 function badge(s){
   const m={
     deployed:'bg',on_hold:'ba',transferred:'bp',pending:'ba',
@@ -976,36 +831,32 @@ function badge(s){
 
 function brow(label,val,color,dotColor){
   return`<div class="bkd-row">
-    <span class="bkd-lbl"><span class="bkd-dot" style="--bd-c:${dotColor||color||'var(--t3)'}"></span>${label}</span>
-    <span class="bkd-val" style="color:${color||'var(--t1)'}">${val}</span>
+    <span class="bkd-row-lbl"><span class="bkd-row-dot" style="--bdc:${dotColor||color||'var(--t3)'}"></span>${label}</span>
+    <span class="bkd-row-val" style="color:${color||'var(--t1)'}">${val}</span>
   </div>`;
 }
 
-/* Chart instances */
-let _fc=null, _dc=null;
-
+let _fc=null,_dc=null;
 const CT={
   plugins:{
     legend:{display:false},
-    tooltip:{
-      backgroundColor:'#0d1b2e',titleColor:'#f0f6ff',bodyColor:'#94a3b8',
-      borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:8,
-    }
+    tooltip:{backgroundColor:'#0d1b2e',titleColor:'#f0f6ff',bodyColor:'#94a3b8',borderColor:'rgba(255,255,255,0.08)',borderWidth:1,padding:10,cornerRadius:6}
   },
   scales:{
-    x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e637a',font:{size:11,family:'JetBrains Mono'}}},
-    y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e637a',font:{size:11,family:'JetBrains Mono'}},beginAtZero:true}
+    x:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#4e637a',font:{size:10,family:'JetBrains Mono'}}},
+    y:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#4e637a',font:{size:10,family:'JetBrains Mono'}},beginAtZero:true}
   }
 };
 
-/* ──────────────── MAIN LOAD ──────────────── */
+/* ── MAIN LOAD ── */
 async function loadAll(){
-  const user=getUser();
+  initWelcome();
+  const user=typeof getUser==='function'?getUser():null;
   if(user){
     const n=user.name||'HR';
     const av=$('user-avatar');if(av)av.textContent=initials(n);
-    const un=$('user-name');if(un)un.textContent=n;
-    const ur=$('user-role');if(ur)ur.textContent=(user.role||'hr').replace('_',' ');
+    setText('user-name',n);
+    setText('user-role',(user.role||'hr').replace(/_/g,' '));
   }
 
   const [r_dash,r_c,r_iv,r_of,r_ob,r_ori,r_dep,r_ready,r_teams]=await Promise.allSettled([
@@ -1026,7 +877,7 @@ async function loadAll(){
   const ds=now.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
   setText('ts-chip','Updated '+ts);
   setText('ts-chip2',ds);
-  const vt=$('ver-ts');if(vt)vt.textContent='Live · '+ds;
+  const vt=$('ver-ts');if(vt)vt.textContent='v2.5 · '+ds;
 
   renderDash(v(r_dash));
   renderCandidates(v(r_c));
@@ -1042,23 +893,22 @@ async function loadAll(){
   renderAlerts(v(r_ob),v(r_ori),v(r_dep));
 }
 
-/* ──────────────── DASHBOARD ──────────────── */
+/* ── DASHBOARD ── */
 function renderDash(data){
   if(!data)return;
   const s=data.stats||{};
-  setText('kpi-total', s.totalEmployees??'—');
+  countUp('kpi-total',s.totalEmployees??0);
   setText('kpi-total-sub',(s.activeEmployees??'—')+' active');
-  setText('kpi-present',s.presentToday??'—');
-  const pct=s.totalEmployees>0?Math.round((s.presentToday/s.activeEmployees||s.totalEmployees)*100)+'%':'—';
-  setText('kpi-present-sub',pct+' attendance');
-  setText('kpi-absent',s.absentToday??'—');
+  countUp('kpi-present',s.presentToday??0);
+  const pct=s.totalEmployees>0?Math.round((s.presentToday/(s.activeEmployees||s.totalEmployees))*100)+'%':'—';
+  setText('kpi-present-sub',pct+' attendance rate');
+  countUp('kpi-absent',s.absentToday??0);
   setText('kpi-absent-sub','out of '+(s.activeEmployees||s.totalEmployees||0));
-  setText('kpi-pending',s.pendingRequests??'—');
+  countUp('kpi-pending',s.pendingRequests??0);
 
   const sb=$('shift-badge');
   if(sb){const p=s.pendingRequests||0;sb.textContent=p;sb.style.display=p>0?'inline':'none';}
 
-  // Employees table
   const hires=data.recentHires||[];
   const hc=$('hires-chip');if(hc)hc.textContent=hires.length+' shown';
   const tbody=$('tb-hires');
@@ -1067,9 +917,9 @@ function renderDash(data){
       tbody.innerHTML='<tr><td colspan="4" class="tbl-empty">No employees yet</td></tr>';
     }else{
       tbody.innerHTML=hires.map(e=>`<tr>
-        <td><div style="display:flex;align-items:center;gap:9px">
+        <td><div style="display:flex;align-items:center;gap:8px">
           <div class="av av-sm">${initials(e.name)}</div>
-          <div><div class="td-bold">${e.name||'—'}</div></div>
+          <div><div class="td-b">${e.name||'—'}</div></div>
         </div></td>
         <td>${e.designation||'—'}</td>
         <td>${e.department||'—'}</td>
@@ -1078,7 +928,6 @@ function renderDash(data){
     }
   }
 
-  // Dept donut
   const bd=data.deptBreakdown||[];
   if(bd.length){
     const C=['#3b82f6','#8b5cf6','#14b8a6','#f59e0b','#f43f5e','#22c55e','#f97316','#06b6d4'];
@@ -1087,7 +936,7 @@ function renderDash(data){
     if(_dc){_dc.destroy();_dc=null;}
     _dc=new Chart($('deptChart'),{
       type:'doughnut',
-      data:{labels,datasets:[{data:values,backgroundColor:C.slice(0,labels.length),borderWidth:0,hoverOffset:6}]},
+      data:{labels,datasets:[{data:values,backgroundColor:C.slice(0,labels.length),borderWidth:0,hoverOffset:5}]},
       options:{responsive:true,maintainAspectRatio:false,cutout:'74%',
         plugins:{legend:{display:false},tooltip:{...CT.plugins.tooltip}}}
     });
@@ -1101,8 +950,7 @@ function renderDash(data){
   }
 }
 
-/* ──────────────── CANDIDATES ──────────────── */
-/* status: "new"|"shortlisted"|"rejected"|"hired" */
+/* ── CANDIDATES ── */
 function renderCandidates(data){
   if(!data){setText('pp-candidates','—');setText('sc-candidates','—');return;}
   const list=data.candidates||[];
@@ -1111,27 +959,23 @@ function renderCandidates(data){
   const sl=list.filter(c=>c.status==='shortlisted').length;
   const rj=list.filter(c=>c.status==='rejected').length;
   const hi=list.filter(c=>c.status==='hired').length;
-
-  setText('pp-candidates',total);
+  countUp('pp-candidates',total);
   setText('pp-candidates-s',nw+' new · '+sl+' shortlisted');
-  setText('pp-shortlisted',sl);
+  countUp('pp-shortlisted',sl);
   setText('pp-shortlisted-s',rj+' rejected');
-  setText('sc-candidates',total);
+  countUp('sc-candidates',total);
   setText('sc-candidates-d',sl+' shortlisted · '+hi+' hired · '+rj+' rejected');
-
   const el=$('bkd-candidates');
   if(el)el.innerHTML=
     brow('New / Applied',nw,'var(--t2)','var(--t3)')+
-    brow('Shortlisted',sl,'var(--blue2)','var(--blue)')+
-    brow('Rejected',rj,'#fb7185','#f43f5e')+
-    brow('Hired',hi,'#4ade80','#22c55e');
-
+    brow('Shortlisted',sl,'#60a5fa','var(--blue)')+
+    brow('Rejected',rj,'#fb7185','var(--rose)')+
+    brow('Hired',hi,'#4ade80','var(--green)');
   const cb=$('cand-badge');
   if(cb){cb.textContent=total;cb.style.display=total>0?'inline':'none';}
 }
 
-/* ──────────────── INTERVIEWS ──────────────── */
-/* overallStatus: "in_progress"|"passed"|"failed"|"on_hold"; offered: bool */
+/* ── INTERVIEWS ── */
 function renderInterviews(data){
   if(!data){setText('pp-interviews','—');setText('sc-interviews','—');return;}
   const list=data.interviews||[];
@@ -1140,12 +984,10 @@ function renderInterviews(data){
   const fa=list.filter(i=>i.overallStatus==='failed').length;
   const oh=list.filter(i=>i.overallStatus==='on_hold').length;
   const of=list.filter(i=>i.offered===true).length;
-
-  setText('pp-interviews',ip);
+  countUp('pp-interviews',ip);
   setText('pp-interviews-s',pa+' passed · '+of+' offered');
-  setText('sc-interviews',ip);
+  countUp('sc-interviews',ip);
   setText('sc-interviews-d',pa+' passed · '+fa+' failed · '+of+' offered');
-
   const el=$('bkd-interviews');
   if(el)el.innerHTML=
     brow('In Progress',ip,'#fbbf24','var(--amber)')+
@@ -1153,7 +995,6 @@ function renderInterviews(data){
     brow('Failed',fa,'#fb7185','var(--rose)')+
     brow('On Hold',oh,'var(--t3)','var(--t4)')+
     brow('Marked for Offer',of,'#2dd4bf','var(--teal)');
-
   const tbody=$('tb-interviews');
   if(tbody){
     const rows=list.slice(0,7);
@@ -1161,14 +1002,18 @@ function renderInterviews(data){
       tbody.innerHTML='<tr><td colspan="4" class="tbl-empty">No interviews yet</td></tr>';
     }else{
       tbody.innerHTML=rows.map(iv=>{
-        const done=[iv.round1,iv.round2,iv.round3].filter(r=>r&&r.status!=='pending').length;
-        const prog=`<div style="display:flex;align-items:center;gap:6px">
-          ${[0,1,2].map(i=>`<div style="width:16px;height:16px;border-radius:4px;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;background:${[iv.round1,iv.round2,iv.round3][i]?.status==='qualified'?'rgba(34,197,94,.2)':[iv.round1,iv.round2,iv.round3][i]?.status==='not_qualified'?'rgba(244,63,94,.2)':'rgba(255,255,255,.06)'};color:${[iv.round1,iv.round2,iv.round3][i]?.status==='qualified'?'#4ade80':[iv.round1,iv.round2,iv.round3][i]?.status==='not_qualified'?'#fb7185':'var(--t4)'}">R${i+1}</div>`).join('')}
+        const prog=`<div style="display:flex;align-items:center;gap:4px">
+          ${[0,1,2].map(i=>{
+            const r=[iv.round1,iv.round2,iv.round3][i];
+            const bg=r?.status==='qualified'?'rgba(34,197,94,.18)':r?.status==='not_qualified'?'rgba(244,63,94,.18)':'rgba(255,255,255,.05)';
+            const c=r?.status==='qualified'?'#4ade80':r?.status==='not_qualified'?'#fb7185':'var(--t4)';
+            return`<div style="width:18px;height:18px;border-radius:4px;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;background:${bg};color:${c}">R${i+1}</div>`;
+          }).join('')}
         </div>`;
         return`<tr>
           <td><div style="display:flex;align-items:center;gap:8px">
             <div class="av av-sm">${initials(iv.candidateName)}</div>
-            <div><div class="td-bold">${iv.candidateName||'—'}</div><div class="td-sub">${iv.candidateEmail||''}</div></div>
+            <div><div class="td-b">${iv.candidateName||'—'}</div><div class="td-s">${iv.candidateEmail||''}</div></div>
           </div></td>
           <td>${iv.appliedFor||'—'}</td>
           <td>${prog}</td>
@@ -1179,20 +1024,16 @@ function renderInterviews(data){
   }
 }
 
-/* ──────────────── OFFERS ──────────────── */
-/* status: "draft"|"sent"|"accepted"|"declined"|"expired" */
+/* ── OFFERS ── */
 function renderOffers(data){
   if(!data){setText('pp-offers','—');return;}
   const list=data.offers||[];
-  const dr=list.filter(o=>o.status==='draft').length;
   const se=list.filter(o=>o.status==='sent').length;
   const ac=list.filter(o=>o.status==='accepted').length;
   const dc=list.filter(o=>o.status==='declined').length;
   const ex=list.filter(o=>o.status==='expired').length;
-
   setText('pp-offers',se+ac);
   setText('pp-offers-s',ac+' accepted · '+(dc+ex)+' declined/exp');
-
   const tbody=$('tb-offers');
   if(tbody){
     const rows=list.slice(0,7);
@@ -1202,7 +1043,7 @@ function renderOffers(data){
       tbody.innerHTML=rows.map(o=>`<tr>
         <td><div style="display:flex;align-items:center;gap:8px">
           <div class="av av-sm">${initials(o.candidateName)}</div>
-          <div><div class="td-bold">${o.candidateName||'—'}</div><div class="td-sub">${o.candidateEmail||''}</div></div>
+          <div><div class="td-b">${o.candidateName||'—'}</div><div class="td-s">${o.candidateEmail||''}</div></div>
         </div></td>
         <td>${o.appliedFor||'—'}</td>
         <td style="font-family:var(--mono);font-size:11px;color:var(--t1)">${fmtSalary(o.offeredSalary,o.ctcCurrency)}</td>
@@ -1212,8 +1053,7 @@ function renderOffers(data){
   }
 }
 
-/* ──────────────── ONBOARDING ──────────────── */
-/* onboardingStatus: offer_sent|docs_pending|docs_submitted|docs_verified|joining_scheduled|onboarded */
+/* ── ONBOARDING ── */
 function renderOnboarding(data){
   if(!data){setText('pp-onboarding','—');setText('sc-onboarding','—');return;}
   const list=data.onboardings||[];
@@ -1224,21 +1064,18 @@ function renderOnboarding(data){
   const js=list.filter(o=>o.onboardingStatus==='joining_scheduled').length;
   const ob=list.filter(o=>o.onboardingStatus==='onboarded').length;
   const active=list.length-ob;
-
-  setText('pp-onboarding',active);
+  countUp('pp-onboarding',active);
   setText('pp-onboarding-s',ob+' onboarded');
-  setText('sc-onboarding',active);
+  countUp('sc-onboarding',active);
   setText('sc-onboarding-d',ob+' onboarded · '+ds+' docs submitted · '+dv+' verified');
-
   const el=$('bkd-onboarding');
   if(el)el.innerHTML=
     brow('Offer Sent',os,'var(--t2)','var(--t4)')+
     brow('Docs Pending',dp,'#fbbf24','var(--amber)')+
     brow('Docs Submitted',ds,'#60a5fa','var(--blue)')+
     brow('Docs Verified',dv,'#2dd4bf','var(--teal)')+
-    brow('Joining Scheduled',js,'#c4b5fd','var(--purple)')+
+    brow('Joining Scheduled',js,'#c4b5fd','var(--violet)')+
     brow('Onboarded',ob,'#4ade80','var(--green)');
-
   const tbody=$('tb-onboarding');
   if(tbody){
     const rows=list.filter(o=>o.onboardingStatus!=='onboarded').slice(0,7);
@@ -1248,7 +1085,7 @@ function renderOnboarding(data){
       tbody.innerHTML=rows.map(o=>`<tr>
         <td><div style="display:flex;align-items:center;gap:8px">
           <div class="av av-sm">${initials(o.candidateName)}</div>
-          <div><div class="td-bold">${o.candidateName||'—'}</div><div class="td-sub">${o.candidateEmail||''}</div></div>
+          <div><div class="td-b">${o.candidateName||'—'}</div><div class="td-s">${o.candidateEmail||''}</div></div>
         </div></td>
         <td>${o.position||'—'}</td>
         <td>${badge(o.onboardingStatus)}</td>
@@ -1257,28 +1094,24 @@ function renderOnboarding(data){
   }
 }
 
-/* ──────────────── ORIENTATION ──────────────── */
-/* orientationStatus: pending|invited|in_progress|completed */
+/* ── ORIENTATION ── */
 function renderOrientation(data){
   if(!data){setText('pp-orientation','—');return;}
   const s=data.stats||{};
-  const pe=s.pending||0, iv=s.invited||0, ip=s.in_progress||0, co=s.completed||0;
+  const pe=s.pending||0,iv=s.invited||0,ip=s.in_progress||0,co=s.completed||0;
   const active=pe+iv+ip;
-
   setText('pp-orientation',active);
   setText('pp-orientation-s',co+' completed');
-
   const el=$('bkd-deploy');
   if(el){
     el._ori=
-      '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Orientation</div>'+
+      '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);font-size:9px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px">Orientation</div>'+
       brow('Pending',pe,'#fbbf24','var(--amber)')+
       brow('Invited',iv,'#60a5fa','var(--blue)')+
       brow('In Progress',ip,'#2dd4bf','var(--teal)')+
       brow('Completed',co,'#4ade80','var(--green)');
     el.innerHTML=(el._dep||'')+el._ori;
   }
-
   const tbody=$('tb-orientation');
   if(tbody){
     const list=(data.orientations||[]).filter(o=>o.orientationStatus!=='completed').slice(0,7);
@@ -1288,7 +1121,7 @@ function renderOrientation(data){
       tbody.innerHTML=list.map(o=>`<tr>
         <td><div style="display:flex;align-items:center;gap:8px">
           <div class="av av-sm">${initials(o.candidateName)}</div>
-          <div><div class="td-bold">${o.candidateName||'—'}</div><div class="td-sub">${o.candidateEmail||''}</div></div>
+          <div><div class="td-b">${o.candidateName||'—'}</div><div class="td-s">${o.candidateEmail||''}</div></div>
         </div></td>
         <td>${o.position||'—'}</td>
         <td>${badge(o.orientationStatus)}</td>
@@ -1297,29 +1130,25 @@ function renderOrientation(data){
   }
 }
 
-/* ──────────────── DEPLOYMENT ──────────────── */
-/* stats: {total, deployed, pending, on_hold, transferred, readyToDeploy} */
+/* ── DEPLOYMENT ── */
 function renderDeployment(data,readyData){
   if(!data){setText('pp-deployed','—');setText('sc-deployed','—');return;}
   const s=data.stats||{};
   const dep=s.deployed||0,oh=s.on_hold||0,tr=s.transferred||0,rd=s.readyToDeploy||0;
-
-  setText('pp-deployed',dep);
+  countUp('pp-deployed',dep);
   setText('pp-deployed-s',rd+' ready to deploy');
-  setText('sc-deployed',dep);
+  countUp('sc-deployed',dep);
   setText('sc-deployed-d',rd+' ready · '+oh+' on hold · '+tr+' transferred');
-
   const el=$('bkd-deploy');
   if(el){
     el._dep=
-      '<div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Deployment</div>'+
+      '<div style="font-size:9px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px">Deployment</div>'+
       brow('Deployed',dep,'#4ade80','var(--green)')+
       brow('On Hold',oh,'#fbbf24','var(--amber)')+
-      brow('Transferred',tr,'#c4b5fd','var(--purple)')+
+      brow('Transferred',tr,'#c4b5fd','var(--violet)')+
       brow('Ready to Deploy',rd,'#60a5fa','var(--blue)');
     el.innerHTML=el._dep+(el._ori||'');
   }
-
   const tbody=$('tb-deployments');
   if(tbody){
     const rows=(data.deployments||[]).slice(0,7);
@@ -1327,20 +1156,19 @@ function renderDeployment(data,readyData){
       tbody.innerHTML='<tr><td colspan="4" class="tbl-empty">No deployments yet</td></tr>';
     }else{
       tbody.innerHTML=rows.map(d=>{
-        const tname=(d.teamId&&d.teamId.name)||d.teamName||'—';
+        const tn=(d.teamId&&d.teamId.name)||d.teamName||'—';
         return`<tr>
           <td><div style="display:flex;align-items:center;gap:8px">
             <div class="av av-sm">${initials(d.candidateName)}</div>
-            <div><div class="td-bold">${d.candidateName||'—'}</div><div class="td-sub">${d.candidateEmail||''}</div></div>
+            <div><div class="td-b">${d.candidateName||'—'}</div><div class="td-s">${d.candidateEmail||''}</div></div>
           </div></td>
-          <td>${tname}</td>
+          <td>${tn}</td>
           <td>${d.roleInTeam||d.position||'—'}</td>
           <td>${badge(d.status||'deployed')}</td>
         </tr>`;
       }).join('');
     }
   }
-
   const rt=$('tb-ready');
   if(rt){
     const ready=readyData?(readyData.ready||[]):[];
@@ -1350,7 +1178,7 @@ function renderDeployment(data,readyData){
       rt.innerHTML=ready.slice(0,7).map(r=>`<tr>
         <td><div style="display:flex;align-items:center;gap:8px">
           <div class="av av-sm">${initials(r.candidateName)}</div>
-          <div><div class="td-bold">${r.candidateName||'—'}</div><div class="td-sub">${r.candidateEmail||''}</div></div>
+          <div><div class="td-b">${r.candidateName||'—'}</div><div class="td-s">${r.candidateEmail||''}</div></div>
         </div></td>
         <td>${r.position||'—'}</td>
         <td>${r.department||'—'}</td>
@@ -1359,7 +1187,7 @@ function renderDeployment(data,readyData){
   }
 }
 
-/* ──────────────── TEAMS ──────────────── */
+/* ── TEAMS ── */
 const TEAM_COLORS=['#3b82f6','#8b5cf6','#14b8a6','#f59e0b','#f43f5e','#22c55e','#f97316','#06b6d4'];
 function renderTeams(data){
   const el=$('teams-list');if(!el)return;
@@ -1368,8 +1196,8 @@ function renderTeams(data){
   if(!teams.length){el.innerHTML='<div style="color:var(--t3);font-size:12px;padding:12px 0">No teams yet</div>';return;}
   el.innerHTML=teams.map((t,i)=>`
     <div class="team-row">
-      <div class="team-logo" style="background:${TEAM_COLORS[i%TEAM_COLORS.length]}22;border:1px solid ${TEAM_COLORS[i%TEAM_COLORS.length]}33">
-        <span style="font-size:16px;color:${TEAM_COLORS[i%TEAM_COLORS.length]}">${(t.name||'?')[0].toUpperCase()}</span>
+      <div class="team-mark" style="background:${TEAM_COLORS[i%8]}18;border:1px solid ${TEAM_COLORS[i%8]}28;color:${TEAM_COLORS[i%8]};font-size:13px;font-weight:700">
+        ${(t.name||'?')[0].toUpperCase()}
       </div>
       <div style="flex:1;min-width:0">
         <div class="team-name">${t.name||'—'}</div>
@@ -1382,53 +1210,39 @@ function renderTeams(data){
     </div>`).join('');
 }
 
-/* ──────────────── UPCOMING JOINS ──────────────── */
+/* ── UPCOMING JOINS ── */
 function renderUpcomingJoins(depData,obData){
   const el=$('joins-list'),bc=$('joins-chip');if(!el)return;
   const today=new Date();today.setHours(0,0,0,0);
   const up=[];
-
   (depData?.deployments||[]).forEach(d=>{
-    if(d.joiningDate){
-      const dt=new Date(d.joiningDate);
-      if(!isNaN(dt)&&dt>=today)up.push({name:d.candidateName||'—',role:d.roleInTeam||d.position||'—',date:dt});
-    }
+    if(d.joiningDate){const dt=new Date(d.joiningDate);if(!isNaN(dt)&&dt>=today)up.push({name:d.candidateName||'—',role:d.roleInTeam||d.position||'—',date:dt});}
   });
   (obData?.onboardings||[]).forEach(o=>{
-    if(o.joiningDate&&['joining_scheduled','docs_verified'].includes(o.onboardingStatus)){
-      const dt=new Date(o.joiningDate);
-      if(!isNaN(dt)&&dt>=today)up.push({name:o.candidateName||'—',role:o.position||'—',date:dt});
-    }
+    if(o.joiningDate&&['joining_scheduled','docs_verified'].includes(o.onboardingStatus)){const dt=new Date(o.joiningDate);if(!isNaN(dt)&&dt>=today)up.push({name:o.candidateName||'—',role:o.position||'—',date:dt});}
   });
-
   const seen=new Set();
-  const deduped=up.filter(u=>{const k=u.name+'|'+u.date.toISOString().slice(0,10);if(seen.has(k))return false;seen.add(k);return true;})
-    .sort((a,b)=>a.date-b.date);
-
+  const deduped=up.filter(u=>{const k=u.name+'|'+u.date.toISOString().slice(0,10);if(seen.has(k))return false;seen.add(k);return true;}).sort((a,b)=>a.date-b.date);
   if(bc)bc.textContent=deduped.length+' upcoming';
-
   if(!deduped.length){el.innerHTML='<div style="color:var(--t3);font-size:12px;padding:12px 0;text-align:center">No upcoming joining dates</div>';return;}
-
   el.innerHTML=deduped.slice(0,7).map(u=>{
     const diff=Math.ceil((u.date-today)/86400000);
     const [badgeTxt,badgeCls]=diff===0?['Today','bg']:diff===1?['Tomorrow','ba']:diff<=7?['In '+diff+' days','ba']:[u.date.toLocaleDateString('en-IN',{day:'numeric',month:'short'}),'bgy'];
-    const day=u.date.toLocaleDateString('en-IN',{day:'numeric'});
-    const mon=u.date.toLocaleDateString('en-IN',{month:'short'}).toUpperCase();
     return`<div class="join-row">
-      <div class="join-day">
-        <div class="join-day-n">${day}</div>
-        <div class="join-day-m">${mon}</div>
+      <div class="join-cal">
+        <div class="join-day">${u.date.toLocaleDateString('en-IN',{day:'numeric'})}</div>
+        <div class="join-mon">${u.date.toLocaleDateString('en-IN',{month:'short'}).toUpperCase()}</div>
       </div>
       <div style="flex:1;min-width:0">
         <div class="join-name">${u.name}</div>
         <div class="join-role">${u.role}</div>
       </div>
-      <div class="join-badge"><span class="badge ${badgeCls}">${badgeTxt}</span></div>
+      <div style="flex-shrink:0"><span class="badge ${badgeCls}">${badgeTxt}</span></div>
     </div>`;
   }).join('');
 }
 
-/* ──────────────── FUNNEL CHART ──────────────── */
+/* ── FUNNEL CHART ── */
 function renderFunnel(cands,ivs,offers,ob){
   const tc=(cands?.candidates||[]).length;
   const sl=(cands?.candidates||[]).filter(c=>c.status==='shortlisted').length;
@@ -1439,72 +1253,55 @@ function renderFunnel(cands,ivs,offers,ob){
     (offers?.offers||[]).filter(o=>o.status==='sent'||o.status==='accepted').length
   );
   const onb=(ob?.onboardings||[]).filter(o=>o.onboardingStatus==='onboarded').length;
-
-  setText('funnel-total-chip',tc+' total');
-
+  setText('funnel-total-chip',tc+' candidates');
   const stages=[
-    {l:'Applied',    v:tc,  c:'rgba(59,130,246,.8)'},
-    {l:'Shortlisted',v:sl,  c:'rgba(139,92,246,.8)'},
-    {l:'Interview',  v:ip,  c:'rgba(245,158,11,.8)'},
-    {l:'Passed',     v:pa,  c:'rgba(20,184,166,.8)'},
-    {l:'Offered',    v:of,  c:'rgba(167,139,250,.8)'},
-    {l:'Onboarded',  v:onb, c:'rgba(34,197,94,.9)'},
+    {l:'Applied',v:tc,c:'rgba(59,130,246,.75)'},
+    {l:'Shortlisted',v:sl,c:'rgba(139,92,246,.75)'},
+    {l:'Interview',v:ip,c:'rgba(245,158,11,.75)'},
+    {l:'Passed',v:pa,c:'rgba(20,184,166,.75)'},
+    {l:'Offered',v:of,c:'rgba(167,139,250,.75)'},
+    {l:'Onboarded',v:onb,c:'rgba(34,197,94,.85)'},
   ];
-
   if(_fc){_fc.destroy();_fc=null;}
   _fc=new Chart($('funnelChart'),{
     type:'bar',
-    data:{
-      labels:stages.map(s=>s.l),
-      datasets:[{
-        data:stages.map(s=>s.v),
-        backgroundColor:stages.map(s=>s.c),
-        borderRadius:8,borderSkipped:false,borderWidth:0,
-      }]
-    },
-    options:{
-      ...CT,responsive:true,maintainAspectRatio:false,
-      plugins:{...CT.plugins},
-      scales:{x:{...CT.scales.x},y:{...CT.scales.y}}
-    }
+    data:{labels:stages.map(s=>s.l),datasets:[{data:stages.map(s=>s.v),backgroundColor:stages.map(s=>s.c),borderRadius:6,borderSkipped:false,borderWidth:0}]},
+    options:{...CT,responsive:true,maintainAspectRatio:false,plugins:{...CT.plugins},scales:{x:{...CT.scales.x},y:{...CT.scales.y}}}
   });
 }
 
-/* ──────────────── ACTIVITY FEED ──────────────── */
+/* ── ACTIVITY FEED ── */
+const FEED_COLORS={deploy:'rgba(34,197,94,.12)',orient:'rgba(20,184,166,.12)',onboard:'rgba(139,92,246,.12)',docs:'rgba(245,158,11,.12)',offer:'rgba(59,130,246,.12)',pass:'rgba(34,197,94,.08)'};
+const FEED_ICONS={
+  deploy:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`,
+  orient:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`,
+  onboard:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>`,
+  docs:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>`,
+  offer:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>`,
+  pass:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>`
+};
 function renderActivityFeed(dep,ori,ob,iv){
   const evs=[];
-  function push(icon,bg,title,desc,ts){
-    const t=new Date(ts||0).getTime();
-    if(!isNaN(t)&&t>0)evs.push({icon,bg,title,desc,ts:t,tsRaw:ts});
-  }
-  (dep?.deployments||[]).slice(0,4).forEach(d=>{
-    const tn=(d.teamId?.name)||d.teamName||'a team';
-    push('🗂️','rgba(34,197,94,.15)',`Deployed — ${d.candidateName||d.candidateEmail||'Candidate'}`,`${tn} · ${d.roleInTeam||d.position||'role'}`,d.createdAt);
-  });
+  function push(type,title,desc,ts){const t=new Date(ts||0).getTime();if(!isNaN(t)&&t>0)evs.push({type,title,desc,ts:t,tsRaw:ts});}
+  (dep?.deployments||[]).slice(0,4).forEach(d=>{const tn=(d.teamId?.name)||d.teamName||'a team';push('deploy',`${d.candidateName||'Candidate'} deployed`,`${tn} · ${d.roleInTeam||d.position||''}`,d.createdAt);});
   (ori?.orientations||[]).slice(0,4).forEach(o=>{
-    if(o.orientationStatus==='completed')
-      push('🎓','rgba(20,184,166,.15)',`Orientation complete — ${o.candidateName||o.candidateEmail||'Candidate'}`,o.position||'',o.completedAt||o.updatedAt);
-    else if(o.orientationStatus==='invited')
-      push('🎓','rgba(59,130,246,.15)',`Orientation invite sent — ${o.candidateName||o.candidateEmail||'Candidate'}`,o.position||'',o.updatedAt||o.createdAt);
+    if(o.orientationStatus==='completed')push('orient',`${o.candidateName||'Candidate'} completed orientation`,o.position||'',o.completedAt||o.updatedAt);
+    else if(o.orientationStatus==='invited')push('orient',`Orientation invite sent to ${o.candidateName||'Candidate'}`,o.position||'',o.updatedAt||o.createdAt);
   });
   (ob?.onboardings||[]).slice(0,4).forEach(o=>{
-    if(o.onboardingStatus==='onboarded')
-      push('🚀','rgba(139,92,246,.15)',`Onboarded — ${o.candidateName||o.candidateEmail||'Candidate'}`,`Documents verified · ${o.position||''}`,o.updatedAt||o.createdAt);
-    else if(o.onboardingStatus==='docs_submitted')
-      push('📁','rgba(245,158,11,.15)',`Docs submitted — ${o.candidateName||o.candidateEmail||'Candidate'}`,`Pending verification · ${o.position||''}`,o.updatedAt||o.createdAt);
+    if(o.onboardingStatus==='onboarded')push('onboard',`${o.candidateName||'Candidate'} onboarded`,`Documents verified · ${o.position||''}`,o.updatedAt||o.createdAt);
+    else if(o.onboardingStatus==='docs_submitted')push('docs',`Docs submitted — ${o.candidateName||'Candidate'}`,`Pending verification · ${o.position||''}`,o.updatedAt||o.createdAt);
   });
   (iv?.interviews||[]).slice(0,4).forEach(i=>{
-    if(i.offered)
-      push('📝','rgba(245,158,11,.15)',`Marked for offer — ${i.candidateName||i.candidateEmail||'Candidate'}`,i.appliedFor||'',i.offeredAt||i.updatedAt);
-    else if(i.overallStatus==='passed')
-      push('✅','rgba(34,197,94,.12)',`All rounds passed — ${i.candidateName||i.candidateEmail||'Candidate'}`,i.appliedFor||'',i.updatedAt);
+    if(i.offered)push('offer',`${i.candidateName||'Candidate'} marked for offer`,i.appliedFor||'',i.offeredAt||i.updatedAt);
+    else if(i.overallStatus==='passed')push('pass',`${i.candidateName||'Candidate'} passed all rounds`,i.appliedFor||'',i.updatedAt);
   });
   evs.sort((a,b)=>b.ts-a.ts);
   const feed=$('activity-feed');if(!feed)return;
   if(!evs.length){feed.innerHTML='<div style="color:var(--t3);font-size:12px;padding:10px 0">No recent activity</div>';return;}
   feed.innerHTML=evs.slice(0,8).map(e=>`
     <div class="tl-item">
-      <div class="tl-icon" style="background:${e.bg}">${e.icon}</div>
+      <div class="tl-dot" style="background:${FEED_COLORS[e.type]||'rgba(255,255,255,.05)'}">${FEED_ICONS[e.type]||''}</div>
       <div class="tl-body">
         <div class="tl-title">${e.title}</div>
         <div class="tl-desc">${e.desc}</div>
@@ -1513,31 +1310,31 @@ function renderActivityFeed(dep,ori,ob,iv){
     </div>`).join('');
 }
 
-/* ──────────────── ALERTS ──────────────── */
+/* ── ALERTS ── */
 function renderAlerts(ob,ori,dep){
   const alerts=[];
   const ds=(ob?.onboardings||[]).filter(o=>o.onboardingStatus==='docs_submitted').length;
-  if(ds>0)alerts.push({icon:'📋',c:'var(--amber)',border:'rgba(245,158,11,.3)',bg:'rgba(245,158,11,.08)',text:`${ds} onboarding record(s) have submitted documents awaiting HR verification`});
+  if(ds>0)alerts.push({color:'var(--amber)',border:'rgba(245,158,11,.25)',bg:'rgba(245,158,11,.06)',text:`${ds} onboarding record${ds>1?'s':''} submitted documents — awaiting HR verification`});
   const un=(ori?.orientations||[]).filter(o=>o.orientationStatus==='pending').length;
-  if(un>0)alerts.push({icon:'🎓',c:'var(--teal)',border:'rgba(20,184,166,.3)',bg:'rgba(20,184,166,.08)',text:`${un} candidate(s) in orientation have not been invited yet`});
+  if(un>0)alerts.push({color:'var(--teal)',border:'rgba(20,184,166,.25)',bg:'rgba(20,184,166,.06)',text:`${un} candidate${un>1?'s':''} in orientation have not been invited yet`});
   const rd=dep?.stats?.readyToDeploy||0;
-  if(rd>0)alerts.push({icon:'🗂️',c:'var(--green)',border:'rgba(34,197,94,.3)',bg:'rgba(34,197,94,.08)',text:`${rd} candidate(s) completed orientation and are ready to be deployed`});
-
+  if(rd>0)alerts.push({color:'var(--green)',border:'rgba(34,197,94,.25)',bg:'rgba(34,197,94,.06)',text:`${rd} candidate${rd>1?'s':''} completed orientation and are ready to be deployed`});
   const cnt=$('notif-count');
   if(cnt){cnt.textContent=alerts.length;cnt.style.display=alerts.length>0?'inline':'none';}
   const body=$('notif-body');
   if(body){
     body.innerHTML=alerts.length
       ?alerts.map(a=>`
-        <div style="display:flex;gap:14px;padding:14px;background:${a.bg};border-radius:10px;border:1px solid ${a.border};margin-bottom:10px;align-items:flex-start">
-          <span style="font-size:22px;flex-shrink:0">${a.icon}</span>
+        <div style="padding:14px 16px;background:${a.bg};border-radius:8px;border:1px solid ${a.border};margin-bottom:10px">
+          <div style="width:3px;height:100%;background:${a.color};border-radius:2px;display:inline-block;margin-right:12px;vertical-align:middle"></div>
           <span style="font-size:13px;color:var(--t1);line-height:1.6">${a.text}</span>
         </div>`).join('')
-      :'<div style="text-align:center;padding:24px 0"><div style="font-size:32px;margin-bottom:10px">✅</div><div style="color:var(--t3);font-size:13px">All clear — no alerts right now</div></div>';
+      :'<div style="text-align:center;padding:28px 0"><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">ALL CLEAR</div><div style="font-size:13px;color:var(--t2)">No pending alerts right now</div></div>';
   }
 }
 
 /* ── BOOT ── */
+initWelcome();
 loadAll();
 </script>
 </body>
