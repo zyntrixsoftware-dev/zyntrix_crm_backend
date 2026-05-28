@@ -7,224 +7,139 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* ── RESET & BASE ────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --navy:    #0d1b2a;
-  --navy2:   #132236;
-  --navy3:   #1a2d42;
-  --navy4:   #203350;
-  --navy5:   #263d5e;
-  --accent:  #4f9cf9;
-  --accent2: #3b82f6;
-  --accent-dim: rgba(59,130,246,0.12);
-  --teal:    #2dd4bf;
-  --amber:   #f59e0b;
-  --rose:    #f43f5e;
-  --green:   #22c55e;
-  --purple:  #a78bfa;
-  --text:    #e2e8f0;
-  --text2:   #94a3b8;
-  --text3:   #64748b;
-  --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --card:    #132236;
-  --radius:  12px;
-  --sidebar: 248px;
-  --font:    'DM Sans', sans-serif;
-  --mono:    'DM Mono', monospace;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d1b2a;--navy2:#132236;--navy3:#1a2d42;--navy4:#203350;--navy5:#263d5e;
+  --accent:#4f9cf9;--accent2:#3b82f6;--accent-dim:rgba(59,130,246,0.12);
+  --teal:#2dd4bf;--amber:#f59e0b;--rose:#f43f5e;--green:#22c55e;--purple:#a78bfa;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --card:#132236;--radius:12px;--sidebar:248px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
 }
-html, body { height: 100%; background: var(--navy); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.6; overflow: hidden; }
-
-/* ── LAYOUT ──────────────────────────────────────────────── */
-.shell   { display: flex; height: 100vh; }
-.sidebar { width: var(--sidebar); min-width: var(--sidebar); background: var(--navy2); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
-.main    { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.topbar  { height: 62px; min-height: 62px; background: var(--navy2); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 14px; }
-.content { flex: 1; overflow-y: auto; padding: 24px; background: var(--navy); }
-
-/* ── SIDEBAR ─────────────────────────────────────────────── */
-.brand { padding: 20px 18px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #3b82f6, #6366f1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.brand-text { display: flex; flex-direction: column; }
-.brand-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
-.brand-ver  { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 1px; }
-
-.nav-section { padding: 14px 10px 6px; }
-.nav-label   { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; padding: 0 8px 8px; }
-.nav-item    { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--text2); font-size: 13px; text-decoration: none; transition: all 0.15s; margin-bottom: 1px; position: relative; }
-.nav-item:hover  { background: var(--accent-dim); color: var(--text); }
-.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
-.nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--accent2); border-radius: 0 3px 3px 0; }
-.nav-icon  { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
-.nav-badge { margin-left: auto; background: var(--rose); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px; line-height: 1.2; }
-.nav-divider { height: 1px; background: var(--border); margin: 8px 10px; }
-
-.sidebar-footer { margin-top: auto; padding: 14px 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
-.user-pill   { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
-.user-pill:hover { background: var(--border); }
-.avatar      { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
-.user-info   { flex: 1; min-width: 0; }
-.user-name   { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-role   { font-size: 11px; color: var(--text3); }
-
-/* ── TOPBAR ──────────────────────────────────────────────── */
-.page-title   { font-size: 16px; font-weight: 600; color: var(--text); flex: 1; }
-.breadcrumb   { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); }
-.breadcrumb span { color: var(--text2); }
-.search-box   { display: flex; align-items: center; gap: 8px; background: var(--navy3); border: 1px solid var(--border2); border-radius: 8px; padding: 7px 14px; color: var(--text2); font-size: 13px; cursor: text; min-width: 220px; transition: border 0.15s; }
-.search-box:focus-within { border-color: var(--accent2); }
-.search-box input { background: none; border: none; outline: none; color: var(--text); font-size: 13px; font-family: var(--font); width: 100%; }
-.search-box input::placeholder { color: var(--text3); }
-.topbar-btn   { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); display: flex; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
-.topbar-btn:hover { background: var(--navy3); }
-.topbar-btn.primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
-.topbar-btn.primary:hover { background: var(--accent); border-color: var(--accent); }
-.notif-wrap { position: relative; }
-.notif-dot  { position: absolute; top: 6px; right: 14px; width: 7px; height: 7px; background: var(--rose); border-radius: 50%; border: 2px solid var(--navy2); }
-
-/* ── CARDS & GRID ────────────────────────────────────────── */
-.grid         { display: grid; gap: 16px; }
-.g4           { grid-template-columns: repeat(4,1fr); }
-.g3           { grid-template-columns: repeat(3,1fr); }
-.g2           { grid-template-columns: repeat(2,1fr); }
-.g21          { grid-template-columns: 2fr 1fr; }
-.g12          { grid-template-columns: 1fr 2fr; }
-.card         { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.card-sm      { padding: 16px; }
-.card-hd      { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
-.card-title   { font-size: 14px; font-weight: 600; color: var(--text); }
-.card-sub     { font-size: 12px; color: var(--text3); margin-top: 2px; }
-
-/* ── STAT CARDS ──────────────────────────────────────────── */
-.stat-icon  { width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 14px; }
-.stat-val   { font-size: 30px; font-weight: 600; line-height: 1; margin-bottom: 4px; letter-spacing: -1px; }
-.stat-label { font-size: 12px; color: var(--text3); }
-.stat-delta { font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
-.up   { color: var(--green); }
-.dn   { color: var(--rose); }
-.neu  { color: var(--text3); }
-
-/* ── BADGES ──────────────────────────────────────────────── */
-.badge        { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
-.b-green      { background: rgba(34,197,94,0.13);  color: var(--green); }
-.b-amber      { background: rgba(245,158,11,0.13); color: var(--amber); }
-.b-rose       { background: rgba(244,63,94,0.13);  color: var(--rose); }
-.b-blue       { background: rgba(79,156,249,0.13); color: var(--accent); }
-.b-purple     { background: rgba(167,139,250,0.13); color: var(--purple); }
-.b-teal       { background: rgba(45,212,191,0.13); color: var(--teal); }
-.b-gray       { background: rgba(100,116,139,0.13); color: var(--text3); }
-
-/* ── TABLE ───────────────────────────────────────────────── */
-table  { width: 100%; border-collapse: collapse; }
-th     { text-align: left; font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; padding: 0 12px 10px; }
-td     { padding: 12px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text2); vertical-align: middle; }
-tr:first-child td { border-top: none; }
-tr:hover td { background: rgba(255,255,255,0.02); }
-.td-main { font-weight: 500; color: var(--text); }
-.td-sub  { font-size: 11px; color: var(--text3); margin-top: 1px; }
-
-/* ── TIMELINE ────────────────────────────────────────────── */
-.timeline   { display: flex; flex-direction: column; }
-.tl-item    { display: flex; gap: 14px; padding-bottom: 18px; position: relative; }
-.tl-item:last-child { padding-bottom: 0; }
-.tl-dot     { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; position: relative; z-index: 1; }
-.tl-item:not(:last-child)::before { content: ''; position: absolute; left: 16px; top: 34px; bottom: 0; width: 2px; background: var(--border2); }
-.tl-body    { flex: 1; padding-top: 5px; }
-.tl-title   { font-size: 13px; font-weight: 500; color: var(--text); }
-.tl-desc    { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.tl-time    { font-size: 11px; color: var(--text3); margin-top: 5px; font-family: var(--mono); }
-
-/* ── PROGRESS ────────────────────────────────────────────── */
-.prog-bar  { height: 5px; background: var(--navy4); border-radius: 3px; overflow: hidden; }
-.prog-fill { height: 100%; border-radius: 3px; }
-
-/* ── DONUT LEGEND ────────────────────────────────────────── */
-.donut-legend { display: flex; flex-direction: column; gap: 9px; flex: 1; }
-.leg-row  { display: flex; align-items: center; gap: 9px; font-size: 13px; }
-.leg-dot  { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.leg-lbl  { flex: 1; color: var(--text2); font-size: 12px; }
-.leg-val  { font-weight: 500; color: var(--text); font-size: 13px; }
-
-/* ── QUICK ACTIONS ───────────────────────────────────────── */
-.qa-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px; }
-.qa-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; transition: all 0.15s; }
-.qa-card:hover { border-color: var(--border2); background: var(--navy3); transform: translateY(-1px); }
-.qa-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
-.qa-text { font-size: 12px; font-weight: 500; color: var(--text); }
-.qa-sub  { font-size: 11px; color: var(--text3); margin-top: 1px; }
-
-/* ── SCROLLBAR ───────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-/* ── MODAL ───────────────────────────────────────────────── */
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-.overlay.open { display: flex; }
-.modal   { background: var(--navy2); border: 1px solid var(--border2); border-radius: 16px; width: 480px; max-width: 92vw; max-height: 88vh; overflow-y: auto; }
-.modal-hd { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.modal-title { font-size: 15px; font-weight: 600; }
-.modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 22px; line-height: 1; }
-.modal-close:hover { color: var(--text); }
-.modal-body { padding: 22px 24px; }
-.modal-ft   { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
-
-/* ── FORM ────────────────────────────────────────────────── */
-.frow  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-.fg    { display: flex; flex-direction: column; gap: 6px; }
-label  { font-size: 12px; font-weight: 500; color: var(--text2); }
-input, select, textarea { background: var(--navy3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font); font-size: 13px; outline: none; width: 100%; transition: border 0.15s; }
-input:focus, select:focus, textarea:focus { border-color: var(--accent2); }
-select option { background: var(--navy2); }
-textarea { resize: vertical; min-height: 80px; }
-.btn  { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; font-family: var(--font); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
-.btn:hover { background: var(--navy3); }
-.btn.primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
-.btn.primary:hover { background: var(--accent); border-color: var(--accent); }
-.btn-sm  { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
-
-/* ── ATTENDANCE MINI CHART ───────────────────────────────── */
-.att-bars { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
-.att-bar  { flex: 1; border-radius: 3px 3px 0 0; min-height: 4px; }
-
-/* ── SECTION HEADER ──────────────────────────────────────── */
-.sec-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.sec-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
-
-/* ── TAG ─────────────────────────────────────────────────── */
-.tag { display: inline-flex; padding: 2px 8px; border-radius: 5px; font-size: 11px; background: var(--navy4); color: var(--text2); }
-
-/* ── KPI STRIP ───────────────────────────────────────────── */
-.kpi-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-.kpi-cell  { background: var(--card); padding: 14px 16px; }
-.kpi-val   { font-size: 22px; font-weight: 600; line-height: 1; }
-.kpi-lbl   { font-size: 11px; color: var(--text3); margin-top: 4px; }
-
-/* ── PIPELINE STRIP ──────────────────────────────────────── */
-.pipeline { display: flex; align-items: stretch; gap: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
-.pipe-step { flex: 1; padding: 14px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; border-right: 1px solid var(--border); text-align: center; text-decoration: none; transition: background 0.15s; cursor: pointer; }
-.pipe-step:last-child { border-right: none; }
-.pipe-step:hover { background: var(--navy3); }
-.pipe-arrow { position: absolute; right: -9px; top: 50%; transform: translateY(-50%); z-index: 2; width: 18px; height: 18px; background: var(--card); border: 1px solid var(--border2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--text3); }
-.pipe-step:last-child .pipe-arrow { display: none; }
-.pipe-icon { font-size: 18px; margin-bottom: 2px; }
-.pipe-num  { font-size: 22px; font-weight: 600; line-height: 1; }
-.pipe-lbl  { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
-.pipe-sub  { font-size: 10px; color: var(--text3); margin-top: 1px; }
-
-/* ── FADE IN ─────────────────────────────────────────────── */
-@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
-.card { animation: fadeUp 0.35s ease both; }
-.card:nth-child(1){animation-delay:0s} .card:nth-child(2){animation-delay:.05s}
-.card:nth-child(3){animation-delay:.1s} .card:nth-child(4){animation-delay:.15s}
-
-/* ── SKELETON PULSE ──────────────────────────────────────── */
-@keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
-.skel { background: var(--navy4); border-radius: 4px; animation: pulse 1.4s ease-in-out infinite; }
-
-/* ── REFRESH INDICATOR ───────────────────────────────────── */
-#last-updated { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+html,body{height:100%;background:var(--navy);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:62px;min-height:62px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px}
+.content{flex:1;overflow-y:auto;padding:24px;background:var(--navy)}
+.brand{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.brand-text{display:flex;flex-direction:column}
+.brand-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-0.3px}
+.brand-ver{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.nav-section{padding:14px 10px 6px}
+.nav-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;text-decoration:none;transition:all 0.15s;margin-bottom:1px;position:relative}
+.nav-item:hover{background:var(--accent-dim);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent2);border-radius:0 3px 3px 0}
+.nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--rose);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;line-height:1.2}
+.nav-divider{height:1px;background:var(--border);margin:8px 10px}
+.sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border);flex-shrink:0}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--text3)}
+.page-title{font-size:16px;font-weight:600;color:var(--text);flex:1}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3)}
+.breadcrumb span{color:var(--text2)}
+.topbar-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all 0.15s;white-space:nowrap}
+.topbar-btn:hover{background:var(--navy3)}
+.notif-wrap{position:relative}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g21{grid-template-columns:2fr 1fr}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card-sm{padding:16px}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px}
+.card-title{font-size:14px;font-weight:600;color:var(--text)}
+.card-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+.stat-val{font-size:30px;font-weight:600;line-height:1;margin-bottom:4px;letter-spacing:-1px}
+.stat-label{font-size:12px;color:var(--text3)}
+.stat-delta{font-size:12px;margin-top:8px;color:var(--text3)}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-green{background:rgba(34,197,94,0.13);color:var(--green)}
+.b-amber{background:rgba(245,158,11,0.13);color:var(--amber)}
+.b-rose{background:rgba(244,63,94,0.13);color:var(--rose)}
+.b-blue{background:rgba(79,156,249,0.13);color:var(--accent)}
+.b-purple{background:rgba(167,139,250,0.13);color:var(--purple)}
+.b-teal{background:rgba(45,212,191,0.13);color:var(--teal)}
+.b-gray{background:rgba(100,116,139,0.13);color:var(--text3)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;padding:0 12px 10px}
+td{padding:10px 12px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);vertical-align:middle}
+tr:first-child td{border-top:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.td-main{font-weight:500;color:var(--text)}
+.td-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.timeline{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:14px;padding-bottom:16px;position:relative}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;position:relative;z-index:1}
+.tl-item:not(:last-child)::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:2px;background:var(--border2)}
+.tl-body{flex:1;padding-top:4px}
+.tl-title{font-size:13px;font-weight:500;color:var(--text)}
+.tl-desc{font-size:12px;color:var(--text3);margin-top:2px}
+.tl-time{font-size:11px;color:var(--text3);margin-top:4px;font-family:var(--mono)}
+.prog-bar{height:5px;background:var(--navy4);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px}
+.donut-legend{display:flex;flex-direction:column;gap:9px;flex:1}
+.leg-row{display:flex;align-items:center;gap:9px}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.leg-lbl{flex:1;color:var(--text2);font-size:12px}
+.leg-val{font-weight:500;color:var(--text);font-size:13px}
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.kpi-cell{background:var(--card);padding:14px 18px}
+.kpi-val{font-size:24px;font-weight:600;line-height:1}
+.kpi-lbl{font-size:11px;color:var(--text3);margin-top:4px}
+/* PIPELINE */
+.pipeline{display:flex;align-items:stretch;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.pipe-step{flex:1;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;border-right:1px solid var(--border);text-align:center;cursor:pointer;transition:background 0.15s;text-decoration:none}
+.pipe-step:last-child{border-right:none}
+.pipe-step:hover{background:var(--navy3)}
+.pipe-arrow{position:absolute;right:-8px;top:50%;transform:translateY(-50%);z-index:2;font-size:11px;color:var(--text3);background:var(--card);padding:1px 2px;border-radius:2px}
+.pipe-step:last-child .pipe-arrow{display:none}
+.pipe-icon{font-size:16px}
+.pipe-num{font-size:20px;font-weight:700;line-height:1.1}
+.pipe-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;font-weight:500}
+.pipe-sub{font-size:10px;color:var(--text3)}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.modal{background:var(--navy2);border:1px solid var(--border2);border-radius:16px;width:500px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:22px 24px}
+.btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s}
+.btn:hover{background:var(--navy3)}
+.btn-sm{padding:4px 10px;font-size:11px;border-radius:6px}
+/* SKELETON */
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:0.8}}
+.skel{background:var(--navy4);border-radius:4px;animation:pulse 1.5s ease-in-out infinite}
+/* FADE */
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{animation:fadeUp 0.3s ease both}
+.card:nth-child(1){animation-delay:0s}.card:nth-child(2){animation-delay:.04s}
+.card:nth-child(3){animation-delay:.08s}.card:nth-child(4){animation-delay:.12s}
+/* BREAKDOWN ROWS */
+.bkd-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:3px 0}
+.bkd-lbl{color:var(--text3)}
+.bkd-val{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+/* STATUS INDICATOR DOT */
+.s-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;flex-shrink:0}
 </style>
 <script src="../../../assets/js/api.js"></script>
 <script src="../../../assets/js/auth.js?v=4"></script>
@@ -233,48 +148,34 @@ textarea { resize: vertical; min-height: 80px; }
 <script>requireAuth(); requireModuleAccess("hr");</script>
 <div class="shell">
 
-<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-icon">👥</div>
     <div class="brand-text">
       <div class="brand-name">HRMS Pro</div>
-      <div class="brand-ver">v2.5 · Live</div>
+      <div class="brand-ver" id="ver-ts">Live Data</div>
     </div>
   </div>
-
   <div class="nav-section">
     <div class="nav-label">Overview</div>
-    <a class="nav-item active" href="hr.html">
-      <span class="nav-icon">🏠</span> Dashboard
-    </a>
+    <a class="nav-item active" href="hr.html"><span class="nav-icon">🏠</span> Dashboard</a>
   </div>
   <div class="nav-section">
     <div class="nav-label">Employees</div>
-    <a class="nav-item" href="../employees/employees.html">
-      <span class="nav-icon">👥</span> All Employees
-    </a>
-    <a class="nav-item" href="../employees/attendance.html">
-      <span class="nav-icon">📅</span> Attendance
-    </a>
+    <a class="nav-item" href="../employees/employees.html"><span class="nav-icon">👥</span> All Employees</a>
+    <a class="nav-item" href="../employees/attendance.html"><span class="nav-icon">📅</span> Attendance</a>
   </div>
-
   <div class="nav-section">
     <div class="nav-label">Talent Acquisition</div>
-    <a class="nav-item" href="../talent_acquisition/careers_and_job_posts/careers.html">
-      <span class="nav-icon">📋</span> Careers &amp; Job Posts
-    </a>
+    <a class="nav-item" href="../talent_acquisition/careers_and_job_posts/careers.html"><span class="nav-icon">📋</span> Careers &amp; Job Posts</a>
     <a class="nav-item" href="../talent_acquisition/candidates/candidates.html">
       <span class="nav-icon">👤</span> Candidates
       <span class="nav-badge" id="cand-badge" style="display:none">0</span>
     </a>
-    <a class="nav-item" href="../talent_acquisition/interview_panel/interviews.html">
-      <span class="nav-icon">🎤</span> Interview Panel
-    </a>
+    <a class="nav-item" href="../talent_acquisition/interview_panel/interviews.html"><span class="nav-icon">🎤</span> Interview Panel</a>
   </div>
-
   <div class="nav-divider"></div>
-
   <div class="nav-section">
     <div class="nav-label">Employee Lifecycle</div>
     <a class="nav-item" href="../employee_lifecycle/offer_letters/offer_letters.html"><span class="nav-icon">📝</span> Offer Letters</a>
@@ -283,357 +184,319 @@ textarea { resize: vertical; min-height: 80px; }
     <a class="nav-item" href="../employee_lifecycle/deployment/deployment.html"><span class="nav-icon">🗂️</span> Deployment</a>
     <a class="nav-item" href="../employee_lifecycle/offboarding/offboarding.html"><span class="nav-icon">🚪</span> Offboarding</a>
   </div>
-
   <div class="nav-divider"></div>
-
   <div class="nav-section">
     <div class="nav-label">Operations</div>
     <a class="nav-item" href="../employees/shift-requests.html">
       <span class="nav-icon">🔄</span> Shift Requests
       <span class="nav-badge" id="shift-badge" style="display:none">0</span>
     </a>
-    <a class="nav-item" href="../employees/requests.html">
-      <span class="nav-icon">📨</span> Leave &amp; Requests
-    </a>
-    <a class="nav-item" href="../operations/escalations.html">
-      <span class="nav-icon">⚠️</span> Escalations
-    </a>
-    <a class="nav-item" href="../operations/performance.html">
-      <span class="nav-icon">📊</span> Performance
-    </a>
+    <a class="nav-item" href="../employees/requests.html"><span class="nav-icon">📨</span> Leave &amp; Requests</a>
+    <a class="nav-item" href="../operations/escalations.html"><span class="nav-icon">⚠️</span> Escalations</a>
+    <a class="nav-item" href="../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
-
   <div class="sidebar-footer">
     <div class="user-pill">
       <div class="avatar" id="user-avatar">HR</div>
       <div class="user-info">
-        <div class="user-name" id="user-name">Loading…</div>
-        <div class="user-role">HR Manager</div>
+        <div class="user-name" id="user-name">—</div>
+        <div class="user-role" id="user-role">HR</div>
       </div>
-      <button onclick="logout()" title="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
+      <button onclick="logout()" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;transition:all 0.15s;white-space:nowrap" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻</button>
     </div>
   </div>
 </aside>
 
-<!-- ═══════════════════════ MAIN ═══════════════════════════ -->
+<!-- ══════════════════ MAIN ══════════════════ -->
 <div class="main">
-
-  <!-- TOPBAR -->
   <div class="topbar">
     <div>
       <div class="page-title">Dashboard</div>
       <div class="breadcrumb">HRMS Pro <span>›</span> Overview</div>
     </div>
-    <span id="last-updated"></span>
-    <div class="search-box">
-      <span>🔍</span>
-      <input type="text" placeholder="Search employees, jobs…" id="dash-search">
-    </div>
-    <div class="notif-wrap">
-      <button class="topbar-btn" onclick="openModal('notif-modal')">🔔 Alerts <span id="notif-count" style="background:var(--rose);color:#fff;font-size:10px;padding:1px 5px;border-radius:10px;margin-left:2px;display:none">0</span></button>
-    </div>
-    <button class="topbar-btn" onclick="loadAllData()">↻ Refresh</button>
+    <div style="flex:1"></div>
+    <span id="last-updated" style="font-size:11px;color:var(--text3);font-family:var(--mono)"></span>
+    <button class="topbar-btn" onclick="openModal('notif-modal')">
+      🔔
+      <span id="notif-count" style="background:var(--rose);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;display:none">0</span>
+    </button>
+    <button class="topbar-btn" onclick="loadAll()" style="gap:6px">↻ Refresh</button>
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
 
-    <!-- KPI STRIP -->
+    <!-- ── KPI STRIP ── -->
     <div class="kpi-strip">
       <div class="kpi-cell">
-        <div class="kpi-val" style="color:var(--accent);" id="dash-total">—</div>
+        <div class="kpi-val" style="color:var(--accent)" id="kpi-total">—</div>
         <div class="kpi-lbl">Total Employees</div>
       </div>
       <div class="kpi-cell">
-        <div class="kpi-val" style="color:var(--green);" id="dash-present">—</div>
+        <div class="kpi-val" style="color:var(--green)" id="kpi-present">—</div>
         <div class="kpi-lbl">Present Today</div>
       </div>
       <div class="kpi-cell">
-        <div class="kpi-val" style="color:var(--amber);" id="dash-absent">—</div>
+        <div class="kpi-val" style="color:var(--amber)" id="kpi-absent">—</div>
         <div class="kpi-lbl">Absent Today</div>
       </div>
       <div class="kpi-cell">
-        <div class="kpi-val" style="color:var(--rose);" id="dash-pending">—</div>
+        <div class="kpi-val" style="color:var(--rose)" id="kpi-pending">—</div>
         <div class="kpi-lbl">Pending Requests</div>
       </div>
     </div>
 
-    <!-- PIPELINE STRIP -->
-    <div class="pipeline" id="pipeline-strip">
-      <div class="pipe-step" onclick="location.href='../talent_acquisition/candidates/candidates.html'">
+    <!-- ── PIPELINE FLOW ── -->
+    <div class="pipeline">
+      <a class="pipe-step" href="../talent_acquisition/candidates/candidates.html">
         <div class="pipe-icon">👤</div>
-        <div class="pipe-num" id="pipe-candidates">—</div>
+        <div class="pipe-num" id="pp-candidates" style="color:var(--accent)">—</div>
         <div class="pipe-lbl">Candidates</div>
-        <div class="pipe-sub" id="pipe-candidates-sub">Applied</div>
+        <div class="pipe-sub" id="pp-candidates-s">total</div>
         <div class="pipe-arrow">›</div>
-      </div>
-      <div class="pipe-step" onclick="location.href='../talent_acquisition/candidates/candidates.html'">
+      </a>
+      <a class="pipe-step" href="../talent_acquisition/candidates/candidates.html">
         <div class="pipe-icon">📋</div>
-        <div class="pipe-num" id="pipe-shortlisted">—</div>
+        <div class="pipe-num" id="pp-shortlisted" style="color:var(--purple)">—</div>
         <div class="pipe-lbl">Shortlisted</div>
-        <div class="pipe-sub">Screened</div>
+        <div class="pipe-sub" id="pp-shortlisted-s">screened</div>
         <div class="pipe-arrow">›</div>
-      </div>
-      <div class="pipe-step" onclick="location.href='../talent_acquisition/interview_panel/interviews.html'">
+      </a>
+      <a class="pipe-step" href="../talent_acquisition/interview_panel/interviews.html">
         <div class="pipe-icon">🎤</div>
-        <div class="pipe-num" id="pipe-interviews">—</div>
+        <div class="pipe-num" id="pp-interviews" style="color:var(--amber)">—</div>
         <div class="pipe-lbl">Interviews</div>
-        <div class="pipe-sub">Active</div>
+        <div class="pipe-sub" id="pp-interviews-s">in progress</div>
         <div class="pipe-arrow">›</div>
-      </div>
-      <div class="pipe-step" onclick="location.href='../employee_lifecycle/offer_letters/offer_letters.html'">
+      </a>
+      <a class="pipe-step" href="../employee_lifecycle/offer_letters/offer_letters.html">
         <div class="pipe-icon">📝</div>
-        <div class="pipe-num" id="pipe-offers">—</div>
+        <div class="pipe-num" id="pp-offers" style="color:var(--teal)">—</div>
         <div class="pipe-lbl">Offers</div>
-        <div class="pipe-sub" id="pipe-offers-sub">Sent</div>
+        <div class="pipe-sub" id="pp-offers-s">sent</div>
         <div class="pipe-arrow">›</div>
-      </div>
-      <div class="pipe-step" onclick="location.href='../employee_lifecycle/onboarding/onboarding.html'">
+      </a>
+      <a class="pipe-step" href="../employee_lifecycle/onboarding/onboarding.html">
         <div class="pipe-icon">🚀</div>
-        <div class="pipe-num" id="pipe-onboarding">—</div>
+        <div class="pipe-num" id="pp-onboarding" style="color:var(--purple)">—</div>
         <div class="pipe-lbl">Onboarding</div>
-        <div class="pipe-sub" id="pipe-onboarding-sub">In Progress</div>
+        <div class="pipe-sub" id="pp-onboarding-s">active</div>
         <div class="pipe-arrow">›</div>
-      </div>
-      <div class="pipe-step" onclick="location.href='../employee_lifecycle/orientation_sessions/orientations.html'">
+      </a>
+      <a class="pipe-step" href="../employee_lifecycle/orientation_sessions/orientations.html">
         <div class="pipe-icon">🎓</div>
-        <div class="pipe-num" id="pipe-orientation">—</div>
+        <div class="pipe-num" id="pp-orientation" style="color:var(--teal)">—</div>
         <div class="pipe-lbl">Orientation</div>
-        <div class="pipe-sub" id="pipe-orientation-sub">Active</div>
+        <div class="pipe-sub" id="pp-orientation-s">active</div>
         <div class="pipe-arrow">›</div>
-      </div>
-      <div class="pipe-step" onclick="location.href='../employee_lifecycle/deployment/deployment.html'">
+      </a>
+      <a class="pipe-step" href="../employee_lifecycle/deployment/deployment.html">
         <div class="pipe-icon">🗂️</div>
-        <div class="pipe-num" id="pipe-deployed" style="color:var(--green);">—</div>
+        <div class="pipe-num" id="pp-deployed" style="color:var(--green)">—</div>
         <div class="pipe-lbl">Deployed</div>
-        <div class="pipe-sub" id="pipe-deployed-sub">In Teams</div>
-      </div>
+        <div class="pipe-sub" id="pp-deployed-s">in teams</div>
+      </a>
     </div>
 
-    <!-- ROW 1: STAT CARDS -->
-    <div class="grid g4" style="margin-bottom:16px;">
+    <!-- ── ROW 1: BIG STAT CARDS ── -->
+    <div class="grid g4" style="margin-bottom:16px">
       <div class="card card-sm">
-        <div class="stat-icon" style="background:rgba(59,130,246,0.12);">👤</div>
-        <div class="stat-val" style="color:var(--accent);" id="stat-candidates">—</div>
+        <div class="stat-icon" style="background:rgba(59,130,246,0.12)">👤</div>
+        <div class="stat-val" style="color:var(--accent)" id="sc-candidates">—</div>
         <div class="stat-label">Total Candidates</div>
-        <div class="stat-delta neu" id="stat-candidates-delta">Loading…</div>
+        <div class="stat-delta" id="sc-candidates-d">loading…</div>
       </div>
       <div class="card card-sm">
-        <div class="stat-icon" style="background:rgba(245,158,11,0.12);">🎤</div>
-        <div class="stat-val" style="color:var(--amber);" id="stat-interviews">—</div>
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12)">🎤</div>
+        <div class="stat-val" style="color:var(--amber)" id="sc-interviews">—</div>
         <div class="stat-label">Active Interviews</div>
-        <div class="stat-delta neu" id="stat-interviews-delta">Loading…</div>
+        <div class="stat-delta" id="sc-interviews-d">loading…</div>
       </div>
       <div class="card card-sm">
-        <div class="stat-icon" style="background:rgba(167,139,250,0.12);">🚀</div>
-        <div class="stat-val" style="color:var(--purple);" id="stat-onboarding">—</div>
+        <div class="stat-icon" style="background:rgba(167,139,250,0.12)">🚀</div>
+        <div class="stat-val" style="color:var(--purple)" id="sc-onboarding">—</div>
         <div class="stat-label">In Onboarding</div>
-        <div class="stat-delta neu" id="stat-onboarding-delta">Loading…</div>
+        <div class="stat-delta" id="sc-onboarding-d">loading…</div>
       </div>
       <div class="card card-sm">
-        <div class="stat-icon" style="background:rgba(34,197,94,0.12);">🗂️</div>
-        <div class="stat-val" style="color:var(--green);" id="stat-deployed">—</div>
+        <div class="stat-icon" style="background:rgba(34,197,94,0.12)">🗂️</div>
+        <div class="stat-val" style="color:var(--green)" id="sc-deployed">—</div>
         <div class="stat-label">Deployed in Teams</div>
-        <div class="stat-delta neu" id="stat-deployed-delta">Loading…</div>
+        <div class="stat-delta" id="sc-deployed-d">loading…</div>
       </div>
     </div>
 
-    <!-- ROW 2: LIFECYCLE CARDS -->
-    <div class="grid g4" style="margin-bottom:16px;">
-      <div class="card card-sm" style="border-left:3px solid var(--accent2);">
-        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Offer Letters</div>
-        <div style="display:flex;flex-direction:column;gap:6px;" id="offers-breakdown">
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Drafted</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Sent</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Accepted</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-        </div>
-        <a href="../employee_lifecycle/offer_letters/offer_letters.html" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:10px;">View all →</a>
+    <!-- ── ROW 2: BREAKDOWN CARDS ── -->
+    <div class="grid g4" style="margin-bottom:16px">
+      <!-- Candidates breakdown -->
+      <div class="card card-sm" style="border-top:2px solid var(--accent2)">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;font-weight:500">Candidates</div>
+        <div id="bkd-candidates"><div class="skel" style="height:70px;border-radius:6px"></div></div>
+        <a href="../talent_acquisition/candidates/candidates.html" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:10px">View candidates →</a>
       </div>
-      <div class="card card-sm" style="border-left:3px solid var(--purple);">
-        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Onboarding</div>
-        <div style="display:flex;flex-direction:column;gap:6px;" id="onboarding-breakdown">
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Pending Docs</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Docs Submitted</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Docs Verified</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-        </div>
-        <a href="../employee_lifecycle/onboarding/onboarding.html" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:10px;">View all →</a>
+      <!-- Interviews + Offers breakdown -->
+      <div class="card card-sm" style="border-top:2px solid var(--amber)">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;font-weight:500">Interviews &amp; Offers</div>
+        <div id="bkd-interviews"><div class="skel" style="height:70px;border-radius:6px"></div></div>
+        <a href="../talent_acquisition/interview_panel/interviews.html" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:10px">View interviews →</a>
       </div>
-      <div class="card card-sm" style="border-left:3px solid var(--teal);">
-        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Orientation</div>
-        <div style="display:flex;flex-direction:column;gap:6px;" id="orientation-breakdown">
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Pending</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Invited</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">In Progress</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-        </div>
-        <a href="../employee_lifecycle/orientation_sessions/orientations.html" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:10px;">View all →</a>
+      <!-- Onboarding breakdown -->
+      <div class="card card-sm" style="border-top:2px solid var(--purple)">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;font-weight:500">Onboarding</div>
+        <div id="bkd-onboarding"><div class="skel" style="height:70px;border-radius:6px"></div></div>
+        <a href="../employee_lifecycle/onboarding/onboarding.html" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:10px">View onboarding →</a>
       </div>
-      <div class="card card-sm" style="border-left:3px solid var(--green);">
-        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Deployment</div>
-        <div style="display:flex;flex-direction:column;gap:6px;" id="deployment-breakdown">
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Deployed</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">On Hold</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Ready to Deploy</span><span class="skel" style="width:30px;height:16px;display:inline-block"></span></div>
-        </div>
-        <a href="../employee_lifecycle/deployment/deployment.html" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:10px;">View all →</a>
+      <!-- Orientation + Deployment breakdown -->
+      <div class="card card-sm" style="border-top:2px solid var(--green)">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;font-weight:500">Orientation &amp; Deployment</div>
+        <div id="bkd-deploy"><div class="skel" style="height:70px;border-radius:6px"></div></div>
+        <a href="../employee_lifecycle/deployment/deployment.html" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-top:10px">View deployment →</a>
       </div>
     </div>
 
-    <!-- ROW 3: CHART + DONUT -->
-    <div class="grid g21" style="margin-bottom:16px;">
+    <!-- ── ROW 3: HIRING FUNNEL + DEPT DONUT ── -->
+    <div class="grid g21" style="margin-bottom:16px">
       <div class="card">
         <div class="card-hd">
           <div>
             <div class="card-title">Hiring Funnel</div>
-            <div class="card-sub">Live candidate pipeline</div>
+            <div class="card-sub">Live pipeline — all stages</div>
           </div>
-          <span class="badge b-blue" id="funnel-total">—</span>
+          <span class="badge b-blue" id="funnel-total-badge">—</span>
         </div>
-        <div style="height:190px;position:relative;">
-          <canvas id="funnelChart"></canvas>
-        </div>
+        <div style="height:200px;position:relative"><canvas id="funnelChart"></canvas></div>
       </div>
       <div class="card">
         <div class="card-hd">
           <div>
             <div class="card-title">Dept. Distribution</div>
-            <div class="card-sub">By employee headcount</div>
+            <div class="card-sub">By headcount</div>
           </div>
         </div>
-        <div style="display:flex;gap:16px;align-items:center;">
-          <div style="width:120px;height:120px;flex-shrink:0;position:relative;">
-            <canvas id="deptChart"></canvas>
-          </div>
-          <div class="donut-legend" id="dept-legend">
-            <div style="color:var(--text3);font-size:12px;">Loading…</div>
-          </div>
+        <div style="display:flex;gap:16px;align-items:center">
+          <div style="width:120px;height:120px;flex-shrink:0"><canvas id="deptChart"></canvas></div>
+          <div class="donut-legend" id="dept-legend"><div style="color:var(--text3);font-size:12px">Loading…</div></div>
         </div>
       </div>
     </div>
 
-    <!-- ROW 4: RECENT HIRES + ACTIVITY FEED -->
-    <div class="grid g2" style="margin-bottom:16px;">
+    <!-- ── ROW 4: RECENT HIRES + ACTIVITY ── -->
+    <div class="grid g2" style="margin-bottom:16px">
       <div class="card">
         <div class="card-hd">
-          <div>
-            <div class="card-title">Recent Hires</div>
-            <div class="card-sub">Latest employees added</div>
-          </div>
-          <span class="badge b-green" id="recent-hires-badge">—</span>
+          <div><div class="card-title">Recent Employees</div><div class="card-sub">Latest additions</div></div>
+          <span class="badge b-green" id="hires-badge">—</span>
         </div>
         <table>
-          <thead><tr>
-            <th>Name</th><th>Designation</th><th>Dept</th><th>Status</th>
-          </tr></thead>
-          <tbody id="recent-hires-tbody">
-            <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Loading…</td></tr>
-          </tbody>
+          <thead><tr><th>Name</th><th>Designation</th><th>Dept</th><th>Status</th></tr></thead>
+          <tbody id="tb-hires"><tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Loading…</td></tr></tbody>
         </table>
-        <div style="margin-top:12px;text-align:right">
-          <a href="../employees/employees.html" style="font-size:12px;color:var(--accent);text-decoration:none">View all employees →</a>
-        </div>
+        <div style="margin-top:10px;text-align:right"><a href="../employees/employees.html" style="font-size:12px;color:var(--accent);text-decoration:none">View all →</a></div>
       </div>
-
       <div class="card">
         <div class="card-hd">
-          <div>
-            <div class="card-title">Activity Feed</div>
-            <div class="card-sub">Recent HR actions</div>
-          </div>
-          <button class="btn btn-sm" onclick="loadAllData()">↻</button>
+          <div><div class="card-title">Activity Feed</div><div class="card-sub">Recent HR actions</div></div>
+          <button class="btn btn-sm" onclick="loadAll()">↻</button>
         </div>
         <div class="timeline" id="activity-feed">
-          <div class="tl-item">
-            <div class="tl-dot skel" style="width:34px;height:34px;"></div>
-            <div class="tl-body" style="padding-top:5px;">
-              <div class="skel" style="height:14px;width:70%;margin-bottom:6px;"></div>
-              <div class="skel" style="height:11px;width:50%;"></div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot skel" style="width:34px;height:34px;"></div>
-            <div class="tl-body" style="padding-top:5px;">
-              <div class="skel" style="height:14px;width:60%;margin-bottom:6px;"></div>
-              <div class="skel" style="height:11px;width:40%;"></div>
-            </div>
-          </div>
+          <div class="tl-item"><div class="tl-dot skel" style="width:32px;height:32px"></div><div class="tl-body"><div class="skel" style="height:13px;width:70%;margin-bottom:7px"></div><div class="skel" style="height:11px;width:50%"></div></div></div>
+          <div class="tl-item"><div class="tl-dot skel" style="width:32px;height:32px"></div><div class="tl-body"><div class="skel" style="height:13px;width:60%;margin-bottom:7px"></div><div class="skel" style="height:11px;width:40%"></div></div></div>
+          <div class="tl-item"><div class="tl-dot skel" style="width:32px;height:32px"></div><div class="tl-body"><div class="skel" style="height:13px;width:65%;margin-bottom:7px"></div><div class="skel" style="height:11px;width:45%"></div></div></div>
         </div>
       </div>
     </div>
 
-    <!-- ROW 5: RECENT DEPLOYMENTS + RECENT ORIENTATIONS -->
-    <div class="grid g2" style="margin-bottom:16px;">
+    <!-- ── ROW 5: INTERVIEWS TABLE ── -->
+    <div class="grid g2" style="margin-bottom:16px">
       <div class="card">
         <div class="card-hd">
-          <div>
-            <div class="card-title">Recent Deployments</div>
-            <div class="card-sub">Latest team assignments</div>
-          </div>
-          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none;"><span class="badge b-teal">View all →</span></a>
+          <div><div class="card-title">Interview Panel</div><div class="card-sub">Active candidates</div></div>
+          <a href="../talent_acquisition/interview_panel/interviews.html" style="text-decoration:none"><span class="badge b-amber">All interviews →</span></a>
         </div>
         <table>
-          <thead><tr>
-            <th>Candidate</th><th>Team</th><th>Role</th><th>Status</th>
-          </tr></thead>
-          <tbody id="recent-deployments-tbody">
-            <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Loading…</td></tr>
-          </tbody>
+          <thead><tr><th>Candidate</th><th>Role</th><th>Rounds</th><th>Status</th></tr></thead>
+          <tbody id="tb-interviews"><tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">Loading…</td></tr></tbody>
         </table>
       </div>
-
       <div class="card">
         <div class="card-hd">
-          <div>
-            <div class="card-title">Orientation Pipeline</div>
-            <div class="card-sub">Candidates in orientation</div>
-          </div>
-          <a href="../employee_lifecycle/orientation_sessions/orientations.html" style="text-decoration:none;"><span class="badge b-purple">View all →</span></a>
+          <div><div class="card-title">Offer Letters</div><div class="card-sub">All statuses</div></div>
+          <a href="../employee_lifecycle/offer_letters/offer_letters.html" style="text-decoration:none"><span class="badge b-teal">View all →</span></a>
         </div>
         <table>
-          <thead><tr>
-            <th>Candidate</th><th>Position</th><th>Status</th>
-          </tr></thead>
-          <tbody id="recent-orientations-tbody">
-            <tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text3)">Loading…</td></tr>
-          </tbody>
+          <thead><tr><th>Candidate</th><th>Role</th><th>Salary</th><th>Status</th></tr></thead>
+          <tbody id="tb-offers"><tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- ROW 6: RECENT INTERVIEWS + RECENT ONBOARDINGS -->
+    <!-- ── ROW 6: ONBOARDING + ORIENTATION ── -->
+    <div class="grid g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Onboarding Queue</div><div class="card-sub">Pending document verification</div></div>
+          <a href="../employee_lifecycle/onboarding/onboarding.html" style="text-decoration:none"><span class="badge b-purple">View all →</span></a>
+        </div>
+        <table>
+          <thead><tr><th>Candidate</th><th>Position</th><th>Stage</th></tr></thead>
+          <tbody id="tb-onboarding"><tr><td colspan="3" style="text-align:center;padding:18px;color:var(--text3)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Orientation Pipeline</div><div class="card-sub">Non-completed records</div></div>
+          <a href="../employee_lifecycle/orientation_sessions/orientations.html" style="text-decoration:none"><span class="badge b-blue">View all →</span></a>
+        </div>
+        <table>
+          <thead><tr><th>Candidate</th><th>Position</th><th>Status</th></tr></thead>
+          <tbody id="tb-orientation"><tr><td colspan="3" style="text-align:center;padding:18px;color:var(--text3)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ROW 7: DEPLOYMENTS ── -->
     <div class="grid g2">
       <div class="card">
         <div class="card-hd">
-          <div>
-            <div class="card-title">Interview Panel</div>
-            <div class="card-sub">Active candidates</div>
-          </div>
-          <a href="../talent_acquisition/interview_panel/interviews.html" style="text-decoration:none;"><span class="badge b-amber">View all →</span></a>
+          <div><div class="card-title">Recent Deployments</div><div class="card-sub">Latest team assignments</div></div>
+          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge b-green">View all →</span></a>
         </div>
         <table>
-          <thead><tr>
-            <th>Candidate</th><th>Position</th><th>Round</th><th>Status</th>
-          </tr></thead>
-          <tbody id="recent-interviews-tbody">
-            <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Loading…</td></tr>
-          </tbody>
+          <thead><tr><th>Candidate</th><th>Team</th><th>Role</th><th>Status</th></tr></thead>
+          <tbody id="tb-deployments"><tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">Loading…</td></tr></tbody>
         </table>
       </div>
-
       <div class="card">
         <div class="card-hd">
-          <div>
-            <div class="card-title">Onboarding Queue</div>
-            <div class="card-sub">Pending document verification</div>
-          </div>
-          <a href="../employee_lifecycle/onboarding/onboarding.html" style="text-decoration:none;"><span class="badge b-rose">View all →</span></a>
+          <div><div class="card-title">Ready to Deploy</div><div class="card-sub">Completed orientation — awaiting team assignment</div></div>
+          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge b-rose">Deploy now →</span></a>
         </div>
         <table>
-          <thead><tr>
-            <th>Candidate</th><th>Position</th><th>Stage</th>
-          </tr></thead>
-          <tbody id="recent-onboardings-tbody">
-            <tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text3)">Loading…</td></tr>
-          </tbody>
+          <thead><tr><th>Candidate</th><th>Position</th><th>Dept</th></tr></thead>
+          <tbody id="tb-ready"><tr><td colspan="3" style="text-align:center;padding:18px;color:var(--text3)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ROW 8: DEPLOYMENT TEAMS + UPCOMING JOINING DATES ── -->
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Deployment Teams</div><div class="card-sub">Active teams &amp; headcount</div></div>
+          <a href="../employee_lifecycle/deployment/deployment.html" style="text-decoration:none"><span class="badge b-teal">Manage teams →</span></a>
+        </div>
+        <table>
+          <thead><tr><th>Team</th><th>Department</th><th>Lead</th><th>Members</th></tr></thead>
+          <tbody id="tb-teams"><tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Upcoming Joining Dates</div><div class="card-sub">Candidates joining soon</div></div>
+          <span class="badge b-amber" id="joins-badge">—</span>
+        </div>
+        <table>
+          <thead><tr><th>Candidate</th><th>Role</th><th>Joining Date</th></tr></thead>
+          <tbody id="tb-joins"><tr><td colspan="3" style="text-align:center;padding:18px;color:var(--text3)">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -642,7 +505,7 @@ textarea { resize: vertical; min-height: 80px; }
 </div><!-- /main -->
 </div><!-- /shell -->
 
-<!-- ════════════════════════ MODALS ════════════════════════ -->
+<!-- NOTIFICATIONS MODAL -->
 <div class="overlay" id="notif-modal" onclick="closeModal('notif-modal')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd">
@@ -650,86 +513,102 @@ textarea { resize: vertical; min-height: 80px; }
       <button class="modal-close" onclick="closeModal('notif-modal')">×</button>
     </div>
     <div class="modal-body" id="notif-body">
-      <p style="color:var(--text3);font-size:13px;">Loading…</p>
+      <p style="color:var(--text3);font-size:13px">Loading…</p>
     </div>
   </div>
 </div>
 
 <script>
-/* ── MODAL HELPERS ── */
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open')); });
+/* ════════════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════════ */
+const $  = id => document.getElementById(id);
+function setText(id, v) { const e=$(id); if(e) e.textContent = (v===null||v===undefined) ? '—' : v; }
+function openModal(id)  { $(id).classList.add('open'); }
+function closeModal(id) { $(id).classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open')); });
 
-/* ── CHART INSTANCES ── */
-let funnelChartInst = null;
-let deptChartInst   = null;
+function timeAgo(d) {
+  if (!d) return '';
+  const diff = Date.now() - new Date(d).getTime();
+  if (isNaN(diff)) return '';
+  const m = Math.floor(diff/60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m+'m ago';
+  const h = Math.floor(m/60);
+  if (h < 24) return h+'h ago';
+  const days = Math.floor(h/24);
+  if (days < 7) return days+'d ago';
+  return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+function initials(n) { return (n||'?').split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 
-const ctd = {
+/* Status badge helper — maps exact model enum values */
+function badge(s) {
+  const map = {
+    // deployment
+    deployed:'b-green', on_hold:'b-amber', transferred:'b-purple', pending:'b-amber',
+    // interview
+    in_progress:'b-blue', passed:'b-green', failed:'b-rose', on_hold_iv:'b-amber',
+    // offer
+    draft:'b-gray', sent:'b-blue', accepted:'b-green', declined:'b-rose', expired:'b-rose',
+    // onboarding
+    offer_sent:'b-gray', docs_pending:'b-amber', docs_submitted:'b-blue',
+    docs_verified:'b-teal', joining_scheduled:'b-purple', onboarded:'b-green',
+    // orientation
+    invited:'b-blue', completed:'b-green',
+    // employee
+    Active:'b-green', 'On Leave':'b-amber', Resigned:'b-rose', Terminated:'b-rose',
+    // candidate
+    new:'b-gray', shortlisted:'b-blue', rejected:'b-rose', hired:'b-green',
+  };
+  const cls = map[s] || 'b-gray';
+  return `<span class="badge ${cls}">${(s||'—').replace(/_/g,' ')}</span>`;
+}
+
+function bkdRow(label, value, color) {
+  return `<div class="bkd-row"><span class="bkd-lbl">${label}</span><span class="bkd-val" style="color:${color||'var(--text)'}">${value}</span></div>`;
+}
+
+/* Chart instances (kept for destroy-on-refresh) */
+let _funnelChart = null;
+let _deptChart   = null;
+
+const CHART_DEFAULTS = {
   color:'#e2e8f0',
   plugins:{
     legend:{display:false},
-    tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1}
+    tooltip:{backgroundColor:'#1a2d42',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#263d5e',borderWidth:1,padding:10}
   },
   scales:{
     x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11,family:'DM Mono'}}},
-    y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11,family:'DM Mono'}}}
+    y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748b',font:{size:11,family:'DM Mono'},stepSize:1},beginAtZero:true}
   }
 };
 
-/* ── HELPERS ── */
-const $ = id => document.getElementById(id);
-function setText(id, val) { const el = $(id); if(el) el.textContent = val ?? '—'; }
-function timeAgo(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d)) return '';
-  const diff = Date.now() - d.getTime();
-  const mins = Math.floor(diff/60000);
-  if (mins < 1)   return 'just now';
-  if (mins < 60)  return mins + 'm ago';
-  const hrs = Math.floor(mins/60);
-  if (hrs < 24)   return hrs + 'h ago';
-  const days = Math.floor(hrs/24);
-  if (days < 7)   return days + 'd ago';
-  return d.toLocaleDateString('en-IN', {day:'numeric',month:'short'});
-}
-function initials(name) {
-  return (name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-}
-function statusBadge(s) {
-  const map = {
-    deployed:'b-green', active:'b-green', Active:'b-green', onboarded:'b-green',
-    pending:'b-amber', invited:'b-blue', in_progress:'b-teal',
-    completed:'b-green', on_hold:'b-amber',
-    transferred:'b-purple', sent:'b-blue', accepted:'b-green',
-    rejected:'b-rose', declined:'b-rose', terminated:'b-rose', Resigned:'b-rose',
-    'docs_submitted':'b-blue', 'docs_verified':'b-teal',
-  };
-  const cls = map[s] || 'b-gray';
-  const label = s ? s.replace(/_/g,' ') : '—';
-  return `<span class="badge ${cls}">${label}</span>`;
-}
-
-/* ── MAIN LOAD ── */
-async function loadAllData() {
-  // Update user info
+/* ════════════════════════════════════════════════
+   MAIN LOAD — parallel fetch, independent renders
+═══════════════════════════════════════════════ */
+async function loadAll() {
+  // User info
   const user = getUser();
   if (user) {
     const n = user.name || 'HR';
-    const av = $('user-avatar'); if (av) av.textContent = initials(n);
-    const un = $('user-name');   if (un) un.textContent = n;
+    const av = $('user-avatar'); if(av) av.textContent = initials(n);
+    const un = $('user-name');   if(un) un.textContent = n;
+    const ur = $('user-role');   if(ur) ur.textContent = user.role || 'HR';
   }
 
-  // Fetch all APIs in parallel — failures don't block other sections
   const [
-    dashRes,
-    candidatesRes,
-    interviewsRes,
-    offersRes,
-    onboardingRes,
-    orientationRes,
-    deploymentRes
+    r_dash,        // /hr/hrms/dashboard  → stats{totalEmployees,activeEmployees,presentToday,absentToday,pendingRequests}, deptBreakdown, recentHires
+    r_cands,       // /hr/candidates      → candidates[]  (status: new|shortlisted|rejected|hired)
+    r_ivs,         // /hr/interviews      → interviews[]  (overallStatus: in_progress|passed|failed|on_hold; offered: bool)
+    r_offers,      // /hr/offers          → offers[]      (status: draft|sent|accepted|declined|expired)
+    r_ob,          // /hr/onboarding      → onboardings[] (onboardingStatus: offer_sent|docs_pending|docs_submitted|docs_verified|joining_scheduled|onboarded)
+    r_ori,         // /hr/orientation     → orientations[], stats{total,pending,invited,in_progress,completed}
+    r_dep,         // /hr/deployment      → deployments[], stats{total,deployed,pending,on_hold,transferred,readyToDeploy}
+    r_ready,       // /hr/deployment/ready→ ready[]
+    r_teams        // /hr/deployment/teams→ teams[]
   ] = await Promise.allSettled([
     apiRequest('/hr/hrms/dashboard'),
     apiRequest('/hr/candidates'),
@@ -737,447 +616,633 @@ async function loadAllData() {
     apiRequest('/hr/offers'),
     apiRequest('/hr/onboarding'),
     apiRequest('/hr/orientation'),
-    apiRequest('/hr/deployment')
+    apiRequest('/hr/deployment'),
+    apiRequest('/hr/deployment/ready'),
+    apiRequest('/hr/deployment/teams')
   ]);
 
-  const ok  = r => r.status === 'fulfilled' && r.value && !r.value.error;
-  const val = r => ok(r) ? r.value : null;
+  const v = r => (r.status==='fulfilled' && r.value && !r.value.error) ? r.value : null;
 
-  renderDashboard(val(dashRes));
-  renderCandidates(val(candidatesRes));
-  renderInterviews(val(interviewsRes));
-  renderOffers(val(offersRes));
-  renderOnboarding(val(onboardingRes));
-  renderOrientation(val(orientationRes));
-  renderDeployment(val(deploymentRes));
-  renderActivityFeed(val(deploymentRes), val(orientationRes), val(onboardingRes), val(interviewsRes));
-  renderNotifications(val(onboardingRes), val(orientationRes), val(deploymentRes));
+  renderDash(v(r_dash));
+  renderCandidates(v(r_cands));
+  renderInterviews(v(r_ivs));
+  renderOffers(v(r_offers));
+  renderOnboarding(v(r_ob));
+  renderOrientation(v(r_ori));
+  renderDeployment(v(r_dep), v(r_ready));
+  renderTeams(v(r_teams));
+  renderUpcomingJoins(v(r_dep), v(r_ob));
+  renderFunnel(v(r_cands), v(r_ivs), v(r_offers), v(r_ob));
+  renderActivityFeed(v(r_dep), v(r_ori), v(r_ob), v(r_ivs));
+  renderAlerts(v(r_ob), v(r_ori), v(r_dep));
 
-  const now = new Date();
-  const el = $('last-updated');
-  if (el) el.textContent = 'Updated ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  // timestamp
+  const ts = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  setText('last-updated', 'Updated ' + ts);
+  const vt = $('ver-ts');
+  if(vt) vt.textContent = 'Live · ' + new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'});
 }
 
-/* ── SECTION RENDERERS ── */
-
-function renderDashboard(data) {
+/* ════════════════════════════════════════════════
+   RENDERER: HRMS DASHBOARD (employees + dept)
+═══════════════════════════════════════════════ */
+function renderDash(data) {
   if (!data) return;
   const s = data.stats || {};
-  setText('dash-total',   s.totalEmployees  ?? '—');
-  setText('dash-present', s.presentToday    ?? '—');
-  setText('dash-absent',  s.absentToday     ?? '—');
-  setText('dash-pending', s.pendingRequests ?? '—');
+  setText('kpi-total',   s.totalEmployees  ?? '—');
+  setText('kpi-present', s.presentToday    ?? '—');
+  setText('kpi-absent',  s.absentToday     ?? '—');
+  setText('kpi-pending', s.pendingRequests ?? '—');
 
   const sb = $('shift-badge');
   if (sb) { const p = s.pendingRequests||0; sb.textContent=p; sb.style.display=p>0?'inline':'none'; }
 
-  // Recent hires
-  const tbody = $('recent-hires-tbody');
-  const hires  = (data.recentHires||[]);
+  // Recent hires table
+  const hires = data.recentHires || [];
+  const hb = $('hires-badge'); if(hb) hb.textContent = hires.length + ' shown';
+  const tbody = $('tb-hires');
   if (tbody) {
-    const badge = $('recent-hires-badge');
-    if (badge) badge.textContent = hires.length + ' shown';
     if (!hires.length) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">No employees yet — <a href="../employees/employees.html" style="color:var(--accent)">add one</a></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">No employees yet</td></tr>';
     } else {
-      tbody.innerHTML = hires.map(e => `
-        <tr>
-          <td><div style="display:flex;align-items:center;gap:9px">
-            <div class="avatar" style="width:28px;height:28px;font-size:10px">${initials(e.name)}</div>
-            <div class="td-main">${e.name||'—'}</div>
-          </div></td>
-          <td>${e.designation||'—'}</td>
-          <td>${e.department||'—'}</td>
-          <td>${statusBadge(e.employeeStatus||'Active')}</td>
-        </tr>`).join('');
+      tbody.innerHTML = hires.map(e => `<tr>
+        <td><div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar" style="width:26px;height:26px;font-size:10px">${initials(e.name)}</div>
+          <span class="td-main">${e.name||'—'}</span>
+        </div></td>
+        <td>${e.designation||'—'}</td>
+        <td>${e.department||'—'}</td>
+        <td>${badge(e.employeeStatus||'Active')}</td>
+      </tr>`).join('');
     }
   }
 
   // Dept donut
   const breakdown = data.deptBreakdown || [];
-  renderDeptDonut(breakdown);
-}
-
-function renderDeptDonut(breakdown) {
-  if (!breakdown.length) return;
-  const colors = ['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#f43f5e','#22c55e','#fb923c'];
-  const labels = breakdown.slice(0,7).map(d=>d._id||'Other');
-  const values = breakdown.slice(0,7).map(d=>d.count||0);
-
-  if (deptChartInst) { deptChartInst.destroy(); deptChartInst = null; }
-  deptChartInst = new Chart($('deptChart'), {
-    type:'doughnut',
-    data:{
-      labels,
-      datasets:[{data:values,backgroundColor:colors.slice(0,labels.length),borderWidth:0,hoverOffset:4}]
-    },
-    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{...ctd.plugins.tooltip}}}
-  });
-
-  const legend = $('dept-legend');
-  if (legend) {
-    legend.innerHTML = labels.map((l,i) =>
-      `<div class="leg-row">
-        <div class="leg-dot" style="background:${colors[i]};"></div>
+  if (breakdown.length) {
+    const COLORS = ['#3b82f6','#a78bfa','#2dd4bf','#f59e0b','#f43f5e','#22c55e','#fb923c','#06b6d4'];
+    const labels = breakdown.slice(0,8).map(d => d._id || 'Other');
+    const values = breakdown.slice(0,8).map(d => d.count || 0);
+    if (_deptChart) { _deptChart.destroy(); _deptChart = null; }
+    _deptChart = new Chart($('deptChart'), {
+      type:'doughnut',
+      data:{ labels, datasets:[{ data:values, backgroundColor:COLORS.slice(0,labels.length), borderWidth:0, hoverOffset:4 }] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'72%', plugins:{ legend:{display:false}, tooltip:{...CHART_DEFAULTS.plugins.tooltip} } }
+    });
+    const leg = $('dept-legend');
+    if (leg) leg.innerHTML = labels.map((l,i) => `
+      <div class="leg-row">
+        <div class="leg-dot" style="background:${COLORS[i]}"></div>
         <span class="leg-lbl">${l}</span>
         <span class="leg-val">${values[i]}</span>
-      </div>`
-    ).join('');
+      </div>`).join('');
   }
 }
 
+/* ════════════════════════════════════════════════
+   RENDERER: CANDIDATES
+   Model status: "new" | "shortlisted" | "rejected" | "hired"
+═══════════════════════════════════════════════ */
 function renderCandidates(data) {
-  if (!data) { setText('pipe-candidates','—'); setText('stat-candidates','—'); return; }
-  const candidates = data.candidates || [];
-  const total = candidates.length;
-  setText('pipe-candidates', total);
-  setText('stat-candidates', total);
+  if (!data) { setText('pp-candidates','—'); setText('sc-candidates','—'); return; }
+  const list = data.candidates || [];
+  const total      = list.length;
+  const newCount   = list.filter(c => c.status === 'new').length;
+  const shortlisted= list.filter(c => c.status === 'shortlisted').length;
+  const rejected   = list.filter(c => c.status === 'rejected').length;
+  const hired      = list.filter(c => c.status === 'hired').length;
 
-  // Count by status
-  const shortlisted = candidates.filter(c=>c.status==='shortlisted').length;
-  const rejected    = candidates.filter(c=>c.status==='rejected').length;
-  const offered     = candidates.filter(c=>c.status==='offered'||c.status==='marked_for_offer').length;
+  // Pipeline
+  setText('pp-candidates', total);
+  setText('pp-candidates-s', newCount + ' new · ' + shortlisted + ' shortlisted');
+  setText('pp-shortlisted', shortlisted);
+  setText('pp-shortlisted-s', rejected + ' rejected');
 
-  setText('pipe-shortlisted', shortlisted);
-  setText('stat-candidates-delta', `${shortlisted} shortlisted · ${rejected} rejected`);
+  // Stat card
+  setText('sc-candidates', total);
+  setText('sc-candidates-d', shortlisted + ' shortlisted · ' + hired + ' hired · ' + rejected + ' rejected');
 
-  // Funnel chart
-  const applied   = candidates.filter(c=>c.status==='applied').length;
-  const hired     = candidates.filter(c=>c.status==='hired').length;
-  const inInterview= candidates.filter(c=>c.status==='interview').length;
+  // Breakdown card
+  const el = $('bkd-candidates');
+  if (el) el.innerHTML =
+    bkdRow('New',        newCount,   'var(--text3)') +
+    bkdRow('Shortlisted',shortlisted,'var(--accent)') +
+    bkdRow('Rejected',   rejected,   'var(--rose)') +
+    bkdRow('Hired',      hired,      'var(--green)');
 
-  setText('funnel-total', total + ' total');
-
-  const funnelData = [
-    { label:'Applied',   val: total,       color:'rgba(59,130,246,0.75)' },
-    { label:'Shortlisted', val: shortlisted, color:'rgba(99,102,241,0.75)' },
-    { label:'Interview', val: inInterview,  color:'rgba(167,139,250,0.75)' },
-    { label:'Offered',   val: offered,      color:'rgba(245,158,11,0.75)' },
-    { label:'Hired',     val: hired,        color:'rgba(34,197,94,0.85)' },
-  ];
-
-  if (funnelChartInst) { funnelChartInst.destroy(); funnelChartInst = null; }
-  funnelChartInst = new Chart($('funnelChart'), {
-    type:'bar',
-    data:{
-      labels: funnelData.map(d=>d.label),
-      datasets:[{
-        data:   funnelData.map(d=>d.val),
-        backgroundColor: funnelData.map(d=>d.color),
-        borderRadius:5, borderSkipped:false
-      }]
-    },
-    options:{
-      ...ctd, responsive:true, maintainAspectRatio:false,
-      plugins:{...ctd.plugins},
-      scales:{x:{...ctd.scales.x},y:{...ctd.scales.y,beginAtZero:true,ticks:{...ctd.scales.y.ticks,stepSize:1}}}
-    }
-  });
-
-  // Badge on sidebar
+  // Sidebar badge
   const cb = $('cand-badge');
-  if (cb) { cb.textContent=total; cb.style.display=total>0?'inline':'none'; }
+  if(cb) { cb.textContent=total; cb.style.display=total>0?'inline':'none'; }
 }
 
+/* ════════════════════════════════════════════════
+   RENDERER: INTERVIEWS
+   Model overallStatus: "in_progress"|"passed"|"failed"|"on_hold"
+   offered: boolean
+═══════════════════════════════════════════════ */
 function renderInterviews(data) {
-  if (!data) { setText('pipe-interviews','—'); setText('stat-interviews','—'); return; }
-  const interviews = data.interviews || [];
-  const active = interviews.filter(i=>i.status==='active'||i.status==='scheduled'||!i.status).length;
-  const offered = interviews.filter(i=>i.offered===true).length;
+  if (!data) { setText('pp-interviews','—'); setText('sc-interviews','—'); return; }
+  const list = data.interviews || [];
+  const inProgress = list.filter(i => i.overallStatus === 'in_progress').length;
+  const passed     = list.filter(i => i.overallStatus === 'passed').length;
+  const failed     = list.filter(i => i.overallStatus === 'failed').length;
+  const onHold     = list.filter(i => i.overallStatus === 'on_hold').length;
+  const offered    = list.filter(i => i.offered === true).length;
 
-  setText('pipe-interviews', active);
-  setText('stat-interviews', active);
-  setText('stat-interviews-delta', offered + ' marked for offer');
+  // Pipeline
+  setText('pp-interviews', inProgress);
+  setText('pp-interviews-s', passed + ' passed · ' + offered + ' offered');
 
-  // Table
-  const tbody = $('recent-interviews-tbody');
+  // Stat card
+  setText('sc-interviews', inProgress);
+  setText('sc-interviews-d', passed + ' passed · ' + failed + ' failed · ' + offered + ' offered');
+
+  // Breakdown in interviews+offers card (will be complemented by renderOffers)
+  const el = $('bkd-interviews');
+  if (el) el.innerHTML =
+    bkdRow('In Progress', inProgress, 'var(--amber)') +
+    bkdRow('Passed',      passed,     'var(--green)') +
+    bkdRow('Failed',      failed,     'var(--rose)') +
+    bkdRow('On Hold',     onHold,     'var(--text3)') +
+    bkdRow('Marked Offered', offered, 'var(--teal)');
+
+  // Table — show in_progress first, then others
+  const tbody = $('tb-interviews');
   if (tbody) {
-    const rows = interviews.slice(0,6);
+    const rows = list.slice(0, 8);
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text3)">No interviews yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">No interviews yet</td></tr>';
     } else {
       tbody.innerHTML = rows.map(iv => {
-        const round = iv.rounds ? iv.rounds.length : (iv.currentRound||1);
+        const roundsDone = [iv.round1, iv.round2, iv.round3].filter(r => r && r.status !== 'pending').length;
+        const roundsTotal = 3;
         return `<tr>
           <td><div class="td-main">${iv.candidateName||'—'}</div><div class="td-sub">${iv.candidateEmail||''}</div></td>
           <td>${iv.appliedFor||'—'}</td>
-          <td><span class="badge b-blue">Round ${round}</span></td>
-          <td>${statusBadge(iv.offered?'offered':(iv.status||'active'))}</td>
+          <td><span style="font-size:12px;color:var(--text3)">${roundsDone}/${roundsTotal}</span></td>
+          <td>${badge(iv.offered ? 'offered' : iv.overallStatus)}</td>
         </tr>`;
       }).join('');
     }
   }
 }
 
+/* ════════════════════════════════════════════════
+   RENDERER: OFFERS
+   Model status: "draft"|"sent"|"accepted"|"declined"|"expired"
+═══════════════════════════════════════════════ */
 function renderOffers(data) {
-  if (!data) {
-    $('offers-breakdown').innerHTML = '<div style="color:var(--text3);font-size:12px;">Unavailable</div>';
-    return;
+  if (!data) { setText('pp-offers', '—'); return; }
+  const list = data.offers || [];
+  const draft    = list.filter(o => o.status === 'draft').length;
+  const sent     = list.filter(o => o.status === 'sent').length;
+  const accepted = list.filter(o => o.status === 'accepted').length;
+  const declined = list.filter(o => o.status === 'declined').length;
+  const expired  = list.filter(o => o.status === 'expired').length;
+
+  // Pipeline
+  setText('pp-offers', sent + accepted);
+  setText('pp-offers-s', accepted + ' accepted · ' + (declined+expired) + ' declined/exp');
+
+  // Table
+  const tbody = $('tb-offers');
+  if (tbody) {
+    const rows = list.slice(0, 8);
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">No offers yet</td></tr>';
+    } else {
+      tbody.innerHTML = rows.map(o => {
+        const sal = o.offeredSalary ? (o.ctcCurrency==='INR' ? '₹':'') + Number(o.offeredSalary).toLocaleString('en-IN') : '—';
+        return `<tr>
+          <td><div class="td-main">${o.candidateName||'—'}</div><div class="td-sub">${o.candidateEmail||''}</div></td>
+          <td>${o.appliedFor||'—'}</td>
+          <td style="font-family:var(--mono);font-size:12px">${sal}</td>
+          <td>${badge(o.status)}</td>
+        </tr>`;
+      }).join('');
+    }
   }
-  const offers = data.offers || [];
-  const drafted  = offers.filter(o=>o.status==='draft').length;
-  const sent     = offers.filter(o=>o.status==='sent').length;
-  const accepted = offers.filter(o=>o.status==='accepted').length;
-  const declined = offers.filter(o=>o.status==='declined').length;
-
-  setText('pipe-offers', sent + accepted);
-  setText('pipe-offers-sub', accepted + ' accepted');
-
-  $('offers-breakdown').innerHTML = `
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Drafted</span><span style="font-weight:600;color:var(--text)">${drafted}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Sent</span><span style="font-weight:600;color:var(--accent)">${sent}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Accepted</span><span style="font-weight:600;color:var(--green)">${accepted}</span></div>
-    ${declined?`<div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Declined</span><span style="font-weight:600;color:var(--rose)">${declined}</span></div>`:''}
-  `;
 }
 
+/* ════════════════════════════════════════════════
+   RENDERER: ONBOARDING
+   onboardingStatus: offer_sent|docs_pending|docs_submitted|docs_verified|joining_scheduled|onboarded
+═══════════════════════════════════════════════ */
 function renderOnboarding(data) {
-  if (!data) {
-    setText('pipe-onboarding','—'); setText('stat-onboarding','—');
-    $('onboarding-breakdown').innerHTML = '<div style="color:var(--text3);font-size:12px;">Unavailable</div>';
-    return;
-  }
-  const obs = data.onboardings || data.records || [];
-  const active = obs.filter(o=>o.status!=='onboarded').length;
-  const pending = obs.filter(o=>o.status==='pending').length;
-  const submitted = obs.filter(o=>o.status==='docs_submitted').length;
-  const verified = obs.filter(o=>o.status==='docs_verified').length;
-  const onboarded = obs.filter(o=>o.status==='onboarded').length;
+  if (!data) { setText('pp-onboarding','—'); setText('sc-onboarding','—'); return; }
+  const list = data.onboardings || [];
+  const offerSent  = list.filter(o => o.onboardingStatus === 'offer_sent').length;
+  const docsPend   = list.filter(o => o.onboardingStatus === 'docs_pending').length;
+  const docsSubmit = list.filter(o => o.onboardingStatus === 'docs_submitted').length;
+  const docsVerif  = list.filter(o => o.onboardingStatus === 'docs_verified').length;
+  const joinsched  = list.filter(o => o.onboardingStatus === 'joining_scheduled').length;
+  const onboarded  = list.filter(o => o.onboardingStatus === 'onboarded').length;
+  const active     = list.length - onboarded;
 
-  setText('pipe-onboarding', active);
-  setText('pipe-onboarding-sub', onboarded + ' onboarded');
-  setText('stat-onboarding', active);
-  setText('stat-onboarding-delta', onboarded + ' onboarded · ' + pending + ' pending docs');
+  // Pipeline
+  setText('pp-onboarding', active);
+  setText('pp-onboarding-s', onboarded + ' onboarded');
 
-  $('onboarding-breakdown').innerHTML = `
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Pending Docs</span><span style="font-weight:600;color:var(--amber)">${pending}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Docs Submitted</span><span style="font-weight:600;color:var(--accent)">${submitted}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Docs Verified</span><span style="font-weight:600;color:var(--teal)">${verified}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Onboarded</span><span style="font-weight:600;color:var(--green)">${onboarded}</span></div>
-  `;
+  // Stat card
+  setText('sc-onboarding', active);
+  setText('sc-onboarding-d', onboarded + ' onboarded · ' + docsSubmit + ' docs submitted · ' + docsVerif + ' verified');
 
-  // Table
-  const tbody = $('recent-onboardings-tbody');
+  // Breakdown card
+  const el = $('bkd-onboarding');
+  if (el) el.innerHTML =
+    bkdRow('Offer Sent',         offerSent,  'var(--text3)') +
+    bkdRow('Docs Pending',       docsPend,   'var(--amber)') +
+    bkdRow('Docs Submitted',     docsSubmit, 'var(--accent)') +
+    bkdRow('Docs Verified',      docsVerif,  'var(--teal)') +
+    bkdRow('Joining Scheduled',  joinsched,  'var(--purple)') +
+    bkdRow('Onboarded',          onboarded,  'var(--green)');
+
+  // Table — show non-onboarded
+  const tbody = $('tb-onboarding');
   if (tbody) {
-    const rows = obs.filter(o=>o.status!=='onboarded').slice(0,6);
+    const rows = list.filter(o => o.onboardingStatus !== 'onboarded').slice(0, 8);
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--text3)">No pending onboardings</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:18px;color:var(--text3)">No pending onboardings</td></tr>';
     } else {
       tbody.innerHTML = rows.map(o => `<tr>
         <td><div class="td-main">${o.candidateName||'—'}</div><div class="td-sub">${o.candidateEmail||''}</div></td>
         <td>${o.position||'—'}</td>
-        <td>${statusBadge(o.status||'pending')}</td>
+        <td>${badge(o.onboardingStatus)}</td>
       </tr>`).join('');
     }
   }
 }
 
+/* ════════════════════════════════════════════════
+   RENDERER: ORIENTATION
+   orientationStatus: pending|invited|in_progress|completed
+   API also returns stats: {total,pending,invited,in_progress,completed}
+═══════════════════════════════════════════════ */
 function renderOrientation(data) {
-  if (!data) {
-    setText('pipe-orientation','—');
-    $('orientation-breakdown').innerHTML = '<div style="color:var(--text3);font-size:12px;">Unavailable</div>';
-    return;
+  if (!data) { setText('pp-orientation','—'); return; }
+  // Use pre-computed stats from backend (one extra DB call saved)
+  const s = data.stats || {};
+  const pending    = s.pending    || 0;
+  const invited    = s.invited    || 0;
+  const inProgress = s.in_progress|| 0;
+  const completed  = s.completed  || 0;
+  const active     = pending + invited + inProgress;
+
+  // Pipeline
+  setText('pp-orientation', active);
+  setText('pp-orientation-s', completed + ' completed');
+
+  // Orientation part of bkd-deploy card
+  const el = $('bkd-deploy');
+  if (el) {
+    // Will be rewritten by renderDeployment too — store partial
+    el._oriHtml =
+      '<div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:500">Orientation</div>' +
+      bkdRow('Pending',     pending,    'var(--amber)') +
+      bkdRow('Invited',     invited,    'var(--accent)') +
+      bkdRow('In Progress', inProgress, 'var(--teal)') +
+      bkdRow('Completed',   completed,  'var(--green)');
+    el.innerHTML = (el._depHtml || '') + el._oriHtml;
   }
-  const orientations = data.orientations || [];
-  const pending    = orientations.filter(o=>o.orientationStatus==='pending').length;
-  const invited    = orientations.filter(o=>o.orientationStatus==='invited').length;
-  const inProgress = orientations.filter(o=>o.orientationStatus==='in_progress').length;
-  const completed  = orientations.filter(o=>o.orientationStatus==='completed').length;
-  const activeOri  = pending + invited + inProgress;
 
-  setText('pipe-orientation', activeOri);
-  setText('pipe-orientation-sub', completed + ' completed');
-
-  $('orientation-breakdown').innerHTML = `
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Pending</span><span style="font-weight:600;color:var(--amber)">${pending}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Invited</span><span style="font-weight:600;color:var(--accent)">${invited}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">In Progress</span><span style="font-weight:600;color:var(--teal)">${inProgress}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Completed</span><span style="font-weight:600;color:var(--green)">${completed}</span></div>
-  `;
-
-  // Table — show non-completed
-  const tbody = $('recent-orientations-tbody');
+  // Table — non-completed
+  const tbody = $('tb-orientation');
   if (tbody) {
-    const rows = orientations.filter(o=>o.orientationStatus!=='completed').slice(0,6);
-    if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--text3)">No active orientations</td></tr>';
+    const list = (data.orientations || []).filter(o => o.orientationStatus !== 'completed').slice(0, 8);
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:18px;color:var(--text3)">No active orientations</td></tr>';
     } else {
-      tbody.innerHTML = rows.map(o => `<tr>
+      tbody.innerHTML = list.map(o => `<tr>
         <td><div class="td-main">${o.candidateName||'—'}</div><div class="td-sub">${o.candidateEmail||''}</div></td>
         <td>${o.position||'—'}</td>
-        <td>${statusBadge(o.orientationStatus||'pending')}</td>
+        <td>${badge(o.orientationStatus)}</td>
       </tr>`).join('');
     }
   }
 }
 
-function renderDeployment(data) {
-  if (!data) {
-    setText('pipe-deployed','—'); setText('stat-deployed','—');
-    $('deployment-breakdown').innerHTML = '<div style="color:var(--text3);font-size:12px;">Unavailable</div>';
-    return;
-  }
+/* ════════════════════════════════════════════════
+   RENDERER: DEPLOYMENT
+   stats: {total, deployed, pending, on_hold, transferred, readyToDeploy}
+═══════════════════════════════════════════════ */
+function renderDeployment(data, readyData) {
+  if (!data) { setText('pp-deployed','—'); setText('sc-deployed','—'); return; }
   const s = data.stats || {};
-  setText('pipe-deployed', s.deployed ?? '—');
-  setText('pipe-deployed-sub', (s.readyToDeploy||0) + ' ready');
-  setText('stat-deployed', s.deployed ?? '—');
-  setText('stat-deployed-delta', (s.readyToDeploy||0) + ' ready · ' + (s.on_hold||0) + ' on hold');
+  const deployed    = s.deployed    || 0;
+  const onHold      = s.on_hold     || 0;
+  const transferred = s.transferred || 0;
+  const rdCount     = s.readyToDeploy || 0;
 
-  $('deployment-breakdown').innerHTML = `
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Deployed</span><span style="font-weight:600;color:var(--green)">${s.deployed||0}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">On Hold</span><span style="font-weight:600;color:var(--amber)">${s.on_hold||0}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Ready to Deploy</span><span style="font-weight:600;color:var(--accent)">${s.readyToDeploy||0}</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text3)">Transferred</span><span style="font-weight:600;color:var(--purple)">${s.transferred||0}</span></div>
-  `;
+  // Pipeline
+  setText('pp-deployed', deployed);
+  setText('pp-deployed-s', rdCount + ' ready to deploy');
 
-  // Table
-  const tbody = $('recent-deployments-tbody');
+  // Stat card
+  setText('sc-deployed', deployed);
+  setText('sc-deployed-d', rdCount + ' ready · ' + onHold + ' on hold · ' + transferred + ' transferred');
+
+  // Breakdown card (deployment part)
+  const el = $('bkd-deploy');
+  if (el) {
+    el._depHtml =
+      '<div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:500">Deployment</div>' +
+      bkdRow('Deployed',        deployed,    'var(--green)') +
+      bkdRow('On Hold',         onHold,      'var(--amber)') +
+      bkdRow('Transferred',     transferred, 'var(--purple)') +
+      bkdRow('Ready to Deploy', rdCount,     'var(--accent)') +
+      '<div style="height:10px"></div>';
+    el.innerHTML = el._depHtml + (el._oriHtml || '');
+  }
+
+  // Deployments table
+  const tbody = $('tb-deployments');
   if (tbody) {
-    const deps = (data.deployments||[]).slice(0,6);
-    if (!deps.length) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text3)">No deployments yet</td></tr>';
+    const rows = (data.deployments || []).slice(0, 8);
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">No deployments yet</td></tr>';
     } else {
-      tbody.innerHTML = deps.map(d => `<tr>
-        <td><div class="td-main">${d.candidateName||'—'}</div><div class="td-sub">${d.candidateEmail||''}</div></td>
-        <td>${(d.teamId&&d.teamId.name)||d.teamName||'—'}</td>
-        <td>${d.roleInTeam||d.position||'—'}</td>
-        <td>${statusBadge(d.status||'deployed')}</td>
+      tbody.innerHTML = rows.map(d => {
+        const tname = (d.teamId && d.teamId.name) || d.teamName || '—';
+        return `<tr>
+          <td><div class="td-main">${d.candidateName||'—'}</div><div class="td-sub">${d.candidateEmail||''}</div></td>
+          <td>${tname}</td>
+          <td>${d.roleInTeam||d.position||'—'}</td>
+          <td>${badge(d.status||'deployed')}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // Ready-to-deploy table
+  const rt = $('tb-ready');
+  if (rt) {
+    const ready = readyData ? (readyData.ready || []) : [];
+    if (!ready.length) {
+      rt.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:18px;color:var(--text3)">${rdCount > 0 ? 'Loading ready list…' : 'No candidates ready to deploy'}</td></tr>`;
+    } else {
+      rt.innerHTML = ready.slice(0, 8).map(r => `<tr>
+        <td><div class="td-main">${r.candidateName||'—'}</div><div class="td-sub">${r.candidateEmail||''}</div></td>
+        <td>${r.position||'—'}</td>
+        <td>${r.department||'—'}</td>
       </tr>`).join('');
     }
   }
 }
 
+/* ════════════════════════════════════════════════
+   RENDERER: HIRING FUNNEL CHART
+   Builds a bar chart showing the full pipeline numerically
+═══════════════════════════════════════════════ */
+function renderFunnel(cands, ivs, offers, ob) {
+  const totalCands  = cands  ? (cands.candidates||[]).length  : 0;
+  const shortlisted = cands  ? (cands.candidates||[]).filter(c=>c.status==='shortlisted').length : 0;
+  const inInterview = ivs    ? (ivs.interviews||[]).filter(i=>i.overallStatus==='in_progress').length : 0;
+  const passed      = ivs    ? (ivs.interviews||[]).filter(i=>i.overallStatus==='passed').length : 0;
+  const offered     = ivs    ? (ivs.interviews||[]).filter(i=>i.offered===true).length : 0;
+  const offerSent   = offers ? (offers.offers||[]).filter(o=>o.status==='sent'||o.status==='accepted').length : 0;
+  const onboarded   = ob     ? (ob.onboardings||[]).filter(o=>o.onboardingStatus==='onboarded').length : 0;
+
+  const stages = [
+    { label:'Applied',    val: totalCands,  color:'rgba(79,156,249,0.75)' },
+    { label:'Shortlisted',val: shortlisted, color:'rgba(99,102,241,0.75)' },
+    { label:'Interview',  val: inInterview, color:'rgba(245,158,11,0.75)' },
+    { label:'Passed',     val: passed,      color:'rgba(45,212,191,0.75)' },
+    { label:'Offered',    val: Math.max(offered, offerSent), color:'rgba(167,139,250,0.75)' },
+    { label:'Onboarded',  val: onboarded,   color:'rgba(34,197,94,0.85)'  },
+  ];
+
+  setText('funnel-total-badge', totalCands + ' total candidates');
+
+  if (_funnelChart) { _funnelChart.destroy(); _funnelChart = null; }
+  _funnelChart = new Chart($('funnelChart'), {
+    type: 'bar',
+    data: {
+      labels: stages.map(s => s.label),
+      datasets: [{
+        data:            stages.map(s => s.val),
+        backgroundColor: stages.map(s => s.color),
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { ...CHART_DEFAULTS.plugins },
+      scales: { x: { ...CHART_DEFAULTS.scales.x }, y: { ...CHART_DEFAULTS.scales.y } }
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════
+   RENDERER: ACTIVITY FEED
+   Builds a timeline from all recent events across modules
+═══════════════════════════════════════════════ */
 function renderActivityFeed(depData, oriData, obData, ivData) {
-  const items = [];
+  const events = [];
 
-  // Recent deployments
-  if (depData && depData.deployments) {
-    depData.deployments.slice(0,3).forEach(d => {
-      items.push({
-        icon:'🗂️', bg:'rgba(34,197,94,0.13)',
-        title:`Deployed — ${d.candidateName||d.candidateEmail||'Candidate'}`,
-        desc:`${(d.teamId&&d.teamId.name)||d.teamName||'team'} · ${d.roleInTeam||d.position||'role'}`,
-        time: d.createdAt, ts: new Date(d.createdAt||0).getTime()
-      });
-    });
+  function pushEvent(icon, bg, title, desc, ts) {
+    const t = new Date(ts||0).getTime();
+    if (!isNaN(t) && t > 0) events.push({ icon, bg, title, desc, ts: t, tsRaw: ts });
   }
 
-  // Recent orientations
-  if (oriData && oriData.orientations) {
-    oriData.orientations.slice(0,3).forEach(o => {
-      if (o.orientationStatus === 'completed') {
-        items.push({
-          icon:'🎓', bg:'rgba(45,212,191,0.13)',
-          title:`Orientation complete — ${o.candidateName||o.candidateEmail||'Candidate'}`,
-          desc: o.position || 'role',
-          time: o.completedAt||o.updatedAt, ts: new Date(o.completedAt||o.updatedAt||0).getTime()
-        });
-      } else if (o.orientationStatus === 'invited') {
-        items.push({
-          icon:'🎓', bg:'rgba(59,130,246,0.13)',
-          title:`Orientation invite sent — ${o.candidateName||o.candidateEmail||'Candidate'}`,
-          desc: o.position || 'role',
-          time: o.updatedAt||o.createdAt, ts: new Date(o.updatedAt||o.createdAt||0).getTime()
-        });
-      }
-    });
-  }
+  // Deployments
+  (depData?.deployments || []).slice(0,5).forEach(d => {
+    const tname = (d.teamId?.name) || d.teamName || 'a team';
+    pushEvent('🗂️','rgba(34,197,94,0.13)',
+      `Deployed — ${d.candidateName||d.candidateEmail||'Candidate'}`,
+      `${tname} · ${d.roleInTeam||d.position||'role'} · ${badge(d.status||'deployed')}`,
+      d.createdAt);
+  });
 
-  // Recent onboardings
-  if (obData && (obData.onboardings||obData.records)) {
-    const obs = obData.onboardings || obData.records || [];
-    obs.slice(0,3).forEach(o => {
-      if (o.status === 'onboarded') {
-        items.push({
-          icon:'🚀', bg:'rgba(167,139,250,0.13)',
-          title:`Onboarded — ${o.candidateName||o.candidateEmail||'Candidate'}`,
-          desc:`Documents verified · ${o.position||''}`,
-          time: o.updatedAt||o.createdAt, ts: new Date(o.updatedAt||o.createdAt||0).getTime()
-        });
-      }
-    });
-  }
+  // Orientation events — invited / completed
+  (oriData?.orientations || []).slice(0,5).forEach(o => {
+    if (o.orientationStatus === 'completed') {
+      pushEvent('🎓','rgba(45,212,191,0.13)',
+        `Orientation completed — ${o.candidateName||o.candidateEmail||'Candidate'}`,
+        o.position || '',
+        o.completedAt || o.updatedAt);
+    } else if (o.orientationStatus === 'invited') {
+      pushEvent('🎓','rgba(59,130,246,0.13)',
+        `Orientation invite sent — ${o.candidateName||o.candidateEmail||'Candidate'}`,
+        o.position || '',
+        o.updatedAt || o.createdAt);
+    }
+  });
 
-  // Recent interviews
-  if (ivData && ivData.interviews) {
-    ivData.interviews.filter(i=>i.offered).slice(0,2).forEach(i => {
-      items.push({
-        icon:'📝', bg:'rgba(245,158,11,0.13)',
-        title:`Marked for offer — ${i.candidateName||i.candidateEmail||'Candidate'}`,
-        desc: i.appliedFor || 'role',
-        time: i.updatedAt||i.createdAt, ts: new Date(i.updatedAt||i.createdAt||0).getTime()
-      });
-    });
-  }
+  // Onboarding — docs_submitted / onboarded
+  (obData?.onboardings || []).slice(0,5).forEach(o => {
+    if (o.onboardingStatus === 'onboarded') {
+      pushEvent('🚀','rgba(167,139,250,0.13)',
+        `Onboarded — ${o.candidateName||o.candidateEmail||'Candidate'}`,
+        `Documents verified · ${o.position||''}`,
+        o.updatedAt || o.createdAt);
+    } else if (o.onboardingStatus === 'docs_submitted') {
+      pushEvent('📁','rgba(245,158,11,0.13)',
+        `Documents submitted — ${o.candidateName||o.candidateEmail||'Candidate'}`,
+        `Pending verification · ${o.position||''}`,
+        o.updatedAt || o.createdAt);
+    }
+  });
 
-  // Sort by most recent
-  items.sort((a,b) => b.ts - a.ts);
+  // Interviews — offered / passed
+  (ivData?.interviews || []).slice(0,5).forEach(i => {
+    if (i.offered) {
+      pushEvent('📝','rgba(245,158,11,0.13)',
+        `Marked for offer — ${i.candidateName||i.candidateEmail||'Candidate'}`,
+        i.appliedFor || '',
+        i.offeredAt || i.updatedAt);
+    } else if (i.overallStatus === 'passed') {
+      pushEvent('✅','rgba(34,197,94,0.1)',
+        `All rounds passed — ${i.candidateName||i.candidateEmail||'Candidate'}`,
+        i.appliedFor || '',
+        i.updatedAt);
+    }
+  });
+
+  events.sort((a,b) => b.ts - a.ts);
 
   const feed = $('activity-feed');
   if (!feed) return;
-
-  if (!items.length) {
-    feed.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:10px 0;">No recent activity</div>';
+  if (!events.length) {
+    feed.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:10px 0">No recent activity to show</div>';
     return;
   }
-
-  feed.innerHTML = items.slice(0,7).map(item => `
+  feed.innerHTML = events.slice(0, 8).map(e => `
     <div class="tl-item">
-      <div class="tl-dot" style="background:${item.bg}">${item.icon}</div>
+      <div class="tl-dot" style="background:${e.bg}">${e.icon}</div>
       <div class="tl-body">
-        <div class="tl-title">${item.title}</div>
-        <div class="tl-desc">${item.desc}</div>
-        <div class="tl-time">${timeAgo(item.time)}</div>
+        <div class="tl-title">${e.title}</div>
+        <div class="tl-desc">${e.desc}</div>
+        <div class="tl-time">${timeAgo(e.tsRaw)}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function renderNotifications(obData, oriData, depData) {
+/* ════════════════════════════════════════════════
+   RENDERER: ALERTS (Notifications modal)
+═══════════════════════════════════════════════ */
+function renderAlerts(obData, oriData, depData) {
   const alerts = [];
 
-  if (obData) {
-    const obs = obData.onboardings || obData.records || [];
-    const pendingDocs = obs.filter(o=>o.status==='docs_submitted').length;
-    if (pendingDocs > 0) {
-      alerts.push({icon:'📋',color:'var(--amber)',title:`${pendingDocs} onboarding(s) have docs submitted awaiting verification`,bg:'rgba(245,158,11,0.08)',border:'var(--amber)'});
-    }
-  }
+  const obs = obData?.onboardings || [];
+  const docsSubmit = obs.filter(o => o.onboardingStatus === 'docs_submitted').length;
+  if (docsSubmit > 0)
+    alerts.push({ icon:'📋', color:'var(--amber)', border:'var(--amber)', bg:'rgba(245,158,11,0.08)',
+      text:`${docsSubmit} onboarding record(s) have submitted documents awaiting HR verification` });
 
-  if (oriData) {
-    const pending = (oriData.orientations||[]).filter(o=>o.orientationStatus==='pending').length;
-    if (pending > 0) {
-      alerts.push({icon:'🎓',color:'var(--teal)',title:`${pending} candidate(s) in orientation not yet invited`,bg:'rgba(45,212,191,0.08)',border:'var(--teal)'});
-    }
-  }
+  const oris = oriData?.orientations || [];
+  const unInvited = oris.filter(o => o.orientationStatus === 'pending').length;
+  if (unInvited > 0)
+    alerts.push({ icon:'🎓', color:'var(--teal)', border:'var(--teal)', bg:'rgba(45,212,191,0.08)',
+      text:`${unInvited} candidate(s) in orientation have not been invited yet` });
 
-  if (depData) {
-    const ready = (depData.stats||{}).readyToDeploy || 0;
-    if (ready > 0) {
-      alerts.push({icon:'🗂️',color:'var(--green)',title:`${ready} candidate(s) completed orientation and ready to deploy`,bg:'rgba(34,197,94,0.08)',border:'var(--green)'});
-    }
-  }
+  const rdCount = depData?.stats?.readyToDeploy || 0;
+  if (rdCount > 0)
+    alerts.push({ icon:'🗂️', color:'var(--green)', border:'var(--green)', bg:'rgba(34,197,94,0.08)',
+      text:`${rdCount} candidate(s) completed orientation and are ready to be deployed` });
 
   const cnt = $('notif-count');
   if (cnt) { cnt.textContent = alerts.length; cnt.style.display = alerts.length > 0 ? 'inline' : 'none'; }
 
   const body = $('notif-body');
   if (body) {
-    if (!alerts.length) {
-      body.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:10px 0;">No alerts right now.</p>';
-    } else {
-      body.innerHTML = alerts.map(a => `
-        <div style="display:flex;gap:12px;padding:12px;background:${a.bg};border-radius:8px;border-left:3px solid ${a.border};margin-bottom:10px;">
-          <span style="font-size:18px;">${a.icon}</span>
-          <div style="font-size:13px;color:var(--text)">${a.title}</div>
-        </div>
-      `).join('');
-    }
+    body.innerHTML = alerts.length
+      ? alerts.map(a => `
+          <div style="display:flex;gap:12px;padding:12px;background:${a.bg};border-radius:8px;border-left:3px solid ${a.border};margin-bottom:10px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">${a.icon}</span>
+            <span style="font-size:13px;color:var(--text);line-height:1.5">${a.text}</span>
+          </div>`).join('')
+      : '<p style="color:var(--text3);font-size:13px;padding:10px 0">No alerts right now — everything looks good.</p>';
   }
 }
 
+/* ════════════════════════════════════════════════
+   RENDERER: DEPLOYMENT TEAMS
+   teams[]: {name, department, teamLead, status, memberCount}
+═══════════════════════════════════════════════ */
+function renderTeams(data) {
+  const tbody = $('tb-teams');
+  if (!tbody) return;
+  if (!data) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">Unavailable</td></tr>';
+    return;
+  }
+  const teams = (data.teams || []).filter(t => t.status !== 'inactive').slice(0, 8);
+  if (!teams.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:18px;color:var(--text3)">No teams created yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = teams.map(t => `<tr>
+    <td><div class="td-main">${t.name||'—'}</div><div class="td-sub">${t.officeLocation||t.location||''}</div></td>
+    <td>${t.department||'—'}</td>
+    <td>${t.teamLead||'—'}</td>
+    <td><span style="font-size:16px;font-weight:600;color:var(--green)">${t.memberCount||0}</span></td>
+  </tr>`).join('');
+}
+
+/* ════════════════════════════════════════════════
+   RENDERER: UPCOMING JOINING DATES
+   Pulls joiningDate from deployments + onboardings, shows
+   those with a future or near-future date sorted ascending.
+═══════════════════════════════════════════════ */
+function renderUpcomingJoins(depData, obData) {
+  const tbody = $('tb-joins');
+  const badge_el = $('joins-badge');
+  if (!tbody) return;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = [];
+
+  // From deployments
+  (depData?.deployments || []).forEach(d => {
+    if (d.joiningDate) {
+      const dt = new Date(d.joiningDate);
+      if (!isNaN(dt) && dt >= today)
+        upcoming.push({ name: d.candidateName||d.candidateEmail||'—', role: d.roleInTeam||d.position||'—', date: dt, dateStr: d.joiningDate });
+    }
+  });
+
+  // From onboardings (joining_scheduled or verified)
+  (obData?.onboardings || []).forEach(o => {
+    if (o.joiningDate && ['joining_scheduled','docs_verified'].includes(o.onboardingStatus)) {
+      const dt = new Date(o.joiningDate);
+      if (!isNaN(dt) && dt >= today)
+        upcoming.push({ name: o.candidateName||o.candidateEmail||'—', role: o.position||'—', date: dt, dateStr: o.joiningDate });
+    }
+  });
+
+  // Deduplicate by name+date, sort ascending
+  const seen = new Set();
+  const deduped = upcoming.filter(u => {
+    const k = u.name + '|' + u.date.toISOString().slice(0,10);
+    if (seen.has(k)) return false; seen.add(k); return true;
+  }).sort((a,b) => a.date - b.date);
+
+  if (badge_el) badge_el.textContent = deduped.length + ' upcoming';
+
+  if (!deduped.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:18px;color:var(--text3)">No upcoming joining dates</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = deduped.slice(0, 8).map(u => {
+    const daysLeft = Math.ceil((u.date - today) / 86400000);
+    const label = daysLeft === 0 ? '<span style="color:var(--green);font-weight:600">Today</span>'
+                : daysLeft === 1 ? '<span style="color:var(--amber);font-weight:600">Tomorrow</span>'
+                : daysLeft <= 7  ? `<span style="color:var(--amber)">In ${daysLeft} days</span>`
+                : `<span style="color:var(--text3)">${u.date.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</span>`;
+    return `<tr>
+      <td><div class="td-main">${u.name}</div></td>
+      <td>${u.role}</td>
+      <td style="white-space:nowrap">${label}</td>
+    </tr>`;
+  }).join('');
+}
+
 /* ── BOOT ── */
-loadAllData();
+loadAll();
 </script>
 </body>
 </html>
