@@ -15,7 +15,7 @@ function emails() { return require("../utils/studentEmails"); }
 // HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 function isSalesOrAdmin(req, res) {
-  const ok = ["sales", "hr", "super_admin", "admin"].includes(req.user?.role);
+  const ok = ["sales","hr","super_admin","admin","leadgen"].includes(req.user?.role);
   if (!ok) res.status(403).json({ msg: "Access denied" });
   return ok;
 }
@@ -1235,6 +1235,56 @@ exports.scoreAllLeads = async (req, res) => {
     return res.json(result);
   } catch (err) {
     console.error("scoreAllLeads:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ══ LEADGEN ══════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /api/sales/leadgen/my-leads — leads created by this leadgen user
+exports.leadgenMyLeads = async (req, res) => {
+  try {
+    if (req.user?.role !== "leadgen" && !["super_admin","admin","sales","hr"].includes(req.user?.role))
+      return res.status(403).json({ msg: "Access denied" });
+
+    const { search, page = 1, limit = 100 } = req.query;
+    const q = { createdBy: req.user.id, isArchived: false };
+    if (search) q.$or = [
+      { fullName: { $regex: search, $options: "i" } },
+      { phone:    { $regex: search, $options: "i" } },
+      { email:    { $regex: search, $options: "i" } }
+    ];
+    const skip  = (parseInt(page) - 1) * parseInt(limit);
+    const total = await StudentLead.countDocuments(q);
+    const leads = await StudentLead.find(q).sort({ createdAt: -1 }).skip(skip).limit(parseInt(limit));
+    return res.json({ leads, total });
+  } catch (err) {
+    console.error("leadgenMyLeads:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// GET /api/sales/leadgen/stats
+exports.leadgenStats = async (req, res) => {
+  try {
+    if (req.user?.role !== "leadgen" && !["super_admin","admin","sales","hr"].includes(req.user?.role))
+      return res.status(403).json({ msg: "Access denied" });
+
+    const userId = req.user.id;
+    const today  = new Date(); today.setHours(0,0,0,0);
+    const week   = new Date(); week.setDate(week.getDate() - 7); week.setHours(0,0,0,0);
+
+    const [total, todayCount, weekCount] = await Promise.all([
+      StudentLead.countDocuments({ createdBy: userId, isArchived: false }),
+      StudentLead.countDocuments({ createdBy: userId, isArchived: false, createdAt: { $gte: today } }),
+      StudentLead.countDocuments({ createdBy: userId, isArchived: false, createdAt: { $gte: week } })
+    ]);
+
+    return res.json({ total, today: todayCount, thisWeek: weekCount });
+  } catch (err) {
+    console.error("leadgenStats:", err);
     return res.status(500).json({ msg: "Server error" });
   }
 };

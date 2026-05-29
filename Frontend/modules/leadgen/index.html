@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LeadGen Panel — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060c14;--bg2:#090f1a;--bg3:#0d1624;--bg4:#111e30;
+  --accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);
+  --blue:#3d8ef0;--blue-dim:rgba(61,142,240,.12);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,.12);
+  --rose:#ff4d6d;--rose-dim:rgba(255,77,109,.12);
+  --green:#22c55e;--green-dim:rgba(34,197,94,.12);
+  --text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);
+  --font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* ── TOPBAR ── */
+.topbar{height:60px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:15px;font-weight:800;color:var(--bg);flex-shrink:0}
+.logo-text{font-family:var(--display);font-size:14px;font-weight:800;color:var(--text)}
+.logo-tag{font-size:9px;color:var(--text3);font-family:var(--mono);background:var(--accent-dim);border:1px solid rgba(0,229,176,.2);color:var(--accent);padding:2px 8px;border-radius:10px;margin-left:4px}
+.tb-spacer{flex:1}
+.tb-user{display:flex;align-items:center;gap:10px}
+.tb-av{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--bg);flex-shrink:0}
+.tb-name{font-size:12px;font-weight:600;color:var(--text)}
+.tb-role{font-size:10px;color:var(--accent);background:var(--accent-dim);padding:1px 8px;border-radius:10px;font-weight:600}
+.tb-logout{background:var(--rose-dim);border:1px solid rgba(255,77,109,.2);color:var(--rose);font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;cursor:pointer;font-family:var(--font);transition:all .15s}
+.tb-logout:hover{background:rgba(255,77,109,.25)}
+
+/* ── HERO STRIP ── */
+.hero{background:linear-gradient(135deg,rgba(0,229,176,.06) 0%,rgba(61,142,240,.04) 100%);border-bottom:1px solid var(--border);padding:28px 36px;display:flex;align-items:center;gap:32px}
+.hero-text h1{font-family:var(--display);font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+.hero-text p{font-size:12.5px;color:var(--text3);margin-top:4px;max-width:480px;line-height:1.6}
+.hero-stats{display:flex;gap:20px;margin-left:auto}
+.hstat{text-align:center;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 22px;min-width:90px}
+.hstat-val{font-family:var(--display);font-size:26px;font-weight:800;color:var(--accent);line-height:1}
+.hstat-lbl{font-size:9.5px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+/* ── MAIN LAYOUT ── */
+.layout{display:grid;grid-template-columns:400px 1fr;gap:0;min-height:calc(100vh - 60px - 110px)}
+
+/* ── LEFT PANEL — INPUT ── */
+.left-panel{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.panel-tabs{display:flex;border-bottom:1px solid var(--border)}
+.ptab{flex:1;padding:14px;text-align:center;font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.ptab:hover:not(.active){color:var(--text2)}
+
+/* ── ADD FORM ── */
+.add-form{padding:24px;flex:1;overflow-y:auto}
+.form-title{font-family:var(--display);font-size:14px;font-weight:700;margin-bottom:4px}
+.form-sub{font-size:11.5px;color:var(--text3);margin-bottom:20px;line-height:1.5}
+.field{margin-bottom:14px;display:flex;flex-direction:column;gap:5px}
+.field label{font-size:10.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px}
+.req{color:var(--rose);font-size:11px}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 13px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,176,.08)}
+.field textarea{resize:vertical;min-height:60px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-submit{width:100%;padding:12px;background:var(--accent);color:var(--bg);border:none;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-submit:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ── IMPORT PANEL ── */
+.import-panel{padding:24px;flex:1;overflow-y:auto}
+.source-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.src-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 14px;text-align:center;cursor:pointer;transition:all .15s}
+.src-card:hover{border-color:rgba(0,229,176,.4);background:rgba(0,229,176,.05)}
+.src-icon{font-size:26px;margin-bottom:6px}
+.src-name{font-size:12px;font-weight:700;color:var(--text)}
+.src-desc{font-size:10px;color:var(--text3);margin-top:2px}
+.link-panel{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:16px;margin-top:16px;display:none}
+.link-input{width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:9px 12px;outline:none;margin-top:8px;transition:border .15s}
+.link-input:focus{border-color:var(--accent)}
+
+/* mapping */
+.map-section{display:none;margin-top:16px}
+.map-title{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.map-row{display:grid;grid-template-columns:1fr 18px 1fr;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.map-lbl{font-size:11.5px;font-weight:600;color:var(--text2)}
+.map-arrow{color:var(--text3);text-align:center;font-size:12px}
+.map-sel{background:var(--bg4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--font);font-size:11.5px;padding:5px 8px;outline:none;width:100%}
+.map-sel:focus{border-color:var(--accent)}
+.import-status{font-size:12px;color:var(--text2);margin-top:10px;min-height:18px}
+.btn-import{width:100%;padding:11px;background:var(--accent);color:var(--bg);border:none;border-radius:9px;font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:14px;display:none}
+.btn-import:hover{background:var(--accent2)}
+.btn-import:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── RIGHT PANEL — LEADS TABLE ── */
+.right-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.rp-topbar{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--bg2)}
+.rp-title{font-family:var(--display);font-size:13px;font-weight:700;flex:1}
+.rp-search{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:6px 12px;outline:none;min-width:200px;transition:border .15s}
+.rp-search:focus{border-color:var(--accent)}
+.badge{display:inline-flex;align-items:center;font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px;text-transform:uppercase}
+.b-new{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.15)}
+.b-contacted{background:rgba(99,102,241,.1);color:#818cf8;border:1px solid rgba(99,102,241,.15)}
+.rp-table-wrap{flex:1;overflow-y:auto}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg2);position:sticky;top:0;z-index:5}
+th{padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:11px 16px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text2);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.015)}
+.lead-name{font-weight:600;color:var(--text);font-size:13px}
+.lead-sub{font-size:10.5px;color:var(--text3);margin-top:2px}
+.src-pill{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700;background:rgba(61,142,240,.1);color:#60a5fa}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.toast-item{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:12.5px;font-weight:500;box-shadow:0 8px 28px rgba(0,0,0,.4);animation:slideIn .25s ease;min-width:240px}
+.toast-item.ok{border-color:rgba(0,229,176,.35);color:var(--accent)}.toast-item.err{border-color:rgba(255,77,109,.35);color:var(--rose)}
+@keyframes slideIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="logo-mark">Z</div>
+  <div>
+    <span class="logo-text">ZyntrixCRM</span>
+    <span class="logo-tag">LeadGen Panel</span>
+  </div>
+  <div class="tb-spacer"></div>
+  <div class="tb-user">
+    <div class="tb-av" id="tb-av">LG</div>
+    <div>
+      <div class="tb-name" id="tb-name">lead@zyntrixsoftware.com</div>
+      <div class="tb-role">Lead Generation</div>
+    </div>
+  </div>
+  <button class="tb-logout" onclick="logout()">Sign Out</button>
+</div>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-text">
+    <h1>Student Lead Collection</h1>
+    <p>Add student details one by one or bulk-import from any source. Every lead you submit flows directly into the Sales Pipeline for the counseling team to take over.</p>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-val" id="stat-today">—</div><div class="hstat-lbl">Today</div></div>
+    <div class="hstat"><div class="hstat-val" id="stat-week">—</div><div class="hstat-lbl">This Week</div></div>
+    <div class="hstat"><div class="hstat-val" id="stat-total">—</div><div class="hstat-lbl">Total</div></div>
+  </div>
+</div>
+
+<!-- ── LAYOUT ── -->
+<div class="layout">
+
+  <!-- LEFT — INPUT PANEL -->
+  <div class="left-panel">
+    <div class="panel-tabs">
+      <div class="ptab active" id="tab-add" onclick="switchTab('add')">✏ Add One by One</div>
+      <div class="ptab" id="tab-import" onclick="switchTab('import')">⬆ Bulk Import</div>
+    </div>
+
+    <!-- ADD ONE BY ONE -->
+    <div class="add-form" id="pane-add">
+      <div class="form-title">Add a Student Lead</div>
+      <div class="form-sub">Fill in what you know. Name + Phone is the minimum. This lead will instantly appear in the Sales Pipeline as a new lead.</div>
+
+      <div class="field">
+        <label>Full Name <span class="req">*</span></label>
+        <input id="f-name" placeholder="e.g. Aryan Gupta" autocomplete="off">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Phone <span class="req">*</span></label>
+          <input id="f-phone" type="tel" placeholder="9876543210">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input id="f-email" type="email" placeholder="student@gmail.com">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>City</label>
+          <input id="f-city" placeholder="Delhi">
+        </div>
+        <div class="field">
+          <label>Budget (₹)</label>
+          <input id="f-budget" type="number" placeholder="25000">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Course Interest</label>
+          <select id="f-course">
+            <option value="">— Select —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Source</label>
+          <select id="f-source">
+            <option value="other">Other</option>
+            <option value="website">Website</option>
+            <option value="social_media">Social Media</option>
+            <option value="referral">Referral</option>
+            <option value="cold_call">Cold Call</option>
+            <option value="walk_in">Walk In</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="f-notes" rows="3" placeholder="Any extra details — class, preparation level, exam target…"></textarea>
+      </div>
+
+      <button class="btn-submit" id="btn-submit" onclick="submitLead()">
+        <span>➕</span> Add to Sales Pipeline
+      </button>
+    </div>
+
+    <!-- BULK IMPORT -->
+    <div class="import-panel" id="pane-import" style="display:none">
+      <div class="form-title">Bulk Import Leads</div>
+      <div class="form-sub">Choose your file format. All imported leads appear instantly in the Sales Leads Pipeline.</div>
+
+      <div class="source-grid" id="src-grid">
+        <div class="src-card" onclick="lgPickFile('.xlsx,.xls','xlsx')">
+          <div class="src-icon">📊</div>
+          <div class="src-name">Excel</div>
+          <div class="src-desc">.xlsx / .xls</div>
+        </div>
+        <div class="src-card" onclick="lgPickFile('.csv','csv')">
+          <div class="src-icon">📄</div>
+          <div class="src-name">CSV</div>
+          <div class="src-desc">Comma-separated</div>
+        </div>
+        <div class="src-card" onclick="lgPickFile('.tsv,.txt','tsv')">
+          <div class="src-icon">📃</div>
+          <div class="src-name">TSV</div>
+          <div class="src-desc">Tab-separated</div>
+        </div>
+        <div class="src-card" onclick="lgPickFile('.html,.htm','html')">
+          <div class="src-icon">🌐</div>
+          <div class="src-name">HTML Table</div>
+          <div class="src-desc">First &lt;table&gt;</div>
+        </div>
+        <div class="src-card" onclick="lgPickFile('.pdf','pdf')">
+          <div class="src-icon">📕</div>
+          <div class="src-name">PDF</div>
+          <div class="src-desc">Text extraction</div>
+        </div>
+        <div class="src-card" onclick="lgOpenLink()">
+          <div class="src-icon">🔗</div>
+          <div class="src-name">Google Sheets</div>
+          <div class="src-desc">Paste share link</div>
+        </div>
+      </div>
+
+      <!-- Google Sheets link input -->
+      <div class="link-panel" id="lg-link-panel">
+        <div style="font-size:12px;font-weight:600;color:var(--text2)">Paste Google Sheets / OneDrive share link</div>
+        <input class="link-input" id="lg-link-url" placeholder="https://docs.google.com/spreadsheets/d/...">
+        <div style="font-size:10.5px;color:var(--text3);margin-top:6px;line-height:1.5">Google Sheets: File → Share → Anyone with the link (Viewer). OneDrive: public share/embed link.</div>
+        <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+          <button onclick="document.getElementById('lg-link-panel').style.display='none'" style="background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:6px 14px;border-radius:7px;cursor:pointer;font-family:var(--font);font-size:12px">Cancel</button>
+          <button onclick="lgFetchLink()" style="background:var(--accent);color:var(--bg);border:none;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:700">Fetch & Parse</button>
+        </div>
+      </div>
+
+      <!-- Column mapping -->
+      <div class="map-section" id="map-section">
+        <div class="map-title" id="map-meta">Map your columns</div>
+        <div id="map-form"></div>
+        <div class="import-status" id="import-status"></div>
+        <button class="btn-import" id="btn-import" onclick="lgCommitImport()">⬆ Import to Sales Pipeline</button>
+      </div>
+
+      <div class="import-status" id="src-status"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT — LEADS TABLE -->
+  <div class="right-panel">
+    <div class="rp-topbar">
+      <div class="rp-title" id="rp-title">My Submitted Leads</div>
+      <input class="rp-search" id="rp-search" placeholder="Search name / phone / email…" oninput="filterLeads()">
+      <button onclick="loadLeads()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:6px 12px;border-radius:7px;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">↻ Refresh</button>
+    </div>
+    <div class="rp-table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Student</th><th>Phone</th><th>City</th><th>Budget</th><th>Source</th><th>Stage</th><th>Submitted</th>
+        </tr></thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="lg-file-input" style="display:none" onchange="lgOnFile(event)">
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script src="../assets/js/api.js"></script>
+<script>
+// ── INIT ─────────────────────────────────────────────────────────────────────
+const LEAD_FIELDS = [
+  { key:"fullName",      label:"Full Name",      required:true,  guess:["full name","fullname","name","student name","student"] },
+  { key:"phone",         label:"Phone",          required:false, guess:["phone","mobile","contact","cell","number"] },
+  { key:"email",         label:"Email",          required:false, guess:["email","e-mail","mail"] },
+  { key:"city",          label:"City",           required:false, guess:["city","location","place"] },
+  { key:"budget",        label:"Budget (₹)",     required:false, guess:["budget","budget (₹)","amount","fee budget"] },
+  { key:"source",        label:"Source",         required:false, guess:["source","lead source","how did you hear"] },
+  { key:"notes",         label:"Notes",          required:false, guess:["notes","remarks","comment"] }
+];
+
+let allLeads = [], pendingRows = [], pendingHeaders = [];
+
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  // Auth guard — only leadgen (or admin) can access this panel
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = localStorage.getItem("token");
+  const allowed = ["leadgen","super_admin","admin","sales","hr"];
+  if (!token || !allowed.includes(user.role)) {
+    window.location.href = "../../index.html";
+    return;
+  }
+  // Extra guard: only lead@zyntrixsoftware.com or leadgen role
+  if (user.email && user.email !== "lead@zyntrixsoftware.com" && user.role === "leadgen") {
+    window.location.href = "../../index.html";
+    return;
+  }
+
+  const av = document.getElementById("tb-av");
+  const nm = document.getElementById("tb-name");
+  if (av) av.textContent = (user.name || user.email || "LG").slice(0,2).toUpperCase();
+  if (nm) nm.textContent = user.name || user.email || "LeadGen";
+
+  loadStats();
+  loadLeads();
+  loadCourses();
+});
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+async function loadStats() {
+  const d = await apiRequest("/sales/leadgen/stats");
+  if (!d.error) {
+    document.getElementById("stat-today").textContent = d.today ?? 0;
+    document.getElementById("stat-week").textContent  = d.thisWeek ?? 0;
+    document.getElementById("stat-total").textContent = d.total ?? 0;
+  }
+}
+
+// ── COURSES dropdown ──────────────────────────────────────────────────────────
+async function loadCourses() {
+  const d = await apiRequest("/sales/courses");
+  if (!d.error) {
+    const sel = document.getElementById("f-course");
+    (d.courses || []).forEach(c => {
+      const o = document.createElement("option");
+      o.value = c._id; o.textContent = c.title;
+      sel.appendChild(o);
+    });
+  }
+}
+
+// ── LEADS TABLE ───────────────────────────────────────────────────────────────
+async function loadLeads() {
+  document.getElementById("leads-tbody").innerHTML =
+    '<tr><td colspan="8" class="empty-state" style="padding:30px;color:var(--text3)">Loading…</td></tr>';
+  const d = await apiRequest("/sales/leadgen/my-leads?limit=200");
+  if (d.error) {
+    document.getElementById("leads-tbody").innerHTML =
+      `<tr><td colspan="8" class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">${d.msg}</div></td></tr>`;
+    return;
+  }
+  allLeads = d.leads || [];
+  document.getElementById("rp-title").textContent =
+    `My Submitted Leads (${allLeads.length})`;
+  renderTable(allLeads);
+  loadStats();
+}
+
+const SOURCE_LABELS = {
+  website:"Website",social_media:"Social Media",referral:"Referral",
+  cold_call:"Cold Call",walk_in:"Walk In",other:"Other"
+};
+const STAGE_STYLES = {
+  new_lead:       {label:"New",         color:"#60a5fa",bg:"rgba(59,130,246,.1)"},
+  contacted:      {label:"Contacted",   color:"#818cf8",bg:"rgba(99,102,241,.1)"},
+  demo_scheduled: {label:"Demo Sched.", color:"#a78bfa",bg:"rgba(139,92,246,.1)"},
+  demo_attended:  {label:"Demo Done",   color:"#fbbf24",bg:"rgba(245,158,11,.1)"},
+  enrolled:       {label:"Enrolled",    color:"#00e5b0",bg:"rgba(0,229,176,.1)"},
+  dropped:        {label:"Dropped",     color:"#fb7185",bg:"rgba(255,77,109,.1)"},
+};
+
+function renderTable(leads) {
+  const tbody = document.getElementById("leads-tbody");
+  if (!leads.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">No leads submitted yet</div>
+      <div style="font-size:12px">Add a lead using the form on the left or bulk import a file</div>
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = leads.map((l, i) => {
+    const st = STAGE_STYLES[l.pipelineStage] || {label:l.pipelineStage||"New",color:"#60a5fa",bg:"rgba(59,130,246,.1)"};
+    const date = new Date(l.createdAt).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+    return `<tr>
+      <td style="color:var(--text3);font-size:11px;font-family:var(--mono)">${i+1}</td>
+      <td>
+        <div class="lead-name">${l.fullName}</div>
+        <div class="lead-sub">${l.email||"—"}</div>
+      </td>
+      <td style="font-family:var(--mono);font-size:12px">${l.phone||"—"}</td>
+      <td>${l.city||"—"}</td>
+      <td>${l.budget?("₹"+Number(l.budget).toLocaleString("en-IN")):"—"}</td>
+      <td><span class="src-pill">${SOURCE_LABELS[l.source]||l.source||"—"}</span></td>
+      <td><span class="badge" style="background:${st.bg};color:${st.color};border:1px solid ${st.color}25">${st.label}</span></td>
+      <td style="font-size:11px;color:var(--text3);white-space:nowrap">${date}</td>
+    </tr>`;
+  }).join("");
+}
+
+function filterLeads() {
+  const q = document.getElementById("rp-search").value.toLowerCase().trim();
+  if (!q) { renderTable(allLeads); return; }
+  renderTable(allLeads.filter(l =>
+    (l.fullName||"").toLowerCase().includes(q) ||
+    (l.phone||"").includes(q) ||
+    (l.email||"").toLowerCase().includes(q)
+  ));
+}
+
+// ── ADD SINGLE LEAD ───────────────────────────────────────────────────────────
+async function submitLead() {
+  const name  = document.getElementById("f-name").value.trim();
+  const phone = document.getElementById("f-phone").value.trim();
+  if (!name)  return toast("Full name is required", "err");
+  if (!phone) return toast("Phone number is required", "err");
+
+  const btn = document.getElementById("btn-submit");
+  btn.disabled = true; btn.textContent = "Saving…";
+
+  const body = {
+    fullName:      name,
+    phone,
+    email:         document.getElementById("f-email").value.trim(),
+    city:          document.getElementById("f-city").value.trim(),
+    budget:        parseFloat(document.getElementById("f-budget").value) || 0,
+    courseInterest:document.getElementById("f-course").value || null,
+    source:        document.getElementById("f-source").value || "other",
+    notes:         document.getElementById("f-notes").value.trim(),
+    pipelineStage: "new_lead"
+  };
+
+  const d = await apiRequest("/sales/leads", "POST", body);
+  btn.disabled = false; btn.innerHTML = "<span>➕</span> Add to Sales Pipeline";
+
+  if (d.error) return toast(d.msg, "err");
+
+  toast(`✅ ${name} added to Sales Pipeline!`, "ok");
+  // Clear form
+  ["f-name","f-phone","f-email","f-city","f-budget","f-notes"].forEach(id => { document.getElementById(id).value=""; });
+  document.getElementById("f-source").value = "other";
+  document.getElementById("f-course").value = "";
+  await loadLeads();
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById("tab-add").classList.toggle("active", tab==="add");
+  document.getElementById("tab-import").classList.toggle("active", tab==="import");
+  document.getElementById("pane-add").style.display    = tab==="add"    ? "block" : "none";
+  document.getElementById("pane-import").style.display = tab==="import" ? "block" : "none";
+}
+
+// ── IMPORT — FILE PARSERS ─────────────────────────────────────────────────────
+function lgPickFile(accept, src) {
+  const inp = document.getElementById("lg-file-input");
+  inp.accept = accept; inp.dataset.src = src; inp.value = ""; inp.click();
+}
+
+function lgOpenLink() {
+  document.getElementById("lg-link-panel").style.display = "block";
+}
+
+async function lgOnFile(e) {
+  const file = e.target.files[0];
+  const src  = e.target.dataset.src || "xlsx";
+  if (!file) return;
+  setSrcStatus("⏳ Parsing " + file.name + "…");
+  try {
+    let rows = [];
+    if (["xlsx","csv","tsv"].includes(src)) rows = await lgParseSheet(file, src);
+    else if (src === "html")               rows = await lgParseHtml(file);
+    else if (src === "pdf")                rows = await lgParsePdf(file);
+    if (!rows.length) { setSrcStatus("❌ No rows detected — try CSV or Excel"); return; }
+    pendingRows    = rows;
+    pendingHeaders = Object.keys(rows[0]);
+    setSrcStatus(`✅ Parsed ${rows.length} rows — map your columns below`);
+    openMapping();
+  } catch (err) { setSrcStatus("❌ " + err.message); }
+}
+
+async function lgFetchLink() {
+  const url = document.getElementById("lg-link-url").value.trim();
+  if (!url) return;
+  setSrcStatus("⏳ Fetching…");
+  const res = await apiRequest("/hr/candidates/import-from-link", "POST", { url });
+  if (res.error) { setSrcStatus("❌ " + res.msg); return; }
+  try {
+    let rows;
+    if (res.format === "xlsx") {
+      const bytes = Uint8Array.from(atob(res.data), c => c.charCodeAt(0));
+      const wb = XLSX.read(bytes, { type:"array" });
+      rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval:"" });
+    } else {
+      const wb = XLSX.read(res.data, { type:"string" });
+      rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval:"" });
+    }
+    if (!rows.length) { setSrcStatus("❌ No rows found in fetched content"); return; }
+    pendingRows = rows; pendingHeaders = Object.keys(rows[0]);
+    document.getElementById("lg-link-panel").style.display = "none";
+    setSrcStatus(`✅ Fetched ${rows.length} rows — map your columns below`);
+    openMapping();
+  } catch (e) { setSrcStatus("❌ " + e.message); }
+}
+
+function lgParseSheet(file, src) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => {
+      try {
+        const wb = XLSX.read(e.target.result, { type: src==="xlsx"?"array":"string" });
+        res(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval:"" }));
+      } catch(err) { rej(err); }
+    };
+    r.onerror = () => rej(new Error("File read failed"));
+    src==="xlsx" ? r.readAsArrayBuffer(file) : r.readAsText(file);
+  });
+}
+
+function lgParseHtml(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => {
+      try {
+        const doc = new DOMParser().parseFromString(e.target.result,"text/html");
+        const tbl = doc.querySelector("table");
+        if (!tbl) return rej(new Error("No <table> found in HTML file"));
+        const wb = XLSX.utils.table_to_book(tbl);
+        res(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval:"" }));
+      } catch(err) { rej(err); }
+    };
+    r.onerror = () => rej(new Error("File read failed"));
+    r.readAsText(file);
+  });
+}
+
+async function lgParsePdf(file) {
+  if (!window.pdfjsLib) throw new Error("pdf.js not loaded — use CSV or Excel");
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data:buf }).promise;
+  const lines = [];
+  for (let i=1; i<=pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const txt  = await page.getTextContent();
+    let line="", lastY=null;
+    for (const it of txt.items) {
+      const y = it.transform[5];
+      if (lastY!==null && Math.abs(y-lastY)>2) { if(line.trim()) lines.push(line.trim()); line=""; }
+      line += (line?" ":"")+it.str; lastY=y;
+    }
+    if (line.trim()) lines.push(line.trim());
+  }
+  const rows = [];
+  for (const line of lines) {
+    const emailM = line.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
+    const phoneM = line.match(/[6-9]\d{9}/);
+    if (emailM || phoneM) {
+      const email = emailM?emailM[0]:"";
+      const phone = phoneM?phoneM[0]:"";
+      const name  = line.replace(email,"").replace(phone,"").replace(/[|,;@]+/g," ").trim() || "Unknown";
+      rows.push({ "Full Name":name, "Phone":phone, "Email":email });
+    }
+  }
+  if (!rows.length) throw new Error("Could not detect student rows in PDF — use CSV/Excel");
+  return rows;
+}
+
+// ── MAPPING UI ────────────────────────────────────────────────────────────────
+function guessHeader(guesses) {
+  for (const g of guesses) {
+    const m = pendingHeaders.find(h =>
+      h.toLowerCase().replace(/[^a-z0-9]/g," ").trim() === g.toLowerCase().replace(/[^a-z0-9]/g," ").trim()
+    );
+    if (m) return m;
+  }
+  for (const g of guesses) {
+    const m = pendingHeaders.find(h => h.toLowerCase().includes(g.toLowerCase()));
+    if (m) return m;
+  }
+  return "";
+}
+
+function openMapping() {
+  const ms = document.getElementById("map-section");
+  const bi = document.getElementById("btn-import");
+  ms.style.display = "block";
+  bi.style.display  = "block";
+  document.getElementById("map-meta").textContent =
+    `Map your ${pendingHeaders.length} columns → lead fields (${pendingRows.length} rows)`;
+
+  document.getElementById("map-form").innerHTML = LEAD_FIELDS.map(f => {
+    const auto = guessHeader(f.guess);
+    const opts = `<option value="">— Skip —</option>` +
+      pendingHeaders.map(h => `<option value="${h.replace(/"/g,'&quot;')}" ${auto===h?"selected":""}>${h}</option>`).join("");
+    return `<div class="map-row">
+      <div class="map-lbl">${f.label}${f.required?'<span style="color:var(--rose)"> *</span>':''}</div>
+      <div class="map-arrow">→</div>
+      <select class="map-sel" id="lgmap-${f.key}">${opts}</select>
+    </div>`;
+  }).join("");
+}
+
+// ── COMMIT IMPORT ─────────────────────────────────────────────────────────────
+async function lgCommitImport() {
+  const btn = document.getElementById("btn-import");
+  btn.disabled = true; btn.textContent = "Importing…";
+  setImportStatus("⏳ Sending leads to the pipeline…");
+
+  // Build rows using the mapping
+  const mapping = LEAD_FIELDS.map(f => ({
+    key:    f.key,
+    header: document.getElementById("lgmap-" + f.key)?.value || ""
+  })).filter(m => m.header);
+
+  const SOURCE_MAP = {
+    "website":"website","social media":"social_media","social_media":"social_media",
+    "referral":"referral","cold call":"cold_call","cold_call":"cold_call",
+    "walk in":"walk_in","walk_in":"walk_in","google ads":"website",
+    "other":"other","":" other"
+  };
+
+  const STAGE_MAP = {
+    "new lead":"new_lead","new_lead":"new_lead","contacted":"contacted",
+    "":" new_lead"
+  };
+
+  let inserted=0, skipped=0, errors=[];
+  for (const row of pendingRows) {
+    const obj = {};
+    mapping.forEach(m => { if (row[m.header]!==undefined) obj[m.key] = row[m.header]; });
+
+    if (!obj.fullName && !obj.phone) { skipped++; continue; }
+    obj.fullName    = String(obj.fullName||"").trim() || "Unknown";
+    obj.phone       = String(obj.phone||"").replace(/\D/g,"").slice(-10);
+    obj.budget      = parseFloat(String(obj.budget||"0").replace(/[₹,]/g,"")) || 0;
+    obj.source      = SOURCE_MAP[String(obj.source||"").toLowerCase()] || "other";
+    obj.pipelineStage = "new_lead";
+
+    const d = await apiRequest("/sales/leads", "POST", obj);
+    if (d.error) errors.push({ row: obj.fullName, err: d.msg });
+    else inserted++;
+  }
+
+  btn.disabled = false; btn.textContent = "⬆ Import to Sales Pipeline";
+  const msg = `✅ ${inserted} imported, ${skipped} skipped${errors.length?" · "+errors.length+" errors":""}`;
+  setImportStatus(msg);
+  toast(msg, errors.length ? "err" : "ok");
+  await loadLeads();
+}
+
+function setSrcStatus(msg)    { document.getElementById("src-status").innerHTML    = msg; }
+function setImportStatus(msg) { document.getElementById("import-status").innerHTML = msg; }
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "../../index.html";
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg, type="ok") {
+  const wrap = document.getElementById("toast-wrap");
+  const d = document.createElement("div");
+  d.className = "toast-item " + type; d.textContent = msg;
+  wrap.appendChild(d); setTimeout(() => d.remove(), 4000);
+}
+</script>
+</body>
+</html>

@@ -12,97 +12,99 @@ router.get ("/sales/import/template/:type",     IC.getTemplate);
 router.post("/sales/import/preview",            IC.upload.single("file"), IC.previewImport);
 router.post("/sales/import/:type",              IC.upload.single("file"), IC.importData);
 
-// ── Reports (declare before /:id routes) ─────────────────────────
-router.get("/sales/reports/pipeline",         C.reportPipeline);
-router.get("/sales/reports/revenue",          C.reportRevenue);
-router.get("/sales/reports/conversion",       C.reportConversion);
-router.get("/sales/reports/rep-performance",  C.reportRepPerformance);
+// ── Reports (declare before /:id routes) ─────────────────────
+router.get("/sales/reports/pipeline",           C.reportPipeline);
+router.get("/sales/reports/revenue",            C.reportRevenue);
+router.get("/sales/reports/conversion",         C.reportConversion);
+router.get("/sales/reports/rep-performance",    C.reportRepPerformance);
 
-// ── Student Leads ────────────────────────────────────────────────
-router.get   ("/sales/leads/stats",       C.leadsStats);
-router.get   ("/sales/leads",             C.listLeads);
-router.post  ("/sales/leads",             C.createLead);
-router.get   ("/sales/leads/:id",         C.getLead);
-router.patch ("/sales/leads/:id",         C.updateLead);
-router.patch ("/sales/leads/:id/stage",   C.moveStage);
-router.delete("/sales/leads/:id",         C.deleteLead);
+// ── LeadGen Panel ─────────────────────────────────────────────
+router.get("/sales/leadgen/my-leads",           C.leadgenMyLeads);
+router.get("/sales/leadgen/stats",              C.leadgenStats);
 
-// ── Courses ──────────────────────────────────────────────────────
-router.get   ("/sales/courses",           C.listCourses);
-router.post  ("/sales/courses",           C.createCourse);
-router.get   ("/sales/courses/:id",       C.getCourse);
-router.patch ("/sales/courses/:id",       C.updateCourse);
-router.delete("/sales/courses/:id",       C.deleteCourse);
+// ── Student Leads ─────────────────────────────────────────────
+router.get   ("/sales/leads/stats",             C.leadsStats);
+router.get   ("/sales/leads",                   C.listLeads);
+router.post  ("/sales/leads",                   C.createLead);
+router.get   ("/sales/leads/:id",               C.getLead);
+router.patch ("/sales/leads/:id",               C.updateLead);
+router.patch ("/sales/leads/:id/stage",         C.moveStage);
+router.post  ("/sales/leads/:id/score",         C.scoreLead);
+router.delete("/sales/leads/:id",               C.deleteLead);
+router.post  ("/sales/leads/score-all",         C.scoreAllLeads);
 
-// ── Batches ──────────────────────────────────────────────────────
-router.get   ("/sales/batches",                    C.listBatches);
-router.post  ("/sales/batches",                    C.createBatch);
-router.get   ("/sales/batches/:id",                C.getBatch);
-router.patch ("/sales/batches/:id",                C.updateBatch);
-router.delete("/sales/batches/:id",                C.deleteBatch);
-router.get   ("/sales/batches/:id/enrollments",    C.getBatchEnrollments);
+// ── Courses ───────────────────────────────────────────────────
+router.get   ("/sales/courses",                 C.listCourses);
+router.post  ("/sales/courses",                 C.createCourse);
+router.get   ("/sales/courses/:id",             C.getCourse);
+router.patch ("/sales/courses/:id",             C.updateCourse);
+router.delete("/sales/courses/:id",             C.deleteCourse);
 
-// ── Demo Sessions ────────────────────────────────────────────────
-router.get   ("/sales/demos",                      C.listDemos);
-router.post  ("/sales/demos",                      C.createDemo);
-router.get   ("/sales/demos/:id",                  C.getDemo);
-router.patch ("/sales/demos/:id",                  C.updateDemo);
-router.delete("/sales/demos/:id",                  C.deleteDemo);
-router.post  ("/sales/demos/:id/send-reminder",    C.sendDemoReminder);
+// ── Batches ───────────────────────────────────────────────────
+router.get   ("/sales/batches",                 C.listBatches);
+router.post  ("/sales/batches",                 C.createBatch);
+router.get   ("/sales/batches/:id",             C.getBatch);
+router.patch ("/sales/batches/:id",             C.updateBatch);
+router.delete("/sales/batches/:id",             C.deleteBatch);
+router.get   ("/sales/batches/:id/enrollments", C.getBatchEnrollments);
 
-// ── Enrollments ──────────────────────────────────────────────────
-router.get   ("/sales/enrollments",        C.listEnrollments);
-router.post  ("/sales/enrollments",        C.createEnrollment);
-router.get   ("/sales/enrollments/:id",    C.getEnrollment);
-router.patch ("/sales/enrollments/:id",    C.updateEnrollment);
-router.delete("/sales/enrollments/:id",    C.deleteEnrollment);
+// ── Demo Sessions ─────────────────────────────────────────────
+router.get   ("/sales/demos",                   C.listDemos);
+router.post  ("/sales/demos",                   C.createDemo);
+router.get   ("/sales/demos/:id",               C.getDemo);
+router.patch ("/sales/demos/:id",               C.updateDemo);
+router.delete("/sales/demos/:id",               C.deleteDemo);
+router.post  ("/sales/demos/:id/send-reminder", C.sendDemoReminder);
 
-// ── Payments ─────────────────────────────────────────────────────
-router.get   ("/sales/payments/summary",   C.paymentSummary);
-router.get   ("/sales/payments",           C.listPayments);
-router.post  ("/sales/payments",           C.createPayment);
-router.patch ("/sales/payments/:id",       C.updatePayment);
-router.delete("/sales/payments/:id",       C.voidPayment);
+// ── Enrollments ───────────────────────────────────────────────
+router.get   ("/sales/enrollments",             C.listEnrollments);
+router.post  ("/sales/enrollments",             C.createEnrollment);
+router.get   ("/sales/enrollments/:id",         C.getEnrollment);
+router.patch ("/sales/enrollments/:id",         C.updateEnrollment);
+router.delete("/sales/enrollments/:id",         C.deleteEnrollment);
 
-// ── Follow-Ups ───────────────────────────────────────────────────
-router.get   ("/sales/followups/today",    C.todayFollowUps);
-router.get   ("/sales/followups",          C.listFollowUps);
-router.post  ("/sales/followups",          C.createFollowUp);
-router.patch ("/sales/followups/:id",      C.updateFollowUp);
-router.delete("/sales/followups/:id",      C.deleteFollowUp);
+// ── Payments ──────────────────────────────────────────────────
+router.get   ("/sales/payments/summary",        C.paymentSummary);
+router.get   ("/sales/payments",                C.listPayments);
+router.post  ("/sales/payments",                C.createPayment);
+router.patch ("/sales/payments/:id",            C.updatePayment);
+router.delete("/sales/payments/:id",            C.voidPayment);
 
-// ── Sales Targets ────────────────────────────────────────────────
-router.get   ("/sales/targets/dashboard",  C.targetsDashboard);
-router.get   ("/sales/targets",            C.listTargets);
-router.post  ("/sales/targets",            C.upsertTarget);
+// ── Follow-Ups ────────────────────────────────────────────────
+router.get   ("/sales/followups/today",         C.todayFollowUps);
+router.get   ("/sales/followups",               C.listFollowUps);
+router.post  ("/sales/followups",               C.createFollowUp);
+router.patch ("/sales/followups/:id",           C.updateFollowUp);
+router.delete("/sales/followups/:id",           C.deleteFollowUp);
 
-// ── Coupons ──────────────────────────────────────────────────────
-router.get   ("/sales/coupons",            C.listCoupons);
-router.post  ("/sales/coupons",            C.createCoupon);
-router.get   ("/sales/coupons/:id",        C.getCoupon);
-router.patch ("/sales/coupons/:id",        C.updateCoupon);
-router.delete("/sales/coupons/:id",        C.deleteCoupon);
-router.post  ("/sales/coupons/validate",   C.validateCoupon);  // check code + return discount
+// ── Sales Targets ─────────────────────────────────────────────
+router.get   ("/sales/targets/dashboard",       C.targetsDashboard);
+router.get   ("/sales/targets",                 C.listTargets);
+router.post  ("/sales/targets",                 C.upsertTarget);
 
-// ── Communication Logs ───────────────────────────────────────────
-router.get   ("/sales/commlogs",           C.listCommLogs);    // ?lead=id
-router.post  ("/sales/commlogs",           C.createCommLog);
-router.patch ("/sales/commlogs/:id",       C.updateCommLog);
-router.delete("/sales/commlogs/:id",       C.deleteCommLog);
+// ── Coupons ───────────────────────────────────────────────────
+router.get   ("/sales/coupons",                 C.listCoupons);
+router.post  ("/sales/coupons",                 C.createCoupon);
+router.get   ("/sales/coupons/:id",             C.getCoupon);
+router.patch ("/sales/coupons/:id",             C.updateCoupon);
+router.delete("/sales/coupons/:id",             C.deleteCoupon);
+router.post  ("/sales/coupons/validate",        C.validateCoupon);
 
-// ── Referrals ────────────────────────────────────────────────────
-router.get   ("/sales/referrals",          C.listReferrals);
-router.post  ("/sales/referrals",          C.createReferral);
-router.get   ("/sales/referrals/:id",      C.getReferral);
-router.patch ("/sales/referrals/:id",      C.updateReferral);
-router.delete("/sales/referrals/:id",      C.deleteReferral);
-router.patch ("/sales/referrals/:id/pay",  C.markIncentivePaid);
+// ── Communication Logs ────────────────────────────────────────
+router.get   ("/sales/commlogs",                C.listCommLogs);
+router.post  ("/sales/commlogs",                C.createCommLog);
+router.patch ("/sales/commlogs/:id",            C.updateCommLog);
+router.delete("/sales/commlogs/:id",            C.deleteCommLog);
 
-// ── Sales Rep Stats ───────────────────────────────────────────────
-router.get   ("/sales/reps/stats",         C.repStats);        // per-rep KPIs for leaderboard
+// ── Referrals ─────────────────────────────────────────────────
+router.get   ("/sales/referrals",               C.listReferrals);
+router.post  ("/sales/referrals",               C.createReferral);
+router.get   ("/sales/referrals/:id",           C.getReferral);
+router.patch ("/sales/referrals/:id",           C.updateReferral);
+router.delete("/sales/referrals/:id",           C.deleteReferral);
+router.patch ("/sales/referrals/:id/pay",       C.markIncentivePaid);
 
-// ── Lead Scoring ──────────────────────────────────────────────────
-router.post  ("/sales/leads/:id/score",    C.scoreLead);       // score a single lead
-router.post  ("/sales/leads/score-all",    C.scoreAllLeads);   // batch score all leads (admin)
+// ── Sales Rep Stats ───────────────────────────────────────────
+router.get   ("/sales/reps/stats",              C.repStats);
 
 module.exports = router;
