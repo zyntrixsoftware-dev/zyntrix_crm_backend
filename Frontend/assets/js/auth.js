@@ -8,7 +8,8 @@ const ROLE_MODULES = {
   payroll:     ["payroll"],
   marketing:   ["marketing"],
   lms:         ["lms"],
-  employee:    ["attendance"]
+  employee:    ["attendance"],
+  leadgen:     ["leadgen"]
 };
 
 // ── PAYROLL SECTION ACCESS (account-based) ────────────────────────────────────
@@ -98,6 +99,9 @@ function redirectByRole(role) {
       break;
     case "lms":
       window.location.href = base + "/crm/modules/lms.html";
+      break;
+    case "leadgen":
+      window.location.href = base + "/crm/modules/leadgen/index.html";
       break;
     case "employee":
     default:
