@@ -48,6 +48,13 @@ const studentLeadSchema = new mongoose.Schema(
     stageHistory: { type: [stageHistorySchema], default: () => [] },
 
     source:     { type: String, enum: SOURCES, default: "other" },
+
+    // Where the lead entered the system from.
+    // "leadgen" → captured by the LeadGen panel/team
+    // "sales"   → added manually inside the Sales system
+    // "import"  → bulk-imported from Excel/CSV
+    origin:     { type: String, enum: ["leadgen", "sales", "import", "other"], default: "sales" },
+
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
     lastContactedAt: { type: Date, default: null },
@@ -81,6 +88,7 @@ studentLeadSchema.index({ assignedTo: 1 });
 studentLeadSchema.index({ followUpDate: 1 });
 studentLeadSchema.index({ isArchived: 1 });
 studentLeadSchema.index({ score: -1 });  // for sorting by hottest leads
+studentLeadSchema.index({ origin: 1, createdAt: -1 });  // for "recent from LeadGen" feed
 
 studentLeadSchema.statics.PIPELINE_STAGES = PIPELINE_STAGES;
 studentLeadSchema.statics.SOURCES         = SOURCES;

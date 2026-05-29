@@ -24,6 +24,7 @@ router.get("/sales/leadgen/stats",              C.leadgenStats);
 
 // ── Student Leads ─────────────────────────────────────────────
 router.get   ("/sales/leads/stats",             C.leadsStats);
+router.get   ("/sales/leads/recent-leadgen",    C.recentLeadgenLeads);
 router.get   ("/sales/leads",                   C.listLeads);
 router.post  ("/sales/leads",                   C.createLead);
 router.get   ("/sales/leads/:id",               C.getLead);

@@ -84,7 +84,12 @@ exports.leadsStats = async (req, res) => {
 exports.createLead = async (req, res) => {
   try {
     if (!isSalesOrAdmin(req, res)) return;
-    const lead = await StudentLead.create({ ...req.body, createdBy: req.user.id });
+    // Tag where the lead came from. The LeadGen panel hits this same endpoint,
+    // so a request from a leadgen user is auto-marked as a LeadGen lead.
+    const origin = ["leadgen", "sales", "import", "other"].includes(req.body.origin)
+      ? req.body.origin
+      : (req.user.role === "leadgen" ? "leadgen" : "sales");
+    const lead = await StudentLead.create({ ...req.body, origin, createdBy: req.user.id });
     // send welcome email
     emails().notifyWelcome(lead).catch(e => console.warn("email:", e.message));
     return res.status(201).json({ lead });
@@ -1262,6 +1267,48 @@ exports.leadgenMyLeads = async (req, res) => {
     return res.json({ leads, total });
   } catch (err) {
     console.error("leadgenMyLeads:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// GET /api/sales/leads/recent-leadgen — recent leads captured by the LeadGen team,
+// surfaced inside the Sales pipeline. Supports ?days=7 (window) and ?limit=50.
+exports.recentLeadgenLeads = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+
+    const days  = Math.min(90, Math.max(1, parseInt(req.query.days)  || 7));
+    const limit  = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
+    const since  = new Date(); since.setDate(since.getDate() - days); since.setHours(0, 0, 0, 0);
+
+    // Match anything explicitly tagged "leadgen", plus historical leads created by
+    // users with the leadgen role (which predate the origin field).
+    const User = require("../models/user");
+    const leadgenUsers = await User.find({ role: "leadgen" }, "_id").lean();
+    const leadgenIds   = leadgenUsers.map(u => u._id);
+
+    const q = {
+      isArchived: false,
+      $or: [{ origin: "leadgen" }]
+    };
+    if (leadgenIds.length) q.$or.push({ createdBy: { $in: leadgenIds } });
+
+    const recentQ = { ...q, createdAt: { $gte: since } };
+
+    const [leads, total, totalAllTime] = await Promise.all([
+      StudentLead.find(recentQ)
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .populate("courseInterest", "title")
+        .populate("assignedTo", "name email")
+        .lean(),
+      StudentLead.countDocuments(recentQ),
+      StudentLead.countDocuments(q)
+    ]);
+
+    return res.json({ leads, total, totalAllTime, days });
+  } catch (err) {
+    console.error("recentLeadgenLeads:", err);
     return res.status(500).json({ msg: "Server error" });
   }
 };

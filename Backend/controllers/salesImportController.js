@@ -66,6 +66,14 @@ function clean(v) {
   return v !== null && v !== undefined ? String(v).trim() : "";
 }
 
+// Only the sales team + admins may import / append data.
+const IMPORT_ROLES = ["sales", "hr", "super_admin", "admin", "leadgen"];
+function requireImporter(req, res) {
+  const ok = IMPORT_ROLES.includes(req.user?.role);
+  if (!ok) res.status(403).json({ msg: "Access denied — sales team or admin only" });
+  return ok;
+}
+
 // Build lookup: customId → ObjectId for each model
 async function buildLookup(Model, customIdField, importIdField = null) {
   const docs = await Model.find({}, `_id ${customIdField} ${importIdField || ""}`.trim()).lean();
@@ -80,6 +88,7 @@ async function buildLookup(Model, customIdField, importIdField = null) {
 // ── PREVIEW ───────────────────────────────────────────────────────────────────
 exports.previewImport = async (req, res) => {
   try {
+    if (!requireImporter(req, res)) return;
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
     const rows = parseFile(req.file.buffer);
     if (!rows.length) return res.status(400).json({ msg: "File has no data rows" });
@@ -181,6 +190,7 @@ exports.listTypes = (req, res) => {
 // ── MAIN IMPORT ───────────────────────────────────────────────────────────────
 exports.importData = async (req, res) => {
   try {
+    if (!requireImporter(req, res)) return;
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
     const type = req.params.type;
     const rows = parseFile(req.file.buffer);
@@ -265,11 +275,17 @@ async function importLeads(rows, userId) {
         createdBy:     userId
       };
 
-      // Upsert by phone (avoid duplicates on re-import)
+      // Append + update existing: re-importing the same phone updates that lead,
+      // brand-new rows are inserted. Nothing is deleted. $setOnInsert keeps the
+      // origin of pre-existing leads (e.g. "leadgen") intact on re-import.
       if (phone) {
-        await StudentLead.findOneAndUpdate({ phone }, { $set: doc }, { upsert: true });
+        await StudentLead.findOneAndUpdate(
+          { phone },
+          { $set: doc, $setOnInsert: { origin: "import" } },
+          { upsert: true }
+        );
       } else {
-        await StudentLead.create(doc);
+        await StudentLead.create({ ...doc, origin: "import" });
       }
       inserted++;
     } catch (e) {

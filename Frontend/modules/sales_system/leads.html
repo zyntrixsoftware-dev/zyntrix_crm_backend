@@ -130,6 +130,24 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
 .spin{animation:spinning .8s linear infinite;display:inline-block}
 @keyframes spinning{to{transform:rotate(360deg)}}
 .ls{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px;gap:8px}
+/* LEADGEN STRIP */
+.lg-strip{background:linear-gradient(90deg,var(--purple-dim),transparent);border-bottom:1px solid var(--border);padding:9px 22px;display:none}
+.lg-strip.show{display:block}
+.lg-head{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.lg-title{font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:6px}
+.lg-pill{font-family:var(--mono);font-size:9.5px;font-weight:600;background:var(--purple-dim);color:var(--purple);padding:2px 7px;border-radius:20px}
+.lg-sub{font-size:10px;color:var(--text3)}
+.lg-collapse{margin-left:auto;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:6px;cursor:pointer;font-size:11px;padding:3px 9px}
+.lg-collapse:hover{color:var(--text);background:var(--bg3)}
+.lg-track{display:flex;gap:8px;overflow-x:auto;padding-bottom:3px}
+.lg-track::-webkit-scrollbar{height:4px}
+.lg-track::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.lg-card{flex-shrink:0;width:172px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:9px;padding:8px 10px;cursor:pointer;transition:all .15s}
+.lg-card:hover{background:var(--bg4);transform:translateY(-1px)}
+.lg-card .nm{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lg-card .mt{font-size:10px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lg-card .dt{font-size:9px;color:var(--purple);font-family:var(--mono);margin-top:4px}
+.origin-tag{font-size:8px;font-weight:700;padding:2px 5px;border-radius:4px;background:var(--purple-dim);color:var(--purple);text-transform:uppercase;letter-spacing:.3px;margin-right:4px}
 </style>
 </head>
 <body>
@@ -207,6 +225,15 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
       <option value="graduate">Graduate</option><option value="working_professional">Working Professional</option>
     </select>
   </div>
+  <!-- RECENT FROM LEADGEN -->
+  <div class="lg-strip" id="lgStrip">
+    <div class="lg-head">
+      <span class="lg-title">&#9889; Recent from LeadGen <span class="lg-pill" id="lgCount">0</span></span>
+      <span class="lg-sub" id="lgSub">Last 7 days</span>
+      <button class="lg-collapse" id="lgToggle" onclick="toggleLg()">Hide</button>
+    </div>
+    <div class="lg-track" id="lgTrack"></div>
+  </div>
   <div class="board-wrap"><div class="board" id="board"><div class="ls"><span class="spin">&#9696;</span>Loading leads...</div></div></div>
 </div>
 </div>
@@ -277,6 +304,32 @@ let allLeads=[],curLead=null,curTab="info",dragId=null;
   await Promise.all([loadBoard(),loadCourses()]);
 })();
 
+let lgCollapsed=false;
+async function loadLeadgenStrip(){
+  const d=await apiRequest("/sales/leads/recent-leadgen?days=7&limit=30");
+  const strip=document.getElementById("lgStrip");
+  if(d.error||!d.leads||!d.leads.length){strip.classList.remove("show");return;}
+  document.getElementById("lgCount").textContent=d.total||d.leads.length;
+  document.getElementById("lgSub").textContent=`Last ${d.days||7} days · ${d.totalAllTime||d.total} total from LeadGen`;
+  const track=document.getElementById("lgTrack");
+  track.innerHTML=d.leads.map(l=>{
+    const days=Math.floor((Date.now()-new Date(l.createdAt))/86400000);
+    const when=days===0?"Today":days===1?"Yesterday":days+"d ago";
+    const meta=[l.phone,l.city].filter(Boolean).join(" · ")||(l.email||"—");
+    return`<div class="lg-card" onclick="openDetail('${l._id}')">
+      <div class="nm">${esc(l.fullName)}</div>
+      <div class="mt">${esc(meta)}</div>
+      <div class="dt">${when}${l.courseInterest?.title?" · "+esc(l.courseInterest.title):""}</div>
+    </div>`;
+  }).join("");
+  if(!lgCollapsed)strip.classList.add("show");
+}
+function toggleLg(){
+  lgCollapsed=!lgCollapsed;
+  document.getElementById("lgTrack").style.display=lgCollapsed?"none":"flex";
+  document.getElementById("lgToggle").textContent=lgCollapsed?"Show":"Hide";
+}
+
 async function loadCourses(){
   const d=await apiRequest("/sales/courses");
   if(d.error)return;
@@ -298,6 +351,7 @@ async function loadBoard(){
     document.getElementById("kDropped").textContent=sm["dropped"]||0;
   }
   renderBoard();
+  loadLeadgenStrip();
 }
 
 function applyFilter(){
@@ -338,7 +392,7 @@ function renderCard(l,st){
     ${l.courseInterest?.title?`<div class="lcourse">${esc(l.courseInterest.title)}</div>`:""}
     <div class="lmeta">${[l.phone,l.city,l.budget?"&#8377;"+l.budget.toLocaleString():""].filter(Boolean).join(" &bull; ")}</div>
     <div class="lfoot">
-      <span class="sbadge" style="background:${SRCCOL[l.source]||"var(--bg4)"};color:var(--text2)">${l.source||"other"}</span>
+      <span>${l.origin==="leadgen"?'<span class="origin-tag" title="Captured by LeadGen team">&#9889; LeadGen</span>':""}<span class="sbadge" style="background:${SRCCOL[l.source]||"var(--bg4)"};color:var(--text2)">${l.source||"other"}</span></span>
       <span class="ldate">${days===0?"Today":days+"d ago"}</span>
     </div>
   </div>`;
