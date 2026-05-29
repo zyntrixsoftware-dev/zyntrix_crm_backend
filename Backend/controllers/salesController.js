@@ -1156,7 +1156,7 @@ exports.markIncentivePaid = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // ══ SALES REP STATS ══════════════════════════════════════════════════════════
 // ─────────────────────────────────────────────────────────────────────────────
-const User = require("../models/User");
+const User = require("../models/user");
 
 // GET /api/sales/reps/stats?month=&year=
 exports.repStats = async (req, res) => {
