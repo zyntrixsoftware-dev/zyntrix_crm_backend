@@ -3,26 +3,19 @@ const mongoose = require("mongoose");
 const CATEGORIES = ["tech", "design", "business", "marketing", "language", "other"];
 const MODES      = ["online", "offline", "hybrid"];
 
-const moduleSchema = new mongoose.Schema(
-  {
-    title:    { type: String, default: "" },
-    duration: { type: String, default: "" }   // e.g. "2 weeks"
-  },
-  { _id: false }
-);
-
+// Sales-side Course: pricing catalogue only.
+// Content (curriculum, thumbnail, recordings) lives in the LMS — NOT here.
 const courseSchema = new mongoose.Schema(
   {
     title:         { type: String, required: true, trim: true },
     slug:          { type: String, unique: true, lowercase: true, trim: true },
-    description:   { type: String, default: "" },
+    description:   { type: String, default: "" },   // short sales pitch
     category:      { type: String, enum: CATEGORIES, default: "tech" },
     durationWeeks: { type: Number, default: 8 },
-    price:         { type: Number, default: 0 },
-    discountPrice: { type: Number, default: 0 },
+    price:         { type: Number, default: 0 },    // MRP
+    discountPrice: { type: Number, default: 0 },    // selling price
     mode:          { type: String, enum: MODES, default: "online" },
-    curriculum:    { type: [moduleSchema], default: [] },
-    thumbnail:     { type: String, default: "" },  // URL
+    highlights:    { type: [String], default: [] }, // bullet selling points shown during demo
     isActive:      { type: Boolean, default: true },
     createdBy:     { type: mongoose.Schema.Types.ObjectId, ref: "User" }
   },

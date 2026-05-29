@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coupons & Discounts — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);--blue:#3d8ef0;--blue-dim:rgba(61,142,240,.12);--amber:#f5a623;--amber-dim:rgba(245,166,35,.12);--rose:#ff4d6d;--rose-dim:rgba(255,77,109,.12);--purple:#b57bee;--purple-dim:rgba(181,123,238,.12);--teal:#22d3ee;--teal-dim:rgba(34,211,238,.12);--green:#22c55e;--green-dim:rgba(34,197,94,.12);--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg);flex-shrink:0}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-a.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;min-height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-hd{flex:1}.pg-title{font-family:var(--display);font-size:15px;font-weight:700}.pg-crumb{font-size:10px;color:var(--text3)}.pg-crumb span{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s;text-decoration:none}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-prim:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-rose{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-rose:hover{background:rgba(255,77,109,.2)}
+.btn-amber{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,.2)}.btn-amber:hover{background:rgba(245,166,35,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+
+/* KPI strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 22px 0}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc)}
+.kpi-val{font-family:var(--display);font-size:26px;font-weight:800;line-height:1;letter-spacing:-1px}
+.kpi-lbl{font-size:10.5px;color:var(--text3);margin-top:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+
+/* filter bar */
+.filter-bar{padding:12px 22px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:transparent;transition:all .15s}
+.chip.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(0,229,176,.3)}
+input.srch{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:6px 12px;outline:none;transition:border .15s;min-width:180px}
+input.srch:focus{border-color:var(--accent)}
+.ml-auto{margin-left:auto}
+
+/* coupon cards grid */
+.content{flex:1;overflow-y:auto;padding:16px 22px 32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.coup-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s;position:relative}
+.coup-card:hover{border-color:var(--border2);box-shadow:0 8px 32px rgba(0,0,0,.35)}
+.coup-card.inactive{opacity:.55}
+.coup-top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.coup-code{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent);letter-spacing:1px;flex:1}
+.coup-type-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px}
+.tb-promo{background:var(--blue-dim);color:var(--blue)}
+.tb-scholarship{background:var(--purple-dim);color:var(--purple)}
+.tb-referral{background:var(--green-dim);color:var(--green)}
+.tb-staff{background:var(--amber-dim);color:var(--amber)}
+.coup-body{padding:14px 16px}
+.coup-desc{font-size:11.5px;color:var(--text2);margin-bottom:12px;line-height:1.5}
+.coup-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.meta-item{display:flex;flex-direction:column;gap:2px}
+.meta-lbl{font-size:9.5px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.meta-val{font-size:12px;font-weight:600;color:var(--text)}
+.coup-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.usage-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.usage-bar{height:100%;border-radius:2px;background:var(--accent);transition:width .4s}
+.usage-txt{font-size:10px;color:var(--text3);white-space:nowrap}
+
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:12px}
+.empty-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px}
+
+/* drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}.overlay.show{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:480px;background:var(--bg2);border-left:1px solid var(--border2);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drw-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.drw-title{flex:1;font-family:var(--display);font-size:15px;font-weight:700}
+.drw-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:4px;line-height:1}.drw-close:hover{color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:20px 22px}
+.drw-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px}
+.field{margin-bottom:14px;display:flex;flex-direction:column;gap:4px}
+.field label{font-size:10.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field .hint{font-size:10.5px;color:var(--text3)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle-field{display:flex;align-items:center;gap:10px;padding:10px 0}
+.toggle-lbl{font-size:12px;font-weight:600;color:var(--text2)}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;border-radius:10px;background:var(--bg4);cursor:pointer;transition:.2s}
+.toggle input:checked + .toggle-slider{background:var(--accent)}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.2s}
+.toggle input:checked + .toggle-slider::before{transform:translateX(16px)}
+
+/* validate modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px;width:420px;max-width:95vw}
+.modal-title{font-family:var(--display);font-size:16px;font-weight:700;margin-bottom:18px}
+.result-card{background:var(--bg3);border-radius:10px;padding:14px 16px;margin-top:14px}
+.result-success{border:1px solid rgba(0,229,176,.3)}
+.result-error{border:1px solid rgba(255,77,109,.3)}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;gap:10px;flex-direction:column}
+.toast-item{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:12.5px;font-weight:500;box-shadow:0 8px 28px rgba(0,0,0,.4);animation:slideIn .25s ease;min-width:240px}
+.toast-item.ok{border-color:rgba(0,229,176,.35);color:var(--accent)}
+.toast-item.err{border-color:rgba(255,77,109,.35);color:var(--rose)}
+@keyframes slideIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">Z</div>
+    <div>
+      <div style="font-family:var(--display);font-size:13px;font-weight:800;color:var(--text)">ZyntrixCRM</div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Sales System</div>
+    </div>
+  </div>
+  <div class="nav-grp">
+    <div class="nav-lbl">Pipeline</div>
+    <a class="nav-a" href="leads.html"><span class="nav-ico">◈</span> Leads</a>
+    <a class="nav-a" href="demos.html"><span class="nav-ico">▷</span> Demo Sessions</a>
+    <a class="nav-a" href="followups.html"><span class="nav-ico">◷</span> Follow-ups</a>
+  </div>
+  <div class="nav-grp">
+    <div class="nav-lbl">Revenue</div>
+    <a class="nav-a" href="enrollments.html"><span class="nav-ico">✓</span> Enrollments</a>
+    <a class="nav-a" href="payments.html"><span class="nav-ico">₹</span> Payments</a>
+    <a class="nav-a on" href="coupons.html"><span class="nav-ico">🏷</span> Coupons</a>
+  </div>
+  <div class="nav-grp">
+    <div class="nav-lbl">Catalogue</div>
+    <a class="nav-a" href="courses.html"><span class="nav-ico">◉</span> Courses</a>
+    <a class="nav-a" href="batches.html"><span class="nav-ico">≡</span> Batches</a>
+  </div>
+  <div class="nav-grp">
+    <div class="nav-lbl">Growth</div>
+    <a class="nav-a" href="referrals.html"><span class="nav-ico">⇋</span> Referrals</a>
+    <a class="nav-a" href="comms.html"><span class="nav-ico">◎</span> Comm Logs</a>
+    <a class="nav-a" href="sales-reps.html"><span class="nav-ico">▲</span> Sales Reps</a>
+  </div>
+  <div class="nav-grp">
+    <div class="nav-lbl">Reports</div>
+    <a class="nav-a" href="targets.html"><span class="nav-ico">◎</span> Targets</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">▣</span> Analytics</a>
+  </div>
+  <div class="sb-foot">
+    <a class="nav-a" href="../../index.html"><span class="nav-ico">←</span> Back to CRM</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="pg-hd">
+      <div class="pg-title">Coupons & Discounts</div>
+      <div class="pg-crumb">Sales System → <span>Coupons</span></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openValidate()">🔍 Validate Code</button>
+    <button class="btn btn-prim btn-sm" onclick="openCreate()">+ New Coupon</button>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpi-strip">
+    <div class="kpi" style="--kc:var(--accent)">
+      <div class="kpi-val" id="kpi-total">—</div>
+      <div class="kpi-lbl">Total Coupons</div>
+    </div>
+    <div class="kpi" style="--kc:var(--green)">
+      <div class="kpi-val" id="kpi-active">—</div>
+      <div class="kpi-lbl">Active</div>
+    </div>
+    <div class="kpi" style="--kc:var(--amber)">
+      <div class="kpi-val" id="kpi-uses">—</div>
+      <div class="kpi-lbl">Total Uses</div>
+    </div>
+    <div class="kpi" style="--kc:var(--rose)">
+      <div class="kpi-val" id="kpi-expired">—</div>
+      <div class="kpi-lbl">Expired / Inactive</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar">
+    <button class="chip active" onclick="setFilter(this,'')">All</button>
+    <button class="chip" onclick="setFilter(this,'promo')">Promo</button>
+    <button class="chip" onclick="setFilter(this,'scholarship')">Scholarship</button>
+    <button class="chip" onclick="setFilter(this,'referral')">Referral</button>
+    <button class="chip" onclick="setFilter(this,'staff')">Staff</button>
+    <input class="srch ml-auto" id="srch" placeholder="Search code…" oninput="debSearch()" />
+  </div>
+
+  <!-- CARDS -->
+  <div class="content">
+    <div class="grid" id="cards-grid"></div>
+    <div class="empty" id="empty" style="display:none">
+      <div class="empty-icon">🏷️</div>
+      <div class="empty-title">No coupons found</div>
+      <div style="font-size:12px">Create your first coupon to offer discounts and scholarships</div>
+    </div>
+  </div>
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- CREATE / EDIT DRAWER -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drw-hdr">
+    <div class="drw-title" id="drw-title">New Coupon</div>
+    <button class="drw-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drw-body">
+    <input type="hidden" id="edit-id">
+    <div class="field">
+      <label>Coupon Code *</label>
+      <input id="f-code" placeholder="e.g. LAUNCH50" style="font-family:var(--mono);text-transform:uppercase">
+      <span class="hint">Will be auto-uppercased. Share this with students.</span>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <input id="f-desc" placeholder="e.g. Launch offer — flat ₹500 off">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Coupon Type</label>
+        <select id="f-type">
+          <option value="promo">Promo</option>
+          <option value="scholarship">Scholarship</option>
+          <option value="referral">Referral</option>
+          <option value="staff">Staff</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Discount Type</label>
+        <select id="f-dtype" onchange="onDiscountTypeChange()">
+          <option value="flat">Flat (₹)</option>
+          <option value="percent">Percentage (%)</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label id="lbl-val">Discount Value (₹)</label>
+        <input id="f-val" type="number" min="0" placeholder="500">
+      </div>
+      <div class="field" id="max-disc-wrap">
+        <label>Max Discount Cap (₹)</label>
+        <input id="f-maxdisc" type="number" min="0" placeholder="Leave blank = no cap">
+      </div>
+    </div>
+    <div class="field">
+      <label>Minimum Order Value (₹)</label>
+      <input id="f-minorder" type="number" min="0" placeholder="0 = no minimum">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Max Uses</label>
+        <input id="f-maxuses" type="number" min="1" placeholder="Leave blank = unlimited">
+      </div>
+      <div class="field" id="valid-till-wrap">
+        <label>Valid Till</label>
+        <input id="f-validtill" type="date">
+      </div>
+    </div>
+    <div class="toggle-field">
+      <label class="toggle"><input type="checkbox" id="f-active" checked><span class="toggle-slider"></span></label>
+      <span class="toggle-lbl">Active (can be used by students)</span>
+    </div>
+    <div class="toggle-field">
+      <label class="toggle"><input type="checkbox" id="f-approval"><span class="toggle-slider"></span></label>
+      <span class="toggle-lbl">Requires manager approval before use</span>
+    </div>
+  </div>
+  <div class="drw-foot">
+    <button class="btn btn-prim" onclick="submitCoupon()">Save Coupon</button>
+    <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+    <button class="btn btn-rose btn-sm" id="del-btn" style="margin-left:auto;display:none" onclick="deactivateCoupon()">Deactivate</button>
+  </div>
+</div>
+
+<!-- VALIDATE MODAL -->
+<div class="modal" id="val-modal">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div class="modal-title">Validate Coupon Code</div>
+      <button class="drw-close" onclick="closeValidate()">✕</button>
+    </div>
+    <div class="field">
+      <label>Coupon Code</label>
+      <input id="v-code" placeholder="Enter code" style="font-family:var(--mono);text-transform:uppercase">
+    </div>
+    <div class="field">
+      <label>Enrollment Fee (₹)</label>
+      <input id="v-fee" type="number" placeholder="e.g. 15000">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-prim" onclick="doValidate()">Check Coupon</button>
+      <button class="btn btn-ghost" onclick="closeValidate()">Cancel</button>
+    </div>
+    <div id="v-result" style="margin-top:0"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000/api'
+  : '/api';
+
+let allCoupons = [], filterType = '', searchQ = '', debTimer = null;
+
+async function apiRequest(path, opts = {}) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    ...opts
+  });
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.msg || 'Request failed'); }
+  return res.json();
+}
+
+async function init() {
+  await loadCoupons();
+}
+
+async function loadCoupons() {
+  try {
+    const data = await apiRequest('/sales/coupons?limit=500');
+    allCoupons = data.coupons || [];
+    updateKPIs();
+    render();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+function updateKPIs() {
+  const now = new Date();
+  const active  = allCoupons.filter(c => c.isActive && (!c.validTill || new Date(c.validTill) > now) && (c.maxUses === null || c.usedCount < c.maxUses));
+  const expired = allCoupons.filter(c => !c.isActive || (c.validTill && new Date(c.validTill) <= now) || (c.maxUses !== null && c.usedCount >= c.maxUses));
+  const uses    = allCoupons.reduce((s, c) => s + (c.usedCount || 0), 0);
+  document.getElementById('kpi-total').textContent   = allCoupons.length;
+  document.getElementById('kpi-active').textContent  = active.length;
+  document.getElementById('kpi-uses').textContent    = uses;
+  document.getElementById('kpi-expired').textContent = expired.length;
+}
+
+function render() {
+  const now = new Date();
+  let list = allCoupons;
+  if (filterType) list = list.filter(c => c.couponType === filterType);
+  if (searchQ)    list = list.filter(c => c.code.includes(searchQ.toUpperCase()));
+
+  const grid  = document.getElementById('cards-grid');
+  const empty = document.getElementById('empty');
+  if (!list.length) { grid.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  grid.innerHTML = list.map(c => {
+    const isExpired = c.validTill && new Date(c.validTill) < now;
+    const isFull    = c.maxUses !== null && c.usedCount >= c.maxUses;
+    const inactive  = !c.isActive || isExpired || isFull;
+    const usePct    = c.maxUses ? Math.min(100, Math.round(c.usedCount / c.maxUses * 100)) : 0;
+    const discLabel = c.discountType === 'flat' ? `₹${c.discountValue} off` : `${c.discountValue}% off${c.maxDiscount ? ` (max ₹${c.maxDiscount})` : ''}`;
+    const expLabel  = c.validTill ? new Date(c.validTill).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : 'No expiry';
+    const statusDot = inactive
+      ? `<span style="font-size:9px;background:var(--rose-dim);color:var(--rose);padding:2px 7px;border-radius:10px;font-weight:700">${isExpired?'EXPIRED':isFull?'EXHAUSTED':'INACTIVE'}</span>`
+      : `<span style="font-size:9px;background:var(--green-dim);color:var(--green);padding:2px 7px;border-radius:10px;font-weight:700">ACTIVE</span>`;
+    return `<div class="coup-card ${inactive?'inactive':''}" onclick="editCoupon('${c._id}')">
+      <div class="coup-top">
+        <div class="coup-code">${c.code}</div>
+        <span class="coup-type-badge tb-${c.couponType}">${c.couponType}</span>
+        ${statusDot}
+      </div>
+      <div class="coup-body">
+        <div class="coup-desc">${c.description || '—'}</div>
+        <div class="coup-meta">
+          <div class="meta-item"><div class="meta-lbl">Discount</div><div class="meta-val" style="color:var(--accent)">${discLabel}</div></div>
+          <div class="meta-item"><div class="meta-lbl">Min Order</div><div class="meta-val">₹${c.minOrderValue || 0}</div></div>
+          <div class="meta-item"><div class="meta-lbl">Valid Till</div><div class="meta-val">${expLabel}</div></div>
+          <div class="meta-item"><div class="meta-lbl">Uses</div><div class="meta-val">${c.usedCount} ${c.maxUses ? '/ ' + c.maxUses : '/ ∞'}</div></div>
+        </div>
+      </div>
+      <div class="coup-footer">
+        <div class="usage-bar-wrap">${c.maxUses ? `<div class="usage-bar" style="width:${usePct}%"></div>` : '<div class="usage-bar" style="width:0%"></div>'}</div>
+        <div class="usage-txt">${c.maxUses ? usePct + '% used' : 'Unlimited'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(el, type) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  filterType = type;
+  render();
+}
+
+function debSearch() {
+  clearTimeout(debTimer);
+  debTimer = setTimeout(() => { searchQ = document.getElementById('srch').value.trim(); render(); }, 250);
+}
+
+// ── CREATE / EDIT ────────────────────────────────────────────
+function openCreate() {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('drw-title').textContent = 'New Coupon';
+  document.getElementById('f-code').value        = '';
+  document.getElementById('f-desc').value        = '';
+  document.getElementById('f-type').value        = 'promo';
+  document.getElementById('f-dtype').value       = 'flat';
+  document.getElementById('f-val').value         = '';
+  document.getElementById('f-maxdisc').value     = '';
+  document.getElementById('f-minorder').value    = '';
+  document.getElementById('f-maxuses').value     = '';
+  document.getElementById('f-validtill').value   = '';
+  document.getElementById('f-active').checked    = true;
+  document.getElementById('f-approval').checked  = false;
+  document.getElementById('del-btn').style.display = 'none';
+  onDiscountTypeChange();
+  openDrawer();
+}
+
+async function editCoupon(id) {
+  const c = allCoupons.find(x => x._id === id);
+  if (!c) return;
+  document.getElementById('edit-id').value       = c._id;
+  document.getElementById('drw-title').textContent = 'Edit Coupon';
+  document.getElementById('f-code').value        = c.code;
+  document.getElementById('f-desc').value        = c.description || '';
+  document.getElementById('f-type').value        = c.couponType;
+  document.getElementById('f-dtype').value       = c.discountType;
+  document.getElementById('f-val').value         = c.discountValue;
+  document.getElementById('f-maxdisc').value     = c.maxDiscount || '';
+  document.getElementById('f-minorder').value    = c.minOrderValue || 0;
+  document.getElementById('f-maxuses').value     = c.maxUses !== null ? c.maxUses : '';
+  document.getElementById('f-validtill').value   = c.validTill ? c.validTill.split('T')[0] : '';
+  document.getElementById('f-active').checked    = c.isActive;
+  document.getElementById('f-approval').checked  = c.requiresApproval;
+  document.getElementById('del-btn').style.display = 'flex';
+  onDiscountTypeChange();
+  openDrawer();
+}
+
+function onDiscountTypeChange() {
+  const isPercent = document.getElementById('f-dtype').value === 'percent';
+  document.getElementById('lbl-val').textContent        = isPercent ? 'Discount Value (%)' : 'Discount Value (₹)';
+  document.getElementById('max-disc-wrap').style.display = isPercent ? '' : 'none';
+}
+
+async function submitCoupon() {
+  const id   = document.getElementById('edit-id').value;
+  const code = document.getElementById('f-code').value.trim().toUpperCase();
+  const val  = parseFloat(document.getElementById('f-val').value);
+  if (!code) return toast('Coupon code is required', 'err');
+  if (isNaN(val) || val < 0) return toast('Discount value is required', 'err');
+
+  const body = {
+    code,
+    description:      document.getElementById('f-desc').value.trim(),
+    couponType:       document.getElementById('f-type').value,
+    discountType:     document.getElementById('f-dtype').value,
+    discountValue:    val,
+    maxDiscount:      document.getElementById('f-maxdisc').value ? parseFloat(document.getElementById('f-maxdisc').value) : null,
+    minOrderValue:    parseFloat(document.getElementById('f-minorder').value) || 0,
+    maxUses:          document.getElementById('f-maxuses').value ? parseInt(document.getElementById('f-maxuses').value) : null,
+    validTill:        document.getElementById('f-validtill').value || null,
+    isActive:         document.getElementById('f-active').checked,
+    requiresApproval: document.getElementById('f-approval').checked
+  };
+  try {
+    if (id) {
+      await apiRequest('/sales/coupons/' + id, { method: 'PATCH', body: JSON.stringify(body) });
+      toast('Coupon updated', 'ok');
+    } else {
+      await apiRequest('/sales/coupons', { method: 'POST', body: JSON.stringify(body) });
+      toast('Coupon created', 'ok');
+    }
+    closeDrawer();
+    await loadCoupons();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function deactivateCoupon() {
+  const id = document.getElementById('edit-id').value;
+  if (!id || !confirm('Deactivate this coupon?')) return;
+  try {
+    await apiRequest('/sales/coupons/' + id, { method: 'DELETE' });
+    toast('Coupon deactivated', 'ok');
+    closeDrawer();
+    await loadCoupons();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+// ── VALIDATE ─────────────────────────────────────────────────
+function openValidate() {
+  document.getElementById('val-modal').classList.add('show');
+  document.getElementById('v-code').value = '';
+  document.getElementById('v-fee').value  = '';
+  document.getElementById('v-result').innerHTML = '';
+}
+function closeValidate() { document.getElementById('val-modal').classList.remove('show'); }
+
+async function doValidate() {
+  const code = document.getElementById('v-code').value.trim();
+  const fee  = parseFloat(document.getElementById('v-fee').value);
+  if (!code || !fee) return toast('Enter code and fee', 'err');
+  try {
+    const d = await apiRequest('/sales/coupons/validate', { method:'POST', body: JSON.stringify({ code, fee }) });
+    document.getElementById('v-result').innerHTML = `
+      <div class="result-card result-success" style="margin-top:14px">
+        <div style="color:var(--accent);font-weight:700;margin-bottom:8px">✓ Valid Coupon — ${d.coupon.code}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+          <div><span style="color:var(--text3)">Original Fee:</span> <strong>₹${fee.toLocaleString('en-IN')}</strong></div>
+          <div><span style="color:var(--text3)">Discount:</span> <strong style="color:var(--rose)">−₹${d.discount.toFixed(0)}</strong></div>
+          <div style="grid-column:1/-1"><span style="color:var(--text3)">Final Fee:</span> <strong style="color:var(--accent);font-size:14px">₹${d.finalFee.toLocaleString('en-IN')}</strong></div>
+        </div>
+      </div>`;
+  } catch (e) {
+    document.getElementById('v-result').innerHTML = `<div class="result-card result-error" style="margin-top:14px;font-size:12px;color:var(--rose)">✗ ${e.message}</div>`;
+  }
+}
+
+// ── DRAWER HELPERS ────────────────────────────────────────────
+function openDrawer()  { document.getElementById('drawer').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+
+// ── TOAST ────────────────────────────────────────────────────
+function toast(msg, type = 'ok') {
+  const t = document.getElementById('toast');
+  const d = document.createElement('div');
+  d.className = 'toast-item ' + type;
+  d.textContent = msg;
+  t.appendChild(d);
+  setTimeout(() => d.remove(), 3500);
+}
+
+init();
+</script>
+</body>
+</html>

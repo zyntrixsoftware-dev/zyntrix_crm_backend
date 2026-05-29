@@ -938,3 +938,303 @@ exports.reportRepPerformance = async (req, res) => {
     return res.status(500).json({ msg: "Server error" });
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ══ COUPONS ══════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+const Coupon = require("../models/Coupon");
+
+// GET /api/sales/coupons
+exports.listCoupons = async (req, res) => {
+  try {
+    const { type, active, search, page = 1, limit = 50 } = req.query;
+    const q = {};
+    if (type)   q.couponType = type;
+    if (active !== undefined) q.isActive = active === "true";
+    if (search) q.code = { $regex: search, $options: "i" };
+    const skip  = (parseInt(page) - 1) * parseInt(limit);
+    const total = await Coupon.countDocuments(q);
+    const coupons = await Coupon.find(q)
+      .sort({ createdAt: -1 }).skip(skip).limit(parseInt(limit))
+      .populate("applicableCourses", "title")
+      .populate("createdBy", "name");
+    return res.json({ coupons, total });
+  } catch (err) { console.error("listCoupons:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// POST /api/sales/coupons
+exports.createCoupon = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const coupon = await Coupon.create({ ...req.body, createdBy: req.user._id });
+    return res.status(201).json(coupon);
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ msg: "Coupon code already exists" });
+    console.error("createCoupon:", err); return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// GET /api/sales/coupons/:id
+exports.getCoupon = async (req, res) => {
+  try {
+    const coupon = await Coupon.findById(req.params.id)
+      .populate("applicableCourses", "title").populate("createdBy", "name");
+    if (!coupon) return res.status(404).json({ msg: "Coupon not found" });
+    return res.json(coupon);
+  } catch (err) { console.error("getCoupon:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// PATCH /api/sales/coupons/:id
+exports.updateCoupon = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!coupon) return res.status(404).json({ msg: "Coupon not found" });
+    return res.json(coupon);
+  } catch (err) { console.error("updateCoupon:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// DELETE /api/sales/coupons/:id  (soft: deactivate)
+exports.deleteCoupon = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    await Coupon.findByIdAndUpdate(req.params.id, { isActive: false });
+    return res.json({ msg: "Coupon deactivated" });
+  } catch (err) { console.error("deleteCoupon:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// POST /api/sales/coupons/validate  { code, courseId, fee }
+exports.validateCoupon = async (req, res) => {
+  try {
+    const { code, courseId, fee } = req.body;
+    if (!code || !fee) return res.status(400).json({ msg: "code and fee are required" });
+    const coupon = await Coupon.findOne({ code: code.toUpperCase().trim() });
+    if (!coupon) return res.status(404).json({ valid: false, msg: "Invalid coupon code" });
+
+    const now = new Date();
+    if (!coupon.isActive) return res.status(400).json({ valid: false, msg: "Coupon is inactive" });
+    if (coupon.validTill && now > coupon.validTill) return res.status(400).json({ valid: false, msg: "Coupon has expired" });
+    if (coupon.maxUses !== null && coupon.usedCount >= coupon.maxUses)
+      return res.status(400).json({ valid: false, msg: "Coupon usage limit reached" });
+    if (fee < coupon.minOrderValue)
+      return res.status(400).json({ valid: false, msg: `Minimum order value ₹${coupon.minOrderValue} required` });
+    if (coupon.applicableCourses.length > 0 && courseId) {
+      const ok = coupon.applicableCourses.map(c => c.toString()).includes(courseId.toString());
+      if (!ok) return res.status(400).json({ valid: false, msg: "Coupon not valid for this course" });
+    }
+
+    const discount = coupon.calcDiscount(fee);
+    const finalFee = Math.max(0, fee - discount);
+    return res.json({ valid: true, coupon, discount, finalFee });
+  } catch (err) { console.error("validateCoupon:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ══ COMMUNICATION LOGS ═══════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+const CommLog = require("../models/CommLog");
+
+// GET /api/sales/commlogs?lead=id
+exports.listCommLogs = async (req, res) => {
+  try {
+    const { lead, type, page = 1, limit = 100 } = req.query;
+    const q = {};
+    if (lead && validId(lead)) q.lead = lead;
+    if (type) q.type = type;
+    const skip  = (parseInt(page) - 1) * parseInt(limit);
+    const total = await CommLog.countDocuments(q);
+    const logs  = await CommLog.find(q)
+      .sort({ loggedAt: -1 }).skip(skip).limit(parseInt(limit))
+      .populate("createdBy", "name");
+    return res.json({ logs, total });
+  } catch (err) { console.error("listCommLogs:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// POST /api/sales/commlogs
+exports.createCommLog = async (req, res) => {
+  try {
+    const log = await CommLog.create({ ...req.body, createdBy: req.user._id });
+    // Update lead's lastContactedAt
+    if (log.lead) {
+      await StudentLead.findByIdAndUpdate(log.lead, { lastContactedAt: log.loggedAt });
+    }
+    return res.status(201).json(log);
+  } catch (err) { console.error("createCommLog:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// PATCH /api/sales/commlogs/:id
+exports.updateCommLog = async (req, res) => {
+  try {
+    const log = await CommLog.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!log) return res.status(404).json({ msg: "Log not found" });
+    return res.json(log);
+  } catch (err) { console.error("updateCommLog:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// DELETE /api/sales/commlogs/:id
+exports.deleteCommLog = async (req, res) => {
+  try {
+    await CommLog.findByIdAndDelete(req.params.id);
+    return res.json({ msg: "Deleted" });
+  } catch (err) { console.error("deleteCommLog:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ══ REFERRALS ════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+const Referral = require("../models/Referral");
+
+// GET /api/sales/referrals
+exports.listReferrals = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 50 } = req.query;
+    const q = {};
+    if (status) q.status = status;
+    const skip  = (parseInt(page) - 1) * parseInt(limit);
+    const total = await Referral.countDocuments(q);
+    const referrals = await Referral.find(q)
+      .sort({ createdAt: -1 }).skip(skip).limit(parseInt(limit))
+      .populate("referredBy",   "fullName phone")
+      .populate("referredLead", "fullName phone pipelineStage")
+      .populate("enrollment",   "enrolledAt totalFee feePaid")
+      .populate("createdBy",    "name");
+    return res.json({ referrals, total });
+  } catch (err) { console.error("listReferrals:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// POST /api/sales/referrals
+exports.createReferral = async (req, res) => {
+  try {
+    const referral = await Referral.create({ ...req.body, createdBy: req.user._id });
+    return res.status(201).json(referral);
+  } catch (err) { console.error("createReferral:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// GET /api/sales/referrals/:id
+exports.getReferral = async (req, res) => {
+  try {
+    const ref = await Referral.findById(req.params.id)
+      .populate("referredBy", "fullName phone")
+      .populate("referredLead", "fullName phone pipelineStage")
+      .populate("enrollment", "enrolledAt totalFee feePaid");
+    if (!ref) return res.status(404).json({ msg: "Referral not found" });
+    return res.json(ref);
+  } catch (err) { console.error("getReferral:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// PATCH /api/sales/referrals/:id
+exports.updateReferral = async (req, res) => {
+  try {
+    const ref = await Referral.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!ref) return res.status(404).json({ msg: "Referral not found" });
+    return res.json(ref);
+  } catch (err) { console.error("updateReferral:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// DELETE /api/sales/referrals/:id
+exports.deleteReferral = async (req, res) => {
+  try {
+    await Referral.findByIdAndDelete(req.params.id);
+    return res.json({ msg: "Deleted" });
+  } catch (err) { console.error("deleteReferral:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// PATCH /api/sales/referrals/:id/pay  — mark incentive as paid
+exports.markIncentivePaid = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const ref = await Referral.findByIdAndUpdate(
+      req.params.id,
+      { incentivePaid: true, paidAt: new Date(), status: "paid" },
+      { new: true }
+    );
+    if (!ref) return res.status(404).json({ msg: "Referral not found" });
+    return res.json(ref);
+  } catch (err) { console.error("markIncentivePaid:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ══ SALES REP STATS ══════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+const User = require("../models/User");
+
+// GET /api/sales/reps/stats?month=&year=
+exports.repStats = async (req, res) => {
+  try {
+    const month = parseInt(req.query.month) || new Date().getMonth() + 1;
+    const year  = parseInt(req.query.year)  || new Date().getFullYear();
+    const start = new Date(year, month - 1, 1);
+    const end   = new Date(year, month, 1);
+
+    // All sales users
+    const reps = await User.find({ role: { $in: ["sales", "admin", "super_admin"] } }, "name email role");
+
+    // Aggregate leads per rep this month
+    const leadAgg = await StudentLead.aggregate([
+      { $match: { createdAt: { $gte: start, $lt: end }, isArchived: false } },
+      { $group: { _id: "$assignedTo", leads: { $sum: 1 } } }
+    ]);
+
+    // Aggregate enrollments + revenue per rep this month
+    const enrollAgg = await Enrollment.aggregate([
+      { $match: { enrolledAt: { $gte: start, $lt: end } } },
+      { $lookup: { from: "studentleads", localField: "lead", foreignField: "_id", as: "ld" } },
+      { $unwind: { path: "$ld", preserveNullAndEmptyArrays: true } },
+      { $group: { _id: "$ld.assignedTo", enrollments: { $sum: 1 }, revenue: { $sum: "$feePaid" } } }
+    ]);
+
+    // Demo stats per rep
+    const DemoSession = require("../models/DemoSession");
+    const demoAgg = await DemoSession.aggregate([
+      { $match: { scheduledAt: { $gte: start, $lt: end } } },
+      { $group: { _id: "$conductor", demos: { $sum: 1 },
+        attended: { $sum: { $cond: [{ $ne: ["$outcome", "no_show"] }, 1, 0] } } } }
+    ]);
+
+    // Merge into a map
+    const map = {};
+    for (const rep of reps) {
+      map[rep._id.toString()] = { rep, leads: 0, demos: 0, attended: 0, enrollments: 0, revenue: 0, target: null };
+    }
+    for (const r of leadAgg)   if (r._id && map[r._id.toString()]) map[r._id.toString()].leads = r.leads;
+    for (const r of enrollAgg) if (r._id && map[r._id.toString()]) { map[r._id.toString()].enrollments = r.enrollments; map[r._id.toString()].revenue = r.revenue; }
+    for (const r of demoAgg)   if (r._id && map[r._id.toString()]) { map[r._id.toString()].demos = r.demos; map[r._id.toString()].attended = r.attended; }
+
+    // Pull targets
+    const targets = await SalesTarget.find({ month, year, user: { $in: reps.map(r => r._id) } });
+    for (const t of targets) if (map[t.user.toString()]) map[t.user.toString()].target = t;
+
+    const result = Object.values(map).sort((a, b) => b.revenue - a.revenue);
+    return res.json({ reps: result, month, year });
+  } catch (err) { console.error("repStats:", err); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ══ LEAD SCORING ═════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+const { scoreLeadAndSave, scoreAllLeads: batchScore } = require("../utils/leadScoring");
+
+// POST /api/sales/leads/:id/score
+exports.scoreLead = async (req, res) => {
+  try {
+    const result = await scoreLeadAndSave(req.params.id);
+    if (!result) return res.status(404).json({ msg: "Lead not found" });
+    return res.json({ score: result.score, breakdown: result.breakdown });
+  } catch (err) {
+    console.error("scoreLead:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// POST /api/sales/leads/score-all  (admin / super_admin only)
+exports.scoreAllLeads = async (req, res) => {
+  try {
+    if (!["admin","super_admin"].includes(req.user?.role))
+      return res.status(403).json({ msg: "Admin only" });
+    const result = await batchScore();
+    return res.json(result);
+  } catch (err) {
+    console.error("scoreAllLeads:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};

@@ -69,4 +69,33 @@ router.get   ("/sales/targets/dashboard",  C.targetsDashboard);
 router.get   ("/sales/targets",            C.listTargets);
 router.post  ("/sales/targets",            C.upsertTarget);
 
+// ── Coupons ──────────────────────────────────────────────────────
+router.get   ("/sales/coupons",            C.listCoupons);
+router.post  ("/sales/coupons",            C.createCoupon);
+router.get   ("/sales/coupons/:id",        C.getCoupon);
+router.patch ("/sales/coupons/:id",        C.updateCoupon);
+router.delete("/sales/coupons/:id",        C.deleteCoupon);
+router.post  ("/sales/coupons/validate",   C.validateCoupon);  // check code + return discount
+
+// ── Communication Logs ───────────────────────────────────────────
+router.get   ("/sales/commlogs",           C.listCommLogs);    // ?lead=id
+router.post  ("/sales/commlogs",           C.createCommLog);
+router.patch ("/sales/commlogs/:id",       C.updateCommLog);
+router.delete("/sales/commlogs/:id",       C.deleteCommLog);
+
+// ── Referrals ────────────────────────────────────────────────────
+router.get   ("/sales/referrals",          C.listReferrals);
+router.post  ("/sales/referrals",          C.createReferral);
+router.get   ("/sales/referrals/:id",      C.getReferral);
+router.patch ("/sales/referrals/:id",      C.updateReferral);
+router.delete("/sales/referrals/:id",      C.deleteReferral);
+router.patch ("/sales/referrals/:id/pay",  C.markIncentivePaid);
+
+// ── Sales Rep Stats ───────────────────────────────────────────────
+router.get   ("/sales/reps/stats",         C.repStats);        // per-rep KPIs for leaderboard
+
+// ── Lead Scoring ──────────────────────────────────────────────────
+router.post  ("/sales/leads/:id/score",    C.scoreLead);       // score a single lead
+router.post  ("/sales/leads/score-all",    C.scoreAllLeads);   // batch score all leads (admin)
+
 module.exports = router;

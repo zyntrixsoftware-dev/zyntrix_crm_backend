@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Referrals — ZyntrixCRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);--blue:#3d8ef0;--blue-dim:rgba(61,142,240,.12);--amber:#f5a623;--amber-dim:rgba(245,166,35,.12);--rose:#ff4d6d;--rose-dim:rgba(255,77,109,.12);--purple:#b57bee;--purple-dim:rgba(181,123,238,.12);--teal:#22d3ee;--teal-dim:rgba(34,211,238,.12);--green:#22c55e;--green-dim:rgba(34,197,94,.12);--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg);flex-shrink:0}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px;position:relative}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-a.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;min-height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-hd{flex:1}.pg-title{font-family:var(--display);font-size:15px;font-weight:700}.pg-crumb{font-size:10px;color:var(--text3)}.pg-crumb span{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-prim:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.2)}.btn-green:hover{background:rgba(34,197,94,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+/* KPI */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 22px 0}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc)}
+.kpi-val{font-family:var(--display);font-size:24px;font-weight:800;line-height:1}
+.kpi-lbl{font-size:10px;color:var(--text3);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+/* filter + table */
+.filter-bar{padding:12px 22px;display:flex;align-items:center;gap:8px}
+.chip{padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:transparent;transition:all .15s}
+.chip.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(0,229,176,.3)}
+.ml-auto{margin-left:auto}
+.content{flex:1;overflow-y:auto;padding:16px 22px 32px}
+.tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg3)}
+th{padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+td{padding:11px 14px;font-size:12.5px;border-top:1px solid var(--border);vertical-align:middle;color:var(--text2)}
+tr:hover td{background:rgba(255,255,255,.015)}
+.badge{display:inline-flex;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase}
+/* drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}.overlay.show{display:block}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:460px;background:var(--bg2);border-left:1px solid var(--border2);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+.drw-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.drw-title{flex:1;font-family:var(--display);font-size:15px;font-weight:700}
+.drw-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:4px}.drw-close:hover{color:var(--text)}
+.drw-body{flex:1;overflow-y:auto;padding:20px 22px}.drw-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px}
+.field{margin-bottom:14px;display:flex;flex-direction:column;gap:4px}
+.field label{font-size:10.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border .15s;width:100%}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;gap:10px;flex-direction:column}
+.toast-item{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:12.5px;font-weight:500;box-shadow:0 8px 28px rgba(0,0,0,.4);animation:slideIn .25s ease;min-width:240px}
+.toast-item.ok{border-color:rgba(0,229,176,.35);color:var(--accent)}.toast-item.err{border-color:rgba(255,77,109,.35);color:var(--rose)}
+@keyframes slideIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:800;color:var(--text)">ZyntrixCRM</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Sales System</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Pipeline</div>
+    <a class="nav-a" href="leads.html"><span class="nav-ico">◈</span> Leads</a>
+    <a class="nav-a" href="demos.html"><span class="nav-ico">▷</span> Demo Sessions</a>
+    <a class="nav-a" href="followups.html"><span class="nav-ico">◷</span> Follow-ups</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Revenue</div>
+    <a class="nav-a" href="enrollments.html"><span class="nav-ico">✓</span> Enrollments</a>
+    <a class="nav-a" href="payments.html"><span class="nav-ico">₹</span> Payments</a>
+    <a class="nav-a" href="coupons.html"><span class="nav-ico">🏷</span> Coupons</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Catalogue</div>
+    <a class="nav-a" href="courses.html"><span class="nav-ico">◉</span> Courses</a>
+    <a class="nav-a" href="batches.html"><span class="nav-ico">≡</span> Batches</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Growth</div>
+    <a class="nav-a on" href="referrals.html"><span class="nav-ico">⇋</span> Referrals</a>
+    <a class="nav-a" href="comms.html"><span class="nav-ico">◎</span> Comm Logs</a>
+    <a class="nav-a" href="sales-reps.html"><span class="nav-ico">▲</span> Sales Reps</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Reports</div>
+    <a class="nav-a" href="targets.html"><span class="nav-ico">◎</span> Targets</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">▣</span> Analytics</a>
+  </div>
+  <div class="sb-foot"><a class="nav-a" href="../../index.html"><span class="nav-ico">←</span> Back to CRM</a></div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="pg-hd">
+      <div class="pg-title">Referral Tracking</div>
+      <div class="pg-crumb">Sales System → <span>Referrals</span></div>
+    </div>
+    <button class="btn btn-prim btn-sm" onclick="openAdd()">+ Record Referral</button>
+  </div>
+
+  <div class="kpi-strip">
+    <div class="kpi" style="--kc:var(--accent)"><div class="kpi-val" id="kpi-total">—</div><div class="kpi-lbl">Total Referrals</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="kpi-val" id="kpi-enrolled">—</div><div class="kpi-lbl">Enrolled</div></div>
+    <div class="kpi" style="--kc:var(--amber)"><div class="kpi-val" id="kpi-pending-pay">—</div><div class="kpi-lbl">Incentive Pending</div></div>
+    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-val" id="kpi-paid">—</div><div class="kpi-lbl">Incentives Paid</div></div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="chip active" onclick="setFilter(this,'')">All</button>
+    <button class="chip" onclick="setFilter(this,'pending')">Pending</button>
+    <button class="chip" onclick="setFilter(this,'enrolled')">Enrolled</button>
+    <button class="chip" onclick="setFilter(this,'paid')">Paid</button>
+    <button class="chip" onclick="setFilter(this,'rejected')">Rejected</button>
+  </div>
+
+  <div class="content">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Referred By</th><th>Referred Lead</th><th>Lead Stage</th><th>Incentive</th><th>Status</th><th>Created</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- DRAWER -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drw-hdr">
+    <div class="drw-title" id="drw-title">Record Referral</div>
+    <button class="drw-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drw-body">
+    <input type="hidden" id="edit-id">
+    <div class="field">
+      <label>Referred By (existing lead / student) *</label>
+      <select id="f-by"><option value="">— select —</option></select>
+    </div>
+    <div class="field">
+      <label>Referred New Lead *</label>
+      <select id="f-lead"><option value="">— select new lead —</option></select>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Incentive Type</label>
+        <select id="f-itype">
+          <option value="cash">Cash</option>
+          <option value="discount">Discount</option>
+          <option value="gift">Gift</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Incentive Value (₹)</label>
+        <input id="f-ival" type="number" min="0" placeholder="500">
+      </div>
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select id="f-status">
+        <option value="pending">Pending</option>
+        <option value="enrolled">Enrolled</option>
+        <option value="paid">Paid</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Notes</label>
+      <input id="f-notes" placeholder="Any notes about this referral">
+    </div>
+  </div>
+  <div class="drw-foot">
+    <button class="btn btn-prim" onclick="submit()">Save</button>
+    <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = (window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')?'http://localhost:5000/api':'/api';
+let allRefs=[], leads=[], filterStatus='';
+
+const STATUS_STYLES = {
+  pending:  {bg:'rgba(245,158,11,.1)',color:'#fbbf24'},
+  enrolled: {bg:'rgba(61,142,240,.1)',color:'#3d8ef0'},
+  paid:     {bg:'rgba(34,197,94,.1)',color:'#22c55e'},
+  rejected: {bg:'rgba(255,77,109,.1)',color:'#ff4d6d'}
+};
+
+async function apiRequest(path,opts={}){
+  const token=localStorage.getItem('token');
+  const r=await fetch(API+path,{headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},  ...opts});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.msg||'Request failed');}
+  return r.json();
+}
+
+async function init(){
+  const [rd, ld] = await Promise.all([
+    apiRequest('/sales/referrals?limit=500').catch(()=>({referrals:[]})),
+    apiRequest('/sales/leads?limit=500').catch(()=>({leads:[]}))
+  ]);
+  allRefs = rd.referrals||[];
+  leads   = ld.leads||[];
+  populateSelects();
+  updateKPIs();
+  render();
+}
+
+function populateSelects(){
+  const opt = l=>`<option value="${l._id}">${l.fullName}${l.phone?' · '+l.phone:''}</option>`;
+  document.getElementById('f-by').innerHTML   = '<option value="">— select —</option>' + leads.map(opt).join('');
+  document.getElementById('f-lead').innerHTML = '<option value="">— select new lead —</option>' + leads.map(opt).join('');
+}
+
+function updateKPIs(){
+  document.getElementById('kpi-total').textContent      = allRefs.length;
+  document.getElementById('kpi-enrolled').textContent   = allRefs.filter(r=>r.status==='enrolled').length;
+  document.getElementById('kpi-pending-pay').textContent = allRefs.filter(r=>r.status==='enrolled'&&!r.incentivePaid).length;
+  document.getElementById('kpi-paid').textContent       = allRefs.filter(r=>r.incentivePaid).length;
+}
+
+function render(){
+  let list = allRefs;
+  if(filterStatus) list = list.filter(r=>r.status===filterStatus);
+  const body = document.getElementById('tbl-body');
+  if(!list.length){body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">No referrals found</td></tr>`;return;}
+  body.innerHTML = list.map(r=>{
+    const byName  = r.referredBy?.fullName || r.referredByName || '—';
+    const leadName = r.referredLead?.fullName || '—';
+    const stage   = r.referredLead?.pipelineStage || '';
+    const stMap   = {new_lead:'New',contacted:'Contacted',demo_scheduled:'Demo Sched.',demo_attended:'Demo Done',enrolled:'Enrolled',dropped:'Dropped'};
+    const st = STATUS_STYLES[r.status]||{bg:'rgba(255,255,255,.05)',color:'#4e6680'};
+    const incentLabel = r.incentiveType==='none'?'None':`${r.incentiveType==='cash'?'₹'+r.incentiveValue:r.incentiveType+' ₹'+r.incentiveValue}`;
+    const paidTag = r.incentivePaid ? `<span style="font-size:9px;background:rgba(34,197,94,.1);color:#22c55e;padding:1px 6px;border-radius:10px;margin-left:4px">PAID</span>` : '';
+    const payBtn = r.status==='enrolled'&&!r.incentivePaid
+      ? `<button class="btn btn-green btn-sm" onclick="markPaid('${r._id}')">Mark Paid</button>` : '';
+    return `<tr>
+      <td><div style="font-weight:600;color:var(--text)">${byName}</div></td>
+      <td><div style="font-weight:600;color:var(--text)">${leadName}</div></td>
+      <td>${stage?`<span style="font-size:10px;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:4px">${stMap[stage]||stage}</span>`:'—'}</td>
+      <td>${incentLabel}${paidTag}</td>
+      <td><span class="badge" style="background:${st.bg};color:${st.color}">${r.status}</span></td>
+      <td style="font-size:11px">${new Date(r.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td style="display:flex;gap:6px">
+        ${payBtn}
+        <button class="btn btn-ghost btn-sm" onclick="editRef('${r._id}')">Edit</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function setFilter(el,s){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');filterStatus=s;render();}
+
+function openAdd(){
+  document.getElementById('edit-id').value='';
+  document.getElementById('drw-title').textContent='Record Referral';
+  document.getElementById('f-by').value='';
+  document.getElementById('f-lead').value='';
+  document.getElementById('f-itype').value='cash';
+  document.getElementById('f-ival').value='';
+  document.getElementById('f-status').value='pending';
+  document.getElementById('f-notes').value='';
+  openDrawer();
+}
+
+function editRef(id){
+  const r=allRefs.find(x=>x._id===id);
+  if(!r) return;
+  document.getElementById('edit-id').value=r._id;
+  document.getElementById('drw-title').textContent='Edit Referral';
+  document.getElementById('f-by').value=r.referredBy?._id||r.referredBy||'';
+  document.getElementById('f-lead').value=r.referredLead?._id||r.referredLead||'';
+  document.getElementById('f-itype').value=r.incentiveType||'cash';
+  document.getElementById('f-ival').value=r.incentiveValue||'';
+  document.getElementById('f-status').value=r.status||'pending';
+  document.getElementById('f-notes').value=r.notes||'';
+  openDrawer();
+}
+
+async function submit(){
+  const id=document.getElementById('edit-id').value;
+  const by=document.getElementById('f-by').value;
+  const lead=document.getElementById('f-lead').value;
+  if(!by||!lead) return toast('Select both referrer and referred lead','err');
+  const body={
+    referredBy:by,referredLead:lead,
+    incentiveType:document.getElementById('f-itype').value,
+    incentiveValue:parseFloat(document.getElementById('f-ival').value)||0,
+    status:document.getElementById('f-status').value,
+    notes:document.getElementById('f-notes').value.trim()
+  };
+  try{
+    if(id){ await apiRequest('/sales/referrals/'+id,{method:'PATCH',body:JSON.stringify(body)}); toast('Updated','ok'); }
+    else  { await apiRequest('/sales/referrals',{method:'POST',body:JSON.stringify(body)}); toast('Referral recorded','ok'); }
+    closeDrawer();
+    const d=await apiRequest('/sales/referrals?limit=500');
+    allRefs=d.referrals||[]; updateKPIs(); render();
+  }catch(e){toast(e.message,'err');}
+}
+
+async function markPaid(id){
+  if(!confirm('Mark incentive as paid?')) return;
+  try{
+    await apiRequest('/sales/referrals/'+id+'/pay',{method:'PATCH'});
+    toast('Incentive marked as paid','ok');
+    const d=await apiRequest('/sales/referrals?limit=500');
+    allRefs=d.referrals||[]; updateKPIs(); render();
+  }catch(e){toast(e.message,'err');}
+}
+
+function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show');}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');const d=document.createElement('div');
+  d.className='toast-item '+type;d.textContent=msg;t.appendChild(d);setTimeout(()=>d.remove(),3500);
+}
+
+init();
+</script>
+</body>
+</html>

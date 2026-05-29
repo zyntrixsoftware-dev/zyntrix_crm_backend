@@ -59,6 +59,16 @@ const studentLeadSchema = new mongoose.Schema(
     // Link to enrollment (set when stage → enrolled)
     enrollmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Enrollment", default: null },
 
+    // Lead Scoring (auto-computed by leadScoring.js)
+    score:          { type: Number, default: 0, min: 0, max: 100 },
+    scoreBreakdown: {
+      source:     { type: Number, default: 0 },
+      budget:     { type: Number, default: 0 },
+      stage:      { type: Number, default: 0 },
+      engagement: { type: Number, default: 0 }
+    },
+    scoredAt:   { type: Date, default: null },
+
     isArchived: { type: Boolean, default: false },
     createdBy:  { type: mongoose.Schema.Types.ObjectId, ref: "User" }
   },
@@ -70,6 +80,7 @@ studentLeadSchema.index({ email: 1 });
 studentLeadSchema.index({ assignedTo: 1 });
 studentLeadSchema.index({ followUpDate: 1 });
 studentLeadSchema.index({ isArchived: 1 });
+studentLeadSchema.index({ score: -1 });  // for sorting by hottest leads
 
 studentLeadSchema.statics.PIPELINE_STAGES = PIPELINE_STAGES;
 studentLeadSchema.statics.SOURCES         = SOURCES;
