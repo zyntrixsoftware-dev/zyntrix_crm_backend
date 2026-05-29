@@ -193,7 +193,9 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
     <a class="nav-a" href="sales-import.html"><span class="nav-ico">⬆</span> Import Data</a>
   </div>
   <div class="sb-foot">
-    <a class="nav-a" href="../../index.html"><span class="nav-ico">←</span> Back to CRM</a></a>
+    <button onclick="salesLogout()" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:8px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.15);color:var(--rose);font-family:var(--font);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,77,109,.15)'" onmouseout="this.style.background='rgba(255,77,109,.08)'">
+    <span style="font-size:13px">⏻</span> Logout
+  </button></a>
   </div>
 </aside>
 <!-- MAIN -->
@@ -239,7 +241,7 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
 </div>
 
 <!-- OVERLAY -->
-<div class="overlay" id="ov" onclick="closeDrawers()"></div>
+<div class="overlay" id="overlay" onclick="closeDrawers()"></div>
 
 <!-- ADD DRAWER -->
 <div class="drawer" id="addDrw">
@@ -503,22 +505,46 @@ function switchTab(tab){
   document.querySelectorAll(".tab").forEach((t,i)=>t.classList.toggle("on",["info","activity","actions"][i]===tab));
   const l=curLead,b=document.getElementById("dBody");
   if(tab==="info"){
+    const scoreColor = l.score>=70?"var(--accent)":l.score>=40?"var(--amber)":"var(--rose)";
+    const scoreLabel = l.score>=70?"Hot 🔥":l.score>=40?"Warm 🌡":"Cold 🧊";
     b.innerHTML=`
-      <div class="info-row"><span class="lbl">Email</span><span class="val">${esc(l.email||"—")}</span></div>
-      <div class="info-row"><span class="lbl">Phone</span><span class="val">${esc(l.phone||"—")}</span></div>
+      <!-- SCORE BADGE -->
+      ${l.score>0?`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:10px;margin-bottom:14px">
+        <div style="font-size:22px;font-weight:800;color:${scoreColor};font-family:var(--display)">${l.score}</div>
+        <div><div style="font-size:11px;font-weight:700;color:${scoreColor}">${scoreLabel}</div><div style="font-size:10px;color:var(--text3)">Lead Score</div></div>
+        <div style="margin-left:auto;height:6px;flex:1;background:var(--bg4);border-radius:3px;overflow:hidden"><div style="height:100%;width:${l.score}%;background:${scoreColor};border-radius:3px"></div></div>
+      </div>`:""}
+      <!-- CONTACT INFO -->
+      <div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Contact</div>
+      <div class="info-row"><span class="lbl">Full Name</span><span class="val" style="font-weight:600;color:var(--text)">${esc(l.fullName)}</span></div>
+      <div class="info-row"><span class="lbl">Phone</span><span class="val">${l.phone?`<a href="tel:${esc(l.phone)}" style="color:var(--accent);text-decoration:none">${esc(l.phone)}</a>`:"—"}</span></div>
+      <div class="info-row"><span class="lbl">Email</span><span class="val">${l.email?`<a href="mailto:${esc(l.email)}" style="color:var(--accent);text-decoration:none">${esc(l.email)}</a>`:"—"}</span></div>
       <div class="info-row"><span class="lbl">City</span><span class="val">${esc(l.city||"—")}</span></div>
       <div class="info-row"><span class="lbl">Education</span><span class="val">${fmt(l.educationLevel)}</span></div>
-      <div class="info-row"><span class="lbl">Source</span><span class="val">${fmt(l.source)}</span></div>
-      <div class="info-row"><span class="lbl">Budget</span><span class="val">${l.budget?"&#8377;"+l.budget.toLocaleString():"—"}</span></div>
+      <!-- SALES INFO -->
+      <div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px">Sales</div>
+      <div class="info-row"><span class="lbl">Stage</span><span class="val"><span style="background:${STAGES.find(s=>s.key===l.pipelineStage)?.bg||"var(--bg3)"};color:${STAGES.find(s=>s.key===l.pipelineStage)?.col||"var(--text2)"};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${fmt(l.pipelineStage)}</span></span></div>
+      <div class="info-row"><span class="lbl">Source</span><span class="val">${fmt(l.source||"—")}</span></div>
+      <div class="info-row"><span class="lbl">Origin</span><span class="val">${l.origin==="leadgen"?'<span style="color:var(--purple);font-size:11px;font-weight:700">⚡ LeadGen</span>':fmt(l.origin||"sales")}</span></div>
+      <div class="info-row"><span class="lbl">Budget</span><span class="val" style="color:var(--accent);font-weight:600">${l.budget?"₹"+Number(l.budget).toLocaleString("en-IN"):"—"}</span></div>
       <div class="info-row"><span class="lbl">Course Interest</span><span class="val">${esc(l.courseInterest?.title||"—")}</span></div>
-      <div class="info-row"><span class="lbl">Follow-up</span><span class="val">${l.followUpDate?new Date(l.followUpDate).toLocaleDateString():"—"}</span></div>
-      <div class="info-row"><span class="lbl">Last Contacted</span><span class="val">${l.lastContactedAt?new Date(l.lastContactedAt).toLocaleString():"—"}</span></div>
-      <div class="info-row"><span class="lbl">Added</span><span class="val">${new Date(l.createdAt).toLocaleDateString()}</span></div>
-      ${l.notes?`<div style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2)">${esc(l.notes)}</div>`:""}
-      <div style="margin-top:16px;display:flex;gap:7px;flex-wrap:wrap">
-        <a class="btn btn-ghost btn-sm" href="demos.html?lead=${l._id}">Book Demo</a>
-        <a class="btn btn-ghost btn-sm" href="followups.html?lead=${l._id}">Add Follow-Up</a>
-        ${l.pipelineStage==="demo_attended"?`<a class="btn btn-prim btn-sm" href="enrollments.html?lead=${l._id}">Enroll</a>`:""}
+      <div class="info-row"><span class="lbl">Assigned To</span><span class="val">${esc(l.assignedTo?.name||"Unassigned")}</span></div>
+      <!-- DATES -->
+      <div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px">Dates</div>
+      <div class="info-row"><span class="lbl">Added</span><span class="val">${new Date(l.createdAt).toLocaleString("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</span></div>
+      <div class="info-row"><span class="lbl">Follow-up</span><span class="val" ${l.followUpDate&&new Date(l.followUpDate)<new Date()?'style="color:var(--rose);font-weight:600"':""}>
+        ${l.followUpDate?new Date(l.followUpDate).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}):"—"}</span></div>
+      <div class="info-row"><span class="lbl">Last Contact</span><span class="val">${l.lastContactedAt?new Date(l.lastContactedAt).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):"—"}</span></div>
+      <!-- NOTES -->
+      ${l.notes?`<div style="margin-top:12px"><div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Notes</div><div style="padding:10px 12px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6">${esc(l.notes)}</div></div>`:""}
+      <!-- TAGS -->
+      ${l.tags&&l.tags.length?`<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">${l.tags.map(t=>`<span style="background:var(--blue-dim);color:var(--blue);font-size:10px;padding:2px 8px;border-radius:10px">${esc(t)}</span>`).join("")}</div>`:""}
+      <!-- ACTIONS -->
+      <div style="margin-top:16px;display:flex;gap:7px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--border)">
+        <a class="btn btn-ghost btn-sm" href="demos.html?lead=${l._id}">📅 Book Demo</a>
+        <a class="btn btn-ghost btn-sm" href="followups.html?lead=${l._id}">🔔 Follow-Up</a>
+        ${l.pipelineStage==="demo_attended"?`<a class="btn btn-prim btn-sm" href="enrollments.html?lead=${l._id}">✅ Enroll</a>`:""}
+        <a class="btn btn-ghost btn-sm" href="comms.html" style="margin-left:auto">📞 Log Call</a>
       </div>`;
   }else if(tab==="activity"){
     const hist=[...(l.stageHistory||[])].reverse();
@@ -617,5 +643,12 @@ function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 function fmt(s){return String(s||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
 </script>
 <script src="sales-import-modal.js"></script>
+<script>
+function salesLogout(){
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = window.location.origin + "/crm/index.html";
+}
+</script>
 </body>
 </html>
