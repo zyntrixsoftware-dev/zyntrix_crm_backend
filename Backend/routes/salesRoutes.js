@@ -2,8 +2,15 @@ const express = require("express");
 const router  = express.Router();
 const auth    = require("../middleware/authMiddleware");
 const C       = require("../controllers/salesController");
+const IC      = require("../controllers/salesImportController");
 
 router.use(auth);
+
+// ── Sales Import ─────────────────────────────────────────────
+router.get ("/sales/import/types",              IC.listTypes);
+router.get ("/sales/import/template/:type",     IC.getTemplate);
+router.post("/sales/import/preview",            IC.upload.single("file"), IC.previewImport);
+router.post("/sales/import/:type",              IC.upload.single("file"), IC.importData);
 
 // ── Reports (declare before /:id routes) ─────────────────────────
 router.get("/sales/reports/pipeline",         C.reportPipeline);
