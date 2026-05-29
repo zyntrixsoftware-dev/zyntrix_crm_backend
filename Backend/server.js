@@ -156,3 +156,32 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log("ZyntrixCRM API running on port " + PORT);
   console.log("Allowed CORS origins:", allowedOrigins);
 });
+
+// ── ONE-TIME LEADGEN SEED (remove after first use) ────────────────
+// Hit: GET /setup-leadgen?key=ZyntrixLeadgen2026
+// This creates lead@zyntrixsoftware.com with role=leadgen
+app.get("/setup-leadgen", async (req, res) => {
+  if (req.query.key !== "ZyntrixLeadgen2026") {
+    return res.status(403).json({ msg: "Forbidden" });
+  }
+  try {
+    const bcrypt = require("bcryptjs");
+    const User   = require("./models/user");
+    const hash   = await bcrypt.hash("Leadgen@2026", 10);
+    const doc    = await User.findOneAndUpdate(
+      { email: "lead@zyntrixsoftware.com" },
+      { $set: { name:"LeadGen Team", email:"lead@zyntrixsoftware.com", password:hash, role:"leadgen", isActive:true } },
+      { upsert:true, new:true }
+    );
+    return res.json({
+      ok: true,
+      msg: "LeadGen user created / updated",
+      id:    doc._id,
+      email: doc.email,
+      role:  doc.role,
+      credentials: { email:"lead@zyntrixsoftware.com", password:"Leadgen@2026" }
+    });
+  } catch (e) {
+    return res.status(500).json({ ok:false, msg:e.message });
+  }
+});
