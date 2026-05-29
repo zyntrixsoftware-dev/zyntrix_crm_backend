@@ -300,7 +300,8 @@ let allLeads=[],curLead=null,curTab="info",dragId=null;
 
 (async()=>{
   const u=JSON.parse(localStorage.getItem("user")||"{}");
-  if(u.name){document.getElementById("navName").textContent=u.name;document.getElementById("navRole").textContent=u.role||"";document.getElementById("navAv").textContent=u.name[0].toUpperCase();}
+  // Safely populate user info — use optional chaining so missing elements never crash
+  if(u.name){const nn=document.getElementById("navName");const nr=document.getElementById("navRole");const na=document.getElementById("navAv");if(nn)nn.textContent=u.name;if(nr)nr.textContent=u.role||"";if(na)na.textContent=u.name[0].toUpperCase();}
   await Promise.all([loadBoard(),loadCourses()]);
 
   // ── Auto-refresh: poll for new LeadGen leads every 30 s ──────────────────
@@ -461,6 +462,10 @@ async function dDrop(e,stage){
   dragId=null;
 }
 
+function showDrw(id){
+  document.getElementById("overlay").classList.add("show");
+  document.getElementById(id).classList.add("open");
+}
 function openAdd(){
   ["fName","fEmail","fPhone","fCity","fNotes"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("fBudget").value="";
