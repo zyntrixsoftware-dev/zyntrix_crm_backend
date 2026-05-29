@@ -302,9 +302,55 @@ let allLeads=[],curLead=null,curTab="info",dragId=null;
   const u=JSON.parse(localStorage.getItem("user")||"{}");
   if(u.name){document.getElementById("navName").textContent=u.name;document.getElementById("navRole").textContent=u.role||"";document.getElementById("navAv").textContent=u.name[0].toUpperCase();}
   await Promise.all([loadBoard(),loadCourses()]);
+
+  // ── Auto-refresh: poll for new LeadGen leads every 30 s ──────────────────
+  // Only refreshes the lightweight LeadGen strip (not the full board).
+  // Full board auto-refreshes every 2 minutes in the background.
+  setInterval(() => loadLeadgenStrip(), 30000);
+  setInterval(() => silentBoardRefresh(), 120000);
 })();
 
 let lgCollapsed=false;
+let _lastLeadCount = 0;  // track total for "new leads" banner
+
+async function silentBoardRefresh() {
+  // Re-fetches leads silently; if count changed, show a banner prompting refresh
+  const d = await apiRequest("/sales/leads/stats");
+  if (d.error) return;
+  const newTotal = d.total || 0;
+  if (_lastLeadCount > 0 && newTotal > _lastLeadCount) {
+    const diff = newTotal - _lastLeadCount;
+    showNewLeadsBanner(diff);
+  }
+  _lastLeadCount = newTotal;
+}
+
+function showNewLeadsBanner(count) {
+  // Remove any existing banner first
+  const existing = document.getElementById("new-leads-banner");
+  if (existing) existing.remove();
+  
+  const banner = document.createElement("div");
+  banner.id = "new-leads-banner";
+  banner.style.cssText = `position:fixed;top:66px;left:50%;transform:translateX(-50%);z-index:300;
+    background:linear-gradient(90deg,rgba(0,229,176,.95),rgba(61,142,240,.9));
+    color:#060c14;font-family:var(--font);font-size:12.5px;font-weight:700;
+    padding:10px 20px;border-radius:20px;box-shadow:0 4px 20px rgba(0,229,176,.35);
+    display:flex;align-items:center;gap:12px;cursor:pointer;
+    animation:slideDown .3s ease`;
+  banner.innerHTML = `<span>⚡</span> <span>${count} new lead${count>1?"s":""} added — click to refresh</span>
+    <button onclick="document.getElementById('new-leads-banner').remove()" 
+      style="background:rgba(0,0,0,.15);border:none;color:#060c14;border-radius:50%;
+      width:18px;height:18px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">✕</button>`;
+  banner.onclick = (e) => {
+    if (e.target.tagName === "BUTTON") return;
+    banner.remove();
+    loadBoard();
+  };
+  document.body.appendChild(banner);
+  // Auto-dismiss after 10s
+  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 10000);
+}
 async function loadLeadgenStrip(){
   const d=await apiRequest("/sales/leads/recent-leadgen?days=7&limit=30");
   const strip=document.getElementById("lgStrip");
@@ -350,6 +396,7 @@ async function loadBoard(){
     document.getElementById("kEnrolled").textContent=sm["enrolled"]||0;
     document.getElementById("kDropped").textContent=sm["dropped"]||0;
   }
+  _lastLeadCount = st.total || allLeads.length || 0;
   renderBoard();
   loadLeadgenStrip();
 }
@@ -470,59 +517,98 @@ function switchTab(tab){
       </div>`;
   }else if(tab==="activity"){
     const hist=[...(l.stageHistory||[])].reverse();
-    b.innerHTML=hist.length===0?`<div style="color:var(--text3);font-size:12px;padding:20px 0">No stage history yet.</div>`:hist.map(h=>`
-      <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:5px"></div>
-        <div>
-          <div style="font-size:12px">${fmt(h.from)} &rarr; <strong>${fmt(h.to)}</strong></div>
-          ${h.note?`<div style="font-size:11px;color:var(--text2)">${esc(h.note)}</div>`:""}
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${h.changedAt?new Date(h.changedAt).toLocaleString():""}</div>
-        </div>
-      </div>`).join("");
-  }else{
+    b.innerHTML=hist.length===0?`<div style="color:var(--text3);font-size:12px;padding:20px 0">No stage history yet.</div>`:his    b.innerHTML=hist.length===0
+      ?`<div style="color:var(--text3);font-size:12px;padding:20px 0">No stage history yet.</div>`
+      :hist.map(h=>`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);white-space:nowrap">${new Date(h.changedAt).toLocaleDateString()}</div>
+          <div style="font-size:12px;color:var(--text2)">${h.from||"—"} → <strong style="color:var(--text)">${h.to}</strong>${h.note?` <span style="color:var(--text3)">· ${esc(h.note)}</span>`:""}</div>
+        </div>`).join("");
+  }else if(tab==="actions"){
+    const stagesOpts=STAGES.filter(s=>s.key!==l.pipelineStage)
+      .map(s=>`<option value="${s.key}">${s.label}</option>`).join("");
     b.innerHTML=`
-      <div class="sec-lbl">Move Stage</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px">
-        ${STAGES.map(s=>`<button class="btn btn-sm" onclick="qStage('${s.key}')" style="${l.pipelineStage===s.key?`background:${s.bg};color:${s.col};border:1px solid ${s.col}30`:"background:var(--bg3);color:var(--text2);border:1px solid var(--border)"}">${s.label}</button>`).join("")}
+      <div style="margin-bottom:16px">
+        <div style="font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Move Stage</div>
+        <div style="display:flex;gap:8px">
+          <select id="stageMove" style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none">
+            <option value="">Select new stage…</option>${stagesOpts}
+          </select>
+          <button onclick="moveStage()" class="btn btn-prim btn-sm">Move</button>
+        </div>
+        <input id="stageNote" placeholder="Optional note…" style="margin-top:6px;width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none">
       </div>
-      <div class="sec-lbl">Quick Edit</div>
-      <div class="fgrid">
-        <div class="field"><label>Follow-up Date</label><input type="date" id="eFU" value="${l.followUpDate?l.followUpDate.slice(0,10):""}"></div>
-        <div class="field"><label>Budget</label><input type="number" id="eBudget" value="${l.budget||0}"></div>
-        <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="eNotes">${esc(l.notes||"")}</textarea></div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Edit Lead</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <input id="editName"  value="${esc(l.fullName||"")}"  placeholder="Full Name"  style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none;width:100%">
+          <input id="editPhone" value="${esc(l.phone||"")}"     placeholder="Phone"      style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none;width:100%">
+          <input id="editEmail" value="${esc(l.email||"")}"     placeholder="Email"      style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none;width:100%">
+          <input id="editCity"  value="${esc(l.city||"")}"      placeholder="City"       style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none;width:100%">
+          <input id="editBudget" type="number" value="${l.budget||""}" placeholder="Budget (₹)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none;width:100%">
+          <textarea id="editNotes" placeholder="Notes…" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none;width:100%;resize:vertical;min-height:60px">${esc(l.notes||"")}</textarea>
+          <button onclick="updateLead()" class="btn btn-prim btn-sm" style="align-self:flex-end">Save Changes</button>
+        </div>
       </div>
-      <button class="btn btn-prim btn-sm" style="margin-top:10px" onclick="qSave()">Save</button>
-      <div style="margin-top:18px"><button class="btn btn-danger btn-sm" onclick="archiveLead()">Archive Lead</button></div>`;
+      <div>
+        <button onclick="archiveLead()" class="btn btn-rose btn-sm" style="background:var(--rose-dim);color:var(--rose);border:1px solid rgba(255,77,109,.2)">Archive Lead</button>
+      </div>`;
   }
 }
-async function qStage(stage){
-  const d=await apiRequest(`/sales/leads/${curLead._id}/stage`,"PATCH",{stage});
+
+async function moveStage(){
+  const stage=document.getElementById("stageMove").value;
+  const note=document.getElementById("stageNote")?.value||"";
+  if(!stage||!curLead)return;
+  const d=await apiRequest(`/sales/leads/${curLead._id}/stage`,"PATCH",{stage,note});
   if(d.error){toast(d.msg,"err");return;}
-  Object.assign(curLead,d.lead);renderDetail();
-  const i=allLeads.findIndex(l=>l._id===curLead._id);if(i>=0)allLeads[i]=curLead;
-  renderBoard();toast("Stage updated","ok");
+  toast("Stage updated","ok");
+  closeDrawers();
+  await loadBoard();
 }
-async function qSave(){
-  const d=await apiRequest(`/sales/leads/${curLead._id}`,"PATCH",{
-    followUpDate:document.getElementById("eFU").value||null,
-    budget:parseFloat(document.getElementById("eBudget").value)||0,
-    notes:document.getElementById("eNotes").value.trim()
-  });
+
+async function updateLead(){
+  if(!curLead)return;
+  const body={
+    fullName: document.getElementById("editName").value.trim(),
+    phone:    document.getElementById("editPhone").value.trim(),
+    email:    document.getElementById("editEmail").value.trim(),
+    city:     document.getElementById("editCity").value.trim(),
+    budget:   parseFloat(document.getElementById("editBudget").value)||0,
+    notes:    document.getElementById("editNotes").value.trim()
+  };
+  const d=await apiRequest(`/sales/leads/${curLead._id}`,"PATCH",body);
   if(d.error){toast(d.msg,"err");return;}
-  Object.assign(curLead,d.lead);
-  const i=allLeads.findIndex(l=>l._id===curLead._id);if(i>=0)allLeads[i]=curLead;
-  renderBoard();toast("Saved!","ok");
+  toast("Lead updated","ok");
+  closeDrawers();
+  await loadBoard();
 }
+
 async function archiveLead(){
-  if(!confirm("Archive this lead?"))return;
+  if(!curLead||!confirm("Archive this lead?"))return;
   const d=await apiRequest(`/sales/leads/${curLead._id}`,"DELETE");
   if(d.error){toast(d.msg,"err");return;}
-  toast("Archived","ok");closeDrawers();await loadBoard();
+  toast("Lead archived","ok");
+  closeDrawers();
+  await loadBoard();
 }
-function showDrw(id){document.getElementById("ov").classList.add("show");document.getElementById(id).classList.add("open");}
-function closeDrawers(){document.getElementById("ov").classList.remove("show");document.querySelectorAll(".drawer").forEach(d=>d.classList.remove("open"));}
-function toast(msg,type="info"){const w=document.getElementById("tw");const el=document.createElement("div");el.className=`toast ${type}`;el.innerHTML=(type==="ok"?"&#10003;":type==="err"?"&#10007;":"&#9432;")+" "+esc(msg);w.appendChild(el);setTimeout(()=>el.remove(),3500);}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function closeDrawers(){
+  document.getElementById("addDrw").classList.remove("open");
+  document.getElementById("detDrw").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
+  curLead=null;
+}
+
+function toast(msg,type="ok"){
+  const w=document.getElementById("tw");
+  const d=document.createElement("div");
+  d.className="toast-item "+(type==="err"?"err":"ok");
+  d.textContent=msg;
+  w.appendChild(d);
+  setTimeout(()=>d.remove(),3500);
+}
+
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function fmt(s){return String(s||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
 </script>
 <script src="sales-import-modal.js"></script>
