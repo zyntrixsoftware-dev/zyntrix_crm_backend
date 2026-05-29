@@ -275,13 +275,32 @@ async function importLeads(rows, userId) {
         createdBy:     userId
       };
 
-      // Append + update existing: re-importing the same phone updates that lead,
-      // brand-new rows are inserted. Nothing is deleted. $setOnInsert keeps the
-      // origin of pre-existing leads (e.g. "leadgen") intact on re-import.
+      // Additive upsert:
+      //   NEW lead (phone not in DB)  → insert everything as new_lead
+      //   EXISTING lead               → update only safe info fields (name/email/city/budget/notes)
+      //                                 NEVER overwrite pipelineStage, stageHistory, assignedTo
+      //                                 so sales progress is preserved on re-import
       if (phone) {
+        const safeUpdate = {
+          fullName:     doc.fullName,
+          email:        doc.email,
+          city:         doc.city,
+          budget:       doc.budget,
+          notes:        doc.notes,
+          followUpDate: doc.followUpDate,
+          score:        doc.score,
+          source:       doc.source
+        };
         await StudentLead.findOneAndUpdate(
           { phone },
-          { $set: doc, $setOnInsert: { origin: "import" } },
+          {
+            $set: safeUpdate,
+            $setOnInsert: {   // only applied when creating a brand-new document
+              pipelineStage: doc.pipelineStage || "new_lead",
+              origin:        "import",
+              createdBy:     userId
+            }
+          },
           { upsert: true }
         );
       } else {

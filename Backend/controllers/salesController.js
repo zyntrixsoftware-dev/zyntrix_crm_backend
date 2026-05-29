@@ -1281,29 +1281,30 @@ exports.recentLeadgenLeads = async (req, res) => {
     const limit  = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
     const since  = new Date(); since.setDate(since.getDate() - days); since.setHours(0, 0, 0, 0);
 
-    // Match anything explicitly tagged "leadgen", plus historical leads created by
-    // users with the leadgen role (which predate the origin field).
-    const User = require("../models/user");
+    // Match anything explicitly tagged "leadgen" OR created by a leadgen-role user
     const leadgenUsers = await User.find({ role: "leadgen" }, "_id").lean();
     const leadgenIds   = leadgenUsers.map(u => u._id);
 
     const q = {
       isArchived: false,
-      $or: [{ origin: "leadgen" }]
+      createdAt:  { $gte: since },
+      $or: [
+        { origin: "leadgen" },
+        { createdBy: { $in: leadgenIds } }
+      ]
     };
-    if (leadgenIds.length) q.$or.push({ createdBy: { $in: leadgenIds } });
-
-    const recentQ = { ...q, createdAt: { $gte: since } };
 
     const [leads, total, totalAllTime] = await Promise.all([
-      StudentLead.find(recentQ)
+      StudentLead.find(q)
         .sort({ createdAt: -1 })
         .limit(limit)
         .populate("courseInterest", "title")
-        .populate("assignedTo", "name email")
         .lean(),
-      StudentLead.countDocuments(recentQ),
-      StudentLead.countDocuments(q)
+      StudentLead.countDocuments(q),
+      StudentLead.countDocuments({
+        isArchived: false,
+        $or: [{ origin: "leadgen" }, { createdBy: { $in: leadgenIds } }]
+      })
     ]);
 
     return res.json({ leads, total, totalAllTime, days });

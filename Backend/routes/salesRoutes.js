@@ -6,25 +6,26 @@ const IC      = require("../controllers/salesImportController");
 
 router.use(auth);
 
-// ── Sales Import ─────────────────────────────────────────────
+// ── Sales Import ──────────────────────────────────────────────
 router.get ("/sales/import/types",              IC.listTypes);
 router.get ("/sales/import/template/:type",     IC.getTemplate);
 router.post("/sales/import/preview",            IC.upload.single("file"), IC.previewImport);
 router.post("/sales/import/:type",              IC.upload.single("file"), IC.importData);
 
-// ── Reports (declare before /:id routes) ─────────────────────
+// ── Reports ───────────────────────────────────────────────────
 router.get("/sales/reports/pipeline",           C.reportPipeline);
 router.get("/sales/reports/revenue",            C.reportRevenue);
 router.get("/sales/reports/conversion",         C.reportConversion);
 router.get("/sales/reports/rep-performance",    C.reportRepPerformance);
 
-// ── LeadGen Panel ─────────────────────────────────────────────
+// ── LeadGen ───────────────────────────────────────────────────
 router.get("/sales/leadgen/my-leads",           C.leadgenMyLeads);
 router.get("/sales/leadgen/stats",              C.leadgenStats);
 
-// ── Student Leads ─────────────────────────────────────────────
+// ── Student Leads (specific routes BEFORE /:id) ───────────────
 router.get   ("/sales/leads/stats",             C.leadsStats);
 router.get   ("/sales/leads/recent-leadgen",    C.recentLeadgenLeads);
+router.post  ("/sales/leads/score-all",         C.scoreAllLeads);
 router.get   ("/sales/leads",                   C.listLeads);
 router.post  ("/sales/leads",                   C.createLead);
 router.get   ("/sales/leads/:id",               C.getLead);
@@ -32,7 +33,6 @@ router.patch ("/sales/leads/:id",               C.updateLead);
 router.patch ("/sales/leads/:id/stage",         C.moveStage);
 router.post  ("/sales/leads/:id/score",         C.scoreLead);
 router.delete("/sales/leads/:id",               C.deleteLead);
-router.post  ("/sales/leads/score-all",         C.scoreAllLeads);
 
 // ── Courses ───────────────────────────────────────────────────
 router.get   ("/sales/courses",                 C.listCourses);

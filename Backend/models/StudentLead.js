@@ -1,13 +1,8 @@
 const mongoose = require("mongoose");
 
 const PIPELINE_STAGES = [
-  "new_lead",
-  "contacted",
-  "demo_scheduled",
-  "demo_attended",
-  "enrolled",
-  "dropped",
-  "completed"
+  "new_lead", "contacted", "demo_scheduled",
+  "demo_attended", "enrolled", "dropped", "completed"
 ];
 
 const SOURCES = [
@@ -40,20 +35,17 @@ const studentLeadSchema = new mongoose.Schema(
     courseInterest: { type: mongoose.Schema.Types.ObjectId, ref: "Course", default: null },
     budget:         { type: Number, default: 0 },
 
-    pipelineStage: {
-      type:    String,
-      enum:    PIPELINE_STAGES,
-      default: "new_lead"
-    },
-    stageHistory: { type: [stageHistorySchema], default: () => [] },
+    pipelineStage: { type: String, enum: PIPELINE_STAGES, default: "new_lead" },
+    stageHistory:  { type: [stageHistorySchema], default: () => [] },
 
-    source:     { type: String, enum: SOURCES, default: "other" },
+    source: { type: String, enum: SOURCES, default: "other" },
 
-    // Where the lead entered the system from.
-    // "leadgen" → captured by the LeadGen panel/team
-    // "sales"   → added manually inside the Sales system
-    // "import"  → bulk-imported from Excel/CSV
-    origin:     { type: String, enum: ["leadgen", "sales", "import", "other"], default: "sales" },
+    // Where the lead entered the system:
+    //   "leadgen" → LeadGen panel/team
+    //   "sales"   → added manually inside Sales system
+    //   "import"  → bulk-imported from Excel/CSV/PDF
+    //   "other"   → misc / API
+    origin: { type: String, enum: ["leadgen","sales","import","other"], default: "sales" },
 
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
@@ -63,7 +55,6 @@ const studentLeadSchema = new mongoose.Schema(
     notes: { type: String, default: "" },
     tags:  { type: [String], default: [] },
 
-    // Link to enrollment (set when stage → enrolled)
     enrollmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Enrollment", default: null },
 
     // Lead Scoring (auto-computed by leadScoring.js)
@@ -74,7 +65,7 @@ const studentLeadSchema = new mongoose.Schema(
       stage:      { type: Number, default: 0 },
       engagement: { type: Number, default: 0 }
     },
-    scoredAt:   { type: Date, default: null },
+    scoredAt: { type: Date, default: null },
 
     isArchived: { type: Boolean, default: false },
     createdBy:  { type: mongoose.Schema.Types.ObjectId, ref: "User" }
@@ -84,14 +75,15 @@ const studentLeadSchema = new mongoose.Schema(
 
 studentLeadSchema.index({ pipelineStage: 1, createdAt: -1 });
 studentLeadSchema.index({ email: 1 });
+studentLeadSchema.index({ phone: 1 });
 studentLeadSchema.index({ assignedTo: 1 });
 studentLeadSchema.index({ followUpDate: 1 });
 studentLeadSchema.index({ isArchived: 1 });
-studentLeadSchema.index({ score: -1 });  // for sorting by hottest leads
-studentLeadSchema.index({ origin: 1, createdAt: -1 });  // for "recent from LeadGen" feed
+studentLeadSchema.index({ score: -1 });
+studentLeadSchema.index({ origin: 1, createdAt: -1 });
 
-studentLeadSchema.statics.PIPELINE_STAGES = PIPELINE_STAGES;
-studentLeadSchema.statics.SOURCES         = SOURCES;
+studentLeadSchema.statics.PIPELINE_STAGES  = PIPELINE_STAGES;
+studentLeadSchema.statics.SOURCES          = SOURCES;
 studentLeadSchema.statics.EDUCATION_LEVELS = EDUCATION_LEVELS;
 
 module.exports = mongoose.model("StudentLead", studentLeadSchema);
