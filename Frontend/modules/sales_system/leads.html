@@ -214,17 +214,22 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
     <div class="kpi-c"><div class="kpi-v" style="color:var(--rose)" id="kDropped">—</div><div class="kpi-l">Dropped</div></div>
   </div>
   <div class="filter-bar">
-    <div class="sw"><span style="color:var(--text3);font-size:12px">&#128269;</span><input id="sInput" placeholder="Search name / email / phone..." oninput="applyFilter()"></div>
+    <!-- Stage filter chips — defaults to New Lead only -->
+    <div id="stage-chips" style="display:flex;gap:5px;flex-wrap:wrap">
+      <button class="stage-chip active" data-stage="new_lead" onclick="setStageFilter(this,'new_lead')">⚡ New Lead</button>
+      <button class="stage-chip" data-stage="contacted"      onclick="setStageFilter(this,'contacted')">📞 Contacted</button>
+      <button class="stage-chip" data-stage="demo_scheduled" onclick="setStageFilter(this,'demo_scheduled')">📅 Demo Sched.</button>
+      <button class="stage-chip" data-stage="demo_attended"  onclick="setStageFilter(this,'demo_attended')">✅ Demo Done</button>
+      <button class="stage-chip" data-stage="enrolled"       onclick="setStageFilter(this,'enrolled')">🎓 Enrolled</button>
+      <button class="stage-chip" data-stage="dropped"        onclick="setStageFilter(this,'dropped')">❌ Dropped</button>
+      <button class="stage-chip" data-stage=""               onclick="setStageFilter(this,'')" style="background:rgba(255,255,255,.04);color:var(--text3)">All Stages</button>
+    </div>
+    <div class="sw" style="margin-left:auto"><span style="color:var(--text3);font-size:12px">&#128269;</span><input id="sInput" placeholder="Search name / email / phone..." oninput="applyFilter()"></div>
     <select class="fsel" id="fSrc" onchange="applyFilter()">
       <option value="">All Sources</option>
       <option value="website">Website</option><option value="social_media">Social Media</option>
       <option value="referral">Referral</option><option value="cold_call">Cold Call</option>
       <option value="walk_in">Walk-in</option><option value="other">Other</option>
-    </select>
-    <select class="fsel" id="fEdu" onchange="applyFilter()">
-      <option value="">All Education</option>
-      <option value="high_school">High School</option><option value="undergraduate">Undergraduate</option>
-      <option value="graduate">Graduate</option><option value="working_professional">Working Professional</option>
     </select>
   </div>
   <!-- RECENT FROM LEADGEN -->
@@ -298,7 +303,7 @@ const STAGES=[
   {key:"completed",      label:"Completed",       col:"var(--green)",  bg:"var(--green-dim)"}
 ];
 const SRCCOL={website:"var(--blue-dim)",social_media:"var(--purple-dim)",referral:"var(--accent-dim)",cold_call:"var(--amber-dim)",walk_in:"var(--teal-dim)",other:"var(--bg4)"};
-let allLeads=[],curLead=null,curTab="info",dragId=null;
+let allLeads=[],curLead=null,curTab="info",dragId=null,stageFilter="new_lead";
 
 (async()=>{
   const u=JSON.parse(localStorage.getItem("user")||"{}");
@@ -400,18 +405,23 @@ async function loadBoard(){
     document.getElementById("kDropped").textContent=sm["dropped"]||0;
   }
   _lastLeadCount = st.total || allLeads.length || 0;
-  renderBoard();
+  applyFilter();   // applies default stageFilter="new_lead"
   loadLeadgenStrip();
 }
 
 function applyFilter(){
   const s=document.getElementById("sInput").value.toLowerCase();
   const src=document.getElementById("fSrc").value;
-  const edu=document.getElementById("fEdu").value;
   renderBoard(allLeads.filter(l=>{
     const ms=!s||(l.fullName||"").toLowerCase().includes(s)||(l.email||"").toLowerCase().includes(s)||(l.phone||"").includes(s);
-    return ms&&(!src||l.source===src)&&(!edu||l.educationLevel===edu);
+    return ms&&(!src||l.source===src)&&(!stageFilter||l.pipelineStage===stageFilter);
   }));
+}
+function setStageFilter(el,stage){
+  stageFilter=stage;
+  document.querySelectorAll(".stage-chip").forEach(c=>c.classList.remove("active"));
+  el.classList.add("active");
+  applyFilter();
 }
 
 function renderBoard(leads){
