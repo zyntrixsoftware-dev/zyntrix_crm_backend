@@ -31,7 +31,7 @@ const couponSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-couponSchema.index({ code: 1 }, { unique: true });
+// Note: code uniqueness is already enforced by { unique: true } in the field definition above
 couponSchema.index({ isActive: 1, validTill: 1 });
 couponSchema.index({ couponType: 1 });
 
