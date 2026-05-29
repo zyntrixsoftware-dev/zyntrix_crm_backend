@@ -107,6 +107,7 @@ tr:hover td{background:var(--bg3)}
 <div class="main">
   <div class="topbar">
     <div class="pg-hd"><div class="pg-title">Batch Manager</div><div class="pg-crumb">Sales &rsaquo; <span>Batches</span></div></div>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('batches', () => loadAll())">&#11014; Import</button>
     <button class="btn btn-ghost btn-sm" onclick="load()">&#8635;</button>
     <button class="btn btn-prim" onclick="openAdd()">+ New Batch</button>
   </div>
@@ -273,5 +274,6 @@ function closeDrw(){document.getElementById("ov").classList.remove("show");docum
 function toast(msg,t="info"){const w=document.getElementById("tw");const el=document.createElement("div");el.className=`toast ${t}`;el.textContent=msg;w.appendChild(el);setTimeout(()=>el.remove(),3500);}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 </script>
+<script src="sales-import-modal.js"></script>
 </body>
 </html>

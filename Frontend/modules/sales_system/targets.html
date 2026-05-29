@@ -114,6 +114,7 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
 <div class="main">
   <div class="topbar">
     <div class="pg-hd"><div class="pg-title">Sales Targets</div><div class="pg-crumb">Performance &rsaquo; <span>Targets</span></div></div>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('targets', () => load())">&#11014; Import</button>
     <button class="btn btn-prim" onclick="openSetTargets()">&#127919; Set Targets</button>
   </div>
   <div class="picker-bar">
@@ -317,5 +318,6 @@ function toast(msg, t='info') {
 
 init();
 </script>
+<script src="sales-import-modal.js"></script>
 </body>
 </html>

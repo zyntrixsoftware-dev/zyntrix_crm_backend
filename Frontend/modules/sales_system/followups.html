@@ -107,6 +107,7 @@ tr:hover td{background:var(--bg3)}
 <div class="main">
   <div class="topbar">
     <div class="pg-hd"><div class="pg-title">Follow-Ups</div><div class="pg-crumb">Pipeline &rsaquo; <span>Follow-Ups</span></div></div>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('followups', () => loadContent())">&#11014; Import</button>
     <button class="btn btn-prim" onclick="openAddDrawer()">&#43; Add Follow-Up</button>
   </div>
   <div class="content" id="content">
@@ -321,5 +322,6 @@ function toast(msg, t='info') {
 
 init();
 </script>
+<script src="sales-import-modal.js"></script>
 </body>
 </html>

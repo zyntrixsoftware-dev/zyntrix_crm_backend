@@ -153,6 +153,7 @@ input.srch:focus{border-color:var(--accent)}
       <div class="pg-title">Coupons & Discounts</div>
       <div class="pg-crumb">Sales System → <span>Coupons</span></div>
     </div>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('coupons', () => loadCoupons())">&#11014; Import</button>
     <button class="btn btn-ghost btn-sm" onclick="openValidate()">🔍 Validate Code</button>
     <button class="btn btn-prim btn-sm" onclick="openCreate()">+ New Coupon</button>
   </div>
@@ -534,5 +535,6 @@ function toast(msg, type = 'ok') {
 
 init();
 </script>
+<script src="sales-import-modal.js"></script>
 </body>
 </html>

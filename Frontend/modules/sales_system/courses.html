@@ -152,6 +152,7 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
 <div class="main">
   <div class="topbar">
     <div class="pg-hd"><div class="pg-title">Course Catalogue</div><div class="pg-crumb">Sales &rsaquo; <span>Courses</span></div></div>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('courses', () => loadAll())">&#11014; Import</button>
     <button class="btn btn-ghost btn-sm" onclick="load()">&#8635; Refresh</button>
     <button class="btn btn-prim" onclick="openAdd()">+ Add Course</button>
   </div>
@@ -343,5 +344,6 @@ function closeDrw(){document.getElementById("ov").classList.remove("show");docum
 function toast(msg,type="info"){const w=document.getElementById("tw");const el=document.createElement("div");el.className=`toast ${type}`;el.textContent=msg;w.appendChild(el);setTimeout(()=>el.remove(),3500);}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 </script>
+<script src="sales-import-modal.js"></script>
 </body>
 </html>

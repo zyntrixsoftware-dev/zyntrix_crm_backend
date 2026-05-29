@@ -182,6 +182,7 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
 <div class="main">
   <div class="topbar">
     <div class="pg-hd"><div class="pg-title">Student Leads Pipeline</div><div class="pg-crumb">Sales &rsaquo; <span>Pipeline</span></div></div>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('leads', () => loadBoard())">&#11014; Import</button>
     <button class="btn btn-ghost btn-sm" onclick="loadBoard()">&#8635; Refresh</button>
     <button class="btn btn-prim" onclick="openAdd()">+ Add Lead</button>
   </div>
@@ -286,7 +287,7 @@ async function loadCourses(){
 async function loadBoard(){
   document.getElementById("board").innerHTML='<div class="ls"><span class="spin">&#9696;</span>Loading...</div>';
   const[ld,st]=await Promise.all([apiRequest("/sales/leads?archived=false&limit=300"),apiRequest("/sales/leads/stats")]);
-  if(ld.error){toast(ld.msg,"err");return;}
+  if(ld.error){document.getElementById("board").innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--text2)"><div style="font-size:32px;margin-bottom:12px">⚠</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">Could not load leads</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px">${ld.msg}</div><button onclick="loadBoard()" style="background:var(--accent);color:var(--bg);border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:600">Try Again</button></div>`;toast(ld.msg,"err");return;}
   allLeads=ld.leads||[];
   if(!st.error){
     const sm={};(st.stages||[]).forEach(s=>sm[s._id]=s.count);
@@ -470,5 +471,6 @@ function toast(msg,type="info"){const w=document.getElementById("tw");const el=d
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function fmt(s){return String(s||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
 </script>
+<script src="sales-import-modal.js"></script>
 </body>
 </html>

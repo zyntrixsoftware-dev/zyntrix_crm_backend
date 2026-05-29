@@ -114,6 +114,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div class="pg-title">Communication Logs</div>
       <div class="pg-crumb">Sales System → <span>Comm Logs</span></div>
     </div>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('commlogs', () => init())">&#11014; Import</button>
     <button class="btn btn-prim btn-sm" onclick="openAdd()">+ Log Interaction</button>
   </div>
 
@@ -362,5 +363,6 @@ function toast(msg,type='ok'){
 
 init();
 </script>
+<script src="sales-import-modal.js"></script>
 </body>
 </html>
