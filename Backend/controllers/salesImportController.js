@@ -251,10 +251,30 @@ async function importLeads(rows, userId) {
     "walk in": "walk_in", "walk_in": "walk_in", "other": "other"
   };
 
-  // Resolve a "Course" column (by title, case-insensitive) to a Course ObjectId.
-  const courseDocs   = await Course.find({}, "_id title").lean();
-  const courseByTitle = {};
-  courseDocs.forEach(c => { if (c.title) courseByTitle[String(c.title).trim().toLowerCase()] = c._id; });
+  // Resolve a "Course" column to a Course ObjectId — forgiving match:
+  // exact → normalized → partial → tech-track keyword bucket.
+  const courseDocs = await Course.find({}, "_id title track").lean();
+  const norm = v => String(v || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  const TRACK_KEYWORDS = {
+    web_dev:       ["web", "full stack", "fullstack", "mern", "react", "frontend", "front end", "backend", "back end", "javascript", "node"],
+    data_ai:       ["data science", "data", "machine learning", "deep learning", "artificial intelligence", "analytics", "ml", "ai"],
+    cloud_devops:  ["cloud", "aws", "azure", "gcp", "devops", "kubernetes", "docker"],
+    cybersecurity: ["cyber", "security", "ethical hack", "pentest"],
+    mobile:        ["app", "android", "ios", "flutter", "mobile", "react native", "kotlin", "swift"],
+    programming:   ["dsa", "data structure", "algorithm", "programming", "c++", "java"]
+  };
+  function resolveCourseId(raw) {
+    const want = norm(raw);
+    if (!want) return null;
+    let hit = courseDocs.find(c => norm(c.title) === want);                                   // exact (normalized)
+    if (!hit) hit = courseDocs.find(c => norm(c.title).includes(want) || want.includes(norm(c.title))); // partial
+    if (!hit) {                                                                                // track keyword
+      for (const [track, words] of Object.entries(TRACK_KEYWORDS)) {
+        if (words.some(w => want.includes(w))) { hit = courseDocs.find(c => c.track === track); if (hit) break; }
+      }
+    }
+    return hit ? hit._id : null;
+  }
 
   let inserted = 0, skipped = 0, errors = [];
   for (const row of rows) {
@@ -267,7 +287,7 @@ async function importLeads(rows, userId) {
       const srcRaw   = clean(row["Source"] || row["source"] || "other").toLowerCase();
 
       const courseRaw = clean(row["Course"] || row["Course Interest"] || row["courseInterest"] || row["course"] || "");
-      const courseId  = courseRaw ? (courseByTitle[courseRaw.toLowerCase()] || null) : null;
+      const courseId  = resolveCourseId(courseRaw);
 
       const doc = {
         fullName:      name,
