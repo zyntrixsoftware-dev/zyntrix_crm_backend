@@ -168,22 +168,28 @@ tr:hover td{background:var(--bg3)}
     <button class="drw-close" onclick="closeAll()">&#10005;</button>
   </div>
   <div class="drw-body">
-    <div class="field"><label>Student Lead *</label><select id="aLead"><option value="">Select lead…</option></select></div>
-    <div class="field"><label>Course *</label><select id="aCourse" onchange="loadBatchesForAdd()"><option value="">Select course…</option></select></div>
+    <div class="field"><label>Student Lead *</label><select id="aLead" onchange="onLeadPick()"><option value="">Select lead…</option></select></div>
+    <div class="field"><label>Course *</label><select id="aCourse" onchange="loadBatchesForAdd();prefillFee()"><option value="">Select course…</option></select></div>
     <div class="field"><label>Batch *</label><select id="aBatch"><option value="">Select batch…</option></select></div>
     <div class="frow">
       <div class="field"><label>Payment Plan *</label>
-        <select id="aPayPlan">
+        <select id="aPayPlan" onchange="updateDueHint()">
           <option value="full">Full Payment</option>
-          <option value="emi_2">EMI – 2 months</option>
-          <option value="emi_3">EMI – 3 months</option>
-          <option value="emi_6">EMI – 6 months</option>
+          <option value="emi">EMI / Installments</option>
           <option value="scholarship">Scholarship</option>
+          <option value="free">Free</option>
         </select>
       </div>
-      <div class="field"><label>Total Fee (₹) *</label><input type="number" id="aTotalFee" placeholder="e.g. 25000"></div>
+      <div class="field"><label>Total Fee (₹) *</label><input type="number" id="aTotalFee" placeholder="e.g. 25000" oninput="updateDueHint()"></div>
     </div>
-    <div class="field"><label>EMI Months (if EMI plan)</label><input type="number" id="aEmiMonths" placeholder="e.g. 3" min="1"></div>
+    <div class="field"><label>EMI Months (if EMI plan)</label><input type="number" id="aEmiMonths" placeholder="e.g. 3" min="1" oninput="updateDueHint()"></div>
+    <div class="frow">
+      <div class="field"><label>Initial Payment (₹)</label><input type="number" id="aInitPay" min="0" placeholder="0" oninput="this.dataset.touched=1"></div>
+      <div class="field"><label>Payment Method</label>
+        <select id="aPayMethod"><option value="upi">UPI</option><option value="card">Card</option><option value="bank_transfer">Bank Transfer</option><option value="cash">Cash</option><option value="cheque">Cheque</option><option value="other">Other</option></select>
+      </div>
+    </div>
+    <div id="aDueHint" style="font-size:11px;color:var(--text3);margin:-4px 0 12px"></div>
     <div class="field"><label>Notes</label><textarea id="aNotes" placeholder="Any enrollment notes…"></textarea></div>
   </div>
   <div class="drw-foot">
@@ -231,13 +237,48 @@ async function loadMeta() {
   if (filterBatch) { document.getElementById('fBatch').value = filterBatch; }
 }
 
+// The student's own choice drives this: course comes from their interest, batch is theirs to pick.
+function onLeadPick(){
+  const l = allLeads.find(x => x._id === document.getElementById('aLead').value);
+  if (l && l.courseInterest) {
+    const cid = l.courseInterest._id || l.courseInterest;
+    const ac = document.getElementById('aCourse');
+    if ([...ac.options].some(o => o.value === cid)) { ac.value = cid; loadBatchesForAdd(); prefillFee(); }
+  }
+}
+function prefillFee(){
+  const c = allCourses.find(x => x._id === document.getElementById('aCourse').value);
+  if (c) document.getElementById('aTotalFee').value = (c.discountPrice || c.price || 0) || '';
+  updateDueHint();
+}
+function updateDueHint(){
+  const plan = document.getElementById('aPayPlan').value;
+  const fee  = parseFloat(document.getElementById('aTotalFee').value) || 0;
+  const emi  = parseInt(document.getElementById('aEmiMonths').value) || 0;
+  const due  = plan === 'full' ? fee : plan === 'emi' ? (emi > 0 ? Math.ceil(fee/emi) : fee) : 0;
+  const hint = document.getElementById('aDueHint');
+  if (hint) hint.textContent = due > 0
+    ? ('Suggested to collect now: ₹' + due.toLocaleString('en-IN') + (plan === 'emi' ? ' (first instalment)' : ''))
+    : 'No payment required for this plan';
+  const ip = document.getElementById('aInitPay');
+  if (ip && !ip.dataset.touched) ip.value = due || '';
+}
 async function loadBatchesForAdd() {
   const cid = document.getElementById('aCourse').value;
   const ab = document.getElementById('aBatch');
   ab.innerHTML = '<option value="">Select batch…</option>';
   if (!cid) return;
-  const filtered = allBatches.filter(b => (b.course?._id || b.course) === cid);
-  filtered.forEach(b => { const o=document.createElement('option'); o.value=b._id; o.textContent=b.batchCode||b.code||b.name; ab.appendChild(o); });
+  allBatches
+    .filter(b => (b.course?._id || b.course) === cid && b.status !== 'cancelled' && b.status !== 'completed')
+    .forEach(b => {
+      const left = (b.totalSeats||0) - (b.seatsBooked||0);
+      const starts = b.startDate ? ' · starts ' + new Date(b.startDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
+      const o = document.createElement('option');
+      o.value = b._id;
+      o.textContent = (b.batchCode||b.code||'Batch') + ' · ' + left + ' seats left' + starts;
+      if (left <= 0) { o.disabled = true; o.textContent += ' (FULL)'; }
+      ab.appendChild(o);
+    });
 }
 
 async function loadEnrollments() {
@@ -262,7 +303,7 @@ function payStatus(e) {
 }
 
 function planLabel(p) {
-  const map = {full:'Full',emi_2:'EMI×2',emi_3:'EMI×3',emi_6:'EMI×6',scholarship:'Scholar'};
+  const map = {full:'Full',emi:'EMI',scholarship:'Scholarship',free:'Free'};
   return map[p] || p;
 }
 
@@ -393,7 +434,7 @@ async function submitPayment() {
     transactionId: document.getElementById('pTxn').value,
     remarks: document.getElementById('pRemarks').value
   };
-  const res = await apiRequest('/sales/payments', { method:'POST', body: JSON.stringify(body) });
+  const res = await apiRequest('/sales/payments', 'POST', body);
   if (res.error) { toast(res.msg || 'Failed to record payment', 'err'); return; }
   toast('Payment recorded!', 'ok');
   openDetail(e._id);
@@ -404,7 +445,7 @@ async function submitCert() {
   const e = currentEnrollment;
   if (!e) return;
   const url = document.getElementById('certUrl').value.trim();
-  const res = await apiRequest('/sales/enrollments/' + e._id, { method:'PATCH', body: JSON.stringify({ certificateIssued: true, certificateUrl: url }) });
+  const res = await apiRequest('/sales/enrollments/' + e._id, 'PATCH', { certificateIssued: true, certificateUrl: url });
   if (res.error) { toast(res.msg || 'Failed', 'err'); return; }
   toast('Certificate issued!', 'ok');
   openDetail(e._id);
@@ -423,10 +464,16 @@ async function submitEnroll() {
   const paymentPlan = document.getElementById('aPayPlan').value;
   const totalFee = parseFloat(document.getElementById('aTotalFee').value);
   if (!lead || !course || !batch || !totalFee) { toast('Fill in all required fields', 'err'); return; }
-  const body = { lead, course, batch, paymentPlan, totalFee, emiMonths: parseInt(document.getElementById('aEmiMonths').value)||undefined, notes: document.getElementById('aNotes').value };
-  const res = await apiRequest('/sales/enrollments', { method:'POST', body: JSON.stringify(body) });
+  const initAmt = parseFloat(document.getElementById('aInitPay').value) || 0;
+  const body = {
+    lead, course, batch, paymentPlan, totalFee,
+    emiMonths: parseInt(document.getElementById('aEmiMonths').value)||undefined,
+    notes: document.getElementById('aNotes').value,
+    initialPayment: { amount: initAmt, method: document.getElementById('aPayMethod').value }
+  };
+  const res = await apiRequest('/sales/enrollments', 'POST', body);
   if (res.error) { toast(res.msg || 'Failed to enroll', 'err'); return; }
-  toast('Student enrolled!', 'ok');
+  toast(initAmt > 0 ? ('Student enrolled · ₹' + initAmt.toLocaleString('en-IN') + ' collected') : 'Student enrolled!', 'ok');
   closeAll(); loadEnrollments();
 }
 

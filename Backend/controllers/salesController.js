@@ -618,9 +618,48 @@ exports.createEnrollment = async (req, res) => {
     if (!batch) return res.status(404).json({ msg: "Batch not found" });
     if (batch.seatsAvailable <= 0) return res.status(400).json({ msg: "Batch is full" });
 
-    const enrollment = await Enrollment.create({ ...req.body, createdBy: req.user.id });
+    const plan          = req.body.paymentPlan || "full";
+    const totalFee      = Number(req.body.totalFee) || 0;
+    const discountedFee = Number(req.body.discountedFee) || totalFee;
+    const emiMonths     = Number(req.body.emiMonths) || 0;
+    const pay           = req.body.initialPayment || {};
+    const payAmt        = Math.max(0, Number(pay.amount) || 0);
 
-    // increment seats
+    // Payment-to-enrol gate. Amount due now depends on the plan:
+    //   full → whole (discounted) fee · emi → first instalment · scholarship/free → 0
+    // Currently NOT enforced (set ENFORCE_ENROLL_PAYMENT = true to require it).
+    const ENFORCE_ENROLL_PAYMENT = false;
+    const dueNow =
+      plan === "full" ? discountedFee :
+      plan === "emi"  ? (emiMonths > 0 ? Math.ceil(discountedFee / emiMonths) : discountedFee) :
+      0;
+    if (ENFORCE_ENROLL_PAYMENT && payAmt < dueNow) {
+      return res.status(400).json({ msg: `Collect at least ₹${dueNow.toLocaleString("en-IN")} before enrolling this student` });
+    }
+
+    const enrollment = await Enrollment.create({
+      ...req.body,
+      discountedFee,
+      feePaid: payAmt,
+      createdBy: req.user.id
+    });
+
+    // record the money collected at enrolment so it shows up in Payments
+    if (payAmt >= 1) {
+      await Payment.create({
+        enrollment:       enrollment._id,
+        lead:             req.body.lead,
+        course:           req.body.course || null,
+        amount:           payAmt,
+        method:           pay.method || "upi",
+        transactionId:    pay.transactionId || "",
+        instalmentNumber: 1,
+        remarks:          "Enrolment payment",
+        createdBy:        req.user.id
+      });
+    }
+
+    // book the seat
     batch.seatsBooked += 1;
     await batch.save();
 
@@ -632,7 +671,6 @@ exports.createEnrollment = async (req, res) => {
       lead.enrollmentId  = enrollment._id;
       await lead.save();
 
-      // enrollment confirmation email
       const course = await Course.findById(req.body.course);
       emails().notifyEnrollmentConfirmation(enrollment, lead, course, batch)
         .catch(e => console.warn(e.message));
