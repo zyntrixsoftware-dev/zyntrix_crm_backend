@@ -31,6 +31,7 @@ router.post  ("/sales/leads",                   C.createLead);
 router.get   ("/sales/leads/:id",               C.getLead);
 router.patch ("/sales/leads/:id",               C.updateLead);
 router.patch ("/sales/leads/:id/stage",         C.moveStage);
+router.patch ("/sales/leads/:id/contact",       C.setContactOutcome);
 router.post  ("/sales/leads/:id/score",         C.scoreLead);
 router.delete("/sales/leads/:id",               C.deleteLead);
 

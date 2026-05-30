@@ -161,6 +161,72 @@ exports.moveStage = async (req, res) => {
   }
 };
 
+// PATCH /api/sales/leads/:id/contact
+// Records the outcome of a sales contact and routes the lead automatically:
+//   in_progress    → stays new_lead
+//   interested     → contacted (ready for a demo)
+//   follow_up      → contacted + followUpDate set + FollowUp record created
+//   not_interested → dropped
+exports.setContactOutcome = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+
+    const { outcome, followUpDate, note, type } = req.body;
+    const STAGE_MAP = {
+      in_progress:    "new_lead",
+      interested:     "contacted",
+      follow_up:      "contacted",
+      not_interested: "dropped"
+    };
+    if (!STAGE_MAP[outcome]) {
+      return res.status(400).json({ msg: "Invalid contact outcome" });
+    }
+    if (outcome === "follow_up" && !followUpDate) {
+      return res.status(400).json({ msg: "Follow-up date is required" });
+    }
+
+    const lead = await StudentLead.findById(req.params.id);
+    if (!lead) return res.status(404).json({ msg: "Lead not found" });
+
+    const newStage = STAGE_MAP[outcome];
+
+    // record stage transition history
+    if (lead.pipelineStage !== newStage) {
+      lead.stageHistory.push({
+        from: lead.pipelineStage,
+        to:   newStage,
+        note: note || ("Contact outcome: " + outcome),
+        changedBy: req.user.id
+      });
+      lead.pipelineStage = newStage;
+    }
+
+    lead.contactOutcome = outcome;
+    if (outcome !== "in_progress") lead.lastContactedAt = new Date();
+    if (outcome === "follow_up")  lead.followUpDate = new Date(followUpDate);
+    if (outcome === "not_interested") lead.followUpDate = null;
+
+    await lead.save();
+
+    // create a Follow-Up record so it surfaces on the Follow-Ups page
+    if (outcome === "follow_up") {
+      await FollowUp.create({
+        lead:        lead._id,
+        scheduledAt: new Date(followUpDate),
+        type:        type || "call",
+        outcome:     "callback",
+        notes:       note || "",
+        createdBy:   req.user.id
+      });
+    }
+
+    return res.json({ lead });
+  } catch (err) {
+    console.error("setContactOutcome:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
 // DELETE /api/sales/leads/:id  (soft delete)
 exports.deleteLead = async (req, res) => {
   try {

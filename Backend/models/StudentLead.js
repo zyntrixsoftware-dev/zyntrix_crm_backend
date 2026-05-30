@@ -38,6 +38,17 @@ const studentLeadSchema = new mongoose.Schema(
     pipelineStage: { type: String, enum: PIPELINE_STAGES, default: "new_lead" },
     stageHistory:  { type: [stageHistorySchema], default: () => [] },
 
+    // Outcome of the latest sales contact (drives the Leads page workflow):
+    //   "in_progress"    → not yet contacted / still working
+    //   "interested"     → contacted, wants to proceed (ready for a demo)
+    //   "follow_up"      → contacted, call back later (scheduled in Follow-Ups)
+    //   "not_interested" → contacted, declined (dropped)
+    contactOutcome: {
+      type: String,
+      enum: ["in_progress", "interested", "follow_up", "not_interested"],
+      default: "in_progress"
+    },
+
     source: { type: String, enum: SOURCES, default: "other" },
 
     // Where the lead entered the system:
