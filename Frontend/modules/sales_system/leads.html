@@ -271,7 +271,7 @@ tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
 <div class="toast-wrap" id="tw"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-let allLeads = [], rawLeads = [], curLead = null, lastStats = null, pendingFuId = null;
+let allLeads = [], rawLeads = [], curLead = null, lastStats = null, pendingFuId = null, editingId = null;
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 (async () => {
@@ -472,7 +472,7 @@ async function openDetail(id) {
   `;
 
   document.getElementById("dFoot").innerHTML = `
-    <button onclick="archiveLead('${l._id}')" class="btn btn-ghost btn-sm" style="margin-left:auto;color:var(--rose);border-color:rgba(255,77,109,.2)">Archive</button>
+    <button onclick="openEdit()" class="btn btn-prim btn-sm" style="margin-left:auto">✎ Edit Lead</button>
   `;
 
   showDrawer("detDrw");
@@ -480,12 +480,36 @@ async function openDetail(id) {
 
 // ── ADD LEAD ──────────────────────────────────────────────────────────────────
 function openAdd() {
+  editingId = null;
   ["fName","fPhone","fEmail","fCity","fNotes"].forEach(id => { document.getElementById(id).value = ""; });
   document.getElementById("fBudget").value = "";
   document.getElementById("fFU").value = "";
   document.getElementById("fEduL").value = "undergraduate";
   document.getElementById("fSrcL").value = "other";
   document.getElementById("fCourse").value = "";
+  document.querySelector("#addDrw .drw-title").textContent = "Add New Lead";
+  document.querySelector("#addDrw .btn-prim").textContent = "+ Add to Pipeline";
+  showDrawer("addDrw");
+}
+
+// Pre-fill the drawer with the current lead and switch it to edit mode
+function openEdit() {
+  const l = curLead;
+  if (!l) return;
+  editingId = l._id;
+  document.getElementById("fName").value   = l.fullName || "";
+  document.getElementById("fPhone").value  = l.phone || "";
+  document.getElementById("fEmail").value  = l.email || "";
+  document.getElementById("fCity").value   = l.city || "";
+  document.getElementById("fBudget").value = l.budget || "";
+  document.getElementById("fEduL").value   = l.educationLevel || "undergraduate";
+  document.getElementById("fSrcL").value   = l.source || "other";
+  document.getElementById("fCourse").value = (l.courseInterest && l.courseInterest._id) ? l.courseInterest._id : (l.courseInterest || "");
+  document.getElementById("fFU").value     = l.followUpDate ? new Date(l.followUpDate).toISOString().slice(0,10) : "";
+  document.getElementById("fNotes").value  = l.notes || "";
+  document.querySelector("#addDrw .drw-title").textContent = "Edit Lead";
+  document.querySelector("#addDrw .btn-prim").textContent = "Save Changes";
+  closeDrawer();
   showDrawer("addDrw");
 }
 
@@ -495,8 +519,9 @@ async function saveLead() {
   if (!name)  return toast("Full name is required", "err");
   if (!phone) return toast("Phone is required", "err");
   const btn = document.querySelector("#addDrw .btn-prim");
+  const wasEditing = !!editingId;
   btn.disabled = true; btn.textContent = "Saving…";
-  const d = await apiRequest("/sales/leads", "POST", {
+  const payload = {
     fullName:      name,
     phone,
     email:         document.getElementById("fEmail").value.trim(),
@@ -506,21 +531,15 @@ async function saveLead() {
     source:        document.getElementById("fSrcL").value,
     courseInterest:document.getElementById("fCourse").value || null,
     followUpDate:  document.getElementById("fFU").value || null,
-    notes:         document.getElementById("fNotes").value.trim(),
-    pipelineStage: "new_lead"
-  });
-  btn.disabled = false; btn.textContent = "+ Add to Pipeline";
+    notes:         document.getElementById("fNotes").value.trim()
+  };
+  const d = wasEditing
+    ? await apiRequest("/sales/leads/" + editingId, "PATCH", payload)
+    : await apiRequest("/sales/leads", "POST", { ...payload, pipelineStage: "new_lead" });
+  btn.disabled = false; btn.textContent = wasEditing ? "Save Changes" : "+ Add to Pipeline";
   if (d.error) return toast(d.msg, "err");
-  toast("✅ " + name + " added!", "ok");
-  closeDrawer();
-  await loadLeads();
-}
-
-async function archiveLead(id) {
-  if (!confirm("Archive this lead?")) return;
-  const d = await apiRequest("/sales/leads/" + id, "DELETE");
-  if (d.error) return toast(d.msg, "err");
-  toast("Lead archived", "ok");
+  toast(wasEditing ? "✅ Lead updated" : "✅ " + name + " added!", "ok");
+  editingId = null;
   closeDrawer();
   await loadLeads();
 }

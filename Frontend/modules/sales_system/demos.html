@@ -56,14 +56,20 @@ tr:hover td{background:var(--bg3)}
 .toast.ok{border-color:rgba(0,229,176,.3)}.toast.err{border-color:rgba(255,77,109,.3)}
 @keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 .spin{animation:sp .8s linear infinite;display:inline-block}@keyframes sp{to{transform:rotate(360deg)}}
-.await-sec{background:var(--bg2);border:1px solid rgba(0,229,176,.3);border-radius:12px;padding:14px 18px;margin-bottom:18px}
-.await-hd{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px}
-.await-chip{background:var(--accent-dim);color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
-.await-track{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
-.await-track::-webkit-scrollbar{height:4px}.await-track::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.await-card{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;min-width:210px;flex-shrink:0}
-.await-card .nm{font-weight:600;font-size:13px;color:var(--text)}
-.await-card .mt{font-size:11px;color:var(--text3);margin-top:2px}
+.int-sec{margin-bottom:22px}
+.int-hd{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px}
+.int-chip{background:var(--accent-dim);color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.lead-st{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:var(--font);font-size:12px;font-weight:600;padding:5px 9px;cursor:pointer;outline:none}
+.lead-st.oc-interested{border-color:rgba(0,229,176,.45);color:var(--accent)}
+.lead-st.oc-follow_up{border-color:rgba(61,142,240,.45);color:var(--blue)}
+.lead-st.oc-not_interested{border-color:rgba(255,77,109,.45);color:var(--rose)}
+.mini-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;align-items:center;justify-content:center}
+.mini-ov.show{display:flex}
+.mini-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:20px 22px;width:340px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.mini-modal h3{font-family:var(--display);font-size:15px;font-weight:700;margin-bottom:4px}
+.mini-modal p{font-size:12px;color:var(--text3);margin-bottom:14px}
+.mini-modal input[type=date]{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;margin-bottom:14px}
+.mini-foot{display:flex;gap:8px;justify-content:flex-end}
 </style>
 </head>
 <body>
@@ -166,6 +172,19 @@ tr:hover td{background:var(--bg3)}
   <div class="drw-body" id="detBody"></div>
   <div class="drw-foot" id="detFoot"></div>
 </div>
+<!-- FOLLOW-UP DATE MODAL -->
+<div class="mini-ov" id="fuOv" onclick="closeFuModal()">
+  <div class="mini-modal" onclick="event.stopPropagation()">
+    <h3>🔔 Schedule Follow-Up</h3>
+    <p>When should the rep call this lead back?</p>
+    <input type="date" id="fuDate">
+    <div class="mini-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeFuModal()">Cancel</button>
+      <button class="btn btn-prim btn-sm" onclick="confirmFuModal()">Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-wrap" id="tw"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
@@ -182,24 +201,74 @@ async function loadLeads(preSelect){
   leads=d.leads||[];
   const sel=document.getElementById("dLead");sel.innerHTML='<option value="">-- Select Student --</option>';
   leads.forEach(l=>{const o=document.createElement("option");o.value=l._id;o.textContent=l.fullName+(l.email?" ("+l.email+")":"");if(preSelect&&l._id===preSelect)o.selected=true;sel.appendChild(o);});
-  renderAwaiting();
+  renderInterested();
 }
 // Leads marked "Interested" on the Leads page surface here automatically, ready to schedule a demo.
-function renderAwaiting(){
+let pendingFuLead=null;
+function fmtEdu(s){return String(s||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
+
+// Leads marked "Interested" on the Leads page appear here automatically with full info + a status control.
+function renderInterested(){
   const box=document.getElementById("awaiting");
   if(!box)return;
   const interested=leads.filter(l=>l.pipelineStage==="contacted"&&l.contactOutcome!=="follow_up");
   if(!interested.length){box.innerHTML="";return;}
-  box.innerHTML=`<div class="await-sec">
-    <div class="await-hd">⚡ Interested — Awaiting Demo <span class="await-chip">${interested.length}</span></div>
-    <div class="await-track">
-      ${interested.map(l=>`<div class="await-card">
-        <div class="nm">${esc(l.fullName)}</div>
-        <div class="mt">${esc(l.phone||"—")}${l.courseInterest&&l.courseInterest.title?" · "+esc(l.courseInterest.title):""}</div>
-        <button class="btn btn-prim btn-sm" style="margin-top:9px;width:100%" onclick="openAdd('${l._id}')">Schedule Demo →</button>
-      </div>`).join("")}
-    </div>
+  box.innerHTML=`<div class="int-sec">
+    <div class="int-hd">⚡ Interested Leads — Ready for Demo <span class="int-chip">${interested.length}</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Student</th><th>Phone</th><th>Email</th><th>City</th><th>Course</th><th>Status</th><th></th></tr></thead>
+      <tbody>${interested.map(l=>{
+        const o=l.contactOutcome||"interested";
+        return `<tr>
+          <td><div style="font-weight:600">${esc(l.fullName)}</div><div style="font-size:10.5px;color:var(--text3)">${esc(fmtEdu(l.educationLevel))}</div></td>
+          <td style="font-family:var(--mono);font-size:12px">${esc(l.phone||"—")}</td>
+          <td style="font-size:12px">${esc(l.email||"—")}</td>
+          <td>${esc(l.city||"—")}</td>
+          <td style="font-size:12px">${esc(l.courseInterest&&l.courseInterest.title?l.courseInterest.title:"—")}</td>
+          <td><select class="lead-st oc-${o}" onchange="setLeadOutcome('${l._id}',this.value)">
+            <option value="interested" ${o==="interested"?"selected":""}>✅ Interested</option>
+            <option value="follow_up" ${o==="follow_up"?"selected":""}>🔔 Follow Up</option>
+            <option value="not_interested" ${o==="not_interested"?"selected":""}>✖ Not Interested</option>
+          </select></td>
+          <td><button class="btn btn-prim btn-sm" onclick="openAdd('${l._id}')">Schedule Demo →</button></td>
+        </tr>`;
+      }).join("")}</tbody>
+    </table></div>
   </div>`;
+}
+
+async function setLeadOutcome(id, outcome){
+  if(outcome==="follow_up"){ pendingFuLead=id; openFuModal(); return; }
+  if(outcome==="not_interested"){
+    if(!confirm("Mark this lead as Not Interested? It will be removed from the list.")){ renderInterested(); return; }
+  }
+  await applyLeadOutcome(id, outcome, null);
+}
+async function applyLeadOutcome(id, outcome, followUpDate){
+  const body={outcome}; if(followUpDate) body.followUpDate=followUpDate;
+  const d=await apiRequest("/sales/leads/"+id+"/contact","PATCH",body);
+  if(d.error){ toast(d.msg||"Update failed","err"); renderInterested(); return; }
+  toast(outcome==="not_interested"?"Marked not interested":outcome==="follow_up"?"Follow-up scheduled":"Updated","ok");
+  await loadLeads();
+}
+function openFuModal(){
+  const i=document.getElementById("fuDate");
+  const t=new Date(); t.setDate(t.getDate()+2);
+  i.min=new Date().toISOString().slice(0,10);
+  i.value=t.toISOString().slice(0,10);
+  document.getElementById("fuOv").classList.add("show");
+}
+function closeFuModal(){
+  document.getElementById("fuOv").classList.remove("show");
+  pendingFuLead=null; renderInterested();
+}
+function confirmFuModal(){
+  const id=pendingFuLead, date=document.getElementById("fuDate").value;
+  if(!id){ closeFuModal(); return; }
+  if(!date){ toast("Pick a follow-up date","err"); return; }
+  document.getElementById("fuOv").classList.remove("show");
+  pendingFuLead=null;
+  applyLeadOutcome(id,"follow_up",date);
 }
 async function loadCourses(){
   const d=await apiRequest("/sales/courses");
