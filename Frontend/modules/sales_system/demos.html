@@ -162,8 +162,6 @@ tr:hover td{background:var(--bg3)}
 <script>
 let demos=[],leads=[],courses=[];
 (async()=>{
-  const u=JSON.parse(localStorage.getItem("user")||"{}");
-  if(u.name){document.getElementById("navName").textContent=u.name;document.getElementById("navRole").textContent=u.role||"";document.getElementById("navAv").textContent=u.name[0].toUpperCase();}
   // check URL for lead param
   const lid=new URLSearchParams(location.search).get("lead");
   await Promise.all([loadLeads(lid),loadCourses(),load()]);

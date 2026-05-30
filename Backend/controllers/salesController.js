@@ -808,10 +808,58 @@ exports.updateFollowUp = async (req, res) => {
     if (req.body.isCompleted && !wasCompleted) fu.completedAt = new Date();
     await fu.save();
 
-    // update lead's lastContacted and followUpDate
-    const update = { lastContactedAt: new Date() };
-    if (req.body.nextFollowUp) update.followUpDate = req.body.nextFollowUp;
-    await StudentLead.findByIdAndUpdate(fu.lead, update);
+    // Sync the parent lead so the Leads/pipeline pages stay consistent.
+    const lead = await StudentLead.findById(fu.lead);
+    if (lead) {
+      lead.lastContactedAt = new Date();
+
+      // On completion, route the lead based on the recorded outcome.
+      if (req.body.isCompleted && !wasCompleted) {
+        const OUTCOME_STAGE = {
+          interested:     "contacted",
+          demo_booked:    "demo_scheduled",
+          enrolled:       "enrolled",
+          not_interested: "dropped",
+          dropped:        "dropped"
+        };
+        const target = OUTCOME_STAGE[req.body.outcome];
+        if (target && lead.pipelineStage !== target) {
+          lead.stageHistory.push({
+            from: lead.pipelineStage, to: target,
+            note: "Follow-up outcome: " + req.body.outcome, changedBy: req.user.id
+          });
+          lead.pipelineStage = target;
+        }
+        if (req.body.outcome === "interested")     lead.contactOutcome = "interested";
+        if (req.body.outcome === "not_interested" ||
+            req.body.outcome === "dropped")        lead.contactOutcome = "not_interested";
+      }
+
+      // A rescheduled (next) follow-up keeps the lead in the follow-up workflow.
+      if (req.body.nextFollowUp) {
+        lead.followUpDate   = new Date(req.body.nextFollowUp);
+        lead.contactOutcome = "follow_up";
+        if (lead.pipelineStage === "new_lead") {
+          lead.stageHistory.push({
+            from: "new_lead", to: "contacted",
+            note: "Rescheduled follow-up", changedBy: req.user.id
+          });
+          lead.pipelineStage = "contacted";
+        }
+      }
+      await lead.save();
+    }
+
+    // Create the next follow-up record so it surfaces on the Follow-Ups page.
+    if (req.body.nextFollowUp) {
+      await FollowUp.create({
+        lead:        fu.lead,
+        scheduledAt: new Date(req.body.nextFollowUp),
+        type:        fu.type || "call",
+        notes:       "",
+        createdBy:   req.user.id
+      });
+    }
 
     return res.json({ followup: await fu.populate("lead", "fullName email phone") });
   } catch (err) {
