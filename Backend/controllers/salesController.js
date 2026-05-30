@@ -245,23 +245,53 @@ exports.deleteLead = async (req, res) => {
 
 exports.listCourses = async (req, res) => {
   try {
-    const { category, active, search } = req.query;
+    const { category, track, active, search } = req.query;
     const q = {};
     if (category) q.category = category;
+    if (track)    q.track    = track;
     if (active !== undefined) q.isActive = active !== "false";
     if (search) q.$or = [
       { title:       { $regex: search, $options: "i" } },
       { description: { $regex: search, $options: "i" } }
     ];
     const courses = await Course.find(q).sort({ createdAt: -1 });
-    // attach batch counts
     const ids = courses.map(c => c._id);
-    const batchCounts = await Batch.aggregate([
-      { $match: { course: { $in: ids }, status: { $ne: "cancelled" } } },
-      { $group: { _id: "$course", count: { $sum: 1 } } }
+
+    // Live demand + capacity per course (powers the catalogue cards)
+    const [batchAgg, interestedAgg, demoAgg, enrolledAgg] = await Promise.all([
+      Batch.aggregate([
+        { $match: { course: { $in: ids }, status: { $in: ["upcoming", "ongoing"] } } },
+        { $group: { _id: "$course", open: { $sum: 1 }, seats: { $sum: "$totalSeats" }, booked: { $sum: "$seatsBooked" } } }
+      ]),
+      StudentLead.aggregate([
+        { $match: { courseInterest: { $in: ids }, isArchived: false, pipelineStage: "contacted", contactOutcome: { $ne: "follow_up" } } },
+        { $group: { _id: "$courseInterest", count: { $sum: 1 } } }
+      ]),
+      DemoSession.aggregate([
+        { $match: { course: { $in: ids }, cancelled: false } },
+        { $group: { _id: "$course", count: { $sum: 1 } } }
+      ]),
+      Enrollment.aggregate([
+        { $match: { course: { $in: ids }, status: "active" } },
+        { $group: { _id: "$course", count: { $sum: 1 } } }
+      ])
     ]);
-    const countMap = Object.fromEntries(batchCounts.map(b => [b._id.toString(), b.count]));
-    const result = courses.map(c => ({ ...c.toObject(), batchCount: countMap[c._id.toString()] || 0 }));
+    const mapBy = arr => Object.fromEntries(arr.map(x => [String(x._id), x]));
+    const bMap = mapBy(batchAgg), iMap = mapBy(interestedAgg), dMap = mapBy(demoAgg), eMap = mapBy(enrolledAgg);
+
+    const result = courses.map(c => {
+      const k = String(c._id);
+      const bd = bMap[k];
+      return {
+        ...c.toObject(),
+        batchCount:      bd ? bd.open : 0,
+        openBatches:     bd ? bd.open : 0,
+        seatsLeft:       bd ? Math.max(0, bd.seats - bd.booked) : 0,
+        interestedCount: iMap[k] ? iMap[k].count : 0,
+        demoCount:       dMap[k] ? dMap[k].count : 0,
+        enrolledCount:   eMap[k] ? eMap[k].count : 0
+      };
+    });
     return res.json({ courses: result });
   } catch (err) {
     console.error("listCourses:", err);

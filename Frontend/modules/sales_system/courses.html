@@ -71,6 +71,10 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
 .price-old{font-size:11px;color:var(--text3);text-decoration:line-through;margin-right:4px}
 .price-new{font-family:var(--display);font-size:14px;font-weight:700;color:var(--accent)}
 .mode-badge{font-size:9.5px;padding:2px 8px;border-radius:5px;font-weight:600}
+.lvl-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--bg4);color:var(--text2);text-transform:uppercase;letter-spacing:.4px}
+.hot-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,.15);color:var(--amber)}
+.ccard-batch{display:flex;align-items:center;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border)}
+.cb-info{font-size:10.5px;color:var(--text3)}
 /* DRAWER */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}
 .overlay.show{display:block}
@@ -160,11 +164,15 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
   </div>
   <div class="filter-bar">
     <div class="sw"><span style="color:var(--text3);font-size:12px">&#128269;</span><input id="sInput" placeholder="Search courses..." oninput="applyFilter()"></div>
-    <select class="fsel" id="fCat" onchange="applyFilter()">
-      <option value="">All Categories</option>
-      <option value="tech">Tech</option><option value="design">Design</option>
-      <option value="business">Business</option><option value="marketing">Marketing</option>
-      <option value="language">Language</option><option value="other">Other</option>
+    <select class="fsel" id="fTrack" onchange="applyFilter()">
+      <option value="">All Tracks</option>
+      <option value="web_dev">Web Development</option>
+      <option value="data_ai">Data Science & AI</option>
+      <option value="cloud_devops">Cloud & DevOps</option>
+      <option value="cybersecurity">Cybersecurity</option>
+      <option value="mobile">Mobile Dev</option>
+      <option value="programming">Programming</option>
+      <option value="other">Other</option>
     </select>
     <select class="fsel" id="fMode" onchange="applyFilter()">
       <option value="">All Modes</option>
@@ -181,8 +189,11 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
   <div class="drw-body">
     <div class="frow">
       <div class="field" style="grid-column:1/-1"><label>Course Title *</label><input id="cTitle" placeholder="e.g. Full Stack Web Development"></div>
-      <div class="field"><label>Category</label>
-        <select id="cCat"><option value="tech">Tech</option><option value="design">Design</option><option value="business">Business</option><option value="marketing">Marketing</option><option value="language">Language</option><option value="other">Other</option></select>
+      <div class="field"><label>Track</label>
+        <select id="cTrack"><option value="web_dev">Web Development</option><option value="data_ai">Data Science & AI</option><option value="cloud_devops">Cloud & DevOps</option><option value="cybersecurity">Cybersecurity</option><option value="mobile">Mobile Dev</option><option value="programming">Programming</option><option value="other">Other</option></select>
+      </div>
+      <div class="field"><label>Level</label>
+        <select id="cLevel"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select>
       </div>
       <div class="field"><label>Mode</label>
         <select id="cMode"><option value="online">Online</option><option value="offline">Offline</option><option value="hybrid">Hybrid</option></select>
@@ -210,14 +221,33 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
 <div class="toast-wrap" id="tw"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-const CATCOL={tech:"var(--blue)",design:"var(--purple)",business:"var(--teal)",marketing:"var(--amber)",language:"var(--green)",other:"var(--text3)"};
-const CATBG={tech:"var(--blue-dim)",design:"var(--purple-dim)",business:"var(--teal-dim)",marketing:"var(--amber-dim)",language:"var(--green-dim)",other:"var(--bg4)"};
+const TRACKS={
+  web_dev:{label:"Web Development",col:"var(--blue)",bg:"var(--blue-dim)"},
+  data_ai:{label:"Data Science & AI",col:"var(--purple)",bg:"var(--purple-dim)"},
+  cloud_devops:{label:"Cloud & DevOps",col:"var(--teal)",bg:"var(--teal-dim)"},
+  cybersecurity:{label:"Cybersecurity",col:"var(--rose)",bg:"var(--rose-dim)"},
+  mobile:{label:"Mobile Dev",col:"var(--amber)",bg:"var(--amber-dim)"},
+  programming:{label:"Programming",col:"var(--green)",bg:"var(--green-dim)"},
+  other:{label:"Other",col:"var(--text3)",bg:"var(--bg4)"}
+};
+const LEVELS={beginner:"Beginner",intermediate:"Intermediate",advanced:"Advanced"};
 const MODECOL={online:"var(--accent-dim)",offline:"var(--amber-dim)",hybrid:"var(--purple-dim)"};
+function guessTrack(title){
+  const t=(title||"").toLowerCase();
+  const has=arr=>arr.some(w=>t.includes(w));
+  if(has(["full stack","fullstack","web","react","frontend","front-end","backend","back-end","javascript","node","mern","html","css"]))return"web_dev";
+  if(has(["data","machine learning","deep learning","artificial intelligence","analytics","data science"]))return"data_ai";
+  if(has(["cloud","aws","azure","gcp","devops","kubernetes","docker"]))return"cloud_devops";
+  if(has(["cyber","security","ethical hack","pentest"]))return"cybersecurity";
+  if(has(["android","ios","flutter","react native","mobile","kotlin","swift"]))return"mobile";
+  if(has(["c++","java ","programming","dsa","data structure","algorithm"]))return"programming";
+  return"other";
+}
+function trackOf(c){ const tk=(c.track&&c.track!=="other")?c.track:guessTrack(c.title); return TRACKS[tk]?tk:"other"; }
+function trackMeta(c){ return TRACKS[trackOf(c)]; }
 let all=[],editId=null;
 
 (async()=>{
-  const u=JSON.parse(localStorage.getItem("user")||"{}");
-  if(u.name){document.getElementById("navName").textContent=u.name;document.getElementById("navRole").textContent=u.role||"";document.getElementById("navAv").textContent=u.name[0].toUpperCase();}
   await load();
 })();
 
@@ -230,25 +260,36 @@ async function load(){
 
 function applyFilter(){
   const s=document.getElementById("sInput").value.toLowerCase();
-  const cat=document.getElementById("fCat").value;
+  const trk=document.getElementById("fTrack").value;
   const mode=document.getElementById("fMode").value;
-  renderGrid(all.filter(c=>(!s||(c.title||"").toLowerCase().includes(s)||(c.description||"").toLowerCase().includes(s))&&(!cat||c.category===cat)&&(!mode||c.mode===mode)));
+  renderGrid(all.filter(c=>(!s||(c.title||"").toLowerCase().includes(s)||(c.description||"").toLowerCase().includes(s))&&(!trk||trackOf(c)===trk)&&(!mode||c.mode===mode)));
 }
 
 function renderGrid(list){
   const g=document.getElementById("grid");
   if(!list.length){g.innerHTML='<div class="empty-state"><div style="font-size:32px">&#9658;</div><div>No courses found</div><button class="btn btn-prim" onclick="openAdd()">Add First Course</button></div>';return;}
-  g.innerHTML=list.map(c=>`
+  g.innerHTML=list.map(c=>{
+    const tm=trackMeta(c);
+    const hot=(c.interestedCount||0)>=40;
+    return `
     <div class="ccard" onclick="openDetail('${c._id}')">
       <div class="ccard-top">
-        <div class="ccat-badge" style="background:${CATBG[c.category]};color:${CATCOL[c.category]}">${c.category||"other"}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+          <span class="ccat-badge" style="background:${tm.bg};color:${tm.col}">${tm.label}</span>
+          <span class="lvl-chip">${LEVELS[c.level]||"Beginner"}</span>
+          ${hot?'<span class="hot-chip">🔥 Batch-ready</span>':''}
+        </div>
         <div class="ctitle">${esc(c.title)}</div>
         <div class="cdesc">${esc(c.description||"No description")}</div>
       </div>
       <div class="ccard-mid">
-        <div class="cstat"><div class="cstat-v">${c.durationWeeks||0}w</div><div class="cstat-l">Duration</div></div>
-        <div class="cstat"><div class="cstat-v">${c.batchCount||0}</div><div class="cstat-l">Batches</div></div>
-        <div class="cstat"><div class="cstat-v">${(c.curriculum||[]).length}</div><div class="cstat-l">Modules</div></div>
+        <div class="cstat"><div class="cstat-v" style="color:var(--accent)">${c.interestedCount||0}</div><div class="cstat-l">Interested</div></div>
+        <div class="cstat"><div class="cstat-v" style="color:var(--blue)">${c.demoCount||0}</div><div class="cstat-l">Demos</div></div>
+        <div class="cstat"><div class="cstat-v" style="color:var(--green)">${c.enrolledCount||0}</div><div class="cstat-l">Enrolled</div></div>
+      </div>
+      <div class="ccard-batch">
+        <span class="cb-info">${c.openBatches||0} open batch${(c.openBatches||0)===1?"":"es"} · ${c.seatsLeft||0} seats left</span>
+        <a class="btn btn-ghost btn-sm" href="batches.html?course=${c._id}&new=1" onclick="event.stopPropagation()">+ Open Batch</a>
       </div>
       <div class="ccard-bot">
         <div>${c.price&&c.discountPrice?`<span class="price-old">&#8377;${c.price.toLocaleString()}</span>`:""}
@@ -256,7 +297,7 @@ function renderGrid(list){
         </div>
         <span class="mode-badge" style="background:${MODECOL[c.mode]};color:var(--text2)">${c.mode||"online"}</span>
       </div>
-    </div>`).join("");
+    </div>`;}).join("");
 }
 
 function openAdd(){
@@ -266,6 +307,8 @@ function openAdd(){
   document.getElementById("cDur").value=8;
   document.getElementById("cPrice").value=0;
   document.getElementById("cDisc").value=0;
+  document.getElementById("cTrack").value="web_dev";
+  document.getElementById("cLevel").value="beginner";
   document.getElementById("modList").innerHTML="";
   showDrw("drw");
 }
@@ -274,7 +317,8 @@ function openEdit(c){
   editId=c._id;
   document.getElementById("drwTitle").textContent="Edit Course";
   document.getElementById("cTitle").value=c.title||"";
-  document.getElementById("cCat").value=c.category||"tech";
+  document.getElementById("cTrack").value=trackOf(c);
+  document.getElementById("cLevel").value=c.level||"beginner";
   document.getElementById("cMode").value=c.mode||"online";
   document.getElementById("cDur").value=c.durationWeeks||8;
   document.getElementById("cPrice").value=c.price||0;
@@ -299,7 +343,7 @@ async function saveCourse(){
   const mods=[...document.getElementById("modList").children].map(d=>{
     const ins=[...d.querySelectorAll("input")];return{title:ins[0]?.value.trim()||"",duration:ins[1]?.value.trim()||""};
   }).filter(m=>m.title);
-  const body={title,category:document.getElementById("cCat").value,mode:document.getElementById("cMode").value,
+  const body={title,category:"tech",track:document.getElementById("cTrack").value,level:document.getElementById("cLevel").value,mode:document.getElementById("cMode").value,
     durationWeeks:parseInt(document.getElementById("cDur").value)||8,
     price:parseFloat(document.getElementById("cPrice").value)||0,
     discountPrice:parseFloat(document.getElementById("cDisc").value)||0,
@@ -315,11 +359,18 @@ async function openDetail(id){
   const c=all.find(x=>x._id===id);if(!c)return;
   const det=document.getElementById("detBody");
   det.innerHTML=`
-    <div style="display:inline-block;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:${CATBG[c.category]};color:${CATCOL[c.category]};text-transform:uppercase;margin-bottom:10px">${c.category}</div>
+    <div style="margin-bottom:10px"><span style="display:inline-block;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:${trackMeta(c).bg};color:${trackMeta(c).col};text-transform:uppercase">${trackMeta(c).label}</span> <span class="lvl-chip">${LEVELS[c.level]||"Beginner"}</span></div>
     <div style="font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:6px">${esc(c.title)}</div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px">${esc(c.description||"No description")}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
       ${["&#8377;"+(c.discountPrice||c.price||0).toLocaleString()+" Price",""+c.durationWeeks+"w Duration",(c.mode||"online")+" Mode"].map(s=>`<div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;font-size:11px;color:var(--text2)">${s}</div>`).join("")}
+    </div>
+    <div class="sec-lbl">Pipeline Demand</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center"><div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--accent)">${c.interestedCount||0}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Interested</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center"><div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--blue)">${c.demoCount||0}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Demos</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center"><div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--green)">${c.enrolledCount||0}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Enrolled</div></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center"><div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--text)">${c.seatsLeft||0}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Seats Left</div></div>
     </div>
     ${c.curriculum?.length?`<div class="sec-lbl">Curriculum (${c.curriculum.length} modules)</div>
       <div style="display:flex;flex-direction:column;gap:5px">
@@ -327,6 +378,7 @@ async function openDetail(id){
       </div>`:""}`;
   document.getElementById("detTitle").textContent=c.title;
   document.getElementById("detFoot").innerHTML=`
+    <a class="btn btn-prim btn-sm" href="batches.html?course=${c._id}&new=1">+ Open Batch</a>
     <button class="btn btn-ghost btn-sm" onclick="openEdit(${JSON.stringify(c).replace(/"/g,'&quot;')})">Edit</button>
     <a class="btn btn-ghost btn-sm" href="batches.html?course=${c._id}">View Batches</a>
     <button class="btn btn-danger btn-sm" onclick="deactivate('${c._id}')">Deactivate</button>

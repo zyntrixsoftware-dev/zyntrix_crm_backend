@@ -165,9 +165,16 @@ const STATCOL={upcoming:"var(--blue)",ongoing:"var(--accent)",completed:"var(--g
 const STATBG={upcoming:"var(--blue-dim)",ongoing:"var(--accent-dim)",completed:"var(--green-dim)",cancelled:"var(--rose-dim)"};
 let courses=[],batches=[],editId=null;
 (async()=>{
-  const u=JSON.parse(localStorage.getItem("user")||"{}");
-  if(u.name){document.getElementById("navName").textContent=u.name;document.getElementById("navRole").textContent=u.role||"";document.getElementById("navAv").textContent=u.name[0].toUpperCase();}
-  await loadCourses();await load();
+  await loadCourses();
+  // Deep-link from Courses: ?course=<id>&new=1 pre-opens a new batch for that course
+  const params=new URLSearchParams(location.search);
+  const pcourse=params.get("course");
+  if(pcourse){ const f=document.getElementById("fCourse"); if(f) f.value=pcourse; }
+  await load();
+  if(pcourse && params.get("new")==="1"){
+    openAdd();
+    const bc=document.getElementById("bCourse"); if(bc) bc.value=pcourse;
+  }
 })();
 async function loadCourses(){
   const d=await apiRequest("/sales/courses");
