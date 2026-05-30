@@ -302,12 +302,22 @@ exports.listCourses = async (req, res) => {
 exports.createCourse = async (req, res) => {
   try {
     if (!isSalesOrAdmin(req, res)) return;
-    const course = await Course.create({ ...req.body, createdBy: req.user.id });
+    const body = { ...req.body, createdBy: req.user.id };
+    // Always set a slug so the unique index never trips on null/empty
+    if (body.title && !body.slug) {
+      body.slug = String(body.title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    }
+    const course = await Course.create(body);
     return res.status(201).json({ course });
   } catch (err) {
-    if (err.code === 11000) return res.status(400).json({ msg: "Course slug already exists" });
+    if (err.code === 11000) {
+      return res.status(400).json({ msg: "A course with this name already exists" });
+    }
+    if (err.name === "ValidationError") {
+      return res.status(400).json({ msg: Object.values(err.errors).map(e => e.message).join("; ") });
+    }
     console.error("createCourse:", err);
-    return res.status(500).json({ msg: "Server error" });
+    return res.status(500).json({ msg: err.message || "Server error" });
   }
 };
 
