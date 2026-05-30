@@ -17,6 +17,7 @@ const SALES_IMPORT_FIELDS = {
     { key:"phone",         label:"Phone",          required:false, guess:["phone","mobile","contact","cell","number"] },
     { key:"email",         label:"Email",          required:false, guess:["email","e-mail","mail"] },
     { key:"city",          label:"City",           required:false, guess:["city","location","place"] },
+    { key:"course",        label:"Course",         required:false, guess:["course","course interest","program","interested course","course name"] },
     { key:"budget",        label:"Budget (₹)",     required:false, guess:["budget","budget (₹)","amount","fee budget"] },
     { key:"pipelineStage", label:"Pipeline Stage", required:false, guess:["pipeline stage","stage","status"] },
     { key:"source",        label:"Source",         required:false, guess:["source","lead source","how did you hear"] },

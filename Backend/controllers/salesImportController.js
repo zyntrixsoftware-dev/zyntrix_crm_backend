@@ -104,7 +104,7 @@ exports.previewImport = async (req, res) => {
 const TEMPLATES = {
   leads: {
     label: "Student Leads",
-    columns: ["Full Name","Phone","Email","City","Budget (₹)","Pipeline Stage","Source","Follow Up Date","Notes"],
+    columns: ["Full Name","Phone","Email","City","Course","Budget (₹)","Pipeline Stage","Source","Follow Up Date","Notes"],
     enums: {
       "Pipeline Stage": ["new_lead","contacted","demo_scheduled","demo_attended","enrolled","dropped"],
       "Source": ["website","social_media","referral","cold_call","walk_in","other"]
@@ -251,6 +251,11 @@ async function importLeads(rows, userId) {
     "walk in": "walk_in", "walk_in": "walk_in", "other": "other"
   };
 
+  // Resolve a "Course" column (by title, case-insensitive) to a Course ObjectId.
+  const courseDocs   = await Course.find({}, "_id title").lean();
+  const courseByTitle = {};
+  courseDocs.forEach(c => { if (c.title) courseByTitle[String(c.title).trim().toLowerCase()] = c._id; });
+
   let inserted = 0, skipped = 0, errors = [];
   for (const row of rows) {
     try {
@@ -261,11 +266,15 @@ async function importLeads(rows, userId) {
       const stageRaw = clean(row["Pipeline Stage"] || row["pipelineStage"] || "new_lead").toLowerCase();
       const srcRaw   = clean(row["Source"] || row["source"] || "other").toLowerCase();
 
+      const courseRaw = clean(row["Course"] || row["Course Interest"] || row["courseInterest"] || row["course"] || "");
+      const courseId  = courseRaw ? (courseByTitle[courseRaw.toLowerCase()] || null) : null;
+
       const doc = {
         fullName:      name,
         phone,
         email:         clean(row["Email"] || row["email"] || ""),
         city:          clean(row["City"] || row["city"] || ""),
+        courseInterest: courseId,
         budget:        toNum(row["Budget (₹)"] || row["budget"] || 0),
         pipelineStage: STAGE_MAP[stageRaw] || "new_lead",
         source:        SOURCE_MAP[srcRaw] || "other",
@@ -291,6 +300,7 @@ async function importLeads(rows, userId) {
           score:        doc.score,
           source:       doc.source
         };
+        if (doc.courseInterest) safeUpdate.courseInterest = doc.courseInterest;
         await StudentLead.findOneAndUpdate(
           { phone },
           {
