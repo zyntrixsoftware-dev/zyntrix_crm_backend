@@ -546,7 +546,7 @@ async function saveLead() {
 
 // ── COURSES DROPDOWN ──────────────────────────────────────────────────────────
 async function loadCourses() {
-  const d = await apiRequest("/sales/courses");
+  const d = await apiRequest("/sales/courses?category=tech&active=true");
   if (d.error) return;
   const sel = document.getElementById("fCourse");
   (d.courses || []).forEach(c => {

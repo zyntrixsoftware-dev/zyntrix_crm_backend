@@ -53,6 +53,7 @@ router.get   ("/sales/batches/:id/enrollments", C.getBatchEnrollments);
 // ── Demo Sessions ─────────────────────────────────────────────
 router.get   ("/sales/demos",                   C.listDemos);
 router.post  ("/sales/demos",                   C.createDemo);
+router.post  ("/sales/demos/bulk",              C.bulkCreateDemos);
 router.get   ("/sales/demos/:id",               C.getDemo);
 router.patch ("/sales/demos/:id",               C.updateDemo);
 router.delete("/sales/demos/:id",               C.deleteDemo);

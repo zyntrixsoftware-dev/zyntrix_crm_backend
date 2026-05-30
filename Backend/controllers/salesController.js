@@ -445,6 +445,50 @@ exports.createDemo = async (req, res) => {
   }
 };
 
+// POST /api/sales/demos/bulk
+// Schedule ONE demo class for a batch of leads (e.g. everyone who picked the same
+// course). Creates a DemoSession per lead and moves them all to demo_scheduled.
+exports.bulkCreateDemos = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const { leadIds, course, scheduledAt, mode, meetingLink, venue, conductedBy } = req.body;
+    if (!Array.isArray(leadIds) || !leadIds.length)
+      return res.status(400).json({ msg: "No leads selected" });
+    if (!scheduledAt)
+      return res.status(400).json({ msg: "Scheduled date/time is required" });
+
+    const ids = leadIds.filter(id => validId(id));
+    if (!ids.length) return res.status(400).json({ msg: "No valid leads" });
+
+    const docs = ids.map(lead => ({
+      lead,
+      course:      course && validId(course) ? course : null,
+      scheduledAt,
+      mode:        mode === "offline" ? "offline" : "online",
+      meetingLink: meetingLink || "",
+      venue:       venue || "",
+      conductedBy: conductedBy || "",
+      createdBy:   req.user.id
+    }));
+    const created = await DemoSession.insertMany(docs);
+
+    // Move each lead into demo_scheduled (with stage history) — only if still earlier in the pipeline.
+    for (const id of ids) {
+      const lead = await StudentLead.findById(id);
+      if (lead && ["new_lead", "contacted"].includes(lead.pipelineStage)) {
+        lead.stageHistory.push({ from: lead.pipelineStage, to: "demo_scheduled", note: "Batch demo scheduled", changedBy: req.user.id });
+        lead.pipelineStage = "demo_scheduled";
+        await lead.save();
+      }
+    }
+
+    return res.status(201).json({ created: created.length });
+  } catch (err) {
+    console.error("bulkCreateDemos:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
 exports.getDemo = async (req, res) => {
   try {
     const demo = await DemoSession.findById(req.params.id)

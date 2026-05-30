@@ -70,6 +70,17 @@ tr:hover td{background:var(--bg3)}
 .mini-modal p{font-size:12px;color:var(--text3);margin-bottom:14px}
 .mini-modal input[type=date]{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;margin-bottom:14px}
 .mini-foot{display:flex;gap:8px;justify-content:flex-end}
+.mini-modal input[type=datetime-local],.mini-modal input[type=text],.mini-modal select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;margin-bottom:10px}
+.mini-modal label.ml{display:block;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.cg{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.cg-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cg-title{font-family:var(--display);font-size:14px;font-weight:700;color:var(--text)}
+.cg-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.cg-batches{display:flex;flex-direction:column;gap:7px}
+.cg-batch{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px}
+.cg-batch-lbl{font-size:12.5px;color:var(--text2)}
+.cg-students{margin-top:10px}
+.cg-students summary{font-size:11.5px;color:var(--accent);cursor:pointer;user-select:none;padding:4px 0}
 </style>
 </head>
 <body>
@@ -172,6 +183,26 @@ tr:hover td{background:var(--bg3)}
   <div class="drw-body" id="detBody"></div>
   <div class="drw-foot" id="detFoot"></div>
 </div>
+<!-- BATCH SCHEDULE MODAL -->
+<div class="mini-ov" id="schedOv" onclick="closeSched()">
+  <div class="mini-modal" style="width:400px" onclick="event.stopPropagation()">
+    <h3>📅 Schedule Demo Class</h3>
+    <p id="schedSub">—</p>
+    <label class="ml">Date &amp; Time</label>
+    <input type="datetime-local" id="schedAt">
+    <label class="ml">Mode</label>
+    <select id="schedMode"><option value="online">Online</option><option value="offline">Offline</option></select>
+    <label class="ml">Meeting Link / Venue</label>
+    <input type="text" id="schedLink" placeholder="https://… or room / address">
+    <label class="ml">Conducted By</label>
+    <input type="text" id="schedBy" placeholder="Instructor / rep name">
+    <div class="mini-foot" style="margin-top:6px">
+      <button class="btn btn-ghost btn-sm" onclick="closeSched()">Cancel</button>
+      <button class="btn btn-prim btn-sm" id="schedGo" onclick="confirmBatchSchedule()">Schedule Class</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOLLOW-UP DATE MODAL -->
 <div class="mini-ov" id="fuOv" onclick="closeFuModal()">
   <div class="mini-modal" onclick="event.stopPropagation()">
@@ -207,34 +238,102 @@ async function loadLeads(preSelect){
 let pendingFuLead=null;
 function fmtEdu(s){return String(s||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
 
-// Leads marked "Interested" on the Leads page appear here automatically with full info + a status control.
+// Demo classes are scheduled per course in batches of 40 — never one student at a time.
+const BATCH_SIZE = 40;
+let courseGroups = {}, pendingBatch = null;
+function chunk(arr,n){ const out=[]; for(let i=0;i<arr.length;i+=n) out.push(arr.slice(i,i+n)); return out; }
+function buildCourseGroups(){
+  const interested = leads.filter(l=>l.pipelineStage==="contacted" && l.contactOutcome!=="follow_up");
+  const g={};
+  interested.forEach(l=>{
+    const cid=(l.courseInterest&&l.courseInterest._id)?l.courseInterest._id:"none";
+    const title=(l.courseInterest&&l.courseInterest.title)?l.courseInterest.title:"No course selected";
+    if(!g[cid]) g[cid]={courseId: cid==="none"?null:cid, title, leads:[]};
+    g[cid].leads.push(l);
+  });
+  return g;
+}
 function renderInterested(){
   const box=document.getElementById("awaiting");
   if(!box)return;
-  const interested=leads.filter(l=>l.pipelineStage==="contacted"&&l.contactOutcome!=="follow_up");
-  if(!interested.length){box.innerHTML="";return;}
+  courseGroups=buildCourseGroups();
+  const keys=Object.keys(courseGroups);
+  if(!keys.length){ box.innerHTML=""; return; }
+  const total=keys.reduce((sum,k)=>sum+courseGroups[k].leads.length,0);
   box.innerHTML=`<div class="int-sec">
-    <div class="int-hd">⚡ Interested Leads — Ready for Demo <span class="int-chip">${interested.length}</span></div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>Student</th><th>Phone</th><th>Email</th><th>City</th><th>Course</th><th>Status</th><th></th></tr></thead>
-      <tbody>${interested.map(l=>{
-        const o=l.contactOutcome||"interested";
-        return `<tr>
-          <td><div style="font-weight:600">${esc(l.fullName)}</div><div style="font-size:10.5px;color:var(--text3)">${esc(fmtEdu(l.educationLevel))}</div></td>
-          <td style="font-family:var(--mono);font-size:12px">${esc(l.phone||"—")}</td>
-          <td style="font-size:12px">${esc(l.email||"—")}</td>
-          <td>${esc(l.city||"—")}</td>
-          <td style="font-size:12px">${esc(l.courseInterest&&l.courseInterest.title?l.courseInterest.title:"—")}</td>
-          <td><select class="lead-st oc-${o}" onchange="setLeadOutcome('${l._id}',this.value)">
-            <option value="interested" ${o==="interested"?"selected":""}>✅ Interested</option>
-            <option value="follow_up" ${o==="follow_up"?"selected":""}>🔔 Follow Up</option>
-            <option value="not_interested" ${o==="not_interested"?"selected":""}>✖ Not Interested</option>
-          </select></td>
-          <td><button class="btn btn-prim btn-sm" onclick="openAdd('${l._id}')">Schedule Demo →</button></td>
-        </tr>`;
-      }).join("")}</tbody>
-    </table></div>
+    <div class="int-hd">⚡ Interested Leads by Course — Schedule Demo Classes <span class="int-chip">${total}</span></div>
+    ${keys.map(k=>{
+      const grp=courseGroups[k];
+      const batches=chunk(grp.leads, BATCH_SIZE);
+      return `<div class="cg">
+        <div class="cg-hd"><div>
+          <div class="cg-title">${esc(grp.title)}</div>
+          <div class="cg-meta">${grp.leads.length} interested · ${batches.length} batch${batches.length>1?"es":""} of up to ${BATCH_SIZE}</div>
+        </div></div>
+        <div class="cg-batches">
+          ${batches.map((b,i)=>`<div class="cg-batch">
+            <span class="cg-batch-lbl">Batch ${i+1} · <b>${b.length}</b> students</span>
+            <button class="btn btn-prim btn-sm" onclick="openBatchSchedule('${k}',${i})">📅 Schedule Class</button>
+          </div>`).join("")}
+        </div>
+        <details class="cg-students">
+          <summary>View ${grp.leads.length} students</summary>
+          <div class="tbl-wrap" style="margin-top:8px"><table>
+            <thead><tr><th>Student</th><th>Phone</th><th>Email</th><th>City</th><th>Status</th></tr></thead>
+            <tbody>${grp.leads.map(l=>{
+              const o=l.contactOutcome||"interested";
+              return `<tr>
+                <td><div style="font-weight:600">${esc(l.fullName)}</div><div style="font-size:10.5px;color:var(--text3)">${esc(fmtEdu(l.educationLevel))}</div></td>
+                <td style="font-family:var(--mono);font-size:12px">${esc(l.phone||"—")}</td>
+                <td style="font-size:12px">${esc(l.email||"—")}</td>
+                <td>${esc(l.city||"—")}</td>
+                <td><select class="lead-st oc-${o}" onchange="setLeadOutcome('${l._id}',this.value)">
+                  <option value="interested" ${o==="interested"?"selected":""}>✅ Interested</option>
+                  <option value="follow_up" ${o==="follow_up"?"selected":""}>🔔 Follow Up</option>
+                  <option value="not_interested" ${o==="not_interested"?"selected":""}>✖ Not Interested</option>
+                </select></td>
+              </tr>`;
+            }).join("")}</tbody>
+          </table></div>
+        </details>
+      </div>`;
+    }).join("")}
   </div>`;
+}
+function openBatchSchedule(key, idx){
+  const grp=courseGroups[key];
+  if(!grp)return;
+  const batch=chunk(grp.leads, BATCH_SIZE)[idx];
+  if(!batch)return;
+  pendingBatch={ courseId:grp.courseId, leadIds:batch.map(l=>l._id), title:grp.title, idx, count:batch.length };
+  document.getElementById("schedSub").textContent=`${grp.title} · Batch ${idx+1} · ${batch.length} students`;
+  const at=document.getElementById("schedAt");
+  const t=new Date(); t.setDate(t.getDate()+1); t.setHours(10,0,0,0);
+  at.value=new Date(t.getTime()-t.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById("schedLink").value="";
+  document.getElementById("schedBy").value="";
+  document.getElementById("schedMode").value="online";
+  document.getElementById("schedOv").classList.add("show");
+}
+function closeSched(){ document.getElementById("schedOv").classList.remove("show"); pendingBatch=null; }
+async function confirmBatchSchedule(){
+  if(!pendingBatch)return;
+  const at=document.getElementById("schedAt").value;
+  if(!at){ toast("Pick a date & time","err"); return; }
+  const btn=document.getElementById("schedGo"); btn.disabled=true; btn.textContent="Scheduling…";
+  const d=await apiRequest("/sales/demos/bulk","POST",{
+    leadIds: pendingBatch.leadIds,
+    course: pendingBatch.courseId,
+    scheduledAt: at,
+    mode: document.getElementById("schedMode").value,
+    meetingLink: document.getElementById("schedLink").value.trim(),
+    conductedBy: document.getElementById("schedBy").value.trim()
+  });
+  btn.disabled=false; btn.textContent="Schedule Class";
+  if(d.error){ toast(d.msg||"Failed","err"); return; }
+  toast(`✅ Demo class scheduled for ${d.created||pendingBatch.count} students`,"ok");
+  closeSched();
+  await Promise.all([load(), loadLeads()]);
 }
 
 async function setLeadOutcome(id, outcome){
@@ -271,7 +370,7 @@ function confirmFuModal(){
   applyLeadOutcome(id,"follow_up",date);
 }
 async function loadCourses(){
-  const d=await apiRequest("/sales/courses");
+  const d=await apiRequest("/sales/courses?category=tech&active=true");
   if(d.error)return;courses=d.courses||[];
   const sel=document.getElementById("dCourse");sel.innerHTML='<option value="">-- No Course --</option>';
   courses.forEach(c=>{const o=document.createElement("option");o.value=c._id;o.textContent=c.title;sel.appendChild(o);});
