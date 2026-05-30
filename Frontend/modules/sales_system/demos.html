@@ -56,6 +56,14 @@ tr:hover td{background:var(--bg3)}
 .toast.ok{border-color:rgba(0,229,176,.3)}.toast.err{border-color:rgba(255,77,109,.3)}
 @keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 .spin{animation:sp .8s linear infinite;display:inline-block}@keyframes sp{to{transform:rotate(360deg)}}
+.await-sec{background:var(--bg2);border:1px solid rgba(0,229,176,.3);border-radius:12px;padding:14px 18px;margin-bottom:18px}
+.await-hd{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px}
+.await-chip{background:var(--accent-dim);color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.await-track{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+.await-track::-webkit-scrollbar{height:4px}.await-track::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.await-card{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;min-width:210px;flex-shrink:0}
+.await-card .nm{font-weight:600;font-size:13px;color:var(--text)}
+.await-card .mt{font-size:11px;color:var(--text3);margin-top:2px}
 </style>
 </head>
 <body>
@@ -127,6 +135,7 @@ tr:hover td{background:var(--bg3)}
     </select>
   </div>
   <div class="content">
+    <div id="awaiting"></div>
     <div class="tbl-wrap">
       <table><thead><tr><th>Student</th><th>Course</th><th>Date &amp; Time</th><th>Mode</th><th>Conducted By</th><th>Status</th><th>Reminder</th><th></th></tr></thead>
       <tbody id="tbody"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text3)"><span class="spin">&#9696;</span></td></tr></tbody>
@@ -173,6 +182,24 @@ async function loadLeads(preSelect){
   leads=d.leads||[];
   const sel=document.getElementById("dLead");sel.innerHTML='<option value="">-- Select Student --</option>';
   leads.forEach(l=>{const o=document.createElement("option");o.value=l._id;o.textContent=l.fullName+(l.email?" ("+l.email+")":"");if(preSelect&&l._id===preSelect)o.selected=true;sel.appendChild(o);});
+  renderAwaiting();
+}
+// Leads marked "Interested" on the Leads page surface here automatically, ready to schedule a demo.
+function renderAwaiting(){
+  const box=document.getElementById("awaiting");
+  if(!box)return;
+  const interested=leads.filter(l=>l.pipelineStage==="contacted"&&l.contactOutcome!=="follow_up");
+  if(!interested.length){box.innerHTML="";return;}
+  box.innerHTML=`<div class="await-sec">
+    <div class="await-hd">⚡ Interested — Awaiting Demo <span class="await-chip">${interested.length}</span></div>
+    <div class="await-track">
+      ${interested.map(l=>`<div class="await-card">
+        <div class="nm">${esc(l.fullName)}</div>
+        <div class="mt">${esc(l.phone||"—")}${l.courseInterest&&l.courseInterest.title?" · "+esc(l.courseInterest.title):""}</div>
+        <button class="btn btn-prim btn-sm" style="margin-top:9px;width:100%" onclick="openAdd('${l._id}')">Schedule Demo →</button>
+      </div>`).join("")}
+    </div>
+  </div>`;
 }
 async function loadCourses(){
   const d=await apiRequest("/sales/courses");
@@ -240,7 +267,7 @@ async function saveDemo(){
     conductedBy:document.getElementById("dBy").value.trim()
   });
   if(d.error){toast(d.msg,"err");return;}
-  toast("Demo scheduled!","ok");closeDrw();await load();
+  toast("Demo scheduled!","ok");closeDrw();await Promise.all([load(),loadLeads()]);
 }
 function openDetail(id){
   const d=demos.find(x=>x._id===id);if(!d)return;
