@@ -302,20 +302,27 @@ exports.listCourses = async (req, res) => {
 exports.createCourse = async (req, res) => {
   try {
     if (!isSalesOrAdmin(req, res)) return;
-    const body = { ...req.body, createdBy: req.user.id };
-    // Always set a slug so the unique index never trips on null/empty
-    if (body.title && !body.slug) {
-      body.slug = String(body.title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-    }
-    const course = await Course.create(body);
-    return res.status(201).json({ course });
-  } catch (err) {
-    if (err.code === 11000) {
+    const body = { ...req.body };
+    delete body._id;
+    const title = String(body.title || "").trim();
+    if (!title) return res.status(400).json({ msg: "Course title is required" });
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+    if (await Course.findOne({ slug })) {
       return res.status(400).json({ msg: "A course with this name already exists" });
     }
-    if (err.name === "ValidationError") {
-      return res.status(400).json({ msg: Object.values(err.errors).map(e => e.message).join("; ") });
-    }
+
+    // Insert via upsert — this skips Mongoose 'save' hooks (the same path the
+    // Import button uses, which works), so a broken pre-save hook can't break Add.
+    const course = await Course.findOneAndUpdate(
+      { slug },
+      { $set: { ...body, title, slug }, $setOnInsert: { createdBy: req.user.id } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    return res.status(201).json({ course });
+  } catch (err) {
+    if (err.code === 11000) return res.status(400).json({ msg: "A course with this name already exists" });
+    if (err.name === "ValidationError") return res.status(400).json({ msg: Object.values(err.errors).map(e => e.message).join("; ") });
     console.error("createCourse:", err);
     return res.status(500).json({ msg: err.message || "Server error" });
   }
