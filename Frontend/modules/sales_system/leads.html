@@ -121,23 +121,16 @@ tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
   <div class="nav-grp"><div class="nav-lbl">Revenue</div>
     <a class="nav-a" href="enrollments.html"><span class="nav-ico">✓</span> Enrollments</a>
     <a class="nav-a" href="payments.html"><span class="nav-ico">₹</span> Payments</a>
-    <a class="nav-a" href="coupons.html"><span class="nav-ico">🏷</span> Coupons & Discounts</a>
+    <a class="nav-a" href="coupons.html"><span class="nav-ico">🏷</span> Coupons & Referrals</a>
   </div>
   <div class="nav-grp"><div class="nav-lbl">Catalogue</div>
     <a class="nav-a" href="courses.html"><span class="nav-ico">◉</span> Courses</a>
     <a class="nav-a" href="batches.html"><span class="nav-ico">≡</span> Batches</a>
   </div>
-  <div class="nav-grp"><div class="nav-lbl">Growth</div>
-    <a class="nav-a" href="referrals.html"><span class="nav-ico">⇋</span> Referrals</a>
-    <a class="nav-a" href="comms.html"><span class="nav-ico">◎</span> Comm Logs</a>
-    <a class="nav-a" href="sales-reps.html"><span class="nav-ico">▲</span> Sales Reps</a>
-  </div>
-  <div class="nav-grp"><div class="nav-lbl">Performance</div>
-    <a class="nav-a" href="targets.html"><span class="nav-ico">◎</span> Targets</a>
-    <a class="nav-a" href="reports.html"><span class="nav-ico">▣</span> Analytics</a>
-  </div>
-  <div class="nav-grp"><div class="nav-lbl">Tools</div>
-    <a class="nav-a" href="sales-import.html"><span class="nav-ico">⬆</span> Import Data</a>
+  <div class="nav-grp"><div class="nav-lbl">Growth & Performance</div>
+  <a class="nav-a" href="comms.html"><span class="nav-ico">◎</span> Comm Logs</a>
+  <a class="nav-a" href="targets.html"><span class="nav-ico">◎</span> Targets</a>
+  <a class="nav-a" href="reports.html"><span class="nav-ico">▣</span> Analytics</a>
   </div>
   <div class="sb-foot">
     <button onclick="salesLogout()" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:8px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.15);color:var(--rose);font-family:var(--font);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,77,109,.15)'" onmouseout="this.style.background='rgba(255,77,109,.08)'">
@@ -188,6 +181,7 @@ tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
           <th>Email</th>
           <th>City</th>
           <th>Course</th>
+          <th>Rep</th>
           <th>Contact Status</th>
         </tr></thead>
         <tbody id="tbl-body"></tbody>
@@ -271,26 +265,26 @@ tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
 <div class="toast-wrap" id="tw"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-let allLeads = [], rawLeads = [], curLead = null, lastStats = null, pendingFuId = null, editingId = null;
+let allLeads = [], rawLeads = [], curLead = null, lastStats = null, pendingFuId = null, editingId = null, reps = [];
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 (async () => {
   const u = JSON.parse(localStorage.getItem("user") || "{}");
-  await Promise.all([loadLeads(), loadCourses()]);
+  await Promise.all([loadLeads(), loadCourses(), loadReps()]);
   setInterval(silentPoll, 120000);
 })();
 
 // ── LOAD LEADS (new_lead only) ────────────────────────────────────────────────
 async function loadLeads() {
   document.getElementById("tbl-body").innerHTML =
-    `<tr class="empty-row"><td colspan="7"><span class="spin">⟳</span> Loading…</td></tr>`;
+    `<tr class="empty-row"><td colspan="8"><span class="spin">⟳</span> Loading…</td></tr>`;
   const [ld, st] = await Promise.all([
     apiRequest("/sales/leads?archived=false&limit=500"),
     apiRequest("/sales/leads/stats")
   ]);
   if (ld.error) {
     document.getElementById("tbl-body").innerHTML =
-      `<tr class="empty-row"><td colspan="7"><div class="empty-icon">⚠️</div>${ld.msg}<br><button onclick="loadLeads()" style="margin-top:8px;background:var(--accent);color:var(--bg);border:none;padding:6px 14px;border-radius:7px;cursor:pointer;font-weight:600">Retry</button></td></tr>`;
+      `<tr class="empty-row"><td colspan="8"><div class="empty-icon">⚠️</div>${ld.msg}<br><button onclick="loadLeads()" style="margin-top:8px;background:var(--accent);color:var(--bg);border:none;padding:6px 14px;border-radius:7px;cursor:pointer;font-weight:600">Retry</button></td></tr>`;
     return;
   }
   rawLeads = ld.leads || [];
@@ -347,7 +341,7 @@ function filter() {
 function renderTable(leads) {
   const tbody = document.getElementById("tbl-body");
   if (!leads.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="7"><div class="empty-icon">📋</div><div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px">No leads</div><div style="font-size:12px">Use Import or Add Lead to add students</div></td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8"><div class="empty-icon">📋</div><div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px">No leads</div><div style="font-size:12px">Use Import or Add Lead to add students</div></td></tr>`;
     return;
   }
   tbody.innerHTML = leads.map((l, i) => {
@@ -361,12 +355,44 @@ function renderTable(leads) {
       <td style="font-size:12px">${esc(l.email||"—")}</td>
       <td>${esc(l.city||"—")}</td>
       <td style="font-size:12px">${esc(l.courseInterest?.title||"—")}</td>
+      <td onclick="event.stopPropagation()">${repSelect(l)}</td>
       <td onclick="event.stopPropagation()">${outcomeSelect(l, false)}</td>
     </tr>`;
   }).join("");
 }
 
 // ── CONTACT OUTCOME ─────────────────────────────────────────────────
+// ── REP ASSIGNMENT ──────────────────────────────────────────────────
+async function loadReps(){ const d = await apiRequest("/sales/reps"); reps = (d && d.reps) ? d.reps : []; }
+function repSelect(l){
+  const cur = (l.assignedTo && l.assignedTo._id) ? l.assignedTo._id : (l.assignedTo || "");
+  const opts = '<option value="">Unassigned</option>' +
+    reps.map(r => `<option value="${r._id}" ${String(cur)===String(r._id)?"selected":""}>${esc(r.name)}</option>`).join("");
+  return `<select class="contact-sel" style="max-width:130px" onchange="assignRep('${l._id}', this.value)">${opts}</select>`;
+}
+async function assignRep(id, repId){
+  const d = await apiRequest("/sales/leads/" + id, "PATCH", { assignedTo: repId || null });
+  if (d.error) { toast(d.msg || "Failed to assign", "err"); return; }
+  const lead = rawLeads.find(l => l._id === id);
+  if (lead) lead.assignedTo = repId ? (reps.find(r => r._id === repId) || repId) : null;
+  toast(repId ? "Assigned to " + (reps.find(r => r._id === repId)?.name || "rep") : "Unassigned", "ok");
+}
+async function loadCommHistory(leadId){
+  const box = document.getElementById("commHist"); if(!box) return;
+  const d = await apiRequest("/sales/commlogs?lead=" + leadId + "&limit=20");
+  const logs = (d && d.logs) ? d.logs : [];
+  if (!logs.length){ box.innerHTML = '<div style="color:var(--text3)">No interactions logged yet.</div>'; return; }
+  const ICON = {call:"📞",whatsapp:"💬",email:"✉️",sms:"✉️",meeting:"🤝",other:"📌"};
+  box.innerHTML = logs.map(l => `
+    <div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+      <div style="font-size:14px">${ICON[l.type]||"📌"}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;color:var(--text2)">${esc(l.summary||l.type)}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${new Date(l.loggedAt).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}${l.createdBy&&l.createdBy.name?" · "+esc(l.createdBy.name):""}</div>
+      </div>
+    </div>`).join("");
+}
+
 // shared <select> used by table rows and the detail drawer
 function outcomeSelect(l, wide) {
   const o = outcomeOf(l);
@@ -469,7 +495,14 @@ async function openDetail(id) {
       ${outcomeSelect(l, true)}
       <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">Pick <b>Interested</b> to keep working the lead, <b>Follow Up</b> to schedule a callback, or <b>Not Interested</b> to drop it.</div>
     </div>
+    <div class="info-sec">Assigned Rep</div>
+    <div style="padding:4px 0">${repSelect(l)}</div>
+    <div class="info-sec" style="display:flex;align-items:center;justify-content:space-between">Communication History
+      <a href="comms.html?lead=${l._id}" class="btn btn-prim btn-sm" style="font-size:10px;padding:3px 9px">＋ Log Call</a>
+    </div>
+    <div id="commHist" style="padding:4px 0">Loading…</div>
   `;
+  loadCommHistory(l._id);
 
   document.getElementById("dFoot").innerHTML = `
     <button onclick="openEdit()" class="btn btn-prim btn-sm" style="margin-left:auto">✎ Edit Lead</button>

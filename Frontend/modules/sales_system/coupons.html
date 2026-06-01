@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Coupons & Discounts — ZyntrixCRM</title>
+<title>Coupons & Referrals — ZyntrixCRM</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -109,6 +109,20 @@ input.srch:focus{border-color:var(--accent)}
 .toast-item.ok{border-color:rgba(0,229,176,.35);color:var(--accent)}
 .toast-item.err{border-color:rgba(255,77,109,.35);color:var(--rose)}
 @keyframes slideIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.tabs{display:flex;gap:6px}
+.tab-btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-family:var(--font);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s}
+.tab-btn:hover{color:var(--text);background:var(--bg3)}
+.tab-btn.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(0,229,176,.3)}
+.panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.panel-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 22px 0}
+.btn-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.2)}.btn-green:hover{background:rgba(34,197,94,.2)}
+.tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg3)}
+th{padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+td{padding:11px 14px;font-size:12.5px;border-top:1px solid var(--border);vertical-align:middle;color:var(--text2)}
+tr:hover td{background:rgba(255,255,255,.015)}
+.badge{display:inline-flex;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -125,23 +139,16 @@ input.srch:focus{border-color:var(--accent)}
   <div class="nav-grp"><div class="nav-lbl">Revenue</div>
   <a class="nav-a" href="enrollments.html"><span class="nav-ico">✓</span> Enrollments</a>
   <a class="nav-a" href="payments.html"><span class="nav-ico">₹</span> Payments</a>
-  <a class="nav-a on" href="coupons.html"><span class="nav-ico">🏷</span> Coupons & Discounts</a>
+  <a class="nav-a on" href="coupons.html"><span class="nav-ico">🏷</span> Coupons & Referrals</a>
   </div>
   <div class="nav-grp"><div class="nav-lbl">Catalogue</div>
   <a class="nav-a" href="courses.html"><span class="nav-ico">◉</span> Courses</a>
   <a class="nav-a" href="batches.html"><span class="nav-ico">≡</span> Batches</a>
   </div>
-  <div class="nav-grp"><div class="nav-lbl">Growth</div>
-  <a class="nav-a" href="referrals.html"><span class="nav-ico">⇋</span> Referrals</a>
+  <div class="nav-grp"><div class="nav-lbl">Growth & Performance</div>
   <a class="nav-a" href="comms.html"><span class="nav-ico">◎</span> Comm Logs</a>
-  <a class="nav-a" href="sales-reps.html"><span class="nav-ico">▲</span> Sales Reps</a>
-  </div>
-  <div class="nav-grp"><div class="nav-lbl">Performance</div>
   <a class="nav-a" href="targets.html"><span class="nav-ico">◎</span> Targets</a>
   <a class="nav-a" href="reports.html"><span class="nav-ico">▣</span> Analytics</a>
-  </div>
-  <div class="nav-grp"><div class="nav-lbl">Tools</div>
-    <a class="nav-a" href="sales-import.html"><span class="nav-ico">⬆</span> Import Data</a>
   </div>
   <div class="sb-foot"><button onclick="salesLogout()" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:8px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.15);color:var(--rose);font-family:var(--font);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,77,109,.15)'" onmouseout="this.style.background='rgba(255,77,109,.08)'">
     <span style="font-size:13px">⏻</span> Logout
@@ -152,9 +159,19 @@ input.srch:focus{border-color:var(--accent)}
 <div class="main">
   <div class="topbar">
     <div class="pg-hd">
-      <div class="pg-title">Coupons & Discounts</div>
-      <div class="pg-crumb">Sales System → <span>Coupons</span></div>
+      <div class="pg-title">Coupons & Referrals</div>
+      <div class="pg-crumb">Sales System → <span id="crumb">Coupons</span></div>
     </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-coupons" onclick="showTab('coupons')">🏷 Coupons</button>
+      <button class="tab-btn" id="tab-referrals" onclick="showTab('referrals')">⇋ Referrals</button>
+    </div>
+  </div>
+
+  <!-- ===== COUPONS PANEL ===== -->
+  <div class="panel" id="panel-coupons">
+  <div class="panel-actions">
+    <button class="btn btn-ghost btn-sm" onclick="loadCoupons()">&#8635; Refresh</button>
     <button class="btn btn-ghost btn-sm" onclick="openSalesImport('coupons', () => loadCoupons())">&#11014; Import</button>
     <button class="btn btn-ghost btn-sm" onclick="openValidate()">🔍 Validate Code</button>
     <button class="btn btn-prim btn-sm" onclick="openCreate()">+ New Coupon</button>
@@ -199,11 +216,40 @@ input.srch:focus{border-color:var(--accent)}
       <div style="font-size:12px">Create your first coupon to offer discounts and scholarships</div>
     </div>
   </div>
+  </div><!-- /panel-coupons -->
+
+  <!-- ===== REFERRALS PANEL ===== -->
+  <div class="panel" id="panel-referrals" style="display:none">
+  <div class="panel-actions">
+    <button class="btn btn-ghost btn-sm" onclick="refInit()">&#8635; Refresh</button>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('referrals', () => refInit())">&#11014; Import</button>
+    <button class="btn btn-prim btn-sm" onclick="refOpenAdd()">+ Record Referral</button>
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi" style="--kc:var(--accent)"><div class="kpi-val" id="r-kpi-total">—</div><div class="kpi-lbl">Total Referrals</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="kpi-val" id="r-kpi-enrolled">—</div><div class="kpi-lbl">Enrolled</div></div>
+    <div class="kpi" style="--kc:var(--amber)"><div class="kpi-val" id="r-kpi-pendingpay">—</div><div class="kpi-lbl">Incentive Pending</div></div>
+    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-val" id="r-kpi-paid">—</div><div class="kpi-lbl">Incentives Paid</div></div>
+  </div>
+  <div class="filter-bar">
+    <button class="chip active" onclick="refSetFilter(this,'')">All</button>
+    <button class="chip" onclick="refSetFilter(this,'pending')">Pending</button>
+    <button class="chip" onclick="refSetFilter(this,'enrolled')">Enrolled</button>
+    <button class="chip" onclick="refSetFilter(this,'paid')">Paid</button>
+    <button class="chip" onclick="refSetFilter(this,'rejected')">Rejected</button>
+  </div>
+  <div class="content">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Referred By</th><th>Referred Lead</th><th>Lead Stage</th><th>Incentive</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+      <tbody id="r-tbl-body"></tbody>
+    </table></div>
+  </div>
+  </div><!-- /panel-referrals -->
 </div><!-- /main -->
 </div><!-- /shell -->
 
 <!-- CREATE / EDIT DRAWER -->
-<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="overlay" id="overlay" onclick="closeDrawer();refCloseDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drw-hdr">
     <div class="drw-title" id="drw-title">New Coupon</div>
@@ -301,13 +347,36 @@ input.srch:focus{border-color:var(--accent)}
   </div>
 </div>
 
+<!-- REFERRAL DRAWER -->
+<div class="drawer" id="rdrawer">
+  <div class="drw-hdr">
+    <div class="drw-title" id="r-drw-title">Record Referral</div>
+    <button class="drw-close" onclick="refCloseDrawer()">✕</button>
+  </div>
+  <div class="drw-body">
+    <input type="hidden" id="r-edit-id">
+    <div class="field"><label>Referred By (existing lead / student) *</label><select id="rf-by"><option value="">— select —</option></select></div>
+    <div class="field"><label>Referred New Lead *</label><select id="rf-lead"><option value="">— select new lead —</option></select></div>
+    <div class="field-row">
+      <div class="field"><label>Incentive Type</label><select id="rf-itype"><option value="cash">Cash</option><option value="discount">Discount</option><option value="gift">Gift</option><option value="none">None</option></select></div>
+      <div class="field"><label>Incentive Value (₹)</label><input id="rf-ival" type="number" min="0" placeholder="500"></div>
+    </div>
+    <div class="field"><label>Status</label><select id="rf-status"><option value="pending">Pending</option><option value="enrolled">Enrolled</option><option value="paid">Paid</option><option value="rejected">Rejected</option></select></div>
+    <div class="field"><label>Notes</label><input id="rf-notes" placeholder="Any notes about this referral"></div>
+  </div>
+  <div class="drw-foot">
+    <button class="btn btn-prim" onclick="refSubmit()">Save</button>
+    <button class="btn btn-ghost" onclick="refCloseDrawer()">Cancel</button>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
 const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:5000/api'
-  : '/api';
+  : 'https://zyntrix-crm-backend.onrender.com/api';
 
 let allCoupons = [], filterType = '', searchQ = '', debTimer = null;
 
@@ -323,6 +392,15 @@ async function apiRequest(path, opts = {}) {
 
 async function init() {
   await loadCoupons();
+  refInit();
+}
+function showTab(t){
+  const cp = t==='coupons';
+  document.getElementById('panel-coupons').style.display   = cp ? 'flex' : 'none';
+  document.getElementById('panel-referrals').style.display = cp ? 'none' : 'flex';
+  document.getElementById('tab-coupons').classList.toggle('active', cp);
+  document.getElementById('tab-referrals').classList.toggle('active', !cp);
+  document.getElementById('crumb').textContent = cp ? 'Coupons' : 'Referrals';
 }
 
 async function loadCoupons() {
@@ -390,7 +468,7 @@ function render() {
 }
 
 function setFilter(el, type) {
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   filterType = type;
   render();
@@ -534,6 +612,99 @@ function toast(msg, type = 'ok') {
   t.appendChild(d);
   setTimeout(() => d.remove(), 3500);
 }
+
+// ════════ REFERRALS ════════
+let refAll=[], refLeads=[], refFilter='';
+const REF_STATUS_STYLES = { pending:{bg:'rgba(245,158,11,.1)',color:'#fbbf24'}, enrolled:{bg:'rgba(61,142,240,.1)',color:'#3d8ef0'}, paid:{bg:'rgba(34,197,94,.1)',color:'#22c55e'}, rejected:{bg:'rgba(255,77,109,.1)',color:'#ff4d6d'} };
+async function refInit(){
+  try{
+    const [rd, ld] = await Promise.all([
+      apiRequest('/sales/referrals?limit=500').catch(()=>({referrals:[]})),
+      apiRequest('/sales/leads?limit=500').catch(()=>({leads:[]}))
+    ]);
+    refAll = rd.referrals||[]; refLeads = ld.leads||[];
+    refPopulateSelects(); refUpdateKPIs(); refRender();
+  }catch(e){ toast(e.message,'err'); }
+}
+function refPopulateSelects(){
+  const opt = l=>`<option value="${l._id}">${l.fullName}${l.phone?' · '+l.phone:''}</option>`;
+  document.getElementById('rf-by').innerHTML   = '<option value="">— select —</option>' + refLeads.map(opt).join('');
+  document.getElementById('rf-lead').innerHTML = '<option value="">— select new lead —</option>' + refLeads.map(opt).join('');
+}
+function refUpdateKPIs(){
+  document.getElementById('r-kpi-total').textContent      = refAll.length;
+  document.getElementById('r-kpi-enrolled').textContent   = refAll.filter(r=>r.status==='enrolled').length;
+  document.getElementById('r-kpi-pendingpay').textContent = refAll.filter(r=>r.status==='enrolled'&&!r.incentivePaid).length;
+  document.getElementById('r-kpi-paid').textContent       = refAll.filter(r=>r.incentivePaid).length;
+}
+function refRender(){
+  let list = refAll;
+  if(refFilter) list = list.filter(r=>r.status===refFilter);
+  const body = document.getElementById('r-tbl-body');
+  if(!list.length){ body.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">No referrals found</td></tr>`; return; }
+  const stMap = {new_lead:'New',contacted:'Contacted',demo_scheduled:'Demo Sched.',demo_attended:'Demo Done',enrolled:'Enrolled',dropped:'Dropped'};
+  body.innerHTML = list.map(r=>{
+    const byName = r.referredBy?.fullName || r.referredByName || '—';
+    const leadName = r.referredLead?.fullName || '—';
+    const stage = r.referredLead?.pipelineStage || '';
+    const st = REF_STATUS_STYLES[r.status]||{bg:'rgba(255,255,255,.05)',color:'#4e6680'};
+    const incentLabel = r.incentiveType==='none'?'None':`${r.incentiveType==='cash'?'₹'+r.incentiveValue:r.incentiveType+' ₹'+r.incentiveValue}`;
+    const paidTag = r.incentivePaid ? `<span style="font-size:9px;background:rgba(34,197,94,.1);color:#22c55e;padding:1px 6px;border-radius:10px;margin-left:4px">PAID</span>` : '';
+    const payBtn = r.status==='enrolled'&&!r.incentivePaid ? `<button class="btn btn-green btn-sm" onclick="refMarkPaid('${r._id}')">Mark Paid</button>` : '';
+    return `<tr>
+      <td><div style="font-weight:600;color:var(--text)">${byName}</div></td>
+      <td><div style="font-weight:600;color:var(--text)">${leadName}</div></td>
+      <td>${stage?`<span style="font-size:10px;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:4px">${stMap[stage]||stage}</span>`:'—'}</td>
+      <td>${incentLabel}${paidTag}</td>
+      <td><span class="badge" style="background:${st.bg};color:${st.color}">${r.status}</span></td>
+      <td style="font-size:11px">${new Date(r.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td style="display:flex;gap:6px">${payBtn}<button class="btn btn-ghost btn-sm" onclick="refEditRef('${r._id}')">Edit</button></td>
+    </tr>`;
+  }).join('');
+}
+function refSetFilter(el,sx){ el.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); refFilter=sx; refRender(); }
+function refOpenAdd(){
+  document.getElementById('r-edit-id').value='';
+  document.getElementById('r-drw-title').textContent='Record Referral';
+  document.getElementById('rf-by').value=''; document.getElementById('rf-lead').value='';
+  document.getElementById('rf-itype').value='cash'; document.getElementById('rf-ival').value='';
+  document.getElementById('rf-status').value='pending'; document.getElementById('rf-notes').value='';
+  refOpenDrawer();
+}
+function refEditRef(id){
+  const r=refAll.find(x=>x._id===id); if(!r) return;
+  document.getElementById('r-edit-id').value=r._id;
+  document.getElementById('r-drw-title').textContent='Edit Referral';
+  document.getElementById('rf-by').value=r.referredBy?._id||r.referredBy||'';
+  document.getElementById('rf-lead').value=r.referredLead?._id||r.referredLead||'';
+  document.getElementById('rf-itype').value=r.incentiveType||'cash';
+  document.getElementById('rf-ival').value=r.incentiveValue||'';
+  document.getElementById('rf-status').value=r.status||'pending';
+  document.getElementById('rf-notes').value=r.notes||'';
+  refOpenDrawer();
+}
+async function refSubmit(){
+  const id=document.getElementById('r-edit-id').value;
+  const by=document.getElementById('rf-by').value, lead=document.getElementById('rf-lead').value;
+  if(!by||!lead) return toast('Select both referrer and referred lead','err');
+  const body={ referredBy:by, referredLead:lead, incentiveType:document.getElementById('rf-itype').value, incentiveValue:parseFloat(document.getElementById('rf-ival').value)||0, status:document.getElementById('rf-status').value, notes:document.getElementById('rf-notes').value.trim() };
+  try{
+    if(id){ await apiRequest('/sales/referrals/'+id,{method:'PATCH',body:JSON.stringify(body)}); toast('Updated','ok'); }
+    else  { await apiRequest('/sales/referrals',{method:'POST',body:JSON.stringify(body)}); toast('Referral recorded','ok'); }
+    refCloseDrawer();
+    const d=await apiRequest('/sales/referrals?limit=500'); refAll=d.referrals||[]; refUpdateKPIs(); refRender();
+  }catch(e){ toast(e.message,'err'); }
+}
+async function refMarkPaid(id){
+  if(!confirm('Mark incentive as paid?')) return;
+  try{
+    await apiRequest('/sales/referrals/'+id+'/pay',{method:'PATCH'});
+    toast('Incentive marked as paid','ok');
+    const d=await apiRequest('/sales/referrals?limit=500'); refAll=d.referrals||[]; refUpdateKPIs(); refRender();
+  }catch(e){ toast(e.message,'err'); }
+}
+function refOpenDrawer(){ document.getElementById('rdrawer').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function refCloseDrawer(){ document.getElementById('rdrawer').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
 
 init();
 </script>

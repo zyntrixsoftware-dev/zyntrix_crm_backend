@@ -86,26 +86,17 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
     <div class="nav-lbl">Revenue</div>
     <a class="nav-a" href="enrollments.html"><span class="nav-ico">✓</span> Enrollments</a>
     <a class="nav-a" href="payments.html"><span class="nav-ico">₹</span> Payments</a>
-    <a class="nav-a" href="coupons.html"><span class="nav-ico">🏷</span> Coupons & Discounts</a>
+    <a class="nav-a" href="coupons.html"><span class="nav-ico">🏷</span> Coupons & Referrals</a>
   </div>
   <div class="nav-grp">
     <div class="nav-lbl">Catalogue</div>
     <a class="nav-a" href="courses.html"><span class="nav-ico">◉</span> Courses</a>
     <a class="nav-a" href="batches.html"><span class="nav-ico">≡</span> Batches</a>
   </div>
-  <div class="nav-grp">
-    <div class="nav-lbl">Growth</div>
-    <a class="nav-a" href="referrals.html"><span class="nav-ico">⇋</span> Referrals</a>
-    <a class="nav-a" href="comms.html"><span class="nav-ico">◎</span> Comm Logs</a>
-    <a class="nav-a" href="sales-reps.html"><span class="nav-ico">▲</span> Sales Reps</a>
-  </div>
-  <div class="nav-grp">
-    <div class="nav-lbl">Performance</div>
-    <a class="nav-a on" href="targets.html"><span class="nav-ico">◎</span> Targets</a>
-    <a class="nav-a" href="reports.html"><span class="nav-ico">▣</span> Analytics</a>
-  </div>
-  <div class="nav-grp"><div class="nav-lbl">Tools</div>
-    <a class="nav-a" href="sales-import.html"><span class="nav-ico">⬆</span> Import Data</a>
+  <div class="nav-grp"><div class="nav-lbl">Growth & Performance</div>
+  <a class="nav-a" href="comms.html"><span class="nav-ico">◎</span> Comm Logs</a>
+  <a class="nav-a on" href="targets.html"><span class="nav-ico">◎</span> Targets</a>
+  <a class="nav-a" href="reports.html"><span class="nav-ico">▣</span> Analytics</a>
   </div>
   <div class="sb-foot">
     <button onclick="salesLogout()" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:8px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.15);color:var(--rose);font-family:var(--font);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,77,109,.15)'" onmouseout="this.style.background='rgba(255,77,109,.08)'">
@@ -116,7 +107,8 @@ select.fsel:focus{outline:none;border-color:var(--accent)}
 <div class="main">
   <div class="topbar">
     <div class="pg-hd"><div class="pg-title">Sales Targets</div><div class="pg-crumb">Performance &rsaquo; <span>Targets</span></div></div>
-    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('targets', () => load())">&#11014; Import</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadTargets()">&#8635; Refresh</button>
+    <button class="btn btn-ghost btn-sm" onclick="openSalesImport('targets', () => loadTargets())">&#11014; Import</button>
     <button class="btn btn-prim" onclick="openSetTargets()">&#127919; Set Targets</button>
   </div>
   <div class="picker-bar">
@@ -256,21 +248,25 @@ function progBar(label, achieved, target, p, forceColor) {
 async function openSetTargets() {
   document.getElementById('overlay').classList.add('show');
   document.getElementById('setDrw').classList.add('open');
-  // Load users list
-  const d = await apiRequest('/sales/targets/dashboard?month=' + document.getElementById('pMonth').value + '&year=' + document.getElementById('pYear').value);
-  const targets = Array.isArray(d) ? d : (d.targets || []);
   const body = document.getElementById('setDrwBody');
+  body.innerHTML = '<div style="color:var(--text3);font-size:12px">Loading reps…</div>';
 
-  if (!targets.length) {
-    body.innerHTML = '<div style="color:var(--text3);font-size:12px">No reps found. Add users to the system first.</div>';
+  // Load ALL sales reps (so you can set targets even when none exist yet)
+  const d = await apiRequest('/sales/reps');
+  const reps = (d && d.reps) ? d.reps : [];
+  if (!reps.length) {
+    body.innerHTML = '<div style="color:var(--text3);font-size:12px">No sales reps found. Create rep user accounts first.</div>';
     return;
   }
+  // Pre-fill with any existing target values for the selected month
+  const existing = {};
+  currentTargets.forEach(t => { existing[(t.user?._id || t.user)] = t; });
 
-  body.innerHTML = targets.map((t, i) => {
-    const name = t.user?.name || t.userName || 'Rep';
+  body.innerHTML = reps.map(r => {
+    const t = existing[r._id] || {};
     return `<div class="rep-section">
-      <div class="rep-sec-name">${name}</div>
-      <input type="hidden" class="t-user" value="${t.user?._id || t.user}">
+      <div class="rep-sec-name">${r.name}${r.email?` <span style="font-size:10px;color:var(--text3);font-weight:400">· ${r.email}</span>`:''}</div>
+      <input type="hidden" class="t-user" value="${r._id}">
       <div class="frow">
         <div class="field"><label>Leads</label><input type="number" class="t-leads" value="${t.targetLeads||0}" min="0"></div>
         <div class="field"><label>Demos</label><input type="number" class="t-demos" value="${t.targetDemos||0}" min="0"></div>
@@ -297,7 +293,7 @@ async function submitTargets() {
       targetEnrollments: parseInt(sec.querySelector('.t-enrollments').value) || 0,
       targetRevenue: parseFloat(sec.querySelector('.t-revenue').value) || 0
     };
-    return apiRequest('/sales/targets', { method:'POST', body: JSON.stringify(body) });
+    return apiRequest('/sales/targets', 'POST', body);
   });
   const results = await Promise.all(calls);
   results.forEach(r => { if (r.error) errors++; });
