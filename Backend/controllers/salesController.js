@@ -1082,7 +1082,7 @@ exports.targetsDashboard = async (req, res) => {
     const enriched = await Promise.all(targets.map(async t => {
       const uid = t.user._id;
       const [leads, demos, enrollments, revenue] = await Promise.all([
-        StudentLead.countDocuments({ createdBy: uid, createdAt: { $gte: startOfMonth, $lte: endOfMonth } }),
+        StudentLead.countDocuments({ assignedTo: uid, createdAt: { $gte: startOfMonth, $lte: endOfMonth } }),
         DemoSession.countDocuments({ createdBy: uid, scheduledAt: { $gte: startOfMonth, $lte: endOfMonth } }),
         Enrollment.countDocuments({ createdBy: uid, enrolledAt: { $gte: startOfMonth, $lte: endOfMonth } }),
         Payment.aggregate([
