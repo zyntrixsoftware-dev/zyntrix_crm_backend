@@ -1434,9 +1434,9 @@ exports.repStats = async (req, res) => {
     // Demo stats per rep
     const DemoSession = require("../models/DemoSession");
     const demoAgg = await DemoSession.aggregate([
-      { $match: { scheduledAt: { $gte: start, $lt: end } } },
-      { $group: { _id: "$conductor", demos: { $sum: 1 },
-        attended: { $sum: { $cond: [{ $ne: ["$outcome", "no_show"] }, 1, 0] } } } }
+      { $match: { scheduledAt: { $gte: start, $lt: end }, cancelled: false } },
+      { $group: { _id: "$createdBy", demos: { $sum: 1 },
+        attended: { $sum: { $cond: ["$attended", 1, 0] } } } }
     ]);
 
     // Merge into a map
