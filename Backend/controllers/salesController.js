@@ -208,6 +208,14 @@ exports.setContactOutcome = async (req, res) => {
 
     await lead.save();
 
+    // Auto-log this contact in the communication journal
+    CommLog.create({
+      lead: lead._id, type: "call", direction: "outbound",
+      callOutcome: outcome === "interested" ? "connected" : outcome === "follow_up" ? "callback_requested" : outcome === "not_interested" ? "not_answered" : "not_applicable",
+      summary: "Contact outcome — " + String(outcome).replace(/_/g, " "),
+      createdBy: req.user.id, loggedAt: new Date()
+    }).catch(e => console.warn("commlog:", e.message));
+
     // create a Follow-Up record so it surfaces on the Follow-Ups page
     if (outcome === "follow_up") {
       await FollowUp.create({
@@ -485,6 +493,12 @@ exports.createDemo = async (req, res) => {
     // send confirmation email
     if (lead) emails().notifyDemoConfirmation(populated, lead).catch(e => console.warn(e.message));
 
+    CommLog.create({
+      lead: demo.lead, type: "meeting", direction: "outbound",
+      summary: "Demo scheduled for " + new Date(demo.scheduledAt).toLocaleString("en-IN"),
+      createdBy: req.user.id, loggedAt: new Date()
+    }).catch(e => console.warn("commlog:", e.message));
+
     return res.status(201).json({ demo: populated });
   } catch (err) {
     console.error("createDemo:", err);
@@ -527,6 +541,11 @@ exports.bulkCreateDemos = async (req, res) => {
         lead.pipelineStage = "demo_scheduled";
         await lead.save();
       }
+      CommLog.create({
+        lead: id, type: "meeting", direction: "outbound",
+        summary: "Demo class scheduled for " + new Date(scheduledAt).toLocaleString("en-IN"),
+        createdBy: req.user.id, loggedAt: new Date()
+      }).catch(e => console.warn("commlog:", e.message));
     }
 
     return res.status(201).json({ created: created.length });
@@ -692,6 +711,12 @@ exports.createEnrollment = async (req, res) => {
       emails().notifyEnrollmentConfirmation(enrollment, lead, course, batch)
         .catch(e => console.warn(e.message));
     }
+
+    CommLog.create({
+      lead: req.body.lead, type: "other", direction: "outbound",
+      summary: "Enrolled — " + plan + " plan" + (payAmt ? ", paid ₹" + payAmt.toLocaleString("en-IN") : ""),
+      createdBy: req.user.id, loggedAt: new Date()
+    }).catch(e => console.warn("commlog:", e.message));
 
     return res.status(201).json({ enrollment: await enrollment.populate([
       { path: "lead",   select: "fullName email phone" },
@@ -1407,6 +1432,17 @@ exports.markIncentivePaid = async (req, res) => {
 const User = require("../models/user");
 
 // GET /api/sales/reps/stats?month=&year=
+// GET /api/sales/reps — sales reps for assignment dropdowns
+exports.listReps = async (req, res) => {
+  try {
+    const reps = await User.find({ role: { $in: ["sales", "admin", "super_admin"] } }, "name email role").sort({ name: 1 });
+    return res.json({ reps });
+  } catch (err) {
+    console.error("listReps:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
 exports.repStats = async (req, res) => {
   try {
     const month = parseInt(req.query.month) || new Date().getMonth() + 1;

@@ -108,6 +108,7 @@ router.delete("/sales/referrals/:id",           C.deleteReferral);
 router.patch ("/sales/referrals/:id/pay",       C.markIncentivePaid);
 
 // ── Sales Rep Stats ───────────────────────────────────────────
+router.get   ("/sales/reps",                    C.listReps);
 router.get   ("/sales/reps/stats",              C.repStats);
 
 module.exports = router;
