@@ -86,6 +86,7 @@ const onboardingSchema = new mongoose.Schema(
       twelfthMarksheet:   { type: documentFieldSchema, default: () => ({}) },
       graduationCert:     { type: documentFieldSchema, default: () => ({}) },
       postGraduationCert: { type: documentFieldSchema, default: () => ({}) },  // optional
+      otherCertifications:{ type: documentFieldSchema, default: () => ({}) },  // optional
       passportPhoto:      { type: documentFieldSchema, default: () => ({}) },
       governmentId:       { type: documentFieldSchema, default: () => ({}) },
       bankDetails:        { type: documentFieldSchema, default: () => ({}) },
@@ -146,7 +147,7 @@ onboardingSchema.virtual("docsSubmittedCount").get(function () {
 onboardingSchema.virtual("requiredDocsComplete").get(function () {
   const d = this.documents || {};
   const mandatory = ["tenthMarksheet","twelfthMarksheet","graduationCert",
-                     "passportPhoto","governmentId","bankDetails","acceptanceLetter"];
+                     "passportPhoto","governmentId","bankDetails"];
   return mandatory.every(k => d[k] && d[k].submitted);
 });
 

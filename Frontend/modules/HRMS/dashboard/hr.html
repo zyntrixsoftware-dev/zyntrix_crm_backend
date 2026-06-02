@@ -325,6 +325,30 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
 
 /* RESPONSIVE */
 @media(max-width:1280px){.kpi-strip{grid-template-columns:repeat(2,1fr)}.stat-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== Match standard HRMS (All Employees) flat card style ===== */
+.kpi::before{display:none}
+.kpi-glow{display:none}
+.kpi{background:var(--surface)}
+.kpi:hover{transform:none;box-shadow:none;border-color:var(--b2)}
+.stat{background:var(--surface)!important;border:1px solid var(--b1)!important}
+.stat:hover{transform:none;box-shadow:none;border-color:var(--b2)}
+.stat-shine{display:none}
+.nav-link.active{background:rgba(79,156,249,0.12)!important;color:var(--blue)!important}
+.nav-link.active::before{background:var(--blue)!important}
+
+/* ===== Sidebar — match All Employees contrast, spacing & active style ===== */
+.nav-section{padding:14px 10px 6px}
+.nav-lbl,.nav-section-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
+.nav-link{color:var(--t2);font-size:13px;gap:9px;padding:8px 10px;border-radius:8px;margin-bottom:1px}
+.nav-link:hover{background:rgba(79,156,249,0.12);color:var(--t1)}
+.nav-link:hover .nav-ic,.nav-link:hover .nav-icon{opacity:1}
+.nav-link.active{background:rgba(79,156,249,0.14)!important;color:var(--blue)!important;font-weight:500}
+.nav-link.active::before{background:var(--blue)!important;height:20px;border-radius:0 3px 3px 0}
+.nav-icon{opacity:1;width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.nav-ic{opacity:.9}
+.nav-link.active .nav-ic{opacity:1}
+.nav-div,.nav-divider{height:1px;background:var(--b1);margin:8px 10px}
 </style>
 <script src="../../../assets/js/api.js"></script>
 <script src="../../../assets/js/auth.js?v=4"></script>
@@ -336,7 +360,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
   <div class="brand">
-    <div class="brand-mark"><svg><use href="#ic-users"/></svg></div>
+    <div class="brand-mark" style="font-size:16px">👥</div>
     <div>
       <div class="brand-name">HRMS Pro</div>
       <div class="brand-tag" id="ver-ts">v2.5</div>
@@ -346,31 +370,31 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
   <div class="nav-section">
     <div class="nav-lbl">Overview</div>
     <a class="nav-link active" href="hr.html">
-      <svg class="nav-ic"><use href="#ic-home"/></svg> Dashboard
+      <span class="nav-icon">🏠</span> Dashboard
     </a>
   </div>
 
   <div class="nav-section">
     <div class="nav-lbl">Employees</div>
     <a class="nav-link" href="../employees/employees.html">
-      <svg class="nav-ic"><use href="#ic-users"/></svg> All Employees
+      <span class="nav-icon">👥</span> All Employees
     </a>
     <a class="nav-link" href="../employees/attendance.html">
-      <svg class="nav-ic"><use href="#ic-calendar"/></svg> Attendance
+      <span class="nav-icon">📅</span> Attendance
     </a>
   </div>
 
   <div class="nav-section">
     <div class="nav-lbl">Talent Acquisition</div>
     <a class="nav-link" href="../talent_acquisition/careers_and_job_posts/careers.html">
-      <svg class="nav-ic"><use href="#ic-briefcase"/></svg> Careers &amp; Jobs
+      <span class="nav-icon">📋</span> Careers &amp; Jobs
     </a>
     <a class="nav-link" href="../talent_acquisition/candidates/candidates.html">
-      <svg class="nav-ic"><use href="#ic-user"/></svg> Candidates
+      <span class="nav-icon">👤</span> Candidates
       <span class="nav-badge" id="cand-badge" style="display:none">0</span>
     </a>
     <a class="nav-link" href="../talent_acquisition/interview_panel/interviews.html">
-      <svg class="nav-ic"><use href="#ic-mic"/></svg> Interview Panel
+      <span class="nav-icon">🎤</span> Interview Panel
     </a>
   </div>
 
@@ -379,19 +403,19 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
   <div class="nav-section">
     <div class="nav-lbl">Employee Lifecycle</div>
     <a class="nav-link" href="../employee_lifecycle/offer_letters/offer_letters.html">
-      <svg class="nav-ic"><use href="#ic-file-text"/></svg> Offer Letters
+      <span class="nav-icon">📝</span> Offer Letters
     </a>
     <a class="nav-link" href="../employee_lifecycle/onboarding/onboarding.html">
-      <svg class="nav-ic"><use href="#ic-rocket"/></svg> Onboarding
+      <span class="nav-icon">🚀</span> Onboarding
     </a>
     <a class="nav-link" href="../employee_lifecycle/orientation_sessions/orientations.html">
-      <svg class="nav-ic"><use href="#ic-graduation"/></svg> Orientations
+      <span class="nav-icon">🎓</span> Orientations
     </a>
     <a class="nav-link" href="../employee_lifecycle/deployment/deployment.html">
-      <svg class="nav-ic"><use href="#ic-grid"/></svg> Deployment
+      <span class="nav-icon">🗂️</span> Deployment
     </a>
     <a class="nav-link" href="../employee_lifecycle/offboarding/offboarding.html">
-      <svg class="nav-ic"><use href="#ic-door"/></svg> Offboarding
+      <span class="nav-icon">🚪</span> Offboarding
     </a>
   </div>
 
@@ -400,17 +424,17 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
   <div class="nav-section">
     <div class="nav-lbl">Operations</div>
     <a class="nav-link" href="../employees/shift-requests.html">
-      <svg class="nav-ic"><use href="#ic-swap"/></svg> Shift Requests
+      <span class="nav-icon">🔄</span> Shift Requests
       <span class="nav-badge" id="shift-badge" style="display:none">0</span>
     </a>
     <a class="nav-link" href="../employees/requests.html">
-      <svg class="nav-ic"><use href="#ic-mail"/></svg> Leave &amp; Requests
+      <span class="nav-icon">📨</span> Leave &amp; Requests
     </a>
     <a class="nav-link" href="../operations/escalations.html">
-      <svg class="nav-ic"><use href="#ic-alert"/></svg> Escalations
+      <span class="nav-icon">⚠️</span> Escalations
     </a>
     <a class="nav-link" href="../operations/performance.html">
-      <svg class="nav-ic"><use href="#ic-bar-chart"/></svg> Performance
+      <span class="nav-icon">📊</span> Performance
     </a>
   </div>
 
@@ -422,7 +446,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
         <div class="sb-urole" id="user-role">HR Manager</div>
       </div>
       <button class="sb-logout-btn" onclick="logout()" title="Sign out">
-        <svg><use href="#ic-power"/></svg>
+        <span style="font-size:14px">⏻</span>
       </button>
     </div>
   </div>

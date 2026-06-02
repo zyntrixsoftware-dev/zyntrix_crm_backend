@@ -235,6 +235,27 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
 .d1{animation-delay:.05s}.d2{animation-delay:.10s}.d3{animation-delay:.15s}.d4{animation-delay:.20s}
 
 @media(max-width:1280px){.kpi-strip{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+
+/* ===== Match standard HRMS (All Employees) flat card style ===== */
+.kpi-card::before{display:none}
+.kpi-glow{display:none}
+.kpi-card{background:var(--surface)}
+.kpi-card:hover{transform:none;border-color:var(--b2)}
+.nav-link.active{background:rgba(79,156,249,0.12)!important;color:var(--blue)!important}
+.nav-link.active::before{background:var(--blue)!important}
+
+/* ===== Sidebar — match All Employees contrast, spacing & active style ===== */
+.nav-section{padding:14px 10px 6px}
+.nav-lbl,.nav-section-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px}
+.nav-link{color:var(--t2);font-size:13px;gap:9px;padding:8px 10px;border-radius:8px;margin-bottom:1px}
+.nav-link:hover{background:rgba(79,156,249,0.12);color:var(--t1)}
+.nav-link:hover .nav-ic,.nav-link:hover .nav-icon{opacity:1}
+.nav-link.active{background:rgba(79,156,249,0.14)!important;color:var(--blue)!important;font-weight:500}
+.nav-link.active::before{background:var(--blue)!important;height:20px;border-radius:0 3px 3px 0}
+.nav-icon{opacity:1;width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.nav-ic{opacity:.9}
+.nav-link.active .nav-ic{opacity:1}
+.nav-div,.nav-divider{height:1px;background:var(--b1);margin:8px 10px}
 </style>
 <script src="../../../../assets/js/api.js"></script>
 <script src="../../../../assets/js/auth.js?v=3"></script>

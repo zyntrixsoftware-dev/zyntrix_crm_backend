@@ -8,6 +8,32 @@
 <link rel="stylesheet" href="../assets/css/module-pages.css">
 <link rel="stylesheet" href="../assets/css/theme.css">
 <script src="../assets/js/appearance.js"></script>
+<style>
+.ws-wrap{display:flex;flex-direction:column;gap:18px}
+.ws-hello{font-size:18px;font-weight:700;color:var(--text)}
+.ws-sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.ws-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ws-kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.ws-kpi-v{font-size:24px;font-weight:800;color:var(--text);line-height:1}
+.ws-kpi-l{font-size:11px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.4px}
+.ws-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ws-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.ws-card h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.ws-card h3 a{font-size:11px;color:var(--cyan);text-decoration:none;font-weight:600}
+.ws-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--border-soft)}
+.ws-row:first-child{border-top:none}
+.ws-row .nm{font-size:12.5px;font-weight:600;color:var(--text)}
+.ws-row .mt{font-size:11px;color:var(--muted);margin-top:1px}
+.ws-badge{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;background:var(--muted-panel);border:1px solid var(--border-soft)}
+.ws-empty{font-size:12px;color:var(--faint);padding:10px 0}
+.ws-prog{display:flex;flex-direction:column;gap:9px}
+.ws-prog-row{display:flex;align-items:center;gap:8px}
+.ws-prog-lbl{font-size:11px;color:var(--muted);width:84px;flex-shrink:0}
+.ws-prog-bar{flex:1;height:6px;background:var(--muted-panel);border-radius:3px;overflow:hidden}
+.ws-prog-fill{height:100%;border-radius:3px}
+.ws-prog-num{font-size:10.5px;color:var(--faint);width:74px;text-align:right;font-family:monospace}
+@media(max-width:1000px){.ws-kpis{grid-template-columns:repeat(2,1fr)}.ws-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -51,7 +77,24 @@
     </header>
 
     <section class="module-content">
-      <!-- Intentionally left blank — content to be added later after consulting the sales team. -->
+      <div class="ws-wrap" id="ws">
+        <div>
+          <div class="ws-hello" id="ws-hello">My Work</div>
+          <div class="ws-sub" id="ws-date"></div>
+        </div>
+        <div class="ws-kpis">
+          <div class="ws-kpi"><div class="ws-kpi-v" id="k-leads">—</div><div class="ws-kpi-l">My Active Leads</div></div>
+          <div class="ws-kpi"><div class="ws-kpi-v" id="k-fu">—</div><div class="ws-kpi-l">Follow-ups Today</div></div>
+          <div class="ws-kpi"><div class="ws-kpi-v" id="k-demos">—</div><div class="ws-kpi-l">My Upcoming Demos</div></div>
+          <div class="ws-kpi"><div class="ws-kpi-v" id="k-enr">—</div><div class="ws-kpi-l">Enrolled This Month</div></div>
+        </div>
+        <div class="ws-grid">
+          <div class="ws-card"><h3>Today's Follow-Ups <a href="sales_system/followups.html">Open &rsaquo;</a></h3><div id="ws-fu"><div class="ws-empty">Loading…</div></div></div>
+          <div class="ws-card"><h3>My Upcoming Demos <a href="sales_system/demos.html">Open &rsaquo;</a></h3><div id="ws-demos"><div class="ws-empty">Loading…</div></div></div>
+          <div class="ws-card"><h3>My Active Leads <a href="sales_system/leads.html">Open &rsaquo;</a></h3><div id="ws-leads"><div class="ws-empty">Loading…</div></div></div>
+          <div class="ws-card"><h3>My Target &mdash; <span id="ws-month"></span> <a href="sales_system/targets.html">Open &rsaquo;</a></h3><div id="ws-target"><div class="ws-empty">Loading…</div></div></div>
+        </div>
+      </div>
     </section>
   </main>
 </div>
@@ -68,6 +111,73 @@ if (user) {
   set("userName", user.name || "Zyntrix Employee");
   set("userRole", user.role ? user.role.replace("_", " ") : "Employee");
 }
+</script>
+<script>
+(async function loadWorkstation(){
+  const user = (function(){ try{ return JSON.parse(localStorage.getItem('user'))||{}; }catch(e){ return {}; } })();
+  function tokId(){ try{ return JSON.parse(atob(localStorage.getItem('token').split('.')[1])).id; }catch(e){ return user._id||user.id||''; } }
+  const myId = tokId();
+  const esc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const now = new Date();
+  document.getElementById('ws-hello').textContent = 'My Work' + (user&&user.name? ' \u2014 '+user.name : '');
+  document.getElementById('ws-date').textContent  = now.toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('ws-month').textContent = now.toLocaleDateString('en-IN',{month:'long'});
+  if (typeof apiRequest !== 'function') {
+    ['ws-fu','ws-demos','ws-leads','ws-target'].forEach(function(id){ var el=document.getElementById(id); if(el) el.innerHTML='<div class="ws-empty">Open the Sales CRM to load this section.</div>'; });
+    return;
+  }
+  const m = now.getMonth()+1, y = now.getFullYear();
+  const todayStart = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+
+  const [ld, fu, dm, st] = await Promise.all([
+    apiRequest('/sales/leads?assignedTo='+myId+'&archived=false&limit=500').catch(()=>({})),
+    apiRequest('/sales/followups/today').catch(()=>({})),
+    apiRequest('/sales/demos').catch(()=>({})),
+    apiRequest('/sales/reps/stats?month='+m+'&year='+y).catch(()=>({}))
+  ]);
+  const leads = (ld&&ld.leads)||[];
+  const myLeadIds = new Set(leads.map(l=>l._id));
+  const active = leads.filter(l => ['new_lead','contacted'].includes(l.pipelineStage) && l.contactOutcome!=='follow_up');
+  const fus = (fu&&fu.followups)||[];
+  const myDemos = ((dm&&dm.demos)||[]).filter(d => d.lead && myLeadIds.has(d.lead._id||d.lead) && !d.attended && !d.cancelled && new Date(d.scheduledAt)>=todayStart);
+  const stat = ((st&&st.reps)||[]).find(r => r.rep && r.rep._id===myId);
+
+  document.getElementById('k-leads').textContent = active.length;
+  document.getElementById('k-fu').textContent    = fus.length;
+  document.getElementById('k-demos').textContent = myDemos.length;
+  document.getElementById('k-enr').textContent   = stat? stat.enrollments : 0;
+
+  const ICON={call:'\ud83d\udcde',whatsapp:'\ud83d\udcac',email:'\u2709\ufe0f',sms:'\u2709\ufe0f',meeting:'\ud83e\udd1d',other:'\ud83d\udccc'};
+  document.getElementById('ws-fu').innerHTML = fus.length ? fus.map(f=>{
+    const nm=(f.lead&&(f.lead.fullName||f.lead.name))||'Lead';
+    return '<div class="ws-row"><div><div class="nm">'+(ICON[f.type]||'\ud83d\udccc')+' '+esc(nm)+'</div><div class="mt">'+esc(f.type||'call')+' \u00b7 '+new Date(f.scheduledAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</div></div></div>';
+  }).join('') : '<div class="ws-empty">No follow-ups due today \ud83c\udf89</div>';
+
+  document.getElementById('ws-demos').innerHTML = myDemos.length ? myDemos.map(d=>{
+    const nm=(d.lead&&d.lead.fullName)||'Student';
+    return '<div class="ws-row"><div><div class="nm">'+esc(nm)+'</div><div class="mt">'+(d.course&&d.course.title?esc(d.course.title)+' \u00b7 ':'')+new Date(d.scheduledAt).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</div></div></div>';
+  }).join('') : '<div class="ws-empty">No upcoming demos.</div>';
+
+  document.getElementById('ws-leads').innerHTML = active.length ? active.slice(0,10).map(l=>{
+    const interested = l.contactOutcome==='interested';
+    const o = interested ? {t:'Interested',c:'var(--teal)'} : {t:'In Progress',c:'var(--yellow)'};
+    return '<div class="ws-row"><div><div class="nm">'+esc(l.fullName)+'</div><div class="mt">'+esc(l.phone||'')+(l.courseInterest&&l.courseInterest.title?' \u00b7 '+esc(l.courseInterest.title):'')+'</div></div><span class="ws-badge" style="color:'+o.c+'">'+o.t+'</span></div>';
+  }).join('') + (active.length>10?'<div class="ws-empty">+'+(active.length-10)+' more</div>':'') : '<div class="ws-empty">No active leads assigned to you.</div>';
+
+  const box=document.getElementById('ws-target');
+  if(!stat){ box.innerHTML='<div class="ws-empty">No target set for this month. Ask your manager to set one in Targets.</div>'; }
+  else {
+    const t=stat.target||{};
+    const bar=(lbl,a,tg,col)=>{ const pct=tg?Math.min(100,Math.round(a/tg*100)):0; return '<div class="ws-prog-row"><div class="ws-prog-lbl">'+lbl+'</div><div class="ws-prog-bar"><div class="ws-prog-fill" style="width:'+pct+'%;background:'+col+'"></div></div><div class="ws-prog-num">'+a+'/'+(tg||0)+'</div></div>'; };
+    const revPct = t.targetRevenue?Math.min(100,Math.round((stat.revenue||0)/t.targetRevenue*100)):0;
+    box.innerHTML = '<div class="ws-prog">'+
+      bar('Leads',stat.leads,t.targetLeads||0,'var(--blue-soft)')+
+      bar('Demos',stat.demos,t.targetDemos||0,'var(--purple)')+
+      bar('Enrollments',stat.enrollments,t.targetEnrollments||0,'var(--teal)')+
+      '<div class="ws-prog-row"><div class="ws-prog-lbl">Revenue</div><div class="ws-prog-bar"><div class="ws-prog-fill" style="width:'+revPct+'%;background:var(--cyan)"></div></div><div class="ws-prog-num">\u20b9'+(stat.revenue||0).toLocaleString('en-IN')+'</div></div>'+
+    '</div>';
+  }
+})();
 </script>
 </body>
 </html>

@@ -274,22 +274,24 @@ exports.shortlistCandidate = async (req, res) => {
     // Send shortlist email via GAS (updates col N in the Sheet AND emails the candidate).
     // Always called — the backend's shortlistEmailSentAt guard prevents re-sends on
     // repeated clicks, and GAS's own EMAIL_SENT_FLAG (col R) provides a second guard.
-    let emailResult = { sent: false, reason: "already_sent" };
-    if (!interview.shortlistEmailSentAt) {
-      emailResult = await notifyShortlisted(interview);
-      if (emailResult.sent) {
-        interview.shortlistEmailSentAt = new Date();
-        await interview.save();
-      }
-    }
+    // Respond immediately so the button works on a SINGLE click. The GAS email
+    // call (302 redirects + Gmail send) can take several seconds and must not
+    // block the HTTP response — otherwise the UI looks frozen and HR clicks again.
+    res.status(201).json({ msg: "Shortlisted", candidate, interview, emailQueued: true });
 
-    return res.status(201).json({
-      msg:           "Shortlisted",
-      candidate,
-      interview,
-      emailDelivered: emailResult.sent,
-      emailReason:    emailResult.reason || undefined
-    });
+    // Fire the shortlist email in the background.
+    if (!interview.shortlistEmailSentAt) {
+      notifyShortlisted(interview)
+        .then(r => {
+          if (r && r.sent) {
+            interview.shortlistEmailSentAt = new Date();
+            return interview.save();
+          }
+          console.warn("[shortlist] email not sent:", r && r.reason);
+        })
+        .catch(e => console.error("[shortlist] email error:", e.message));
+    }
+    return;
   } catch (err) {
     console.error("SHORTLIST CANDIDATE ERROR:", err);
     return res.status(500).json({ msg: "Server error: " + err.message });

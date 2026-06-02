@@ -73,18 +73,16 @@ exports.formWebhook = async (req, res) => {
     }
 
     // Map the submitted document URLs into the documents sub-document
-    const DOC_KEYS = [
-      "tenthMarksheet", "twelfthMarksheet", "graduationCert",
-      "postGraduationCert",
-      "passportPhoto", "governmentId", "bankDetails", "acceptanceLetter"
-    ];
-
-    DOC_KEYS.forEach(key => {
-      const url = String((documents[key] || "")).trim();
-      if (url) {
+    // Store every document URL the form submitted. Iterating the payload keys
+    // (instead of a hardcoded subset) captures any field the form sends,
+    // including optional ones like otherCertifications.
+    Object.keys(documents || {}).forEach(key => {
+      const url = String(documents[key] || "").trim();
+      if (url && typeof ob.documents[key] !== "undefined") {
         ob.documents[key] = { url, submitted: true };
       }
     });
+    ob.markModified("documents");
 
     ob.formSubmittedAt = submittedAt ? new Date(submittedAt) : new Date();
 
