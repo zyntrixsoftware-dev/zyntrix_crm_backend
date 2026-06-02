@@ -246,30 +246,31 @@ exports.shortlistCandidate = async (req, res) => {
     const candidate = await Candidate.findById(req.params.id);
     if (!candidate) return res.status(404).json({ msg: "Candidate not found" });
 
+    // Find the existing interview if already shortlisted; otherwise create it.
+    // We do NOT early-return on "already shortlisted" — so if a prior attempt
+    // never actually emailed the candidate, clicking Shortlist again retries it.
+    let interview = null;
     if (candidate.status === "shortlisted" && candidate.interviewId) {
-      // Already shortlisted — return existing interview
-      const existing = await Interview.findById(candidate.interviewId);
-      return res.json({ msg: "Already shortlisted", candidate, interview: existing });
+      interview = await Interview.findById(candidate.interviewId);
     }
-
-    // Create the interview record with 3 empty rounds (50 min each)
-    const interview = await Interview.create({
-      candidateId:    candidate._id,
-      candidateName:  candidate.name,
-      candidateEmail: candidate.email,
-      candidatePhone: candidate.phone,
-      appliedFor:     candidate.appliedFor || "—",
-      department:     candidate.department,
-      round1: { status: "pending", durationMin: 50 },
-      round2: { status: "pending", durationMin: 50 },
-      round3: { status: "pending", durationMin: 50 },
-      overallStatus:  "in_progress",
-      createdBy:      req.user.id
-    });
-
-    candidate.status      = "shortlisted";
-    candidate.interviewId = interview._id;
-    await candidate.save();
+    if (!interview) {
+      interview = await Interview.create({
+        candidateId:    candidate._id,
+        candidateName:  candidate.name,
+        candidateEmail: candidate.email,
+        candidatePhone: candidate.phone,
+        appliedFor:     candidate.appliedFor || "—",
+        department:     candidate.department,
+        round1: { status: "pending", durationMin: 50 },
+        round2: { status: "pending", durationMin: 50 },
+        round3: { status: "pending", durationMin: 50 },
+        overallStatus:  "in_progress",
+        createdBy:      req.user.id
+      });
+      candidate.status      = "shortlisted";
+      candidate.interviewId = interview._id;
+      await candidate.save();
+    }
 
     // Send shortlist email via GAS (updates col N in the Sheet AND emails the candidate).
     // Always called — the backend's shortlistEmailSentAt guard prevents re-sends on

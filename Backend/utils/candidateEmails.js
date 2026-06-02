@@ -79,6 +79,12 @@ async function _callGAS(action, payload) {
       console.error(`[candidateEmails] GAS "${action}" error:`, result.error);
       return { sent: false, reason: result.error || "GAS returned ok:false" };
     }
+    // Some handlers (shortlist) report whether they actually emailed via `emailed`.
+    // If GAS skipped the send (guard), treat it as NOT sent so we can retry later.
+    if (result.emailed === false) {
+      console.warn(`[candidateEmails] GAS "${action}" skipped sending (guard) → ${payload.email}`);
+      return { sent: false, reason: "GAS skipped (already-sent guard)" };
+    }
     console.log(`[candidateEmails] GAS "${action}" sent → ${payload.email}`);
     return { sent: true, reason: "via_gas" };
   } catch (err) {
