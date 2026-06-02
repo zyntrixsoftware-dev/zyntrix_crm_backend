@@ -60,6 +60,7 @@ exports.formWebhook = async (req, res) => {
 
     // Find the existing onboarding record by email (created when offer was sent)
     let ob = await Onboarding.findOne({ candidateEmail: email });
+    const matchedExisting = !!ob;
 
     if (!ob) {
       // Candidate submitted the form but no onboarding record exists yet
@@ -93,8 +94,16 @@ exports.formWebhook = async (req, res) => {
 
     await ob.save();
 
-    console.log("[Onboarding webhook] form submitted by:", email, "| status:", ob.onboardingStatus);
-    return res.json({ ok: true, onboardingId: ob._id, status: ob.onboardingStatus });
+    const submittedCount = Object.values(ob.documents || {}).filter(d => d && d.submitted).length;
+    if (!matchedExisting) {
+      console.warn("[Onboarding webhook] NO existing onboarding record for", email,
+                   "— created a NEW one. The candidate likely used a different email in the form than the offer was sent to.");
+    }
+    console.log("[Onboarding webhook] form submitted by:", email,
+                "| matched existing:", matchedExisting,
+                "| documents stored:", submittedCount,
+                "| status:", ob.onboardingStatus);
+    return res.json({ ok: true, onboardingId: ob._id, status: ob.onboardingStatus, matchedExisting, documentsStored: submittedCount });
   } catch (err) {
     console.error("ONBOARDING WEBHOOK ERROR:", err);
     return res.status(500).json({ ok: false, error: "Server error" });
