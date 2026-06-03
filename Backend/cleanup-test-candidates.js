@@ -10,12 +10,17 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 
-// >>> The emails to purge. Edit this list if needed. <<<
+// >>> Exact emails to purge. <<<
 const EMAILS = [
   "kolasanidinesh875@gmail.com",
   "kolasanidinesh25@gmail.com",
   "dinesh.kolasani@zyntrixsoftware.com",
+  "kolasanidinesh@875@gmail.com",   // malformed test address (double @)
 ];
+
+// >>> Substring sweep: also delete ANY address containing one of these. <<<
+// Catches typo'd variants (e.g. double-@) and any other kolasani test data.
+const CONTAINS = ["kolasani"];
 
 const DRY = process.argv.includes("--dry");
 
@@ -27,10 +32,13 @@ const Orientation        = require("./models/Orientation");
 const Deployment         = require("./models/Deployment");
 const ApplicationEmailLog = require("./models/ApplicationEmailLog");
 
-// case-insensitive exact-match regexes for each email
-const rx = EMAILS.map(e =>
-  new RegExp("^" + e.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "i")
-);
+// case-insensitive regexes: exact matches for each email, PLUS substring
+// matches for each CONTAINS keyword (so typos and variants are caught too).
+const esc = s => s.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const rx = [
+  ...EMAILS.map(e => new RegExp("^" + esc(e) + "$", "i")),
+  ...CONTAINS.map(k => new RegExp(esc(k), "i")),
+];
 
 // [model, fieldName]
 const TARGETS = [
@@ -48,7 +56,8 @@ const TARGETS = [
   if (!uri) { console.error("No MONGO_URI in environment."); process.exit(1); }
   await mongoose.connect(uri);
   console.log(`Connected.${DRY ? "  (DRY RUN — nothing will be deleted)" : ""}`);
-  console.log("Emails:", EMAILS.join(", "), "\n");
+  console.log("Exact:", EMAILS.join(", "));
+  console.log("Contains:", CONTAINS.join(", "), "\n");
 
   let grandTotal = 0;
   for (const [Model, field] of TARGETS) {

@@ -1162,8 +1162,18 @@ function cleanupTestRows() {
   var emails = [
     "kolasanidinesh875@gmail.com",
     "kolasanidinesh25@gmail.com",
-    "dinesh.kolasani@zyntrixsoftware.com"
+    "dinesh.kolasani@zyntrixsoftware.com",
+    "kolasanidinesh@875@gmail.com"   // malformed test address (double @)
   ].map(function (e) { return e.trim().toLowerCase(); });
+  // Also delete ANY address containing one of these substrings (catches typos).
+  var contains = ["kolasani"];
+  function isMatch(cell) {
+    var v = String(cell || "").trim().toLowerCase();
+    if (!v) return false;
+    if (emails.indexOf(v) !== -1) return true;
+    for (var i = 0; i < contains.length; i++) { if (v.indexOf(contains[i]) !== -1) return true; }
+    return false;
+  }
 
   // Spreadsheets to clean: the applications sheet + the form's response sheet.
   var ssIds = [SHEET_ID];
@@ -1199,8 +1209,7 @@ function cleanupTestRows() {
       // Delete matching rows bottom-up so indices stay valid.
       var deleted = 0;
       for (var r = data.length - 1; r >= 1; r--) {
-        var cell = String(data[r][emailCol] || "").trim().toLowerCase();
-        if (emails.indexOf(cell) !== -1) { sheet.deleteRow(r + 1); deleted++; }
+        if (isMatch(data[r][emailCol])) { sheet.deleteRow(r + 1); deleted++; }
       }
       if (deleted > 0) Logger.log(ss.getName() + " / " + sheet.getName() + ": deleted " + deleted + " row(s)");
       totalDeleted += deleted;
@@ -1222,4 +1231,19 @@ function formatPhoneColumnAsText() {
   var lastRow = Math.max(sheet.getMaxRows(), 1000);
   sheet.getRange(2, COL.PHONE + 1, lastRow - 1, 1).setNumberFormat("@");
   Logger.log("Phone column set to plain text.");
+}
+
+// ════════════════════════════════════════════════════════════
+//  CHECK EMAIL QUOTA — run this (select checkEmailQuota → ▶ Run)
+//  to see how many emails the script can still send today.
+//  If it prints 0, you've hit Gmail's daily limit; it resets
+//  around midnight Pacific time. Bulk-sending exhausts it fast.
+// ════════════════════════════════════════════════════════════
+function checkEmailQuota() {
+  var left = MailApp.getRemainingDailyQuota();
+  Logger.log("Emails remaining today: " + left);
+  if (left <= 0) {
+    Logger.log("QUOTA EXHAUSTED — no emails will send until it resets (~midnight Pacific).");
+  }
+  return left;
 }
