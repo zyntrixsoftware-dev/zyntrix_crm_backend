@@ -58,9 +58,20 @@ exports.formWebhook = async (req, res) => {
 
     const email = candidateEmail.trim().toLowerCase();
 
-    // Find the existing onboarding record by email (created when offer was sent)
-    let ob = await Onboarding.findOne({ candidateEmail: email });
+    // Find the onboarding record by email. If several records share the same
+    // email (e.g. during testing, or genuine duplicates), prefer the most recent
+    // one that is still AWAITING documents over an already-completed one.
+    let ob = await Onboarding.findOne({
+      candidateEmail: email,
+      onboardingStatus: { $in: ["offer_sent", "docs_pending", "docs_submitted"] }
+    }).sort({ createdAt: -1 });
+    if (!ob) ob = await Onboarding.findOne({ candidateEmail: email }).sort({ createdAt: -1 });
     const matchedExisting = !!ob;
+    const dupCount = await Onboarding.countDocuments({ candidateEmail: email });
+    if (dupCount > 1) {
+      console.warn("[Onboarding webhook]", dupCount, "onboarding records share the email", email,
+                   "— updated the most recent one awaiting docs. Use a UNIQUE email per candidate to avoid ambiguity.");
+    }
 
     if (!ob) {
       // Candidate submitted the form but no onboarding record exists yet
@@ -224,11 +235,14 @@ exports.updateStatus = async (req, res) => {
     if (!ob) return res.status(404).json({ msg: "Onboarding record not found" });
 
     ob.onboardingStatus = status;
-    if (status === "onboarded" && !ob.onboardedAt) ob.onboardedAt = new Date();
+    // Only the FIRST time a record becomes "onboarded" should the email fire.
+    // Re-saving / toggling status back to onboarded must NOT re-send it.
+    const firstOnboard = status === "onboarded" && !ob.onboardedAt;
+    if (firstOnboard) ob.onboardedAt = new Date();
     await ob.save();
 
-    // Fire onboarding-complete email + auto-create orientation record
-    if (status === "onboarded") {
+    // Fire onboarding-complete email + auto-create orientation record (once)
+    if (firstOnboard) {
       notifyOnboarded(ob).then(result => {
         if (result.sent) {
           console.log(`[updateStatus] onboarded email sent → ${ob.candidateEmail}`);

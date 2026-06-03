@@ -1,4 +1,5 @@
 const Candidate = require("../models/Candidate");
+const ApplicationEmailLog = require("../models/ApplicationEmailLog");
 const Interview = require("../models/Interview");
 const mongoose  = require("mongoose");
 const https     = require("https");
@@ -191,17 +192,63 @@ exports.bulkImport = async (req, res) => {
     // We don't await — Office365 can be slow and we don't want the import HTTP
     // response to wait for 100+ SMTP roundtrips. Each send is independently
     // logged; failures don't affect the import response.
+    // HR can suppress application emails entirely for an import by passing
+    // sendEmails=false (query) or sendApplicationEmails:false (body) — e.g. when
+    // loading historical data that should NOT be emailed.
+    const sendApplicationEmails =
+      String(req.query.sendEmails) !== "false" &&
+      req.body.sendApplicationEmails !== false;
+
     setImmediate(async () => {
       try {
+        if (!sendApplicationEmails) {
+          await Candidate.updateMany(
+            { createdBy: req.user.id, importBatchId },
+            { $set: { applicationEmailSentAt: new Date() } }
+          );
+          console.log(`[bulkImport] sendEmails=false — marked batch ${importBatchId} as notified WITHOUT emailing`);
+          return;
+        }
         const fresh = await Candidate.find({
           createdBy:     req.user.id,
           importBatchId,
           applicationEmailSentAt: null
         }).select("_id name email appliedFor");
 
+        // Email each address only ONCE, ever. Two layers of protection:
+        //   • emailedAddresses  — de-dupes repeated rows within THIS import.
+        //   • ApplicationEmailLog — a persistent collection that survives the
+        //     import wipe, so RE-importing the same roster never re-emails a
+        //     candidate who was already notified in a previous import.
+        const emailedAddresses = new Set();
         for (const c of fresh) {
+          const addr = String(c.email || "").trim().toLowerCase();
+
+          // Already emailed in this batch, or in a previous import? Skip the send.
+          const alreadyLogged = addr
+            ? await ApplicationEmailLog.findOne({ createdBy: req.user.id, email: addr }).lean()
+            : null;
+          if (addr && (emailedAddresses.has(addr) || alreadyLogged)) {
+            await Candidate.updateOne(
+              { _id: c._id },
+              { $set: { applicationEmailSentAt: new Date() } }
+            );
+            continue;
+          }
+
           const result = await notifyApplicationReceived(c);
           if (result.sent) {
+            if (addr) {
+              emailedAddresses.add(addr);
+              // Record persistently so future imports won't re-email this address.
+              try {
+                await ApplicationEmailLog.updateOne(
+                  { createdBy: req.user.id, email: addr },
+                  { $setOnInsert: { sentAt: new Date() } },
+                  { upsert: true }
+                );
+              } catch (e) { /* duplicate-key race is fine */ }
+            }
             await Candidate.updateOne(
               { _id: c._id },
               { $set: { applicationEmailSentAt: new Date() } }

@@ -245,6 +245,18 @@ exports.sendInvite = async (req, res) => {
     if (!or) return res.status(404).json({ msg: "Orientation record not found" });
     if (!or.candidateEmail) return res.status(400).json({ msg: "Candidate has no email" });
 
+    // Guard against duplicate invites. The invite re-sends only if the caller
+    // explicitly passes { resend: true } (e.g. after the schedule changed).
+    if (or.inviteSentAt && !req.body.resend) {
+      return res.status(409).json({
+        msg: "Orientation invite was already sent on " +
+             new Date(or.inviteSentAt).toLocaleString("en-IN") +
+             ". Pass resend:true to send it again.",
+        alreadySent: true,
+        inviteSentAt: or.inviteSentAt
+      });
+    }
+
     // Build sessions array for the email
     const sessions = (or.sessionIds || [])
       .filter(s => s && s.status !== "cancelled")
