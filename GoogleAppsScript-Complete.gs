@@ -181,6 +181,12 @@ function _handleApplication(data) {
   row[COL.SOURCE]             = String(data.source         || "").trim();
   row[COL.DECLARATION]        = String(data.declaration    || "").trim();
   sheet.appendRow(row);
+  // Force the phone cell to TEXT so a leading "+" (e.g. +91…) is stored
+  // literally instead of being mis-read by Sheets as a formula (#ERROR!).
+  var newRow = sheet.getLastRow();
+  sheet.getRange(newRow, COL.PHONE + 1)
+       .setNumberFormat("@")
+       .setValue(String(data.phone || "").trim());
   SpreadsheetApp.flush();
   try {
     _sendApplicationConfirmation({ fullName, email, position });
@@ -1145,3 +1151,75 @@ function onShortlistEdit(e) {
 //     - onShortlistEdit → From spreadsheet → On edit
 //     - onFormSubmit    → From form        → On form submit
 // ════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════
+//  TEST CLEANUP — delete all rows for the given emails
+//  Run this from the editor (select cleanupTestRows → ▶ Run).
+//  Cleans the applications sheet AND the onboarding form's
+//  response sheet. Finds the email column by header automatically.
+// ════════════════════════════════════════════════════════════
+function cleanupTestRows() {
+  var emails = [
+    "kolasanidinesh875@gmail.com",
+    "kolasanidinesh25@gmail.com",
+    "dinesh.kolasani@zyntrixsoftware.com"
+  ].map(function (e) { return e.trim().toLowerCase(); });
+
+  // Spreadsheets to clean: the applications sheet + the form's response sheet.
+  var ssIds = [SHEET_ID];
+  try {
+    if (ONBOARDING_FORM_URL) {
+      var form   = FormApp.openByUrl(ONBOARDING_FORM_URL);
+      var destId = form.getDestinationId();
+      if (destId && ssIds.indexOf(destId) === -1) ssIds.push(destId);
+    }
+  } catch (err) {
+    Logger.log("Note: couldn't open the onboarding form to locate its response sheet (" + err +
+               "). If needed, add its spreadsheet ID to ssIds manually.");
+  }
+
+  var totalDeleted = 0;
+  ssIds.forEach(function (id) {
+    var ss;
+    try { ss = SpreadsheetApp.openById(id); }
+    catch (e) { Logger.log("Could not open spreadsheet " + id + ": " + e); return; }
+
+    ss.getSheets().forEach(function (sheet) {
+      var data = sheet.getDataRange().getValues();
+      if (data.length < 2) return;
+
+      // Locate the email column from the header row.
+      var header = data[0].map(function (h) { return String(h || "").toLowerCase(); });
+      var emailCol = -1;
+      for (var i = 0; i < header.length; i++) {
+        if (header[i].indexOf("email") !== -1) { emailCol = i; break; }
+      }
+      if (emailCol === -1) return;
+
+      // Delete matching rows bottom-up so indices stay valid.
+      var deleted = 0;
+      for (var r = data.length - 1; r >= 1; r--) {
+        var cell = String(data[r][emailCol] || "").trim().toLowerCase();
+        if (emails.indexOf(cell) !== -1) { sheet.deleteRow(r + 1); deleted++; }
+      }
+      if (deleted > 0) Logger.log(ss.getName() + " / " + sheet.getName() + ": deleted " + deleted + " row(s)");
+      totalDeleted += deleted;
+    });
+  });
+
+  Logger.log("DONE — deleted " + totalDeleted + " row(s) across " + ssIds.length + " spreadsheet(s).");
+}
+
+// ════════════════════════════════════════════════════════════
+//  ONE-TIME: format the Phone column as TEXT
+//  Run once (select formatPhoneColumnAsText → ▶ Run) so phone
+//  numbers with a leading "+" are never treated as formulas.
+//  Note: cells ALREADY showing #ERROR! lost their value in the
+//  sheet — but the phone is still safe in the backend database.
+// ════════════════════════════════════════════════════════════
+function formatPhoneColumnAsText() {
+  var sheet = _getSheet();
+  var lastRow = Math.max(sheet.getMaxRows(), 1000);
+  sheet.getRange(2, COL.PHONE + 1, lastRow - 1, 1).setNumberFormat("@");
+  Logger.log("Phone column set to plain text.");
+}
