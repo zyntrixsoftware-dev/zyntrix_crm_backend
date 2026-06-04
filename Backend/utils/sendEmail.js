@@ -102,7 +102,10 @@ const sendEmail = async (to, subject, text, opts = {}) => {
     from:    `"${senderName}" <${fromAddress}>`,
     to,
     subject,
-    text
+    text,
+    // Candidate replies go to HR. Defaults to the sending mailbox (hr@),
+    // overridable via EMAIL_REPLY_TO env or opts.replyTo.
+    replyTo: opts.replyTo || process.env.EMAIL_REPLY_TO || fromAddress
   };
   if (opts.html)        mail.html        = opts.html;
   if (opts.attachments) mail.attachments = opts.attachments;

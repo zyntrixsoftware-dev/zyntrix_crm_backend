@@ -166,7 +166,7 @@ async function simFetchFromLink() {
   if (!url) return;
   simSetStatus("⏳ Fetching from link…");
   const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000/api" : "https://zyntrix-crm-backend.onrender.com/api";
+    ? "http://localhost:5000/api" : "https://api.zyntrixsoftware.com/api";
   try {
     const res = await fetch(API_BASE + "/hr/candidates/import-from-link", {
       method: "POST",
@@ -331,7 +331,7 @@ async function simCommitImport() {
   fd.append("file", csvBlob, "import.csv");
 
   const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:5000/api" : "https://zyntrix-crm-backend.onrender.com/api";
+    ? "http://localhost:5000/api" : "https://api.zyntrixsoftware.com/api";
 
   try {
     const res = await fetch(API_BASE + "/sales/import/" + _importType, {

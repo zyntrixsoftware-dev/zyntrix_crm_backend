@@ -2,7 +2,7 @@
 //  DEPLOYMENT CONFIG
 // ══════════════════════════════════════════════════════════════════
 // ⚠ UPDATE THIS to your actual Railway backend URL if it changes
-const RAILWAY_BACKEND_URL = "https://zyntrix-crm-backend.onrender.com";
+const RAILWAY_BACKEND_URL = "https://api.zyntrixsoftware.com";
 
 const API_BASE = (
   window.location.hostname === "localhost" ||

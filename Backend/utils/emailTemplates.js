@@ -435,6 +435,48 @@ function orientationInvite({ fullName, position, joiningDate, mentorName, mentor
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════════
+//  10. DEPLOYED — assigned to a team
+// ════════════════════════════════════════════════════════════════════════════
+function deployed({ fullName, position, teamName, department, roleInTeam, reportingManager, workLocation, officeLocation, shift, domainEmail, deployedDate, joiningDate }) {
+  const subject = `Welcome to the Team - Your Deployment Details | ${COMPANY_NAME}`;
+  function row(label, value) {
+    if (!value) return "";
+    return `<tr style="border-bottom:1px solid #F0F0F0;"><td style="padding:8px 0;color:${C_GRAY_LIGHT};font-size:13px;width:150px;vertical-align:top;">${label}</td><td style="padding:8px 0;color:${C_GRAY_DARK};font-size:13px;font-weight:600;">${value}</td></tr>`;
+  }
+  const locLabel    = workLocation === "remote" ? "Remote" : workLocation === "hybrid" ? "Hybrid" : "Office";
+  const locationStr = officeLocation ? `${locLabel} - ${officeLocation}` : locLabel;
+  const domainBlock = domainEmail
+    ? `<div style="background:${C_LIME_LIGHT};border-left:4px solid ${C_LIME};border-radius:6px;padding:14px 18px;margin-bottom:24px;"><p style="margin:0 0 4px;font-size:13px;font-weight:bold;color:${C_GRAY_DARK};">Your Company Email</p><p style="margin:0;font-size:15px;color:${C_GRAY_DARK};font-weight:bold;">${domainEmail}</p></div>`
+    : "";
+  const joiningBlock = joiningDate
+    ? `<div style="background:${C_LIME_LIGHT};border-left:4px solid ${C_LIME};border-radius:6px;padding:14px 18px;margin-bottom:24px;"><p style="margin:0 0 2px;font-size:13px;font-weight:bold;color:${C_GRAY_DARK};">Your Joining Date</p><p style="margin:0;font-size:15px;color:${C_GRAY_DARK};font-weight:bold;">${joiningDate}</p></div>`
+    : "";
+  const html = _wrap(
+    _header("HR - Team Deployment") +
+    `<div style="background:${C_LIME};padding:14px 32px;text-align:center;"><span style="color:${C_BLACK};font-size:14px;font-weight:bold;letter-spacing:0.5px;">CONGRATULATIONS - YOU HAVE BEEN DEPLOYED!</span></div>` +
+    `<div style="padding:32px;background:${C_WHITE};">` +
+      `<p style="font-size:18px;color:${C_GRAY_DARK};margin:0 0 10px;">Dear <strong>${fullName}</strong>,</p>` +
+      `<p style="font-size:15px;color:${C_GRAY_MID};line-height:1.8;margin:0 0 20px;">Congratulations! You have been officially deployed to <strong>${teamName || "your team"}</strong> at <strong>${COMPANY_NAME}</strong>. Please find your deployment details below.</p>` +
+      joiningBlock +
+      `<div style="background:#F9F9F9;border:1px solid ${C_GRAY_BORDER};border-radius:8px;padding:20px;margin-bottom:24px;">` +
+        `<p style="margin:0 0 14px;font-weight:bold;font-size:14px;color:${C_GRAY_DARK};">Deployment Details</p>` +
+        `<table style="width:100%;border-collapse:collapse;">` +
+          row("Team", teamName) + row("Department", department) + row("Role", roleInTeam) +
+          row("Position", position) + row("Reporting Manager", reportingManager) +
+          row("Work Location", locationStr) + row("Shift", shift) + row("Deployed On", deployedDate) +
+        `</table>` +
+      `</div>` +
+      domainBlock +
+      `<div style="background:${C_LIME_LIGHT};border-left:4px solid ${C_LIME};border-radius:6px;padding:16px 18px;margin-bottom:24px;"><p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:${C_GRAY_DARK};">What Happens Next</p><p style="margin:0;font-size:14px;color:${C_GRAY_MID};line-height:1.8;">Your reporting manager will get in touch with you shortly to brief you on your responsibilities, tools, and the team.</p></div>` +
+      `<p style="margin-top:20px;font-size:15px;color:${C_GRAY_DARK};font-weight:bold;">Welcome to the ${teamName || COMPANY_NAME} team!</p>` +
+      `<p style="font-size:14px;color:${C_GRAY_MID};">Regards,<br><strong>${COMPANY_NAME} - HR Team</strong></p>` +
+    `</div>` +
+    _footer()
+  );
+  return { subject, html };
+}
+
 module.exports = {
   applicationReceived,
   resumeShortlisted,
@@ -445,4 +487,5 @@ module.exports = {
   rejected,
   onboarded,
   orientationInvite,
+  deployed,
 };

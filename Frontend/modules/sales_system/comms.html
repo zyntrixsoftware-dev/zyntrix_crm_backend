@@ -214,7 +214,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <div class="toast" id="toast"></div>
 
 <script>
-const API = (window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')?'http://localhost:5000/api':'https://zyntrix-crm-backend.onrender.com/api';
+const API = (window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')?'http://localhost:5000/api':'https://api.zyntrixsoftware.com/api';
 let allLogs=[], leads=[], filterType='', searchQ='', debTimer=null;
 
 const TYPE_COLORS = {call:'b-call',whatsapp:'b-whatsapp',email:'b-email',sms:'b-sms',meeting:'b-meeting',other:'b-other'};
