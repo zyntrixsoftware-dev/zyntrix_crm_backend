@@ -94,6 +94,9 @@ const generalLimiter = rateLimit({
 });
 
 // Public candidate onboarding upload page (reads ?token client-side)
+// Serve static assets for the onboarding page (e.g. /onboarding.js)
+app.use(express.static(require("path").join(__dirname, "public")));
+
 app.get("/onboarding", (req, res) => {
   // Override helmet's strict CSP for this self-served HTML page (inline CSS/JS + Google Fonts).
   res.setHeader("Content-Security-Policy",
