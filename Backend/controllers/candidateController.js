@@ -9,6 +9,36 @@ const {
   notifyRejected
 } = require("../utils/candidateEmails");
 
+// ── Resume upload (public apply) → stored on the VM disk ────────────────────
+const multer = require("multer");
+const path   = require("path");
+const fs     = require("fs");
+const crypto = require("crypto");
+const jwt    = require("jsonwebtoken");
+
+const RESUME_DIR = path.join(__dirname, "..", "uploads", "resumes");
+fs.mkdirSync(RESUME_DIR, { recursive: true });
+
+const _resumeUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, RESUME_DIR),
+    filename:    (req, file, cb) => cb(null, crypto.randomUUID() + ".pdf"),
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },               // 5 MB
+  fileFilter: (req, file, cb) => {
+    const ok = file.mimetype === "application/pdf" || /\.pdf$/i.test(file.originalname || "");
+    cb(ok ? null : new Error("Only PDF resumes are allowed"), ok);
+  },
+}).single("resume");
+
+// Tolerant wrapper: surfaces multer errors as clean JSON, never crashes the route.
+exports.uploadResumeMw = function (req, res, next) {
+  _resumeUpload(req, res, function (err) {
+    if (err) return res.status(400).json({ success: false, error: err.message });
+    next();
+  });
+};
+
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -451,6 +481,24 @@ exports.applyForJob = async (req, res) => {
       }
     });
 
+    // Attach the uploaded resume (multipart file) or legacy base64; store on disk.
+    try {
+      let storedName = null;
+      if (req.file) {
+        storedName = req.file.filename;             // multer already wrote it to RESUME_DIR
+      } else if (d.resumeBase64) {
+        storedName = crypto.randomUUID() + ".pdf";
+        fs.writeFileSync(path.join(RESUME_DIR, storedName), Buffer.from(d.resumeBase64, "base64"));
+      }
+      if (storedName) {
+        candidate.resumeFile = storedName;
+        candidate.resumeUrl  = `/api/hr/resume/${candidate._id}`;
+        await candidate.save();
+      }
+    } catch (fileErr) {
+      console.warn("[apply] resume save failed:", fileErr.message);
+    }
+
     // Sync new application to Google Sheet (fire-and-forget)
     syncNewApplicationToSheet(d, candidate.email);
 
@@ -595,3 +643,32 @@ function httpsGet(url, redirectsLeft = 5) {
     }
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/hr/resume/:id — stream a candidate's resume PDF.
+// Protected: requires a valid login JWT, accepted via the Authorization header
+// OR a ?token= query param (so HR can open the link directly in a browser tab).
+// ─────────────────────────────────────────────────────────────────────────────
+exports.downloadResume = async (req, res) => {
+  let token = "";
+  const hdr = req.headers.authorization || "";
+  if (hdr.startsWith("Bearer ")) token = hdr.slice(7);
+  if (!token && req.query.token) token = String(req.query.token);
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+  } catch {
+    return res.status(401).json({ msg: "Unauthorized - please log in to view resumes" });
+  }
+  try {
+    const c = await Candidate.findById(req.params.id).select("resumeFile name");
+    if (!c || !c.resumeFile) return res.status(404).json({ msg: "Resume not found" });
+    const filePath = path.join(RESUME_DIR, c.resumeFile);
+    if (!fs.existsSync(filePath)) return res.status(404).json({ msg: "Resume file missing on server" });
+    const safe = String(c.name || "resume").replace(/[^a-z0-9]+/gi, "_");
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="${safe}_resume.pdf"`);
+    fs.createReadStream(filePath).pipe(res);
+  } catch (err) {
+    return res.status(500).json({ msg: "Download error: " + err.message });
+  }
+};

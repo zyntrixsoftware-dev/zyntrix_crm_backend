@@ -6,7 +6,9 @@ const {
   rejectCandidate,
   deleteCandidate,
   importFromLink,
-  applyForJob
+  applyForJob,
+  uploadResumeMw,
+  downloadResume
 } = require("../controllers/candidateController");
 const auth = require("../middleware/authMiddleware");
 
@@ -14,7 +16,10 @@ const router = express.Router();
 
 // ── PUBLIC — no auth required ───────────────────────────────────────────────
 // This replaces the direct GAS web-app POST and avoids browser CORS errors.
-router.post("/apply", applyForJob);
+router.post("/apply", uploadResumeMw, applyForJob);
+
+// Resume download — token-gated inside the handler (header or ?token=)
+router.get("/resume/:id", downloadResume);
 
 // ── HR only ─────────────────────────────────────────────────────────────────
 router.get   ("/candidates",                   auth, getCandidates);

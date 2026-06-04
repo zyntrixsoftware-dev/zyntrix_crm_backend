@@ -29,6 +29,7 @@ const candidateSchema = new mongoose.Schema({
   },
   importBatchId: { type: String, default: "" },   // group rows from same upload
   resumeUrl:     { type: String, default: "" },
+  resumeFile:    { type: String, default: "" },   // stored filename on the VM disk
 
   // ── Link back to the interview record (set when shortlisted) ──
   interviewId: { type: mongoose.Schema.Types.ObjectId, ref: "Interview", default: null },
