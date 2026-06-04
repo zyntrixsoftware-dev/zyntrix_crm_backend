@@ -25,7 +25,8 @@ const ONBOARDING_STATUSES = [
 // One entry per required document
 const documentFieldSchema = new mongoose.Schema(
   {
-    url:       { type: String,  default: "" },    // Google Drive link from form
+    url:       { type: String,  default: "" },    // download URL (VM-hosted or external)
+    file:      { type: String,  default: "" },    // stored filename on the VM disk
     submitted: { type: Boolean, default: false },
     verifiedAt:{ type: Date,    default: null }
   },

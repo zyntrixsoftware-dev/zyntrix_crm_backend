@@ -12,6 +12,7 @@
 
 const sendEmail = require("./sendEmail");
 const T         = require("./emailTemplates");
+const jwt       = require("jsonwebtoken");
 
 // ── internal: send a built { subject, html } email to `to` ──────────────────
 async function _send(to, built, opts = {}) {
@@ -84,11 +85,19 @@ async function notifyMarkedForOffer(interview) {
 
 // 5. OFFER LETTER (PDF attached)
 async function notifyOfferLetter(payload) {
+  // Per-candidate onboarding upload link (signed token, 45-day expiry).
+  let onboardingUrl = "";
+  if (payload.email && process.env.JWT_SECRET) {
+    const tok  = jwt.sign({ purpose: "onboarding", email: String(payload.email).toLowerCase() },
+                          process.env.JWT_SECRET, { expiresIn: "45d" });
+    const base = (process.env.PUBLIC_BASE_URL || "https://api.zyntrixsoftware.com").replace(/\/$/, "");
+    onboardingUrl = `${base}/onboarding?token=${encodeURIComponent(tok)}`;
+  }
   const built = T.offerLetter({
     fullName         : payload.fullName || "Candidate",
     position         : payload.position || "the role",
     hasAttachment    : !!payload.offerPdfBase64,
-    onboardingFormUrl: process.env.ONBOARDING_FORM_URL || "",
+    onboardingFormUrl: onboardingUrl || process.env.ONBOARDING_FORM_URL || "",
   });
   const opts = {};
   if (payload.offerPdfBase64) {

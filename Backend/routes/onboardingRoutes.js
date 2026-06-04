@@ -12,12 +12,19 @@ const {
   updateChecklistItem,
   verifyDocument,
   addNote,
-  updateOnboarding
+  updateOnboarding,
+  uploadOnboardingDocsMw,
+  publicUploadDocs,
+  downloadDoc
 } = require("../controllers/onboardingController");
 
 // ── Public webhook — called by Google Apps Script (no JWT) ───────────────────
 // Protected by shared ONBOARDING_WEBHOOK_SECRET in the request body.
 router.post("/onboarding/webhook", formWebhook);
+
+// Public — candidate document upload (token in body) + protected download (token in header/query)
+router.post("/onboarding/upload", uploadOnboardingDocsMw, publicUploadDocs);
+router.get ("/onboarding/doc/:id/:docKey", downloadDoc);
 
 // ── HR-authenticated routes ───────────────────────────────────────────────────
 router.use(auth);

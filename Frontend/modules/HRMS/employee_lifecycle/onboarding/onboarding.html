@@ -834,6 +834,12 @@ function renderDocsTab(ob) {
     const doc     = docs[d.key] || {};
     const hasFile = !!doc.url;
     const verified= !!doc.verifiedAt;
+    // Build a clickable document URL: external links (legacy) open directly;
+    // VM-hosted docs (/api/hr/onboarding/doc/...) get the backend origin + login token.
+    const _origin = (typeof API_BASE !== "undefined" ? API_BASE : "").replace(/\/api$/, "");
+    const docHref = !doc.url ? "#"
+      : /^https?:\/\//i.test(doc.url) ? doc.url
+      : _origin + doc.url + "?token=" + encodeURIComponent(localStorage.getItem("token") || "");
     const cls     = hasFile ? "has-file" : "";
     const verifiedBadge = verified
       ? `<span class="badge b-green" style="font-size:10px;">✓ Verified</span>`
@@ -851,7 +857,7 @@ function renderDocsTab(ob) {
         <div class="doc-actions">
           ${verifiedBadge}
           ${hasFile
-            ? `<a href="${esc(doc.url)}" target="_blank" class="btn btn-sm" style="font-size:12px;color:var(--green);border-color:rgba(34,197,94,0.3);padding:4px 11px;">🔗 View</a>`
+            ? `<a href="${docHref}" target="_blank" class="btn btn-sm" style="font-size:12px;color:var(--green);border-color:rgba(34,197,94,0.3);padding:4px 11px;">🔗 View</a>`
             : `<span style="font-size:12px;color:var(--text3);">Not uploaded</span>`}
         </div>
       </div>`;

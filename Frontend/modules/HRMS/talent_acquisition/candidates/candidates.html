@@ -590,9 +590,15 @@ function viewDetails(id) {
   };
 
   // Resume: build an authenticated, clickable link (API_BASE + login token).
-  const _resumeHref = c.resumeUrl
-    ? `${API_BASE}/hr/resume/${c._id}?token=${encodeURIComponent(localStorage.getItem("token") || "")}`
-    : "";
+  // Resume can be EITHER a file stored on our VM (relative "/api/hr/resume/..." path,
+  // saved by the application form) OR an external link pulled in from an import
+  // (Google Drive / spreadsheet URL). Link to whichever applies.
+  let _resumeHref = "";
+  if (c.resumeUrl) {
+    _resumeHref = /^https?:\/\//i.test(c.resumeUrl)
+      ? c.resumeUrl
+      : `${API_BASE}/hr/resume/${c._id}?token=${encodeURIComponent(localStorage.getItem("token") || "")}`;
+  }
   const resumeRow = c.resumeUrl
     ? `<div style="display:grid;grid-template-columns:160px 1fr;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);">
          <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Resume</div>

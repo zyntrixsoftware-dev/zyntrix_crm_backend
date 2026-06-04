@@ -2,6 +2,46 @@ const Onboarding  = require("../models/Onboarding");
 const { notifyOnboarded } = require("../utils/candidateEmails");
 const OfferLetter = require("../models/OfferLetter");
 const Interview   = require("../models/Interview");
+const multer = require("multer");
+const path   = require("path");
+const fs     = require("fs");
+const crypto = require("crypto");
+const jwt    = require("jsonwebtoken");
+
+// All onboarding document slots (must match the Onboarding model `documents` keys)
+const ONB_DOC_KEYS = [
+  "tenthMarksheet", "twelfthMarksheet", "graduationCert", "postGraduationCert",
+  "otherCertifications", "passportPhoto", "governmentId", "bankDetails", "acceptanceLetter"
+];
+
+const ONBOARD_DIR = path.join(__dirname, "..", "uploads", "onboarding");
+fs.mkdirSync(ONBOARD_DIR, { recursive: true });
+
+const _MIME = { ".pdf":"application/pdf", ".jpg":"image/jpeg", ".jpeg":"image/jpeg", ".png":"image/png", ".webp":"image/webp" };
+
+const _docUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, ONBOARD_DIR),
+    filename:    (req, file, cb) => {
+      const ext = (path.extname(file.originalname || "") || ".pdf").toLowerCase();
+      cb(null, crypto.randomUUID() + ext);
+    },
+  }),
+  limits: { fileSize: 8 * 1024 * 1024 },   // 8 MB per file
+  fileFilter: (req, file, cb) => {
+    const ok = /\.(pdf|jpe?g|png|webp)$/i.test(file.originalname || "") || /(pdf|image)/i.test(file.mimetype || "");
+    cb(ok ? null : new Error("Only PDF or image files are allowed"), ok);
+  },
+}).fields(ONB_DOC_KEYS.map(k => ({ name: k, maxCount: 1 })));
+
+// Tolerant multer wrapper for the public upload endpoint.
+exports.uploadOnboardingDocsMw = function (req, res, next) {
+  _docUpload(req, res, function (err) {
+    if (err) return res.status(400).json({ ok: false, error: err.message });
+    next();
+  });
+};
+
 // Lazy-require to avoid circular deps — orientationController is loaded after this file
 function _autoCreateOrientation(ob, userId) {
   try {
@@ -673,5 +713,82 @@ exports.updateOnboarding = async (req, res) => {
     return res.json({ msg: "Onboarding updated", onboarding: ob });
   } catch (err) {
     return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/hr/onboarding/upload  (PUBLIC — candidate document upload)
+// Body: multipart files keyed by document name + `token` (signed email).
+// ─────────────────────────────────────────────────────────────────────────────
+exports.publicUploadDocs = async (req, res) => {
+  const token = req.body.token || req.query.token || "";
+  let email;
+  try {
+    const d = jwt.verify(token, process.env.JWT_SECRET);
+    if (d.purpose !== "onboarding") throw new Error("wrong token");
+    email = String(d.email || "").trim().toLowerCase();
+    if (!email) throw new Error("no email");
+  } catch {
+    return res.status(401).json({ ok: false, error: "This upload link is invalid or has expired. Please contact HR." });
+  }
+  try {
+    let ob = await Onboarding.findOne({
+      candidateEmail: email,
+      onboardingStatus: { $in: ["offer_sent", "docs_pending", "docs_submitted"] }
+    }).sort({ createdAt: -1 });
+    if (!ob) ob = await Onboarding.findOne({ candidateEmail: email }).sort({ createdAt: -1 });
+    if (!ob) return res.status(404).json({ ok: false, error: "No onboarding record found for this email. Please contact HR." });
+
+    const files = req.files || {};
+    let count = 0;
+    ONB_DOC_KEYS.forEach(key => {
+      const f = files[key] && files[key][0];
+      if (f) {
+        ob.documents[key] = { url: `/api/hr/onboarding/doc/${ob._id}/${key}`, file: f.filename, submitted: true };
+        count++;
+      }
+    });
+    if (count === 0) return res.status(400).json({ ok: false, error: "No documents were uploaded." });
+
+    ob.markModified("documents");
+    ob.formSubmittedAt = new Date();
+    if (["offer_sent", "docs_pending"].includes(ob.onboardingStatus)) ob.onboardingStatus = "docs_submitted";
+    await ob.save();
+    console.log(`[onboarding upload] ${email} | docs stored: ${count} | status: ${ob.onboardingStatus}`);
+    return res.json({ ok: true, documentsStored: count, status: ob.onboardingStatus, candidateName: ob.candidateName });
+  } catch (err) {
+    console.error("[onboarding upload] error:", err.message);
+    return res.status(500).json({ ok: false, error: "Server error: " + err.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/hr/onboarding/doc/:id/:docKey  (HR — protected download)
+// Token via Authorization header OR ?token= (login token; NOT the upload token).
+// ─────────────────────────────────────────────────────────────────────────────
+exports.downloadDoc = async (req, res) => {
+  let token = "";
+  const hdr = req.headers.authorization || "";
+  if (hdr.startsWith("Bearer ")) token = hdr.slice(7);
+  if (!token && req.query.token) token = String(req.query.token);
+  try {
+    const d = jwt.verify(token, process.env.JWT_SECRET);
+    if (d.purpose === "onboarding") throw new Error("candidate token cannot download");
+  } catch {
+    return res.status(401).json({ msg: "Unauthorized - please log in to view documents" });
+  }
+  try {
+    const ob = await Onboarding.findById(req.params.id).select("documents candidateName");
+    const doc = ob && ob.documents && ob.documents[req.params.docKey];
+    if (!doc || !doc.file) return res.status(404).json({ msg: "Document not found" });
+    const fp = path.join(ONBOARD_DIR, doc.file);
+    if (!fs.existsSync(fp)) return res.status(404).json({ msg: "File missing on server" });
+    const ext = path.extname(doc.file).toLowerCase();
+    res.setHeader("Content-Type", _MIME[ext] || "application/octet-stream");
+    const safe = (req.params.docKey + "_" + (ob.candidateName || "doc")).replace(/[^a-z0-9_]+/gi, "_");
+    res.setHeader("Content-Disposition", `inline; filename="${safe}${ext}"`);
+    fs.createReadStream(fp).pipe(res);
+  } catch (err) {
+    return res.status(500).json({ msg: "Download error: " + err.message });
   }
 };

@@ -93,6 +93,19 @@ const generalLimiter = rateLimit({
   message: { msg: "Too many requests — please slow down." }
 });
 
+// Public candidate onboarding upload page (reads ?token client-side)
+app.get("/onboarding", (req, res) => {
+  // Override helmet's strict CSP for this self-served HTML page (inline CSS/JS + Google Fonts).
+  res.setHeader("Content-Security-Policy",
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline'; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src https://fonts.gstatic.com; " +
+    "img-src 'self' data:; " +
+    "connect-src 'self'");
+  res.sendFile(require("path").join(__dirname, "public", "onboarding.html"));
+});
+
 app.use("/api/", generalLimiter);
 app.use("/api/auth/", authLimiter);
 

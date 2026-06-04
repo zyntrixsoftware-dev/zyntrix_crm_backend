@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Onboarding Documents — Zyntrix Software Solution</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0d0f14;--card:#161a22;--surface:#1c212b;--border:#2a313d;--accent:#AAFF00;--accent-dark:#7ACC00;--text:#e8eaf0;--muted:#8b93a7;--error:#ff6b6b;--success:#4caf7d;--radius:12px}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:32px 16px 72px}
+  .wrap{max-width:680px;margin:0 auto}
+  .head{text-align:center;margin-bottom:32px}
+  .logo{width:64px;height:64px;border-radius:14px;background:#0A0A0A;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .logo span{color:var(--accent);font-weight:700;font-size:26px}
+  .head h1{font-size:26px;font-weight:700;margin-bottom:6px}
+  .head .co{color:var(--accent);font-weight:600;font-size:14px;letter-spacing:.5px}
+  .head p{color:var(--muted);font-size:14px;line-height:1.6;max-width:480px;margin:12px auto 0}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:32px 28px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  @media(max-width:560px){.card{padding:24px 18px}}
+  .who{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:24px;font-size:13.5px;color:var(--muted)}
+  .who b{color:var(--text)}
+  .doc{margin-bottom:18px}
+  .doc label{display:block;font-size:13.5px;font-weight:500;margin-bottom:8px}
+  .doc label .req{color:var(--accent);margin-left:3px}
+  .doc label .opt{color:var(--muted);font-weight:400;font-size:12px;margin-left:6px}
+  .file{position:relative;background:var(--surface);border:1.5px dashed var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .2s,background .2s}
+  .file:hover{border-color:var(--accent-dark);background:rgba(170,255,0,.04)}
+  .file.filled{border-style:solid;border-color:var(--accent-dark)}
+  .file input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .file .ic{font-size:20px}
+  .file .txt{font-size:13px;color:var(--muted);flex:1;word-break:break-all}
+  .file.filled .txt{color:var(--success);font-weight:500}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .submit{width:100%;margin-top:24px;padding:15px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#0A0A0A;font-family:inherit;font-size:15px;font-weight:700;border:none;border-radius:var(--radius);cursor:pointer;transition:opacity .2s,transform .15s}
+  .submit:hover{opacity:.92;transform:translateY(-1px)}
+  .submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .msg{margin-top:18px;padding:14px 16px;border-radius:var(--radius);font-size:14px;display:none;line-height:1.6}
+  .msg.show{display:block}
+  .msg.error{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.4);color:#ffb3b3}
+  .msg.ok{background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.4);color:#9be4c0}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:28px;line-height:1.7}
+  .foot a{color:var(--accent)}
+  .gate{text-align:center;padding:48px 24px;color:var(--muted)}
+  .gate h2{color:var(--text);margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="logo"><span>Z</span></div>
+    <div class="co">ZYNTRIX SOFTWARE SOLUTION PVT LTD</div>
+    <h1>Onboarding Documents</h1>
+    <p>Welcome aboard! Please upload your documents below to complete onboarding. Accepted formats: PDF or image (JPG/PNG), up to 8&nbsp;MB each.</p>
+  </div>
+
+  <div id="gate" class="card gate" style="display:none">
+    <h2>Invalid or missing link</h2>
+    <p>This upload link is invalid or has expired. Please use the link from your offer letter email, or contact HR at <a href="mailto:hr@zyntrixsoftware.com" style="color:var(--accent)">hr@zyntrixsoftware.com</a>.</p>
+  </div>
+
+  <div id="formCard" class="card" style="display:none">
+    <div class="who">Uploading documents for: <b id="whoEmail">your account</b></div>
+    <form id="docForm">
+      <div id="docs"></div>
+      <button type="submit" class="submit" id="submitBtn">Submit Documents</button>
+      <div class="msg" id="msg"></div>
+    </form>
+  </div>
+
+  <div class="foot">
+    Your documents are sent securely to Zyntrix HR.<br>
+    Questions? <a href="mailto:hr@zyntrixsoftware.com">hr@zyntrixsoftware.com</a>
+  </div>
+</div>
+
+<script>
+  var DOCS = [
+    { key:"tenthMarksheet",     label:"10th / SSC Marksheet",                 req:true },
+    { key:"twelfthMarksheet",   label:"12th / HSC Marksheet",                 req:true },
+    { key:"graduationCert",     label:"Graduation Certificate & Marksheet",   req:true },
+    { key:"postGraduationCert", label:"Post Graduation Certificate",          req:false },
+    { key:"otherCertifications",label:"Other Certifications",                 req:false },
+    { key:"passportPhoto",      label:"Passport Size Photograph (colour)",    req:true },
+    { key:"governmentId",       label:"Government ID — PAN / Voter ID / DL",   req:true },
+    { key:"bankDetails",        label:"Bank Account Details (passbook / statement)", req:true },
+    { key:"acceptanceLetter",   label:"Signed Offer Acceptance Letter",       req:false }
+  ];
+
+  function getToken(){
+    var m = new URLSearchParams(window.location.search).get("token");
+    return m ? m.trim() : "";
+  }
+  var TOKEN = getToken();
+
+  function decodeEmail(t){
+    try { var p = JSON.parse(atob(t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))); return p.email || ""; }
+    catch(e){ return ""; }
+  }
+
+  if(!TOKEN){
+    document.getElementById("gate").style.display = "block";
+  } else {
+    document.getElementById("formCard").style.display = "block";
+    var em = decodeEmail(TOKEN);
+    if(em) document.getElementById("whoEmail").textContent = em;
+
+    var html = "";
+    DOCS.forEach(function(d){
+      html +=
+        '<div class="doc">' +
+          '<label>' + d.label + (d.req ? '<span class="req">*</span>' : '<span class="opt">(optional)</span>') + '</label>' +
+          '<div class="file" id="file-' + d.key + '">' +
+            '<div class="ic">📄</div>' +
+            '<div class="txt" id="txt-' + d.key + '">Click to choose a file</div>' +
+            '<input type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*" data-key="' + d.key + '" />' +
+          '</div>' +
+        '</div>';
+    });
+    document.getElementById("docs").innerHTML = html;
+
+    document.querySelectorAll('.file input[type="file"]').forEach(function(inp){
+      inp.addEventListener("change", function(){
+        var key = this.getAttribute("data-key");
+        var box = document.getElementById("file-" + key);
+        var txt = document.getElementById("txt-" + key);
+        if(this.files.length){ txt.textContent = "✓ " + this.files[0].name; box.classList.add("filled"); }
+        else { txt.textContent = "Click to choose a file"; box.classList.remove("filled"); }
+      });
+    });
+  }
+
+  function showMsg(type, text){
+    var m = document.getElementById("msg");
+    m.className = "msg show " + type;
+    m.innerHTML = text;
+  }
+
+  var form = document.getElementById("docForm");
+  if(form){
+    form.addEventListener("submit", async function(e){
+      e.preventDefault();
+      var btn = document.getElementById("submitBtn");
+      var inputs = document.querySelectorAll('.file input[type="file"]');
+      var fd = new FormData();
+      fd.append("token", TOKEN);
+      var have = 0, missingReq = [];
+      DOCS.forEach(function(d){
+        var inp = document.querySelector('.file input[data-key="' + d.key + '"]');
+        if(inp && inp.files[0]){ fd.append(d.key, inp.files[0]); have++; }
+        else if(d.req){ missingReq.push(d.label); }
+      });
+      if(missingReq.length){ showMsg("error", "Please upload these required documents:<br>• " + missingReq.join("<br>• ")); return; }
+      if(have === 0){ showMsg("error", "Please choose at least one document."); return; }
+
+      btn.disabled = true; btn.textContent = "Uploading…";
+      try{
+        var resp = await fetch("/api/hr/onboarding/upload", { method:"POST", body: fd });
+        var data = await resp.json();
+        if(resp.ok && data.ok){
+          document.getElementById("docForm").innerHTML =
+            '<div style="text-align:center;padding:24px 8px">' +
+              '<div style="font-size:46px;margin-bottom:12px">✅</div>' +
+              '<h2 style="margin-bottom:8px">Documents submitted!</h2>' +
+              '<p style="color:var(--muted);line-height:1.7">Thank you' + (data.candidateName ? ", <b style=\\"color:var(--text)\\">" + data.candidateName + "</b>" : "") + '. We received <b style="color:var(--text)">' + data.documentsStored + '</b> document(s). Our HR team will verify them and get back to you with the next steps.</p>' +
+            '</div>';
+        } else {
+          showMsg("error", (data && data.error) ? data.error : "Upload failed. Please try again.");
+          btn.disabled = false; btn.textContent = "Submit Documents";
+        }
+      } catch(err){
+        showMsg("error", "Could not reach the server. Please check your connection and try again.");
+        btn.disabled = false; btn.textContent = "Submit Documents";
+      }
+    });
+  }
+</script>
+</body>
+</html>
