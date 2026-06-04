@@ -569,7 +569,6 @@ function viewDetails(id) {
     ["Phone",       c.phone],
     ["Applied For", c.appliedFor],
     ["Department",  c.department],
-    ["Resume URL",  c.resumeUrl],
     ["Source",      c.importedFrom],
     ["Status",      c.status]
   ].filter(([_,v]) => v !== undefined && v !== null && v !== "");
@@ -590,11 +589,23 @@ function viewDetails(id) {
     </div>`;
   };
 
+  // Resume: build an authenticated, clickable link (API_BASE + login token).
+  const _resumeHref = c.resumeUrl
+    ? `${API_BASE}/hr/resume/${c._id}?token=${encodeURIComponent(localStorage.getItem("token") || "")}`
+    : "";
+  const resumeRow = c.resumeUrl
+    ? `<div style="display:grid;grid-template-columns:160px 1fr;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);">
+         <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Resume</div>
+         <div style="font-size:13px;"><a href="${_resumeHref}" target="_blank" rel="noopener" style="display:inline-block;background:var(--accent);color:#0d0f14;padding:6px 14px;border-radius:8px;font-weight:600;text-decoration:none;">\uD83D\uDCC4 View Resume (PDF)</a></div>
+       </div>`
+    : "";
+
   const html = `
     <div style="font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">
       Parsed fields
     </div>
     ${standardRows.map(([k,v]) => rowHtml(k, v)).join("")}
+    ${resumeRow}
 
     ${rawKeys.length ? `
       <div style="font-size:10.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:20px 0 6px;">
