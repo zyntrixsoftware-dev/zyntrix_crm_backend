@@ -499,9 +499,6 @@ exports.applyForJob = async (req, res) => {
       console.warn("[apply] resume save failed:", fileErr.message);
     }
 
-    // Sync new application to Google Sheet (fire-and-forget)
-    syncNewApplicationToSheet(d, candidate.email);
-
     // Send application-received email (fire-and-forget — never block the response)
     notifyApplicationReceived(candidate).catch(err =>
       console.warn("[apply] confirmation email failed:", err.message)
@@ -514,39 +511,6 @@ exports.applyForJob = async (req, res) => {
   }
 };
 
-// Sends the new-application row to the Google Sheet via GAS doPost (fire-and-forget)
-function syncNewApplicationToSheet(d, email) {
-  const gasUrl = process.env.GAS_WEBAPP_URL;
-  if (!gasUrl) return;
-
-  const payload = JSON.stringify({
-    timestamp      : d.timestamp      || new Date().toISOString(),
-    position       : d.position       || d.appliedFor || "",
-    fullName       : d.fullName       || d.name       || "",
-    email          : email,
-    phone          : d.phone          || "",
-    qualifications : d.qualifications || "",
-    experience     : d.experience     || "",
-    stateAddress   : d.stateAddress   || "",
-    edtech         : d.edtech         || "",
-    availability   : d.availability   || "",
-    source         : d.source         || "",
-    declaration    : d.declaration    || "",
-    resumeBase64   : d.resumeBase64   || undefined,
-    resumeName     : d.resumeName     || undefined,
-  });
-
-  fetch(gasUrl, {
-    method  : "POST",
-    headers : { "Content-Type": "application/json" },
-    body    : payload,
-    redirect: "follow",
-  })
-    .then(r => r.text().then(b =>
-      console.log("[GAS apply sync] HTTP", r.status, "|", b.slice(0, 80))
-    ))
-    .catch(err => console.warn("[GAS apply sync] failed:", err.message));
-}
 
 exports.importFromLink = async (req, res) => {
   try {

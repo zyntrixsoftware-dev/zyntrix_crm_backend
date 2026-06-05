@@ -809,9 +809,8 @@ exports.sendOffer = async (req, res) => {
 
     const filename = `Zyntrix_Offer_Letter_${safeFilename(offer.candidateName)}.pdf`;
 
-    // Send the offer letter through the Google Apps Script web app (Gmail),
-    // which records OFFERED=TRUE in the Sheet and emails the PDF. SMTP is
-    // intentionally NOT used for offer letters.
+    // Send the offer letter with the PDF attached via the backend SMTP mailbox
+    // (hr@zyntrixsoftware.com). No Google Apps Script is involved.
     const result = await notifyOfferLetter({
       email         : offer.candidateEmail,
       fullName      : offer.candidateName,
@@ -822,8 +821,8 @@ exports.sendOffer = async (req, res) => {
 
     if (!result.sent) {
       return res.status(502).json({
-        msg: "Offer letter could not be sent — the Apps Script email service is unavailable " +
-             "(check GAS_WEBAPP_URL). SMTP is disabled for offer letters."
+        msg: "Offer letter could not be sent. The email service (hr@zyntrixsoftware.com) " +
+             "is unavailable - check the EMAIL_* settings and try again. Reason: " + (result.reason || "unknown")
       });
     }
 
@@ -835,7 +834,7 @@ exports.sendOffer = async (req, res) => {
     // Auto-create the onboarding record (fire-and-forget)
     _bootstrapOnboarding(offer, req.user.id);
 
-    return res.json({ msg: `Offer letter sent to ${offer.candidateEmail} via Apps Script`, offer });
+    return res.json({ msg: `Offer letter sent to ${offer.candidateEmail}`, offer });
   } catch (err) {
     console.error("SEND OFFER ERROR:", err);
     return res.status(500).json({ msg: "Failed to send offer: " + err.message });
@@ -1002,7 +1001,7 @@ exports.bulkSendOffers = async (req, res) => {
         );
         const filename = `Zyntrix_Offer_Letter_${safeFilename(offer.candidateName)}.pdf`;
 
-        // Send via the Google Apps Script web app (Gmail) — no SMTP.
+        // Send the offer letter via the backend SMTP mailbox (hr@).
         const result = await notifyOfferLetter({
           email         : offer.candidateEmail,
           fullName      : offer.candidateName,
@@ -1011,7 +1010,7 @@ exports.bulkSendOffers = async (req, res) => {
           offerPdfName  : filename
         });
         if (!result.sent) {
-          failed.push({ interviewId: id, reason: "Apps Script email service unavailable (GAS_WEBAPP_URL)" });
+          failed.push({ interviewId: id, reason: "Email service unavailable (check EMAIL_* settings)" });
           continue;
         }
 
