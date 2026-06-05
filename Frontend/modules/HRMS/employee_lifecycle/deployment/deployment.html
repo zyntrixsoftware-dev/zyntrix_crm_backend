@@ -397,6 +397,10 @@ textarea{resize:vertical;min-height:60px}
         <input id="dm-email" type="email" placeholder="firstname.l@company.com">
       </div>
       <div class="fg">
+        <label>CRM Login Password</label>
+        <input id="dm-password" type="text" placeholder="set a password for https://zyntrixsoftware.com/crm/ login">
+      </div>
+      <div class="fg">
         <label>System Access</label>
         <div class="chk-group" id="access-group">
           <label class="chk-item" onclick="toggleAccess(this)"><input type="checkbox" value="Slack"> Slack</label>
@@ -840,6 +844,7 @@ function openDeployModal(orientation) {
   document.getElementById("dm-office").value  = "";
   document.getElementById("dm-shift").value   = "morning";
   document.getElementById("dm-email").value   = "";
+  document.getElementById("dm-password").value = "";
   document.getElementById("dm-device").value  = "Pending";
   document.getElementById("dm-notes").value   = "";
   // Reset access checkboxes
@@ -885,6 +890,7 @@ async function saveDeploy() {
     officeLocation:   document.getElementById("dm-office").value.trim(),
     shift:            document.getElementById("dm-shift").value,
     domainEmail:      document.getElementById("dm-email").value.trim(),
+    loginPassword:    document.getElementById("dm-password").value.trim(),
     systemAccess,
     deviceIssued:     document.getElementById("dm-device").value.trim(),
     notes:            document.getElementById("dm-notes").value.trim(),

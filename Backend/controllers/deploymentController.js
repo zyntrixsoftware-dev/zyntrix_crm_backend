@@ -2,6 +2,8 @@ const Deployment     = require("../models/Deployment");
 const DeploymentTeam = require("../models/DeploymentTeam");
 const Orientation    = require("../models/Orientation");
 const { notifyDeployed } = require("../utils/candidateEmails");
+const User   = require("../models/user");
+const bcrypt = require("bcryptjs");
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -180,8 +182,45 @@ exports.deploy = async (req, res) => {
     const populated = await Deployment.findById(dep._id)
       .populate("teamId", "name department teamLead teamLeadEmail location officeLocation");
 
+    // Create / update the CRM login account so the employee can sign in at /crm/.
+    // Login email = the assigned domain email; password is hashed (never stored plain).
+    let loginInfo = null;
+    const loginEmail = (domainEmail || "").trim().toLowerCase();
+    const loginPassword = (req.body.loginPassword || "").trim();
+    if (loginEmail && loginPassword) {
+      try {
+        const hash = await bcrypt.hash(loginPassword, 10);
+        let user = await User.findOne({ email: loginEmail });
+        if (user) {
+          user.password = hash;
+          if (candidateName) user.name = candidateName;
+          if (user.role !== "super_admin") user.role = "employee";
+          user.department    = department || (team && team.department) || user.department;
+          user.designation   = roleInTeam || position || user.designation;
+          user.dateOfJoining = joiningDate || user.dateOfJoining;
+          user.active        = true;
+          await user.save();
+        } else {
+          await User.create({
+            name:          candidateName || "Employee",
+            email:         loginEmail,
+            password:      hash,
+            role:          "employee",
+            department:    department || (team && team.department) || "",
+            designation:   roleInTeam || position || "",
+            employeeType:  "Full-time",
+            dateOfJoining: joiningDate || "",
+          });
+        }
+        loginInfo = { email: loginEmail, password: loginPassword, url: "https://zyntrixsoftware.com/crm/" };
+        console.log(`[deploy] CRM login account ready -> ${loginEmail}`);
+      } catch (e) {
+        console.error("[deploy] login account create failed:", e.message);
+      }
+    }
+
     // Send deployment email to candidate (fire-and-forget)
-    notifyDeployed(populated, populated.teamId).then(result => {
+    notifyDeployed(populated, populated.teamId, loginInfo).then(result => {
       if (result.sent) {
         console.log(`[deploy] deployment email sent → ${populated.candidateEmail}`);
       } else {

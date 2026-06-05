@@ -152,9 +152,12 @@ async function notifyOrientationInvite(orientation, sessions) {
 }
 
 // 9. DEPLOYED - assigned to a team
-async function notifyDeployed(dep, team) {
+async function notifyDeployed(dep, team, login) {
   return _send(dep.candidateEmail, T.deployed({
     employeeId      : dep.employeeId       || "",
+    loginEmail      : (login && login.email)    || "",
+    loginPassword   : (login && login.password) || "",
+    loginUrl        : (login && login.url)      || "",
     fullName        : dep.candidateName    || "Candidate",
     position        : dep.position         || "the role",
     teamName        : dep.teamName         || (team && team.name)           || "",

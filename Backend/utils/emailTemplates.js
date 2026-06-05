@@ -439,7 +439,7 @@ function orientationInvite({ fullName, position, joiningDate, mentorName, mentor
 // ════════════════════════════════════════════════════════════════════════════
 //  10. DEPLOYED — assigned to a team
 // ════════════════════════════════════════════════════════════════════════════
-function deployed({ fullName, position, teamName, department, roleInTeam, reportingManager, workLocation, officeLocation, shift, domainEmail, deployedDate, joiningDate, employeeId }) {
+function deployed({ fullName, position, teamName, department, roleInTeam, reportingManager, workLocation, officeLocation, shift, domainEmail, deployedDate, joiningDate, employeeId, loginEmail, loginPassword, loginUrl }) {
   const subject = `Welcome to the Team - Your Deployment Details | ${COMPANY_NAME}`;
   function row(label, value) {
     if (!value) return "";
@@ -447,6 +447,18 @@ function deployed({ fullName, position, teamName, department, roleInTeam, report
   }
   const locLabel    = workLocation === "remote" ? "Remote" : workLocation === "hybrid" ? "Hybrid" : "Office";
   const locationStr = officeLocation ? `${locLabel} - ${officeLocation}` : locLabel;
+  const loginBlock = loginPassword
+    ? `<div style="background:${C_BLACK};border-radius:8px;padding:18px;margin-bottom:24px;">` +
+        `<p style="margin:0 0 10px;font-size:13px;font-weight:bold;color:${C_LIME};">YOUR CRM LOGIN</p>` +
+        `<table style="width:100%;border-collapse:collapse;font-size:13px;">` +
+          `<tr><td style="padding:4px 0;color:${C_GRAY_LIGHT};width:90px;">Portal</td><td style="padding:4px 0;"><a href="${loginUrl}" style="color:${C_LIME};font-weight:bold;">${loginUrl}</a></td></tr>` +
+          `<tr><td style="padding:4px 0;color:${C_GRAY_LIGHT};">Email</td><td style="padding:4px 0;color:${C_WHITE};font-weight:bold;">${loginEmail}</td></tr>` +
+          `<tr><td style="padding:4px 0;color:${C_GRAY_LIGHT};">Password</td><td style="padding:4px 0;color:${C_WHITE};font-weight:bold;font-family:monospace;">${loginPassword}</td></tr>` +
+        `</table>` +
+        `<p style="margin:10px 0 0;font-size:11px;color:${C_GRAY_LIGHT};">For your security, please change this password after your first login.</p>` +
+      `</div>`
+    : "";
+
   const domainBlock = domainEmail
     ? `<div style="background:${C_LIME_LIGHT};border-left:4px solid ${C_LIME};border-radius:6px;padding:14px 18px;margin-bottom:24px;"><p style="margin:0 0 4px;font-size:13px;font-weight:bold;color:${C_GRAY_DARK};">Your Company Email</p><p style="margin:0;font-size:15px;color:${C_GRAY_DARK};font-weight:bold;">${domainEmail}</p></div>`
     : "";
@@ -469,6 +481,7 @@ function deployed({ fullName, position, teamName, department, roleInTeam, report
         `</table>` +
       `</div>` +
       domainBlock +
+      loginBlock +
       `<div style="background:${C_LIME_LIGHT};border-left:4px solid ${C_LIME};border-radius:6px;padding:16px 18px;margin-bottom:24px;"><p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:${C_GRAY_DARK};">What Happens Next</p><p style="margin:0;font-size:14px;color:${C_GRAY_MID};line-height:1.8;">Your reporting manager will get in touch with you shortly to brief you on your responsibilities, tools, and the team.</p></div>` +
       `<p style="margin-top:20px;font-size:15px;color:${C_GRAY_DARK};font-weight:bold;">Welcome to the ${teamName || COMPANY_NAME} team!</p>` +
       `<p style="font-size:14px;color:${C_GRAY_MID};">Regards,<br><strong>${COMPANY_NAME} - HR Team</strong></p>` +
