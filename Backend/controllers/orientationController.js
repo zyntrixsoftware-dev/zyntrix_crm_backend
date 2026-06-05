@@ -51,13 +51,13 @@ exports.list = async (req, res) => {
       const [onboardedList, allExisting] = await Promise.all([
         Onboarding.find({ onboardingStatus: "onboarded" })
           .select("_id candidateEmail candidateName position department joiningDate"),
-        Orientation.find({}).select("candidateEmail")
+        Orientation.find({}).select("onboardingId")
       ]);
 
-      const existingEmails = new Set(allExisting.map(r => r.candidateEmail.toLowerCase()));
-      const missing = onboardedList.filter(ob =>
-        ob.candidateEmail && !existingEmails.has(ob.candidateEmail.toLowerCase())
+      const existingObIds = new Set(
+        allExisting.filter(r => r.onboardingId).map(r => String(r.onboardingId))
       );
+      const missing = onboardedList.filter(ob => !existingObIds.has(String(ob._id)));
 
       if (missing.length) {
         const mandatory = await OrientationSession.find({ isMandatory: true, status: "upcoming" }).select("_id");
@@ -480,12 +480,9 @@ exports.deleteSession = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 exports.autoCreate = async (onboarding, userId) => {
   try {
-    const exists = await Orientation.findOne({
-      $or: [
-        { candidateEmail: onboarding.candidateEmail },
-        { onboardingId:   onboarding._id }
-      ]
-    });
+    // Dedupe by the onboarding record (NOT email) — two candidates can share an
+    // email, but each onboarding record must get its own orientation.
+    const exists = await Orientation.findOne({ onboardingId: onboarding._id });
     if (exists) return exists;
 
     const or = await Orientation.create({

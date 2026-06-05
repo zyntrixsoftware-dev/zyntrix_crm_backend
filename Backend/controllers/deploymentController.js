@@ -26,14 +26,15 @@ exports.listReady = async (req, res) => {
       .select("_id candidateEmail candidateName position department joiningDate mentorName orientationStatus completedAt")
       .sort({ completedAt: -1 });
 
-    // Emails already deployed (any status except pending means they're handled)
-    const deployedEmails = await Deployment.find({
+    // Orientation records already deployed (dedupe by record, not email —
+    // two candidates can share an email but each orientation deploys once).
+    const deployedOrIds = await Deployment.find({
       status: { $in: ["deployed", "on_hold", "transferred"] }
-    }).distinct("candidateEmail");
+    }).distinct("orientationId");
 
-    const deployedSet = new Set(deployedEmails.map(e => e.toLowerCase()));
+    const deployedSet = new Set(deployedOrIds.filter(Boolean).map(id => String(id)));
 
-    const ready = completed.filter(o => !deployedSet.has(o.candidateEmail.toLowerCase()));
+    const ready = completed.filter(o => !deployedSet.has(String(o._id)));
 
     return res.json({ ready, total: ready.length });
   } catch (err) {
@@ -84,11 +85,8 @@ exports.list = async (req, res) => {
 
     // Ready to deploy count
     const completedOrientations = await Orientation.countDocuments({ orientationStatus: "completed" });
-    const deployedEmails = new Set(
-      (await Deployment.find({ status: { $in: ["deployed", "on_hold", "transferred"] } }).distinct("candidateEmail"))
-        .map(e => e.toLowerCase())
-    );
-    stats.readyToDeploy = completedOrientations - deployedEmails.size;
+    const deployedOrCount = (await Deployment.find({ status: { $in: ["deployed", "on_hold", "transferred"] } }).distinct("orientationId")).filter(Boolean).length;
+    stats.readyToDeploy = Math.max(0, completedOrientations - deployedOrCount);
 
     return res.json({ deployments, total: deployments.length, stats });
   } catch (err) {
@@ -140,12 +138,12 @@ exports.deploy = async (req, res) => {
     const team = await DeploymentTeam.findById(teamId);
     if (!team) return res.status(404).json({ msg: "Team not found" });
 
-    // Check if already deployed (active record)
-    const existing = await Deployment.findOne({
-      candidateEmail: candidateEmail.toLowerCase().trim(),
-      status: { $in: ["deployed", "on_hold"] }
-    });
-    if (existing) return res.status(409).json({ msg: "Candidate is already deployed or on hold" });
+    // Already deployed? Check by the orientation record (not email), so two
+    // candidates sharing an email don't block each other.
+    const existing = orientationId
+      ? await Deployment.findOne({ orientationId, status: { $in: ["deployed", "on_hold"] } })
+      : null;
+    if (existing) return res.status(409).json({ msg: "This candidate is already deployed or on hold" });
 
     const dep = await Deployment.create({
       orientationId: orientationId || null,
