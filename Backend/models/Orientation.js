@@ -51,6 +51,7 @@ const orientationSchema = new mongoose.Schema(
     },
     inviteSentAt: { type: Date, default: null },
     completedAt:  { type: Date, default: null },
+    completedEmailSentAt: { type: Date, default: null },
 
     // ── New-joinee task checklist ──────────────────────────────────────────
     // Standard edtech company orientation checklist. HR ticks items off as the

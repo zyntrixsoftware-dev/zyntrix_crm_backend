@@ -292,6 +292,7 @@ textarea{resize:vertical;min-height:60px}
             <thead>
               <tr>
                 <th>Employee</th>
+                <th>Emp ID</th>
                 <th>Position</th>
                 <th>Team</th>
                 <th>Role in Team</th>
@@ -806,6 +807,7 @@ function renderDeployed(list) {
           </div>
         </div>
       </td>
+      <td style="font-size:12px;font-family:var(--mono);color:var(--teal);font-weight:600;">${esc(d.employeeId||"—")}</td>
       <td style="font-size:12px;">${esc(d.position||"—")}</td>
       <td><span style="background:var(--navy4);padding:3px 8px;border-radius:5px;font-size:12px;">${esc(teamName)}</span></td>
       <td style="font-size:12px;">${esc(d.roleInTeam||"—")}</td>

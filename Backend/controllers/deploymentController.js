@@ -128,7 +128,7 @@ exports.deploy = async (req, res) => {
       orientationId, candidateEmail, candidateName, position, department,
       joiningDate, teamId, roleInTeam, reportingManager,
       workLocation, officeLocation, shift, deployedDate,
-      domainEmail, systemAccess, deviceIssued, notes
+      domainEmail, systemAccess, deviceIssued, notes, employeeId
     } = req.body;
 
     if (!candidateEmail) return res.status(400).json({ msg: "candidateEmail is required" });
@@ -145,10 +145,19 @@ exports.deploy = async (req, res) => {
       : null;
     if (existing) return res.status(409).json({ msg: "This candidate is already deployed or on hold" });
 
+    // Assign an employee ID — use the one provided, else auto-generate the next ZYN####.
+    let empId = (employeeId || "").trim();
+    if (!empId) {
+      const existingIds = await Deployment.find({ employeeId: { $regex: /^ZYN\d+$/ } }).select("employeeId");
+      const maxNum = existingIds.reduce((m, d) => Math.max(m, parseInt(d.employeeId.slice(3)) || 0), 1000);
+      empId = "ZYN" + (maxNum + 1);
+    }
+
     const dep = await Deployment.create({
       orientationId: orientationId || null,
       candidateEmail: candidateEmail.toLowerCase().trim(),
       candidateName:  candidateName  || "",
+      employeeId:     empId,
       position:       position       || "",
       department:     department     || team.department || "",
       joiningDate:    joiningDate    || "",

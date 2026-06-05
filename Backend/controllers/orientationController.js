@@ -2,7 +2,16 @@ const Orientation        = require("../models/Orientation");
 const OrientationSession = require("../models/OrientationSession");
 const Onboarding         = require("../models/Onboarding");
 const User               = require("../models/user");
-const { notifyOrientationInvite } = require("../utils/candidateEmails");
+const { notifyOrientationInvite, notifyOrientationCompleted } = require("../utils/candidateEmails");
+
+async function _sendOrientationCompleteEmail(or) {
+  try {
+    if (!or || or.orientationStatus !== "completed" || or.completedEmailSentAt) return;
+    const r = await notifyOrientationCompleted(or);
+    if (r && r.sent) { or.completedEmailSentAt = new Date(); await or.save(); }
+    else console.warn("[orientation] complete email not sent:", r && r.reason);
+  } catch (e) { console.error("[orientation] complete email error:", e.message); }
+}
 
 function checkHrAccess(req, res) {
   if (!["hr", "super_admin"].includes(req.user.role)) {
@@ -219,6 +228,8 @@ exports.update = async (req, res) => {
     }
 
     await or.save();
+    _sendOrientationCompleteEmail(or);   // fire-and-forget; guarded once-only
+
     const populated = await Orientation.findById(or._id)
       .populate("mentorId", "name email designation")
       .populate("sessionIds", "title scheduledDate startTime endTime mode venue facilitator isMandatory status");
@@ -333,6 +344,7 @@ exports.updateChecklist = async (req, res) => {
     }
 
     await or.save();
+    _sendOrientationCompleteEmail(or);   // fire-and-forget; guarded once-only
     return res.json({ msg: "Checklist updated", orientation: or });
   } catch (err) {
     console.error("UPDATE CHECKLIST ERROR:", err);

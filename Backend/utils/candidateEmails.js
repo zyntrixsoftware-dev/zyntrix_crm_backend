@@ -154,6 +154,7 @@ async function notifyOrientationInvite(orientation, sessions) {
 // 9. DEPLOYED - assigned to a team
 async function notifyDeployed(dep, team) {
   return _send(dep.candidateEmail, T.deployed({
+    employeeId      : dep.employeeId       || "",
     fullName        : dep.candidateName    || "Candidate",
     position        : dep.position         || "the role",
     teamName        : dep.teamName         || (team && team.name)           || "",
@@ -169,6 +170,14 @@ async function notifyDeployed(dep, team) {
   }));
 }
 
+// Orientation completed - candidate will be deployed to a team soon
+async function notifyOrientationCompleted(orientation) {
+  return _send(orientation.candidateEmail, T.orientationCompleted({
+    fullName: orientation.candidateName || "Candidate",
+    position: orientation.position      || "the role",
+  }));
+}
+
 module.exports = {
   notifyApplicationReceived,
   notifyShortlisted,
@@ -179,5 +188,6 @@ module.exports = {
   notifyRejected,
   notifyOnboarded,
   notifyOrientationInvite,
+  notifyOrientationCompleted,
   notifyDeployed,
 };

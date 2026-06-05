@@ -18,6 +18,7 @@ const deploymentSchema = new mongoose.Schema(
     // ── Candidate identity (denormalised for quick reads) ──────────────────
     candidateEmail: { type: String, required: true, lowercase: true, trim: true },
     candidateName:  { type: String, default: "" },
+    employeeId:     { type: String, default: "" },   // assigned at deployment
     position:       { type: String, default: "" },   // original position applied for
     department:     { type: String, default: "" },
     joiningDate:    { type: String, default: "" },   // YYYY-MM-DD

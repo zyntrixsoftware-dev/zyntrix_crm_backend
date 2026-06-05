@@ -46,6 +46,7 @@ function _footer() {
   return (
     `<div style="background:${C_BLACK};padding:24px 32px;text-align:center;">` +
       `<p style="color:${C_LIME};font-size:14px;font-weight:bold;margin:0 0 4px;">${COMPANY_NAME}</p>` +
+      `<p style="color:${C_GRAY_LIGHT};font-size:11px;margin:0 0 4px;">GST No: 37AACCZ9867D1ZR</p>` +
       `<a href="${WEBSITE_URL}" style="color:${C_GRAY_LIGHT};font-size:12px;text-decoration:none;">${WEBSITE_URL}</a>` +
       `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:14px auto 10px;border-collapse:collapse;"><tr>` +
         `<td style="padding:0 5px;"><a href="${LINKEDIN_URL}" style="text-decoration:none;"><span style="display:inline-block;background:#0A66C2;color:#fff;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:bold;">LinkedIn</span></a></td>` +
@@ -438,7 +439,7 @@ function orientationInvite({ fullName, position, joiningDate, mentorName, mentor
 // ════════════════════════════════════════════════════════════════════════════
 //  10. DEPLOYED — assigned to a team
 // ════════════════════════════════════════════════════════════════════════════
-function deployed({ fullName, position, teamName, department, roleInTeam, reportingManager, workLocation, officeLocation, shift, domainEmail, deployedDate, joiningDate }) {
+function deployed({ fullName, position, teamName, department, roleInTeam, reportingManager, workLocation, officeLocation, shift, domainEmail, deployedDate, joiningDate, employeeId }) {
   const subject = `Welcome to the Team - Your Deployment Details | ${COMPANY_NAME}`;
   function row(label, value) {
     if (!value) return "";
@@ -462,7 +463,7 @@ function deployed({ fullName, position, teamName, department, roleInTeam, report
       `<div style="background:#F9F9F9;border:1px solid ${C_GRAY_BORDER};border-radius:8px;padding:20px;margin-bottom:24px;">` +
         `<p style="margin:0 0 14px;font-weight:bold;font-size:14px;color:${C_GRAY_DARK};">Deployment Details</p>` +
         `<table style="width:100%;border-collapse:collapse;">` +
-          row("Team", teamName) + row("Department", department) + row("Role", roleInTeam) +
+          row("Employee ID", employeeId) + row("Team", teamName) + row("Department", department) + row("Role", roleInTeam) +
           row("Position", position) + row("Reporting Manager", reportingManager) +
           row("Work Location", locationStr) + row("Shift", shift) + row("Deployed On", deployedDate) +
         `</table>` +
@@ -471,6 +472,23 @@ function deployed({ fullName, position, teamName, department, roleInTeam, report
       `<div style="background:${C_LIME_LIGHT};border-left:4px solid ${C_LIME};border-radius:6px;padding:16px 18px;margin-bottom:24px;"><p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:${C_GRAY_DARK};">What Happens Next</p><p style="margin:0;font-size:14px;color:${C_GRAY_MID};line-height:1.8;">Your reporting manager will get in touch with you shortly to brief you on your responsibilities, tools, and the team.</p></div>` +
       `<p style="margin-top:20px;font-size:15px;color:${C_GRAY_DARK};font-weight:bold;">Welcome to the ${teamName || COMPANY_NAME} team!</p>` +
       `<p style="font-size:14px;color:${C_GRAY_MID};">Regards,<br><strong>${COMPANY_NAME} - HR Team</strong></p>` +
+    `</div>` +
+    _footer()
+  );
+  return { subject, html };
+}
+
+function orientationCompleted({ fullName, position }) {
+  const subject = `Orientation Complete - Team Deployment Coming Soon | ${COMPANY_NAME}`;
+  const html = _wrap(
+    _header("Onboarding & Orientation Team") +
+    `<div style="background:${C_LIME};padding:14px 32px;text-align:center;"><span style="color:${C_BLACK};font-size:14px;font-weight:bold;letter-spacing:0.5px;">ORIENTATION COMPLETE!</span></div>` +
+    `<div style="padding:32px;background:${C_WHITE};">` +
+      `<p style="font-size:18px;color:${C_GRAY_DARK};margin:0 0 10px;">Dear <strong>${fullName}</strong>,</p>` +
+      `<p style="font-size:15px;color:${C_GRAY_MID};line-height:1.8;margin:0 0 20px;">Congratulations on successfully completing your orientation for the <strong>${position}</strong> role at <strong>${COMPANY_NAME}</strong>. You have finished all the required sessions and onboarding steps.</p>` +
+      `<div style="background:${C_LIME_LIGHT};border-left:4px solid ${C_LIME};border-radius:6px;padding:18px;margin-bottom:24px;"><p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:${C_GRAY_DARK};">What Happens Next</p><p style="margin:0;font-size:14px;color:${C_GRAY_MID};line-height:1.8;">Our HR team will <strong>assign you to a team shortly</strong> and share your deployment details - including your reporting manager, employee ID and work setup. Please keep an eye on your inbox.</p></div>` +
+      `<p style="margin-top:20px;font-size:15px;color:${C_GRAY_DARK};font-weight:bold;">Welcome aboard - we are excited to have you on the team!</p>` +
+      `<p style="font-size:14px;color:${C_GRAY_MID};">Regards,<br><strong>${COMPANY_NAME} - HR and Onboarding Team</strong></p>` +
     `</div>` +
     _footer()
   );
@@ -487,5 +505,6 @@ module.exports = {
   rejected,
   onboarded,
   orientationInvite,
+  orientationCompleted,
   deployed,
 };
