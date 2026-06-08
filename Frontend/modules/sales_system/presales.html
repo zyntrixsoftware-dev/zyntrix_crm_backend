@@ -172,7 +172,7 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
         </div>
         <div class="card"><h3>Saved Quotes <span class="chip" id="sq-count"></span></h3>
           <div id="saved-quotes"></div>
-          <p class="muted" style="margin-top:10px">Saved locally in this browser. Connect a backend later to share across the team.</p>
+          <p class="muted" style="margin-top:10px">Saved to the server — shared across the Pre-Sales team.</p>
         </div>
       </div>
     </div>
@@ -182,7 +182,7 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
 
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){ location.href = location.origin + "/crm/index.html"; }
+(function(){var t=localStorage.getItem("token");var u;try{u=JSON.parse(localStorage.getItem("user"))}catch(e){}if(!t||!u){location.href=location.origin+"/crm/index.html";return;}if(['super_admin','sales','presales'].indexOf(u.role)<0){alert("You do not have access to this panel.");location.href=location.origin+"/crm/index.html";}})();
 var LEADS=[], STATS={}, DEMOS=[], FOLLOWUPS=[], COURSES=[];
 var PRESALE_STAGES=[["new_lead","New Lead","var(--blue)"],["contacted","Contacted","var(--teal)"],["demo_scheduled","Demo Scheduled","var(--amber)"],["demo_attended","Demo Attended","var(--purple)"],["enrolled","Enrolled (Won)","var(--green)"]];
 var STAGE_LABELS={new_lead:"New Lead",contacted:"Contacted",demo_scheduled:"Demo Scheduled",demo_attended:"Demo Attended",enrolled:"Enrolled",dropped:"Dropped",completed:"Completed"};
@@ -328,19 +328,19 @@ function genQuote(){
     '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-prim btn-sm" onclick="saveQuote(\''+c._id+'\','+Math.round(total)+')">Save</button>'+
     '<button class="btn btn-ghost btn-sm" onclick="window.print()">Print</button></div></div>';
 }
-function getQuotes(){try{return JSON.parse(localStorage.getItem("zx_quotes")||"[]");}catch(e){return [];}}
-function saveQuote(cid,total){
+async function saveQuote(cid,total){
   var c=COURSES.find(function(x){return x._id===cid;});
-  var q=getQuotes(); q.unshift({name:$("q-name").value.trim()||"Prospect",course:c?c.title:"",total:total,date:new Date().toISOString()});
-  localStorage.setItem("zx_quotes",JSON.stringify(q.slice(0,50))); renderSavedQuotes();
+  var body={prospectName:$("q-name").value.trim()||"Prospect",course:cid,courseTitle:c?c.title:"",basePrice:coursePrice(c),discountPct:Number($("q-disc").value)||0,gstPct:Number($("q-gst").value)||0,total:total};
+  var r=await apiRequest("/sales/quotes","POST",body);
+  if(r&&!r.error){renderSavedQuotes();}else alert((r&&r.msg)||"Could not save quote");
 }
-function delQuote(i){var q=getQuotes();q.splice(i,1);localStorage.setItem("zx_quotes",JSON.stringify(q));renderSavedQuotes();}
-function renderSavedQuotes(){
-  var q=getQuotes(); $("sq-count").textContent=q.length;
-  $("saved-quotes").innerHTML = q.length? q.map(function(x,i){
-    return '<div class="list-item"><div style="flex:1"><div class="nm">'+esc(x.name)+'</div><div class="sub">'+esc(x.course)+' · '+new Date(x.date).toLocaleDateString("en-IN")+'</div></div>'+
+async function delQuote(id){var r=await apiRequest("/sales/quotes/"+id,"DELETE");if(r&&!r.error)renderSavedQuotes();}
+async function renderSavedQuotes(){
+  var d=await apiRequest("/sales/quotes"); var q=(d&&d.quotes)||[]; $("sq-count").textContent=q.length;
+  $("saved-quotes").innerHTML = q.length? q.map(function(x){
+    return '<div class="list-item"><div style="flex:1"><div class="nm">'+esc(x.prospectName)+'</div><div class="sub">'+esc(x.courseTitle||"")+' · '+new Date(x.createdAt).toLocaleDateString("en-IN")+'</div></div>'+
       '<div class="nm" style="color:var(--accent)">'+inr(x.total)+'</div>'+
-      '<button class="btn btn-ghost btn-sm" onclick="delQuote('+i+')" style="margin-left:8px">✕</button></div>';
+      '<button class="btn btn-ghost btn-sm" onclick="delQuote(\''+x._id+'\')" style="margin-left:8px">✕</button></div>';
   }).join("") : '<p class="empty">No saved quotes yet.</p>';
 }
 

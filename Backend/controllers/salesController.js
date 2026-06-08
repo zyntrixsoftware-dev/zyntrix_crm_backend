@@ -4,6 +4,7 @@ const Course      = require("../models/Course");
 const Batch       = require("../models/Batch");
 const DemoSession = require("../models/DemoSession");
 const Enrollment  = require("../models/Enrollment");
+const { ensureStudent, emailStudentCreds } = require("../utils/provisionStudent");
 const Payment     = require("../models/Payment");
 const FollowUp    = require("../models/FollowUp");
 const SalesTarget = require("../models/SalesTarget");
@@ -710,6 +711,11 @@ exports.createEnrollment = async (req, res) => {
       const course = await Course.findById(req.body.course);
       emails().notifyEnrollmentConfirmation(enrollment, lead, course, batch)
         .catch(e => console.warn(e.message));
+
+      // Data-flow link: an enrolled student automatically gets an LMS login
+      ensureStudent(lead.email, lead.fullName).then(r => {
+        if (r && r.created && r.tempPassword) emailStudentCreds(r.email, r.name, r.tempPassword);
+      }).catch(e => console.warn("auto-provision:", e.message));
     }
 
     CommLog.create({

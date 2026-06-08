@@ -2,12 +2,16 @@
 // Payroll is NOT a role-based module — it is restricted to two dedicated login
 // accounts (see PAYROLL_EMAILS + requirePayrollAccess below).
 const ROLE_MODULES = {
-  super_admin: ["admin", "hr", "sales", "marketing", "lms", "attendance"],
+  super_admin: ["admin", "hr", "sales", "presales", "postsales", "marketing", "lms", "attendance"],
   hr:          ["hr"],
-  sales:       ["sales"],
+  sales:       ["sales", "presales", "postsales"],
+  presales:    ["presales"],
+  postsales:   ["postsales"],
   payroll:     ["payroll"],
   marketing:   ["marketing"],
   lms:         ["lms"],
+  instructor:  ["lms"],
+  student:     ["lms"],
   employee:    ["attendance"],
   leadgen:     ["leadgen"]
 };
@@ -99,6 +103,16 @@ function redirectByRole(role) {
       break;
     case "lms":
       window.location.href = base + "/crm/modules/lms.html";
+      break;
+    case "instructor":
+    case "student":
+      window.location.href = base + "/crm/modules/lms.html";
+      break;
+    case "presales":
+      window.location.href = base + "/crm/modules/sales_system/presales.html";
+      break;
+    case "postsales":
+      window.location.href = base + "/crm/modules/sales_system/postsales.html";
       break;
     case "leadgen":
       window.location.href = base + "/crm/modules/leadgen/index.html";

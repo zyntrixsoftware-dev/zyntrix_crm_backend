@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>User Management — Zyntrix CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--accent:#00e5b0;--blue:#3d8ef0;--rose:#ff4d6d;--green:#22c55e;--amber:#f5a623;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif}
+body{background:radial-gradient(circle at 20% 0%,#13233f,#080e18 60%);color:var(--text);font-family:var(--font);min-height:100vh;padding:24px}
+.wrap{max-width:1100px;margin:0 auto}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;color:var(--bg)}
+h1{font-family:var(--display);font-size:20px;flex:1}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:8px;border:0;cursor:pointer;font-family:var(--font);font-size:12.5px;font-weight:600;text-decoration:none}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-rose{background:rgba(255,77,109,.12);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-sm{padding:5px 10px;font-size:11.5px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px}
+.card h3{font-family:var(--display);font-size:15px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:0 0 5px}
+.input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 11px;outline:none}
+.input:focus{border-color:var(--accent)}
+.toolbar{display:flex;gap:10px;margin-bottom:12px}
+table{width:100%;border-collapse:collapse}th{padding:9px 12px;text-align:left;font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text2);vertical-align:middle}
+.sel{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;padding:5px 8px;font-family:var(--font)}
+.nm{font-weight:600;color:var(--text)}.muted{color:var(--text3);font-size:11px}
+.badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:13px;display:none;z-index:60;max-width:340px}.toast.on{display:block}
+.empty{text-align:center;color:var(--text3);padding:30px}
+</style></head><body>
+<div class="wrap">
+<div class="top"><div class="logo">Z</div><h1>User Management</h1>
+<a class="btn btn-ghost btn-sm" href="admin.html">← Admin</a>
+<button class="btn btn-rose btn-sm" onclick="logout()">⏻ Logout</button></div>
+
+<div class="card"><h3>Create / update a login</h3>
+<div class="grid">
+<div><label class="fl">Name</label><input class="input" id="u-name" placeholder="Full name"></div>
+<div><label class="fl">Email</label><input class="input" id="u-email" placeholder="user@zyntrixsoftware.com"></div>
+<div><label class="fl">Role</label><select class="input" id="u-role"></select></div>
+<div><label class="fl">Password (blank = auto)</label><input class="input" id="u-pass" placeholder="optional"></div>
+</div>
+<div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+<label style="font-size:12px;color:var(--text2)"><input type="checkbox" id="u-mail" checked> Email the credentials</label>
+<button class="btn btn-prim btn-sm" style="margin-left:auto" onclick="createUser()">Create / Update</button></div>
+<div id="c-res" class="muted" style="margin-top:8px"></div></div>
+
+<div class="card"><h3>All users</h3>
+<div class="toolbar"><input class="input" id="search" placeholder="Search name / email…" oninput="deb()" style="max-width:280px"><select class="input sel" id="frole" onchange="load()" style="max-width:180px"><option value="">All roles</option></select></div>
+<div style="overflow-x:auto"><table><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="tbl"></tbody></table></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script>
+(function(){var u=getUser&&getUser();if(!localStorage.getItem("token")||!u){location.href=location.origin+"/crm/index.html";return;}
+if(u.role!=="super_admin"&&u.role!=="admin"){alert("Admins only");location.href=location.origin+"/crm/modules/admin.html";}})();
+var ROLES=[],dt=null;
+var $=function(i){return document.getElementById(i);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function toast(t){var e=$("toast");e.innerHTML=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},3500);}
+function deb(){clearTimeout(dt);dt=setTimeout(load,300);}
+async function init(){await load();}
+async function load(){
+  var qs=[];var s=$("search").value.trim();if(s)qs.push("search="+encodeURIComponent(s));var fr=$("frole").value;if(fr)qs.push("role="+fr);
+  var d=await apiRequest("/admin/users"+(qs.length?("?"+qs.join("&")):""));
+  if(!d||d.error){toast((d&&d.msg)||"Error");return;}
+  ROLES=d.roles||[];
+  if(!$("u-role").options.length){$("u-role").innerHTML=ROLES.map(function(r){return '<option value="'+r+'">'+r+'</option>';}).join("");
+    $("frole").innerHTML='<option value="">All roles</option>'+ROLES.map(function(r){return '<option value="'+r+'">'+r+'</option>';}).join("");}
+  var users=d.users||[];
+  $("tbl").innerHTML=users.length?users.map(function(x){
+    var ropts=ROLES.map(function(r){return '<option value="'+r+'"'+(x.role===r?" selected":"")+'>'+r+'</option>';}).join("");
+    return '<tr><td><div class="nm">'+esc(x.name||"")+'</div><div class="muted">'+esc(x.email||"")+'</div></td>'+
+      '<td><select class="sel" onchange="setRole(\''+x._id+'\',this.value)">'+ropts+'</select></td>'+
+      '<td><span class="badge" style="background:'+(x.active?"rgba(34,197,94,.15);color:var(--green)":"rgba(255,77,109,.15);color:var(--rose)")+'">'+(x.active?"active":"inactive")+'</span></td>'+
+      '<td><button class="btn btn-ghost btn-sm" onclick="toggle(\''+x._id+'\','+(!x.active)+')">'+(x.active?"Deactivate":"Activate")+'</button> '+
+      '<button class="btn btn-ghost btn-sm" onclick="reset(\''+x._id+'\')">Reset password</button></td></tr>';
+  }).join(""):'<tr><td colspan="4"><div class="empty">No users.</div></td></tr>';
+}
+async function createUser(){
+  var body={name:$("u-name").value.trim(),email:$("u-email").value.trim(),role:$("u-role").value,password:$("u-pass").value.trim(),sendEmail:$("u-mail").checked};
+  if(!body.email){toast("Email required");return;}
+  var r=await apiRequest("/admin/users","POST",body);
+  if(r&&!r.error){$("c-res").innerHTML=r.created?('✅ Created'+(r.emailed?' — credentials emailed.':' — temp password: <b>'+esc(r.tempPassword||"")+'</b>')):'ℹ️ Existing user updated.';$("u-name").value="";$("u-email").value="";$("u-pass").value="";load();}
+  else $("c-res").textContent=(r&&r.msg)||"Error";
+}
+async function setRole(id,role){var r=await apiRequest("/admin/users/"+id,"PATCH",{role:role});if(r&&!r.error)toast("Role updated");else toast((r&&r.msg)||"Error");}
+async function toggle(id,active){var r=await apiRequest("/admin/users/"+id,"PATCH",{active:active});if(r&&!r.error){toast("Updated");load();}else toast((r&&r.msg)||"Error");}
+async function reset(id){if(!confirm("Reset this user's password?"))return;var r=await apiRequest("/admin/users/"+id+"/reset","POST",{sendEmail:true});if(r&&!r.error)toast(r.emailed?"Password reset & emailed":("New password: <b>"+esc(r.tempPassword||"")+"</b>"));else toast((r&&r.msg)||"Error");}
+init();
+</script></body></html>

@@ -3,6 +3,7 @@ const router  = express.Router();
 const auth    = require("../middleware/authMiddleware");
 const C       = require("../controllers/salesController");
 const IC      = require("../controllers/salesImportController");
+const LC      = require("../controllers/salesLifecycleController");
 
 router.use(auth);
 
@@ -110,5 +111,18 @@ router.patch ("/sales/referrals/:id/pay",       C.markIncentivePaid);
 // ── Sales Rep Stats ───────────────────────────────────────────
 router.get   ("/sales/reps",                    C.listReps);
 router.get   ("/sales/reps/stats",              C.repStats);
+
+// ── Pre-Sales: Quotes / Proposals ─────────────────────────────
+router.get   ("/sales/quotes",      LC.listQuotes);
+router.post  ("/sales/quotes",      LC.createQuote);
+router.patch ("/sales/quotes/:id",  LC.updateQuote);
+router.delete("/sales/quotes/:id",  LC.deleteQuote);
+
+// ── Post-Sales: Support Tickets ───────────────────────────────
+router.get   ("/sales/tickets",          LC.listTickets);
+router.post  ("/sales/tickets",          LC.createTicket);
+router.patch ("/sales/tickets/:id",      LC.updateTicket);
+router.post  ("/sales/tickets/:id/reply",LC.replyTicket);
+router.delete("/sales/tickets/:id",      LC.deleteTicket);
 
 module.exports = router;

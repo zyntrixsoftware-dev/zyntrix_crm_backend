@@ -140,7 +140,7 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
               <select class="input" id="t-cat"><option>Payment</option><option>Course Access</option><option>Schedule</option><option>Technical</option><option>Other</option></select></div>
           </div>
           <button class="btn btn-prim" style="width:100%;justify-content:center" onclick="addTicket()">Create Ticket</button>
-          <p class="muted" style="margin-top:10px">Stored locally in this browser. Connect a backend later to share the queue across the team.</p>
+          <p class="muted" style="margin-top:10px">Stored on the server — shared across the Post-Sales team.</p>
         </div>
         <div class="card"><h3>Ticket Queue <span class="chip" id="tk-count"></span></h3>
           <div id="ticket-list"></div>
@@ -167,7 +167,7 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
 
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){ location.href = location.origin + "/crm/index.html"; }
+(function(){var t=localStorage.getItem("token");var u;try{u=JSON.parse(localStorage.getItem("user"))}catch(e){}if(!t||!u){location.href=location.origin+"/crm/index.html";return;}if(['super_admin','sales','postsales'].indexOf(u.role)<0){alert("You do not have access to this panel.");location.href=location.origin+"/crm/index.html";}})();
 var ENR=[], SUMMARY={};
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -242,27 +242,26 @@ function renderRenewals(){
   }).join(""):'<p class="empty">No at-risk students. 🎉</p>';
 }
 
-// ── Support tickets (client-side) ──
-function getTickets(){try{return JSON.parse(localStorage.getItem("zx_tickets")||"[]");}catch(e){return [];}}
-function setTickets(t){localStorage.setItem("zx_tickets",JSON.stringify(t));}
-function addTicket(){
+// ── Support tickets (server-backed) ──
+async function addTicket(){
   var nm=$("t-name").value.trim(), su=$("t-subj").value.trim();
   if(!nm||!su){alert("Enter student name and subject");return;}
-  var t=getTickets(); t.unshift({id:Date.now(),name:nm,subject:su,priority:$("t-pri").value,category:$("t-cat").value,status:"open",date:new Date().toISOString()});
-  setTickets(t); $("t-name").value="";$("t-subj").value=""; renderTickets();
+  var r=await apiRequest("/sales/tickets","POST",{studentName:nm,subject:su,priority:$("t-pri").value,category:$("t-cat").value});
+  if(r&&!r.error){$("t-name").value="";$("t-subj").value=""; renderTickets();}else alert((r&&r.msg)||"Could not create ticket");
 }
-function setStatus(id,st){var t=getTickets();var x=t.find(function(y){return y.id===id;});if(x)x.status=st;setTickets(t);renderTickets();}
-function delTicket(id){var t=getTickets().filter(function(y){return y.id!==id;});setTickets(t);renderTickets();}
-function renderTickets(){
-  var t=getTickets(); var open=t.filter(function(x){return x.status!=="resolved";}).length;
+async function setStatus(id,st){var r=await apiRequest("/sales/tickets/"+id,"PATCH",{status:st});if(r&&!r.error)renderTickets();}
+async function delTicket(id){var r=await apiRequest("/sales/tickets/"+id,"DELETE");if(r&&!r.error)renderTickets();}
+async function renderTickets(){
+  var d=await apiRequest("/sales/tickets"); var t=(d&&d.tickets)||[];
+  var open=t.filter(function(x){return x.status!=="resolved";}).length;
   $("tk-count").textContent=open+" open";
   var pc={low:"var(--text3)",medium:"var(--amber)",high:"var(--rose)"};
   $("ticket-list").innerHTML=t.length?t.map(function(x){
     return '<div class="list-item"><span class="dot" style="background:'+(pc[x.priority]||"var(--text3)")+'"></span>'+
-      '<div style="flex:1"><div class="nm">'+esc(x.subject)+'</div><div class="sub">'+esc(x.name)+' · '+esc(x.category)+' · '+esc(x.priority)+'</div></div>'+
-      '<select class="sel" onchange="setStatus('+x.id+',this.value)">'+
+      '<div style="flex:1"><div class="nm">'+esc(x.subject)+'</div><div class="sub">'+esc(x.studentName)+' · '+esc(x.category)+' · '+esc(x.priority)+'</div></div>'+
+      '<select class="sel" onchange="setStatus(\''+x._id+'\',this.value)">'+
         ['open','in_progress','resolved'].map(function(s){return '<option value="'+s+'"'+(x.status===s?' selected':'')+'>'+s.replace("_"," ")+'</option>';}).join("")+'</select>'+
-      '<button class="btn btn-ghost btn-sm" onclick="delTicket('+x.id+')" style="margin-left:8px">✕</button></div>';
+      '<button class="btn btn-ghost btn-sm" onclick="delTicket(\''+x._id+'\')" style="margin-left:8px">✕</button></div>';
   }).join(""):'<p class="empty">No tickets yet.</p>';
 }
 
