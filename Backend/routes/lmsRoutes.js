@@ -2,6 +2,7 @@ const express = require("express");
 const jwt     = require("jsonwebtoken");
 const router  = express.Router();
 const C       = require("../controllers/lmsController");
+const A       = require("../controllers/lmsActivityController");
 
 // Auth that accepts a Bearer header OR ?token= (so <video src> and downloads work)
 function auth(req, res, next) {
@@ -39,5 +40,39 @@ router.get  ("/my/courses",            C.myCourses);
 router.get  ("/my/courses/:courseId",  C.coursePlayer);
 router.post ("/lessons/:id/complete",  C.markComplete);
 router.patch("/lessons/:id/progress",  C.saveProgress);
+
+// ── Phase 2: Assignments ─────────────────────────────────────
+router.get   ("/assignments",                 A.listAssignments);
+router.post  ("/assignments",                 A.createAssignment);
+router.patch ("/assignments/:id",             A.updateAssignment);
+router.delete("/assignments/:id",             A.deleteAssignment);
+router.post  ("/assignments/:id/attach",      A.uploadFilesMw, A.attachAssignmentFile);
+router.post  ("/assignments/:id/submit",      A.uploadFilesMw, A.submitAssignment);
+router.get   ("/assignments/:id/submissions", A.listSubmissions);
+router.patch ("/submissions/:id/grade",       A.gradeSubmission);
+
+// ── Phase 2: Quizzes ─────────────────────────────────────────
+router.get   ("/quizzes",            A.listQuizzes);
+router.post  ("/quizzes",            A.createQuiz);
+router.get   ("/quizzes/:id",        A.getQuiz);
+router.patch ("/quizzes/:id",        A.updateQuiz);
+router.delete("/quizzes/:id",        A.deleteQuiz);
+router.get   ("/quizzes/:id/take",   A.takeQuiz);
+router.post  ("/quizzes/:id/attempt",A.submitQuiz);
+router.get   ("/quizzes/:id/attempts",A.listAttempts);
+
+// ── Phase 2: Announcements ───────────────────────────────────
+router.get   ("/announcements",     A.listAnnouncements);
+router.post  ("/announcements",     A.createAnnouncement);
+router.delete("/announcements/:id", A.deleteAnnouncement);
+
+// ── Phase 2: Discussions / Doubts ────────────────────────────
+router.get ("/discussions",          A.listDiscussions);
+router.post("/discussions",          A.createDiscussion);
+router.post("/discussions/:id/reply",A.replyDiscussion);
+
+// ── Phase 2: Student provisioning ────────────────────────────
+router.post("/students/provision",     A.provisionStudent);
+router.post("/students/provision-all",  A.provisionAll);
 
 module.exports = router;
