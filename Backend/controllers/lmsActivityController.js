@@ -92,9 +92,11 @@ exports.submitAssignment = async (req, res) => {
     const a = await Assignment.findById(req.params.id).lean(); if (!a) return res.status(404).json({ msg: "Assignment not found" });
     const late = a.dueDate && new Date() > new Date(a.dueDate);
     const files = (req.files || []).map(mapFile);
+    const update = { $set: { course: a.course, text: req.body.text || "", submittedAt: new Date(), status: late ? "late" : "submitted" } };
+    if (files.length) update.$push = { files: { $each: files } };
     const sub = await Submission.findOneAndUpdate(
       { assignment: a._id, student: req.user.id },
-      { $set: { course: a.course, text: req.body.text || "", submittedAt: new Date(), status: late ? "late" : "submitted" }, $push: files.length ? { files: { $each: files } } : {} },
+      update,
       { upsert: true, new: true, setDefaultsOnInsert: true });
     return res.json({ submission: sub });
   } catch (e) { console.error("submitAssignment:", e); return res.status(500).json({ msg: "Server error" }); }
