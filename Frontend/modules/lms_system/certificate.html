@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Certificate — Zyntrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b1220;font-family:'Instrument Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px}
+.bar{width:min(960px,100%);display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px}
+.btn{padding:9px 16px;border-radius:8px;border:0;cursor:pointer;font-weight:700;font-size:13px;font-family:inherit}
+.btn-p{background:#00e5b0;color:#06202a}.btn-g{background:#1b2740;color:#cfe0f5}
+.cert{width:min(960px,100%);aspect-ratio:1.414/1;background:#fff;color:#16263b;border-radius:6px;position:relative;overflow:hidden;padding:60px 70px;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.cert::before{content:"";position:absolute;inset:18px;border:2px solid #d8b25a;border-radius:4px;pointer-events:none}
+.cert::after{content:"";position:absolute;inset:26px;border:1px solid #e7d3a1;border-radius:4px;pointer-events:none}
+.top{display:flex;align-items:center;gap:12px;z-index:1}
+.logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#1ad0c6,#2462c4);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Syne';font-weight:800;font-size:22px}
+.org{font-family:'Syne';font-weight:800;font-size:18px;color:#16263b}.org span{display:block;font-family:'Instrument Sans';font-weight:500;font-size:11px;color:#7a8aa0;letter-spacing:2px;text-transform:uppercase}
+.mid{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;z-index:1}
+.k{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#b08d3c;font-weight:600}
+.title{font-family:'Syne';font-size:40px;font-weight:800;margin:6px 0 22px;color:#16263b}
+.name{font-family:'Syne';font-size:34px;font-weight:700;color:#0b2a4a;border-bottom:2px solid #d8b25a;display:inline-block;padding:0 30px 8px;margin:6px auto 18px}
+.for{font-size:15px;color:#46586f}.course{font-size:22px;font-weight:700;color:#16263b;margin-top:6px}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;z-index:1;font-size:12px;color:#46586f}
+.sig{text-align:center}.sig b{display:block;border-top:1.5px solid #16263b;padding-top:6px;color:#16263b;font-size:13px;min-width:170px}
+.seal{width:80px;height:80px;border-radius:50%;border:3px double #d8b25a;display:flex;align-items:center;justify-content:center;color:#b08d3c;font-family:'Syne';font-weight:800;font-size:11px;text-align:center;line-height:1.1}
+@media print{body{background:#fff;padding:0}.bar{display:none}.cert{box-shadow:none;border-radius:0}}
+.err{color:#cfe0f5;margin-top:40px}
+</style></head><body>
+<div class="bar"><button class="btn btn-g" onclick="history.back()">← Back</button><button class="btn btn-p" onclick="window.print()">⬇ Print / Save PDF</button></div>
+<div id="root"><div class="err">Loading…</div></div>
+<script src="../../assets/js/api.js"></script>
+<script>
+if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+async function load(){
+  var id=new URLSearchParams(location.search).get("id");
+  if(!id){document.getElementById("root").innerHTML='<div class="err">No certificate specified.</div>';return;}
+  var d=await apiRequest("/lms/certificates/"+id);
+  if(!d||d.error){document.getElementById("root").innerHTML='<div class="err">'+((d&&d.msg)||"Certificate not found")+'</div>';return;}
+  var c=d.certificate;var dt=new Date(c.issuedAt).toLocaleDateString("en-IN",{day:"2-digit",month:"long",year:"numeric"});
+  document.getElementById("root").innerHTML=
+  '<div class="cert"><div class="top"><div class="logo">Z</div><div class="org">Zyntrix Software Solutions<span>EdTech Academy</span></div></div>'+
+  '<div class="mid"><div class="k">Certificate of Completion</div><div class="title">Certificate of Achievement</div>'+
+  '<div class="for">This is proudly presented to</div><div class="name">'+esc(c.studentName||"Student")+'</div>'+
+  '<div class="for">for successfully completing the course</div><div class="course">'+esc(c.courseTitle||"Course")+'</div></div>'+
+  '<div class="foot"><div class="sig"><b>Zyntrix LMS</b>Authorised Signatory</div>'+
+  '<div class="seal">ZYNTRIX<br>VERIFIED</div>'+
+  '<div class="sig"><b>'+esc(dt)+'</b>Date · '+esc(c.certificateNo)+'</div></div></div>';
+}
+load();
+</script></body></html>

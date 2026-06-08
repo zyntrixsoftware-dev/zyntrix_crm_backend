@@ -4,6 +4,7 @@ const router  = express.Router();
 const C       = require("../controllers/lmsController");
 const A       = require("../controllers/lmsActivityController");
 const L       = require("../controllers/lmsLiveController");
+const R       = require("../controllers/lmsReportController");
 
 // Auth that accepts a Bearer header OR ?token= (so <video src> and downloads work)
 function auth(req, res, next) {
@@ -85,5 +86,13 @@ router.get   ("/sessions/:id/attendance",  L.sessionAttendance);
 router.post  ("/sessions/:id/attendance",  L.markAttendance);
 router.post  ("/sessions/:id/attend",      L.attendSession);
 router.get   ("/my/sessions",              L.mySessions);
+
+// ── Phase 4: Gradebook, reports, certificates ────────────────
+router.get ("/gradebook",          R.gradebook);
+router.get ("/reports",            R.reports);
+router.get ("/certificates",       R.listCertificates);
+router.post("/certificates",       R.issueCertificate);
+router.get ("/my/certificates",    R.myCertificates);
+router.get ("/certificates/:id",   R.getCertificate);
 
 module.exports = router;
