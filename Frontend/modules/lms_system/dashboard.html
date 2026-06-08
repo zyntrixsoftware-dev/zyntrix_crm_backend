@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LMS Dashboard — Zyntrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--blue:#3d8ef0;--amber:#f5a623;--rose:#ff4d6d;--purple:#b57bee;--green:#22c55e;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--accent-dim:rgba(0,229,176,.10);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg)}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:var(--text2);font-size:12.5px;text-decoration:none;margin-bottom:1px}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-ico{width:16px;text-align:center}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px}
+.pg-title{font-family:var(--display);font-size:15px;font-weight:700;flex:1}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;text-decoration:none}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-rose{background:rgba(255,77,109,.12);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-sm{padding:5px 11px;font-size:11.5px}
+.content{flex:1;overflow-y:auto;padding:18px 22px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
+.kpi-val{font-family:var(--display);font-size:26px;font-weight:800}.kpi-lbl{font-size:10px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
+.card h3{font-family:var(--display);font-size:14px;font-weight:700;margin-bottom:14px}
+.crow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.crow:last-child{border-bottom:none}.nm{font-weight:600;font-size:13px}.sub{font-size:10.5px;color:var(--text3)}
+table{width:100%;border-collapse:collapse}th{padding:9px 12px;text-align:left;font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text2)}
+.chip{font-size:10px;padding:2px 8px;border-radius:5px;background:var(--bg3);color:var(--text2)}
+.empty{text-align:center;color:var(--text3);padding:24px}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:800">Zyntrix LMS</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Admin</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Manage</div>
+    <a class="nav-a on" href="dashboard.html"><span class="nav-ico">▦</span> Dashboard</a>
+    <a class="nav-a" href="content-builder.html"><span class="nav-ico">✎</span> Content Builder</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Learner</div>
+    <a class="nav-a" href="student-dashboard.html"><span class="nav-ico">◉</span> My Learning</a>
+  </div>
+  <div class="sb-foot"><button class="btn btn-rose btn-sm" style="width:100%;justify-content:center" onclick="lmsLogout()">⏻ Logout</button></div>
+</aside>
+<div class="main">
+  <div class="topbar"><div class="pg-title">LMS Dashboard</div><button class="btn btn-ghost btn-sm" onclick="load()">↻ Refresh</button></div>
+  <div class="content">
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-val" id="k-courses">—</div><div class="kpi-lbl">Active Courses</div></div>
+      <div class="kpi"><div class="kpi-val" id="k-modules">—</div><div class="kpi-lbl">Modules</div></div>
+      <div class="kpi"><div class="kpi-val" id="k-lessons">—</div><div class="kpi-lbl">Lessons</div></div>
+      <div class="kpi"><div class="kpi-val" id="k-learners">—</div><div class="kpi-lbl">Learners</div></div>
+      <div class="kpi"><div class="kpi-val" id="k-completions">—</div><div class="kpi-lbl">Lessons Completed</div></div>
+    </div>
+    <div class="card"><h3>Courses</h3><div id="courses"></div></div>
+    <div class="card" id="roster"><h3>Learner Roster</h3><div style="overflow-x:auto"><table><thead><tr><th>Student</th><th>Course</th><th>Status</th><th>Enrolled</th></tr></thead><tbody id="roster-body"></tbody></table></div></div>
+  </div>
+</div>
+</div>
+<script src="../../assets/js/api.js"></script>
+<script>
+if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function fmtD(d){return d?new Date(d).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"2-digit"}):"—";}
+async function load(){
+  var r=await Promise.all([apiRequest("/lms/dashboard"),apiRequest("/lms/courses"),apiRequest("/lms/roster")]);
+  var d=r[0]||{},cs=(r[1]&&r[1].courses)||[],ro=(r[2]&&r[2].roster)||[];
+  $("k-courses").textContent=d.courses||0;$("k-modules").textContent=d.modules||0;$("k-lessons").textContent=d.lessons||0;$("k-learners").textContent=d.learners||0;$("k-completions").textContent=d.completions||0;
+  $("courses").innerHTML=cs.length?cs.map(function(c){
+    return '<div class="crow"><div style="flex:1"><div class="nm">'+esc(c.title)+'</div><div class="sub">'+(c.lessonCount||0)+' lessons · '+esc(c.level||"")+'</div></div><a class="btn btn-ghost btn-sm" href="content-builder.html?course='+c._id+'">Build content</a></div>';
+  }).join(""):'<div class="empty">No active courses.</div>';
+  $("roster-body").innerHTML=ro.length?ro.map(function(x){
+    var nm=x.student&&x.student.fullName?x.student.fullName:"Student";var em=x.student&&x.student.email?x.student.email:"";var co=x.course&&x.course.title?x.course.title:"—";
+    return '<tr><td><div class="nm">'+esc(nm)+'</div><div class="sub">'+esc(em)+'</div></td><td>'+esc(co)+'</td><td><span class="chip">'+esc(x.status||"")+'</span></td><td>'+fmtD(x.enrolledAt)+'</td></tr>';
+  }).join(""):'<tr><td colspan="4"><div class="empty">No learners yet.</div></td></tr>';
+}
+function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+load();
+</script>
+</body>
+</html>

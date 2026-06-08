@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Learning — Zyntrix LMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--accent:#00e5b0;--blue:#3d8ef0;--green:#22c55e;--amber:#f5a623;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--accent-dim:rgba(0,229,176,.10);--rose:#ff4d6d;--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg)}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:var(--text2);font-size:12.5px;text-decoration:none}
+.nav-a.on{background:var(--accent-dim);color:var(--accent)}.nav-ico{width:16px;text-align:center}
+.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px}
+.pg-title{font-family:var(--display);font-size:15px;font-weight:700;flex:1}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;text-decoration:none}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-rose{background:rgba(255,77,109,.12);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-sm{padding:5px 11px;font-size:11.5px}
+.content{flex:1;overflow-y:auto;padding:18px 22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.cc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.cc-top{height:90px;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:28px;font-weight:800;color:var(--bg)}
+.cc-body{padding:14px;flex:1;display:flex;flex-direction:column}
+.cc-title{font-weight:700;font-size:14px;margin-bottom:4px}.cc-sub{font-size:11px;color:var(--text3);margin-bottom:12px}
+.bar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:6px}.bar-fill{height:100%;background:var(--green);border-radius:4px}
+.pct{font-size:11px;color:var(--text2);margin-bottom:12px}
+.empty{text-align:center;color:var(--text3);padding:50px}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:800">Zyntrix LMS</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Learner</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Learn</div>
+    <a class="nav-a on" href="student-dashboard.html"><span class="nav-ico">◉</span> My Courses</a>
+  </div>
+  <div class="sb-foot"><button class="btn btn-rose btn-sm" style="width:100%;justify-content:center" onclick="lmsLogout()">⏻ Logout</button></div>
+</aside>
+<div class="main">
+  <div class="topbar"><div class="pg-title">My Learning</div><button class="btn btn-rose btn-sm" style="visibility:hidden">x</button></div>
+  <div class="content"><div class="grid" id="grid"></div></div>
+</div>
+</div>
+<script src="../../assets/js/api.js"></script>
+<script>
+if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+async function load(){
+  var d=await apiRequest("/lms/my/courses");
+  var cs=(d&&d.courses)||[];
+  if(!cs.length){$("grid").innerHTML='<div class="empty" style="grid-column:1/-1">You are not enrolled in any course yet, or your login email doesn\'t match an enrollment. Contact your coordinator.</div>';return;}
+  $("grid").innerHTML=cs.map(function(c){
+    var t=c.course.title||"Course";var pct=c.progress&&c.progress.pct||0;
+    return '<div class="cc"><div class="cc-top">'+esc(t.charAt(0).toUpperCase())+'</div><div class="cc-body">'+
+      '<div class="cc-title">'+esc(t)+'</div><div class="cc-sub">'+(c.progress.completed||0)+' / '+(c.progress.total||0)+' lessons</div>'+
+      '<div class="bar"><div class="bar-fill" style="width:'+pct+'%"></div></div><div class="pct">'+pct+'% complete</div>'+
+      '<a class="btn btn-prim btn-sm" style="margin-top:auto;justify-content:center" href="course-player.html?course='+c.course._id+'">'+(pct>0?"Continue":"Start")+'</a></div></div>';
+  }).join("");
+}
+function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+load();
+</script>
+</body>
+</html>

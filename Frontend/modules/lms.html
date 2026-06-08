@@ -1,94 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LMS Panel</title>
-<link rel="stylesheet" href="../assets/css/attendance.css">
-<link rel="stylesheet" href="../assets/css/module-pages.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zyntrix LMS</title>
 </head>
 <body>
-<div class="app">
-	<aside class="sidebar">
-		<div>
-			<div class="brand">
-				<div class="brand-mark">Z</div>
-				<div>
-					<strong>Zyntrix</strong>
-					<span>EdTech CRM</span>
-				</div>
-			</div>
-			<nav class="side-nav" aria-label="Primary">
-				<a class="active" href="lms.html"><span class="nav-icon">⌕</span>LMS</a>
-			</nav>
-		</div>
-
-		<div class="sidebar-user">
-			<img src="https://i.pravatar.cc/80?img=6" alt="">
-			<div>
-				<strong id="sideUserName">Zyntrix LMS</strong>
-				<span id="sideUserEmail">lms@zyntrix.com</span>
-			</div>
-			<button class="icon-button small" type="button" aria-label="Open profile menu">⌄</button>
-		</div>
-	</aside>
-
-	<main class="main">
-		<header class="topbar">
-			<h1>LMS Dashboard</h1>
-			<div class="topbar-actions">
-				<div class="top-profile">
-					<img src="https://i.pravatar.cc/80?img=6" alt="">
-					<div>
-						<strong id="userName">Zyntrix LMS</strong>
-						<span id="userRole">LMS</span>
-					</div>
-					<button onclick="logout()" type="button" aria-label="Logout" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;letter-spacing:0.3px;transition:all 0.15s;white-space:nowrap;font-family:inherit;" onmouseover="this.style.background='rgba(244,63,94,0.22)'" onmouseout="this.style.background='rgba(244,63,94,0.12)'">⏻ Logout</button>
-				</div>
-			</div>
-		</header>
-
-		<section class="module-content">
-			<div class="stat-grid">
-				<div class="stat-card">
-					<p>Active Courses</p>
-					<strong>27</strong>
-				</div>
-				<div class="stat-card">
-					<p>Enrolled Students</p>
-					<strong>512</strong>
-				</div>
-				<div class="stat-card">
-					<p>Completion Rate</p>
-					<strong>71%</strong>
-				</div>
-				<div class="stat-card">
-					<p>Pending Reviews</p>
-					<strong>34</strong>
-				</div>
-			</div>
-
-			<section class="section-panel">
-				<h2>Learning Ops</h2>
-				<p class="empty-copy">Track curriculum quality, mentor bandwidth, and low-completion cohorts.</p>
-			</section>
-		</section>
-	</main>
-</div>
-
-<script src="../assets/js/api.js"></script>
-<script src="../assets/js/auth.js"></script>
-<script>
-requireAuth();
-requireModuleAccess("lms");
-
-const user = JSON.parse(localStorage.getItem("user"));
-if (user) {
-	document.getElementById("userName").innerText = user.name || "Zyntrix LMS";
-	document.getElementById("sideUserName").innerText = user.name || "Zyntrix LMS";
-	document.getElementById("sideUserEmail").innerText = user.email || "lms@zyntrix.com";
-	document.getElementById("userRole").innerText = user.role ? user.role.replace("_", " ") : "LMS";
-}
-</script>
+  <p style="font-family:sans-serif;color:#888;padding:20px">Opening the LMS…</p>
+  <script>
+    (function () {
+      var role = "";
+      try { role = (JSON.parse(localStorage.getItem("user") || "{}").role || ""); } catch (e) {}
+      var staff = ["lms", "instructor", "super_admin", "admin"].indexOf(role) >= 0;
+      window.location.replace(staff ? "lms_system/dashboard.html" : "lms_system/student-dashboard.html");
+    })();
+  </script>
 </body>
 </html>

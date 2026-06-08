@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Content Builder — Zyntrix LMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--accent2:#00c99a;--accent-dim:rgba(0,229,176,.10);--blue:#3d8ef0;--amber:#f5a623;--rose:#ff4d6d;--purple:#b57bee;--green:#22c55e;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg)}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:var(--text2);font-size:12.5px;text-decoration:none;transition:all .15s;margin-bottom:1px}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-ico{width:16px;text-align:center}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-title{font-family:var(--display);font-size:15px;font-weight:700;flex:1}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;text-decoration:none}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-sm{padding:5px 11px;font-size:11.5px}.btn-rose{background:rgba(255,77,109,.12);color:var(--rose);border:1px solid rgba(255,77,109,.2)}
+.content{flex:1;overflow-y:auto;padding:18px 22px}
+.sel,.input{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;outline:none}
+.sel:focus,.input:focus{border-color:var(--accent)}
+.module{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.module-hd{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--bg3)}
+.module-hd .mt{font-weight:700;font-size:14px;flex:1}
+.lesson{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid var(--border)}
+.lesson .lt{flex:1;font-size:13px}
+.tag{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;text-transform:uppercase;background:var(--bg4);color:var(--text2)}
+.muted{color:var(--text3);font-size:11px}
+.empty{text-align:center;color:var(--text3);padding:40px;font-size:13px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal.on{display:flex}
+.modal-card{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:22px;width:min(520px,100%);max-height:90vh;overflow-y:auto}
+.modal-card h3{font-family:var(--display);margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:10px 0 5px}
+.input{width:100%}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:13px;display:none;z-index:60}
+.toast.on{display:block}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:800">Zyntrix LMS</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Admin</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Manage</div>
+    <a class="nav-a" href="dashboard.html"><span class="nav-ico">▦</span> Dashboard</a>
+    <a class="nav-a on" href="content-builder.html"><span class="nav-ico">✎</span> Content Builder</a>
+    <a class="nav-a" href="dashboard.html#roster"><span class="nav-ico">☰</span> Roster</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Learner</div>
+    <a class="nav-a" href="student-dashboard.html"><span class="nav-ico">◉</span> My Learning</a>
+  </div>
+  <div class="sb-foot"><button class="btn btn-rose btn-sm" style="width:100%;justify-content:center" onclick="lmsLogout()">⏻ Logout</button></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="pg-title">Content Builder</div>
+    <select class="sel" id="courseSel" onchange="loadContent()"></select>
+    <button class="btn btn-prim btn-sm" onclick="openModule()">＋ Add Module</button>
+  </div>
+  <div class="content" id="content"><div class="empty">Select a course to build its curriculum.</div></div>
+</div>
+</div>
+
+<!-- Module modal -->
+<div class="modal" id="m-module"><div class="modal-card">
+  <h3 id="mm-title">Add Module</h3>
+  <label class="fl">Module title</label><input class="input" id="mm-name" placeholder="e.g. Introduction">
+  <label class="fl">Description</label><input class="input" id="mm-desc" placeholder="Optional">
+  <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+    <button class="btn btn-ghost btn-sm" onclick="closeM('m-module')">Cancel</button>
+    <button class="btn btn-prim btn-sm" onclick="saveModule()">Save</button>
+  </div>
+</div></div>
+
+<!-- Lesson modal -->
+<div class="modal" id="m-lesson"><div class="modal-card">
+  <h3 id="ml-title">Add Lesson</h3>
+  <label class="fl">Lesson title</label><input class="input" id="ml-name" placeholder="Lesson name">
+  <label class="fl">Type</label>
+  <select class="input" id="ml-type" onchange="lessonTypeUI()">
+    <option value="video">Video</option><option value="text">Text / Notes</option>
+    <option value="document">Document</option><option value="assignment">Assignment</option><option value="quiz">Quiz</option>
+  </select>
+  <div id="ml-video-wrap">
+    <label class="fl">Video URL (external embed) — or upload below</label>
+    <input class="input" id="ml-videourl" placeholder="https://... (leave blank to upload a file)">
+  </div>
+  <div id="ml-text-wrap" style="display:none">
+    <label class="fl">Content (text / notes)</label>
+    <textarea class="input" id="ml-content" rows="5" placeholder="Lesson text..."></textarea>
+  </div>
+  <label class="fl">Duration (minutes)</label><input class="input" id="ml-dur" type="number" min="0" value="0">
+  <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+    <button class="btn btn-ghost btn-sm" onclick="closeM('m-lesson')">Cancel</button>
+    <button class="btn btn-prim btn-sm" onclick="saveLesson()">Save</button>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script>
+if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
+var TOKEN=localStorage.getItem("token");
+var COURSES=[], CURRENT=null, MODULES=[], editModuleId=null, editLessonId=null, lessonModuleId=null;
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2200);}
+function closeM(id){$(id).classList.remove("on");}
+
+async function init(){
+  var d=await apiRequest("/lms/courses");
+  COURSES=(d&&d.courses)||[];
+  $("courseSel").innerHTML='<option value="">— Select course —</option>'+COURSES.map(function(c){return '<option value="'+c._id+'">'+esc(c.title)+' ('+(c.lessonCount||0)+' lessons)</option>';}).join("");
+  var pre=new URLSearchParams(location.search).get("course");
+  if(pre){ $("courseSel").value=pre; loadContent(); }
+}
+async function loadContent(){
+  CURRENT=$("courseSel").value;
+  if(!CURRENT){$("content").innerHTML='<div class="empty">Select a course to build its curriculum.</div>';return;}
+  var d=await apiRequest("/lms/courses/"+CURRENT+"/content");
+  MODULES=(d&&d.modules)||[];
+  render();
+}
+function render(){
+  if(!MODULES.length){$("content").innerHTML='<div class="empty">No modules yet. Click “Add Module” to start.</div>';return;}
+  $("content").innerHTML=MODULES.map(function(m){
+    var lessons=(m.lessons||[]).map(function(l){
+      return '<div class="lesson"><span class="tag">'+esc(l.type)+'</span><div class="lt">'+esc(l.title)+
+        (l.videoFile?' <span class="muted">· video uploaded</span>':(l.videoUrl?' <span class="muted">· external video</span>':''))+
+        (l.isPublished?'':' <span class="muted" style="color:var(--amber)">· draft</span>')+'</div>'+
+        (l.type==="video"?'<label class="btn btn-ghost btn-sm" style="cursor:pointer">⬆ Video<input type="file" accept="video/*" style="display:none" onchange="uploadVideo(\''+l._id+'\',this)"></label>':'')+
+        '<button class="btn btn-ghost btn-sm" onclick="editLesson(\''+l._id+'\')">Edit</button>'+
+        '<button class="btn btn-rose btn-sm" onclick="delLesson(\''+l._id+'\')">✕</button></div>';
+    }).join("");
+    return '<div class="module"><div class="module-hd"><div class="mt">'+esc(m.title)+'</div>'+
+      '<button class="btn btn-ghost btn-sm" onclick="openLesson(\''+m._id+'\')">＋ Lesson</button>'+
+      '<button class="btn btn-ghost btn-sm" onclick="editModule(\''+m._id+'\')">Edit</button>'+
+      '<button class="btn btn-rose btn-sm" onclick="delModule(\''+m._id+'\')">✕</button></div>'+
+      (lessons||'<div class="lesson"><span class="muted">No lessons yet.</span></div>')+'</div>';
+  }).join("");
+}
+
+// modules
+function openModule(){editModuleId=null;$("mm-title").textContent="Add Module";$("mm-name").value="";$("mm-desc").value="";$("m-module").classList.add("on");}
+function editModule(id){var m=MODULES.find(function(x){return x._id===id;});editModuleId=id;$("mm-title").textContent="Edit Module";$("mm-name").value=m.title;$("mm-desc").value=m.description||"";$("m-module").classList.add("on");}
+async function saveModule(){
+  if(!CURRENT){toast("Pick a course first");return;}
+  var body={title:$("mm-name").value.trim(),description:$("mm-desc").value.trim()};
+  if(!body.title){toast("Title required");return;}
+  var r=editModuleId?await apiRequest("/lms/modules/"+editModuleId,"PATCH",body):await apiRequest("/lms/modules","POST",Object.assign({course:CURRENT},body));
+  if(r&&!r.error){closeM('m-module');loadContent();toast("Saved");}else toast((r&&r.msg)||"Error");
+}
+async function delModule(id){if(!confirm("Delete this module and its lessons?"))return;var r=await apiRequest("/lms/modules/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Deleted");}}
+
+// lessons
+function lessonTypeUI(){var t=$("ml-type").value;$("ml-video-wrap").style.display=t==="video"?"block":"none";$("ml-text-wrap").style.display=(t==="text"||t==="document"||t==="assignment")?"block":"none";}
+function openLesson(moduleId){editLessonId=null;lessonModuleId=moduleId;$("ml-title").textContent="Add Lesson";$("ml-name").value="";$("ml-type").value="video";$("ml-videourl").value="";$("ml-content").value="";$("ml-dur").value=0;lessonTypeUI();$("m-lesson").classList.add("on");}
+function editLesson(id){
+  var l; MODULES.forEach(function(m){(m.lessons||[]).forEach(function(x){if(x._id===id)l=x;});});
+  editLessonId=id;lessonModuleId=l.module;$("ml-title").textContent="Edit Lesson";$("ml-name").value=l.title;$("ml-type").value=l.type;$("ml-videourl").value=l.videoUrl||"";$("ml-content").value=l.content||"";$("ml-dur").value=l.durationMin||0;lessonTypeUI();$("m-lesson").classList.add("on");
+}
+async function saveLesson(){
+  var body={title:$("ml-name").value.trim(),type:$("ml-type").value,videoUrl:$("ml-videourl").value.trim(),content:$("ml-content").value,durationMin:Number($("ml-dur").value)||0};
+  if(!body.title){toast("Title required");return;}
+  var r=editLessonId?await apiRequest("/lms/lessons/"+editLessonId,"PATCH",body):await apiRequest("/lms/lessons","POST",Object.assign({module:lessonModuleId},body));
+  if(r&&!r.error){closeM('m-lesson');loadContent();toast("Saved");}else toast((r&&r.msg)||"Error");
+}
+async function delLesson(id){if(!confirm("Delete this lesson?"))return;var r=await apiRequest("/lms/lessons/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Deleted");}}
+
+async function uploadVideo(lessonId,input){
+  var f=input.files[0];if(!f)return;
+  toast("Uploading video… ("+Math.round(f.size/1048576)+" MB)");
+  var fd=new FormData();fd.append("video",f);
+  try{
+    var res=await fetch(API_BASE+"/lms/lessons/"+lessonId+"/video",{method:"POST",headers:{Authorization:"Bearer "+TOKEN},body:fd});
+    var d=await res.json();
+    if(res.ok){toast("Video uploaded ✓");loadContent();}else toast(d.msg||"Upload failed");
+  }catch(e){toast("Upload failed: "+e.message);}
+}
+function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+init();
+</script>
+</body>
+</html>

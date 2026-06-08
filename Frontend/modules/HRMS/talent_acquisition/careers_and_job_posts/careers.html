@@ -256,6 +256,13 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
 .nav-ic{opacity:.9}
 .nav-link.active .nav-ic{opacity:1}
 .nav-div,.nav-divider{height:1px;background:var(--b1);margin:8px 10px}
+.hr-tp{display:flex;align-items:center;gap:10px;margin-left:auto;padding-left:14px;border-left:1px solid var(--b1)}
+.hr-tp-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.hr-tp-meta{line-height:1.2;min-width:0}
+.hr-tp-meta strong{display:block;font-size:12.5px;font-weight:600;color:var(--t1);white-space:nowrap}
+.hr-tp-meta span{display:block;font-size:10.5px;color:var(--t3);text-transform:capitalize;white-space:nowrap}
+.sb-logout-full{width:100%;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);color:var(--rose);font-size:12px;font-weight:600;padding:9px 12px;border-radius:8px;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.sb-logout-full:hover{background:rgba(244,63,94,0.22)}
 </style>
 <script src="../../../../assets/js/api.js"></script>
 <script src="../../../../assets/js/auth.js?v=3"></script>
@@ -306,14 +313,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
     <a class="nav-link" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
   <div class="sb-footer">
-    <div class="sb-user">
-      <div class="sb-avatar">HR</div>
-      <div style="flex:1;min-width:0">
-        <div class="sb-uname">HR Manager</div>
-        <div class="sb-urole">Administrator</div>
-      </div>
-      <button class="sb-logout" onclick="logout()">⏻</button>
-    </div>
+    <button class="sb-logout-full" onclick="logout()" title="Logout">⏻ Logout</button>
   </div>
 </aside>
 
@@ -336,6 +336,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
     <button class="tb-btn primary" onclick="window.open('https://zyntrixsoftware.com/careers/','_blank')">
       🌐 View Website
     </button>
+  
+    <div class="hr-tp"><div class="hr-tp-av">HR</div><div class="hr-tp-meta"><strong>HR Manager</strong><span>Administrator</span></div></div>
   </div>
 
   <div style="overflow-y:auto;flex:1">

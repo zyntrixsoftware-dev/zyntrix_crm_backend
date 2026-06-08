@@ -22,6 +22,7 @@ const onboardingRoutes      = require("./routes/onboardingRoutes");
 const orientationRoutes     = require("./routes/orientationRoutes");
 const deploymentRoutes      = require("./routes/deploymentRoutes");
 const salesRoutes           = require("./routes/salesRoutes");
+const lmsRoutes = require("./routes/lmsRoutes");
 
 const app = express();
 
@@ -128,6 +129,7 @@ app.use("/api/hr",         onboardingRoutes);       // candidate onboarding + do
 app.use("/api/hr",         orientationRoutes);      // candidate orientation + session schedule
 app.use("/api/hr",         deploymentRoutes);       // team deployment after orientation
 app.use("/api",            salesRoutes);             // student course sales system
+app.use("/api/lms",        lmsRoutes);              // learning management system
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────
 app.get("/", (req, res) => {

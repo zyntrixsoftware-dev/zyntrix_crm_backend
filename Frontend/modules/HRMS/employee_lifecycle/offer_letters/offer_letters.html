@@ -107,6 +107,13 @@ textarea.letter-body{font-family:var(--mono);font-size:12.5px;line-height:1.65;m
 .hint{font-size:11px;color:var(--text3);line-height:1.6}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hr-tp{display:flex;align-items:center;gap:10px;margin-left:auto;padding-left:14px;border-left:1px solid var(--border)}
+.hr-tp-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.hr-tp-meta{line-height:1.2;min-width:0}
+.hr-tp-meta strong{display:block;font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap}
+.hr-tp-meta span{display:block;font-size:10.5px;color:var(--text3);text-transform:capitalize;white-space:nowrap}
+.sidebar-logout{width:100%;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);color:#f43f5e;font-size:12px;font-weight:600;padding:9px 12px;border-radius:8px;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.sidebar-logout:hover{background:rgba(244,63,94,0.22)}
 </style>
 <script src="../../../../assets/js/api.js"></script>
 <script src="../../../../assets/js/auth.js?v=3"></script>
@@ -154,11 +161,7 @@ textarea.letter-body{font-family:var(--mono);font-size:12.5px;line-height:1.65;m
     <a class="nav-item" href="../../operations/performance.html"><span class="nav-icon">📊</span> Performance</a>
   </div>
   <div class="sidebar-footer">
-    <div class="user-pill">
-      <div class="avatar" id="sb-av">HR</div>
-      <div style="flex:1;min-width:0;"><div class="user-name" id="sb-name">HR Manager</div><div class="user-role">Talent Acquisition</div></div>
-      <button onclick="logout()" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.25);cursor:pointer;color:#f43f5e;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;">⏻ Logout</button>
-    </div>
+    <button class="sidebar-logout" onclick="logout()" title="Logout">⏻ Logout</button>
   </div>
 </aside>
 
@@ -170,6 +173,8 @@ textarea.letter-body{font-family:var(--mono);font-size:12.5px;line-height:1.65;m
     </div>
     <div style="flex:1;"></div>
     <button class="topbar-btn" onclick="reloadAll()">🔄 Refresh</button>
+  
+    <div class="hr-tp"><div class="hr-tp-av" id="sb-av">HR</div><div class="hr-tp-meta"><strong id="sb-name">HR Manager</strong><span>Talent Acquisition</span></div></div>
   </div>
 
   <div class="content">

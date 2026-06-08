@@ -371,47 +371,9 @@
         <!-- ── TAB: Security ── -->
         <div class="tab-panel" id="tab-security">
 
-          <!-- Change Password -->
-          <div class="section-panel">
-            <h3 class="panel-heading">Change Password</h3>
-            <p class="toast-msg" id="pwToast"></p>
-            <div class="field-grid">
-              <div class="field-group span-2">
-                <label>Current Password</label>
-                <div class="pw-wrap">
-                  <input type="password" id="f-currentPw" placeholder="Enter current password" autocomplete="current-password">
-                  <button type="button" class="pw-eye" onclick="togglePw('f-currentPw',this)">👁</button>
-                </div>
-              </div>
-              <div class="field-group">
-                <label>New Password</label>
-                <div class="pw-wrap">
-                  <input type="password" id="f-newPw" placeholder="Min 8 characters" oninput="checkPwStrength()" autocomplete="new-password">
-                  <button type="button" class="pw-eye" onclick="togglePw('f-newPw',this)">👁</button>
-                </div>
-                <div class="pw-strength-wrap">
-                  <div class="pw-strength-bar">
-                    <div id="pwStrengthFill" class="pw-fill"></div>
-                  </div>
-                  <span id="pwStrengthLabel" class="pw-label"></span>
-                </div>
-              </div>
-              <div class="field-group">
-                <label>Confirm New Password</label>
-                <div class="pw-wrap">
-                  <input type="password" id="f-confirmPw" placeholder="Re-enter new password" autocomplete="new-password">
-                  <button type="button" class="pw-eye" onclick="togglePw('f-confirmPw',this)">👁</button>
-                </div>
-              </div>
-            </div>
-            <div class="pw-rules">
-              <p id="rule-len"  class="rule">✕ At least 8 characters</p>
-              <p id="rule-upper" class="rule">✕ One uppercase letter</p>
-              <p id="rule-num"  class="rule">✕ One number</p>
-              <p id="rule-sym"  class="rule">✕ One special character</p>
-            </div>
-            <button class="btn-primary" style="margin-top:16px;" onclick="changePassword()">Update Password</button>
-          </div>
+          <!-- Password resets are handled via the "Forgot password?" link on the
+               login page (secure OTP to your recovery email). In-app password
+               change has been removed. -->
 
           <!-- Active Sessions -->
           <div class="section-panel" style="margin-top:14px;">
@@ -670,56 +632,6 @@ async function saveEmergency() {
 
   if (res.profile) renderProfile(res.profile);
   else await loadProfile();
-}
-
-// ── PASSWORD CHANGE ───────────────────────────────────────────────
-function togglePw(inputId, btn) {
-  const inp = document.getElementById(inputId);
-  inp.type = inp.type === "password" ? "text" : "password";
-  btn.textContent = inp.type === "password" ? "👁" : "🙈";
-}
-
-function checkPwStrength() {
-  const pw = document.getElementById("f-newPw").value;
-  const rules = {
-    "rule-len":   pw.length >= 8,
-    "rule-upper": /[A-Z]/.test(pw),
-    "rule-num":   /[0-9]/.test(pw),
-    "rule-sym":   /[^A-Za-z0-9]/.test(pw)
-  };
-  let score = 0;
-  Object.entries(rules).forEach(([id, ok]) => {
-    const el = document.getElementById(id);
-    el.classList.toggle("rule-ok", ok);
-    el.textContent = (ok ? "✓ " : "✕ ") + el.textContent.slice(2);
-    if (ok) score++;
-  });
-  const fill  = document.getElementById("pwStrengthFill");
-  const label = document.getElementById("pwStrengthLabel");
-  const pct   = (score / 4) * 100;
-  fill.style.width = pct + "%";
-  fill.style.background = score <= 1 ? "#c8292c" : score <= 2 ? "#e3b608" : score === 3 ? "#ea740c" : "#22d3c8";
-  label.textContent = ["", "Weak", "Fair", "Good", "Strong"][score];
-  label.style.color = fill.style.background;
-}
-
-async function changePassword() {
-  const cur  = document.getElementById("f-currentPw").value;
-  const nw   = document.getElementById("f-newPw").value;
-  const conf = document.getElementById("f-confirmPw").value;
-
-  if (!cur || !nw || !conf) { showToast("pwToast", "All fields are required", "err"); return; }
-  if (nw !== conf)           { showToast("pwToast", "Passwords do not match", "err"); return; }
-  if (nw.length < 8)         { showToast("pwToast", "Password must be at least 8 characters", "err"); return; }
-  if (!/\d/.test(nw))        { showToast("pwToast", "Password must include at least one number", "err"); return; }
-
-  const res = await apiRequest("/auth/change-password", "POST", { currentPassword: cur, newPassword: nw });
-  if (res.error) { showToast("pwToast", res.msg || "Failed", "err"); return; }
-
-  document.getElementById("f-currentPw").value = "";
-  document.getElementById("f-newPw").value     = "";
-  document.getElementById("f-confirmPw").value = "";
-  showToast("pwToast", "Password updated successfully!", "ok");
 }
 
 // ── 2FA TOGGLE ────────────────────────────────────────────────────
