@@ -5,6 +5,7 @@ const C       = require("../controllers/lmsController");
 const A       = require("../controllers/lmsActivityController");
 const L       = require("../controllers/lmsLiveController");
 const R       = require("../controllers/lmsReportController");
+const O       = require("../controllers/lmsOpsController");
 
 // Auth that accepts a Bearer header OR ?token= (so <video src> and downloads work)
 function auth(req, res, next) {
@@ -94,5 +95,13 @@ router.get ("/certificates",       R.listCertificates);
 router.post("/certificates",       R.issueCertificate);
 router.get ("/my/certificates",    R.myCertificates);
 router.get ("/certificates/:id",   R.getCertificate);
+
+// ── LMS Operations ───────────────────────────────────────────
+router.get   ("/ops/summary",          O.opsSummary);
+router.get   ("/instructors",          O.listInstructors);
+router.post  ("/instructors",          O.createInstructor);
+router.get   ("/course-staff",         O.listCourseStaff);
+router.post  ("/course-staff",         O.assignInstructor);
+router.delete("/course-staff/:course", O.unassignInstructor);
 
 module.exports = router;

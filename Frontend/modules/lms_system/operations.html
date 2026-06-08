@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Operations — Zyntrix LMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--blue:#3d8ef0;--amber:#f5a623;--rose:#ff4d6d;--green:#22c55e;--purple:#b57bee;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--accent-dim:rgba(0,229,176,.10);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;color:var(--bg)}
+.nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:var(--text2);font-size:12.5px;text-decoration:none;margin-bottom:1px}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-ico{width:16px;text-align:center}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px}
+.pg-title{font-family:var(--display);font-size:15px;font-weight:700;flex:1}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;text-decoration:none}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-rose{background:rgba(255,77,109,.12);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-sm{padding:5px 11px;font-size:11.5px}
+.tabs{display:flex;gap:4px;padding:10px 22px 0;background:var(--bg2)}
+.tab{padding:8px 16px;border-radius:8px 8px 0 0;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);border:1px solid transparent;border-bottom:none}
+.tab.on{background:var(--bg);color:var(--accent);border-color:var(--border)}
+.content{flex:1;overflow-y:auto;padding:18px 22px;background:var(--bg)}
+.pane{display:none}.pane.on{display:block}
+.sel,.input{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px;outline:none;width:100%}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card h3{font-family:var(--display);font-size:14px;font-weight:700;margin-bottom:10px}
+.muted{color:var(--text3);font-size:11px}.empty{text-align:center;color:var(--text3);padding:30px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:13px;display:none;z-index:60}.toast.on{display:block}
+.chip{font-size:10px;padding:2px 8px;border-radius:5px;background:var(--bg3);color:var(--text2)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:14px 16px}.kpi-val{font-family:var(--display);font-size:24px;font-weight:800}.kpi-lbl{font-size:10px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+table{width:100%;border-collapse:collapse}th{padding:9px 12px;text-align:left;font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text2)}
+.item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}.item:last-child{border-bottom:none}.it-t{flex:1}.it-t .nm{font-weight:600;font-size:13px;color:var(--text)}.it-t .sb{font-size:11px;color:var(--text3)}
+.row2{display:flex;gap:12px}.row2>div{flex:1}.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:0 0 5px}</style></head><body><div class="shell">
+<aside class="sidebar"><div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:800">Zyntrix LMS</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Admin</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Manage</div>
+    <a class="nav-a" href="dashboard.html"><span class="nav-ico">▦</span> Dashboard</a>
+    <a class="nav-a" href="content-builder.html"><span class="nav-ico">✎</span> Content Builder</a>
+    <a class="nav-a" href="assignments.html"><span class="nav-ico">▤</span> Assignments</a>
+    <a class="nav-a" href="quizzes.html"><span class="nav-ico">?</span> Quizzes</a>
+    <a class="nav-a" href="announcements.html"><span class="nav-ico">◔</span> Announcements</a>
+    <a class="nav-a" href="live-classes.html"><span class="nav-ico">⏵</span> Live Classes</a>
+    <a class="nav-a" href="gradebook.html"><span class="nav-ico">▥</span> Gradebook</a>
+    <a class="nav-a" href="reports.html"><span class="nav-ico">▣</span> Reports</a>
+    <a class="nav-a on" href="operations.html"><span class="nav-ico">⚙</span> Operations</a>
+    <a class="nav-a" href="students.html"><span class="nav-ico">☰</span> Students</a>
+  </div>
+  <div class="nav-grp"><div class="nav-lbl">Learner</div><a class="nav-a" href="student-dashboard.html"><span class="nav-ico">◉</span> My Learning</a></div>
+<div class="sb-foot"><button class="btn btn-rose btn-sm" style="width:100%;justify-content:center" onclick="lmsLogout()">⏻ Logout</button></div></aside>
+<div class="main"><div class="topbar"><div class="pg-title">LMS Operations</div><button class="btn btn-ghost btn-sm" onclick="loadOps()">↻ Refresh</button></div>
+<div class="tabs"><div class="tab on" data-pane="ov">Overview</div><div class="tab" data-pane="ins">Instructors</div></div>
+<div class="content">
+<div class="pane on" id="pane-ov">
+<div class="kpis">
+<div class="kpi"><div class="kpi-val" id="k-pend">—</div><div class="kpi-lbl">Pending Grading</div></div>
+<div class="kpi"><div class="kpi-val" id="k-low">—</div><div class="kpi-lbl">Low-Completion Courses</div></div>
+<div class="kpi"><div class="kpi-val" id="k-risk">—</div><div class="kpi-lbl">At-Risk Learners</div></div>
+<div class="kpi"><div class="kpi-val" id="k-learn">—</div><div class="kpi-lbl">Total Learners</div></div>
+<div class="kpi"><div class="kpi-val" id="k-store">—</div><div class="kpi-lbl">Video Storage</div></div></div>
+<div class="card"><h3>Courses needing attention (&lt;40% completion)</h3><div id="low-list"></div></div>
+<div class="card"><h3>Ungraded submissions <span class="chip" id="ung-count"></span></h3><div id="ung-list"></div></div>
+<div class="card"><h3>At-risk learners <span class="muted">(no lessons completed)</span></h3><div id="risk-list"></div></div>
+</div>
+<div class="pane" id="pane-ins">
+<div class="card"><h3>Add instructor</h3><div class="row2"><div><label class="fl">Email</label><input class="input" id="i-email" placeholder="instructor@gmail.com"></div><div><label class="fl">Name</label><input class="input" id="i-name"></div></div>
+<button class="btn btn-prim btn-sm" style="margin-top:12px" onclick="addIns()">Create instructor</button><div id="i-res" class="muted" style="margin-top:8px"></div></div>
+<div class="card"><h3>Assign instructor to course</h3><div class="row2"><div><label class="fl">Course</label><select class="input" id="a-course"></select></div><div><label class="fl">Instructor</label><select class="input" id="a-ins"></select></div></div>
+<button class="btn btn-prim btn-sm" style="margin-top:12px" onclick="assign()">Assign</button></div>
+<div class="card"><h3>Instructors</h3><div id="ins-list"></div></div>
+<div class="card"><h3>Course assignments</h3><div id="map-list"></div></div>
+</div>
+</div></div></div>
+<div class="toast" id="toast"></div>
+<script src="../../assets/js/api.js"></script>
+<script>
+if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+var $=function(i){return document.getElementById(i);};var COURSES=[],INS=[];
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2500);}
+document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");});document.querySelectorAll(".pane").forEach(function(x){x.classList.remove("on");});t.classList.add("on");$("pane-"+t.dataset.pane).classList.add("on");});});
+async function loadOps(){var d=await apiRequest("/lms/ops/summary");if(!d||d.error){toast((d&&d.msg)||"Error");return;}
+$("k-pend").textContent=d.pendingGrading||0;$("k-low").textContent=(d.lowCompletion||[]).length;$("k-risk").textContent=d.atRiskCount||0;$("k-learn").textContent=d.totalLearners||0;$("k-store").textContent=(d.storageMB||0)+" MB";
+$("low-list").innerHTML=(d.lowCompletion||[]).length?d.lowCompletion.map(function(c){return '<div class="item"><div class="it-t"><div class="nm">'+esc(c.course)+'</div><div class="sb">'+c.learners+' learners · '+c.completed+' completed</div></div><span class="chip" style="color:var(--amber)">'+c.completionRate+'%</span></div>';}).join(""):'<div class="empty">All courses healthy.</div>';
+$("ung-count").textContent=(d.ungraded||[]).length;
+$("ung-list").innerHTML=(d.ungraded||[]).length?d.ungraded.map(function(s){var nm=s.student&&s.student.name?s.student.name:"Student";var as=s.assignment&&s.assignment.title?s.assignment.title:"";var co=s.course&&s.course.title?s.course.title:"";return '<div class="item"><div class="it-t"><div class="nm">'+esc(nm)+'</div><div class="sb">'+esc(as)+' · '+esc(co)+'</div></div><a class="btn btn-ghost btn-sm" href="assignments.html">Grade</a></div>';}).join(""):'<div class="empty">Nothing pending. 🎉</div>';
+$("risk-list").innerHTML=(d.atRisk||[]).length?d.atRisk.map(function(u){return '<div class="item"><div class="it-t"><div class="nm">'+esc(u.name||"Student")+'</div><div class="sb">'+esc(u.email||"")+'</div></div><span class="chip" style="color:var(--rose)">no progress</span></div>';}).join(""):'<div class="empty">No at-risk learners.</div>';}
+async function loadIns(){var d=await apiRequest("/lms/courses");COURSES=(d&&d.courses)||[];$("a-course").innerHTML=COURSES.map(function(c){return '<option value="'+c._id+'">'+esc(c.title)+'</option>';}).join("");
+var di=await apiRequest("/lms/instructors");INS=(di&&di.instructors)||[];$("a-ins").innerHTML=INS.length?INS.map(function(i){return '<option value="'+i._id+'">'+esc(i.name||i.email)+'</option>';}).join(""):'<option value="">No instructors yet</option>';
+$("ins-list").innerHTML=INS.length?INS.map(function(i){return '<div class="item"><div class="it-t"><div class="nm">'+esc(i.name||"Instructor")+'</div><div class="sb">'+esc(i.email)+'</div></div><span class="chip">instructor</span></div>';}).join(""):'<div class="empty">No instructors yet.</div>';
+var dm=await apiRequest("/lms/course-staff");var map=(dm&&dm.courseStaff)||[];
+$("map-list").innerHTML=map.length?map.map(function(m){var co=m.course&&m.course.title?m.course.title:"(course)";var inn=m.instructor&&m.instructor.name?m.instructor.name:m.instructorName;return '<div class="item"><div class="it-t"><div class="nm">'+esc(co)+'</div><div class="sb">'+esc(inn||"")+'</div></div><button class="btn btn-rose btn-sm" onclick="unassign(\''+(m.course&&m.course._id||"")+'\')">Remove</button></div>';}).join(""):'<div class="empty">No assignments yet.</div>';}
+async function addIns(){var email=$("i-email").value.trim();if(!email){toast("Email required");return;}var r=await apiRequest("/lms/instructors","POST",{email:email,name:$("i-name").value.trim()});
+if(r&&!r.error){$("i-res").innerHTML=r.created?('✅ Created. '+(r.emailed?'Login emailed.':'Temp password: <b>'+esc(r.tempPassword||"")+'</b>')):'ℹ️ Existing user promoted to instructor.';$("i-email").value="";$("i-name").value="";loadIns();}else $("i-res").textContent=(r&&r.msg)||"Error";}
+async function assign(){var c=$("a-course").value,i=$("a-ins").value;if(!c||!i){toast("Pick course and instructor");return;}var r=await apiRequest("/lms/course-staff","POST",{course:c,instructor:i});if(r&&!r.error){toast("Assigned");loadIns();}else toast((r&&r.msg)||"Error");}
+async function unassign(c){if(!c)return;var r=await apiRequest("/lms/course-staff/"+c,"DELETE");if(r&&!r.error){toast("Removed");loadIns();}}
+function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+loadOps();loadIns();
+</script></body></html>
