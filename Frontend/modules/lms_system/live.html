@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Students — Zyntrix LMS</title>
+<title>Live Classes — Zyntrix LMS</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--blue:#3d8ef0;--amber:#f5a623;--rose:#ff4d6d;--green:#22c55e;--purple:#b57bee;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--accent-dim:rgba(0,229,176,.10);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
@@ -30,29 +30,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .chip{font-size:10px;padding:2px 8px;border-radius:5px;background:var(--bg3);color:var(--text2)}
 .row2{display:flex;gap:12px}.row2>div{flex:1}
 .item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}.item:last-child{border-bottom:none}
-.qblock{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px}</style></head><body><div class="shell">
-<aside class="sidebar"><div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:800">Zyntrix LMS</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Admin</div></div></div>
-  <div class="nav-grp"><div class="nav-lbl">Manage</div>
-    <a class="nav-a" href="dashboard.html"><span class="nav-ico">▦</span> Dashboard</a>
-    <a class="nav-a" href="content-builder.html"><span class="nav-ico">✎</span> Content Builder</a>
-    <a class="nav-a " href="assignments.html"><span class="nav-ico">▤</span> Assignments</a>
-    <a class="nav-a " href="quizzes.html"><span class="nav-ico">?</span> Quizzes</a>
-    <a class="nav-a " href="announcements.html"><span class="nav-ico">◔</span> Announcements</a>
-    <a class="nav-a" href="live-classes.html"><span class="nav-ico">⏵</span> Live Classes</a>
-    <a class="nav-a on" href="students.html"><span class="nav-ico">☰</span> Students</a>
-  </div>
-  <div class="nav-grp"><div class="nav-lbl">Learner</div>
-    <a class="nav-a" href="student-dashboard.html"><span class="nav-ico">◉</span> My Learning</a>
+.it-t{flex:1}.it-t .nm{font-weight:600;font-size:13px}.it-t .sb{font-size:11px;color:var(--text3)}</style></head><body><div class="shell">
+<aside class="sidebar"><div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:800">Zyntrix LMS</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Learner</div></div></div>
+  <div class="nav-grp"><div class="nav-lbl">Learn</div>
+    <a class="nav-a" href="student-dashboard.html"><span class="nav-ico">◉</span> My Courses</a>
+    <a class="nav-a" href="my-assignments.html"><span class="nav-ico">▤</span> Assignments</a>
+    <a class="nav-a" href="my-quizzes.html"><span class="nav-ico">?</span> Quizzes</a>
+    <a class="nav-a on" href="live.html"><span class="nav-ico">⏵</span> Live Classes</a>
+    <a class="nav-a" href="doubts.html"><span class="nav-ico">✎</span> Doubts</a>
   </div>
 <div class="sb-foot"><button class="btn btn-rose btn-sm" style="width:100%;justify-content:center" onclick="lmsLogout()">⏻ Logout</button></div></aside>
-<div class="main"><div class="topbar"><div class="pg-title">Students &amp; Logins</div></div>
-<div class="content">
-<div class="card"><h3>Provision all enrolled students</h3><div class="muted" style="margin-bottom:10px">Creates a student login for every active / handed-off enrollment that doesn't have one yet, and emails them their credentials.</div>
-<button class="btn btn-prim btn-sm" id="allBtn" onclick="provAll()">Provision all student logins</button><div id="all-res" class="muted" style="margin-top:10px"></div></div>
-<div class="card"><h3>Provision a single student</h3>
-<div class="row2"><div><label class="fl">Email</label><input class="input" id="s-email" placeholder="student@gmail.com"></div><div><label class="fl">Name (optional)</label><input class="input" id="s-name"></div></div>
-<button class="btn btn-prim btn-sm" style="margin-top:12px" onclick="provOne()">Create login</button><div id="one-res" class="muted" style="margin-top:10px"></div></div>
-<div class="card"><h3>Learner Roster</h3><div id="roster"></div></div></div></div></div>
+<div class="main"><div class="topbar"><div class="pg-title">Live Classes</div></div>
+<div class="content" id="list"><div class="empty">Loading…</div></div></div></div>
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
@@ -60,11 +49,18 @@ if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.htm
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2500);}
-async function provAll(){$("allBtn").disabled=true;$("all-res").textContent="Working…";var r=await apiRequest("/lms/students/provision-all","POST",{});$("allBtn").disabled=false;$("all-res").textContent=(r&&r.msg)||(r&&r.error?("Error: "+r.msg):"Done");load();}
-async function provOne(){var email=$("s-email").value.trim();if(!email){toast("Email required");return;}var r=await apiRequest("/lms/students/provision","POST",{email:email,name:$("s-name").value.trim()});
-if(r&&!r.error){$("one-res").innerHTML=r.created?('✅ Created. '+(r.emailed?'Credentials emailed.':'Email not sent — temp password: <b>'+esc(r.tempPassword||"")+'</b>')):'ℹ️ Account already existed; role set to student.';load();}else $("one-res").textContent=(r&&r.msg)||"Error";}
-async function load(){var d=await apiRequest("/lms/roster");var ro=(d&&d.roster)||[];
-$("roster").innerHTML=ro.length?ro.map(function(x){var nm=x.student&&x.student.fullName?x.student.fullName:"Student";var em=x.student&&x.student.email?x.student.email:"";var co=x.course&&x.course.title?x.course.title:"—";return '<div class="item"><div class="it-t"><div class="nm">'+esc(nm)+'</div><div class="sb">'+esc(em)+' · '+esc(co)+'</div></div><span class="chip">'+esc(x.status||"")+'</span></div>';}).join(""):'<div class="empty">No learners.</div>';}
+function fmtDT(d){return d?new Date(d).toLocaleString("en-IN",{weekday:"short",day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):"—";}
+async function load(){var d=await apiRequest("/lms/my/sessions");var items=(d&&d.sessions)||[];
+if(!items.length){$("list").innerHTML='<div class="empty">No live classes scheduled for your courses.</div>';return;}
+var now=Date.now();
+$("list").innerHTML=items.map(function(s){var upcoming=new Date(s.scheduledAt).getTime()>now-3600000 && s.status!=="completed" && s.status!=="cancelled";
+var att=s.myAttendance?('<span class="chip" style="color:var(--green)">'+s.myAttendance+'</span>'):'';
+return '<div class="card"><div style="display:flex;gap:10px;align-items:center"><div style="flex:1"><h3>'+esc(s.title)+' '+att+'</h3><div class="muted">'+(s.course&&s.course.title?esc(s.course.title):"")+' · '+fmtDT(s.scheduledAt)+' · '+(s.durationMin||0)+' min'+(s.instructorName?(' · '+esc(s.instructorName)):'')+'</div></div>'+
+(s.joinUrl&&upcoming?'<button class="btn btn-prim btn-sm" onclick="join(\''+s._id+'\',\''+encodeURIComponent(s.joinUrl)+'\')">Join</button>':'')+
+(s.recordingUrl?'<a class="btn btn-ghost btn-sm" target="_blank" href="'+esc(s.recordingUrl)+'">▶ Recording</a>':'')+
+'</div></div>';
+}).join("");}
+async function join(id,url){try{await apiRequest("/lms/sessions/"+id+"/attend","POST",{});}catch(e){}window.open(decodeURIComponent(url),"_blank");toast("Marked present");setTimeout(load,800);}
 function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 load();
 </script></body></html>

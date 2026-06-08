@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Assignments — Zyntrix LMS</title>
+<title>Live Classes — Zyntrix LMS</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--blue:#3d8ef0;--amber:#f5a623;--rose:#ff4d6d;--green:#22c55e;--purple:#b57bee;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--accent-dim:rgba(0,229,176,.10);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
@@ -35,64 +35,63 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="nav-grp"><div class="nav-lbl">Manage</div>
     <a class="nav-a" href="dashboard.html"><span class="nav-ico">▦</span> Dashboard</a>
     <a class="nav-a" href="content-builder.html"><span class="nav-ico">✎</span> Content Builder</a>
-    <a class="nav-a on" href="assignments.html"><span class="nav-ico">▤</span> Assignments</a>
-    <a class="nav-a NAV_quiz" href="quizzes.html"><span class="nav-ico">?</span> Quizzes</a>
-    <a class="nav-a NAV_ann" href="announcements.html"><span class="nav-ico">◔</span> Announcements</a>
-    <a class="nav-a" href="live-classes.html"><span class="nav-ico">⏵</span> Live Classes</a>
-    <a class="nav-a NAV_stu" href="students.html"><span class="nav-ico">☰</span> Students</a>
+    <a class="nav-a" href="assignments.html"><span class="nav-ico">▤</span> Assignments</a>
+    <a class="nav-a" href="quizzes.html"><span class="nav-ico">?</span> Quizzes</a>
+    <a class="nav-a" href="announcements.html"><span class="nav-ico">◔</span> Announcements</a>
+    <a class="nav-a on" href="live-classes.html"><span class="nav-ico">⏵</span> Live Classes</a>
+    <a class="nav-a" href="students.html"><span class="nav-ico">☰</span> Students</a>
   </div>
-  <div class="nav-grp"><div class="nav-lbl">Learner</div>
-    <a class="nav-a" href="student-dashboard.html"><span class="nav-ico">◉</span> My Learning</a>
-  </div>
+  <div class="nav-grp"><div class="nav-lbl">Learner</div><a class="nav-a" href="student-dashboard.html"><span class="nav-ico">◉</span> My Learning</a></div>
 <div class="sb-foot"><button class="btn btn-rose btn-sm" style="width:100%;justify-content:center" onclick="lmsLogout()">⏻ Logout</button></div></aside>
-<div class="main"><div class="topbar"><div class="pg-title">Assignments</div>
+<div class="main"><div class="topbar"><div class="pg-title">Live Classes</div>
 <select class="sel" id="courseSel" style="width:auto" onchange="load()"></select>
-<button class="btn btn-prim btn-sm" onclick="openNew()">＋ New Assignment</button></div>
+<button class="btn btn-prim btn-sm" onclick="openNew()">＋ Schedule Class</button></div>
 <div class="content" id="list"><div class="empty">Select a course.</div></div></div></div>
 
-<div class="modal" id="m-new"><div class="modal-card"><h3 id="mn-title">New Assignment</h3>
-<label class="fl">Title</label><input class="input" id="a-title">
-<label class="fl">Description</label><input class="input" id="a-desc">
-<label class="fl">Instructions</label><textarea class="input" id="a-inst" rows="3"></textarea>
-<div class="row2"><div><label class="fl">Max marks</label><input class="input" id="a-marks" type="number" value="100"></div><div><label class="fl">Due date</label><input class="input" id="a-due" type="date"></div></div>
+<div class="modal" id="m-new"><div class="modal-card"><h3 id="mn-title">Schedule Class</h3>
+<label class="fl">Title</label><input class="input" id="s-title">
+<div class="row2"><div><label class="fl">Date &amp; time</label><input class="input" id="s-when" type="datetime-local"></div><div><label class="fl">Duration (min)</label><input class="input" id="s-dur" type="number" value="60"></div></div>
+<label class="fl">Join link (Zoom / Meet / Teams)</label><input class="input" id="s-url" placeholder="https://...">
+<label class="fl">Instructor name</label><input class="input" id="s-inst">
 <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn btn-ghost btn-sm" onclick="closeM('m-new')">Cancel</button><button class="btn btn-prim btn-sm" onclick="save()">Save</button></div></div></div>
 
-<div class="modal" id="m-subs"><div class="modal-card"><h3>Submissions</h3><div id="subs-body"></div>
-<div style="text-align:right;margin-top:14px"><button class="btn btn-ghost btn-sm" onclick="closeM('m-subs')">Close</button></div></div></div>
+<div class="modal" id="m-att"><div class="modal-card"><h3>Attendance</h3><div id="att-body"></div>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class="btn btn-ghost btn-sm" onclick="closeM('m-att')">Close</button><button class="btn btn-prim btn-sm" onclick="saveAtt()">Save Attendance</button></div></div></div>
 
+<div class="modal" id="m-rec"><div class="modal-card"><h3>Update Session</h3>
+<label class="fl">Recording URL</label><input class="input" id="r-url">
+<label class="fl">Status</label><select class="input" id="r-status"><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn btn-ghost btn-sm" onclick="closeM('m-rec')">Cancel</button><button class="btn btn-prim btn-sm" onclick="saveRec()">Save</button></div></div></div>
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
 if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
-var COURSES=[],CUR="",editId=null,subAssignId=null;
+var COURSES=[],CUR="",attSession=null,recSession=null,ROSTER=[];
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2200);}
 function closeM(i){$(i).classList.remove("on");}
-function fmtD(d){return d?new Date(d).toLocaleDateString("en-IN",{day:"2-digit",month:"short"}):"—";}
-async function init(){var d=await apiRequest("/lms/courses");COURSES=(d&&d.courses)||[];$("courseSel").innerHTML='<option value="">— Course —</option>'+COURSES.map(function(c){return '<option value="'+c._id+'">'+esc(c.title)+'</option>';}).join("");var p=new URLSearchParams(location.search).get("course");if(p){$("courseSel").value=p;load();}}
+function fmtDT(d){return d?new Date(d).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):"—";}
+async function init(){var d=await apiRequest("/lms/courses");COURSES=(d&&d.courses)||[];$("courseSel").innerHTML='<option value="">— Course —</option>'+COURSES.map(function(c){return '<option value="'+c._id+'">'+esc(c.title)+'</option>';}).join("");}
 async function load(){CUR=$("courseSel").value;if(!CUR){$("list").innerHTML='<div class="empty">Select a course.</div>';return;}
-var d=await apiRequest("/lms/assignments?course="+CUR);var items=(d&&d.assignments)||[];
-$("list").innerHTML=items.length?items.map(function(a){var st=a.subStats||{n:0,graded:0};
-return '<div class="card"><div style="display:flex;align-items:center;gap:10px"><div style="flex:1"><h3>'+esc(a.title)+'</h3><div class="muted">'+(a.maxMarks||0)+' marks · due '+fmtD(a.dueDate)+' · '+st.n+' submissions ('+st.graded+' graded)</div></div>'+
-'<button class="btn btn-ghost btn-sm" onclick="viewSubs(\''+a._id+'\')">Submissions</button>'+
-'<button class="btn btn-ghost btn-sm" onclick="edit(\''+a._id+'\',\''+encodeURIComponent(a.title)+'\')">Edit</button>'+
-'<button class="btn btn-rose btn-sm" onclick="del(\''+a._id+'\')">✕</button></div>'+
-(a.description?'<div class="muted" style="margin-top:8px">'+esc(a.description)+'</div>':'')+'</div>';
-}).join(""):'<div class="empty">No assignments yet.</div>';}
-function openNew(){editId=null;$("mn-title").textContent="New Assignment";$("a-title").value="";$("a-desc").value="";$("a-inst").value="";$("a-marks").value=100;$("a-due").value="";$("m-new").classList.add("on");}
-function edit(id){editId=id;$("mn-title").textContent="Edit Assignment";$("m-new").classList.add("on");}
-async function save(){if(!CUR){toast("Pick a course");return;}var body={title:$("a-title").value.trim(),description:$("a-desc").value.trim(),instructions:$("a-inst").value.trim(),maxMarks:Number($("a-marks").value)||100,dueDate:$("a-due").value||null};if(!body.title){toast("Title required");return;}
-var r=editId?await apiRequest("/lms/assignments/"+editId,"PATCH",body):await apiRequest("/lms/assignments","POST",Object.assign({course:CUR},body));
-if(r&&!r.error){closeM('m-new');load();toast("Saved");}else toast((r&&r.msg)||"Error");}
-async function del(id){if(!confirm("Delete assignment and its submissions?"))return;var r=await apiRequest("/lms/assignments/"+id,"DELETE");if(r&&!r.error){load();toast("Deleted");}}
-async function viewSubs(id){subAssignId=id;var d=await apiRequest("/lms/assignments/"+id+"/submissions");var subs=(d&&d.submissions)||[];
-$("subs-body").innerHTML=subs.length?subs.map(function(s){var nm=s.student&&s.student.name?s.student.name:"Student";
-return '<div class="card"><div class="nm">'+esc(nm)+' <span class="chip">'+esc(s.status)+'</span></div><div class="muted" style="margin:4px 0">'+esc(s.text||"(no text)")+'</div>'+
-(s.files&&s.files.length?s.files.map(function(f){return '<a class="chip" style="text-decoration:none;margin-right:6px" target="_blank" href="'+API_BASE.replace(/\/api$/,"")+f.fileUrl+'?token='+encodeURIComponent(localStorage.getItem("token"))+'">⬇ '+esc(f.fileName)+'</a>';}).join(""):"")+
-'<div class="row2" style="margin-top:8px;align-items:flex-end"><div style="max-width:110px"><label class="fl">Marks</label><input class="input" id="mk-'+s._id+'" type="number" value="'+(s.marks!=null?s.marks:"")+'"></div><div><label class="fl">Feedback</label><input class="input" id="fb-'+s._id+'" value="'+esc(s.feedback||"")+'"></div><button class="btn btn-prim btn-sm" onclick="grade(\''+s._id+'\')">Save</button></div></div>';
-}).join(""):'<div class="empty">No submissions.</div>';$("m-subs").classList.add("on");}
-async function grade(sid){var body={marks:Number($("mk-"+sid).value),feedback:$("fb-"+sid).value};var r=await apiRequest("/lms/submissions/"+sid+"/grade","PATCH",body);if(r&&!r.error){toast("Graded");viewSubs(subAssignId);load();}else toast((r&&r.msg)||"Error");}
+var d=await apiRequest("/lms/sessions?course="+CUR);var items=(d&&d.sessions)||[];
+$("list").innerHTML=items.length?items.map(function(s){var stc={scheduled:"var(--blue)",live:"var(--green)",completed:"var(--text3)",cancelled:"var(--rose)"}[s.status]||"var(--text3)";
+return '<div class="card"><div style="display:flex;gap:10px;align-items:center"><div style="flex:1"><h3>'+esc(s.title)+' <span class="chip" style="color:'+stc+'">'+esc(s.status)+'</span></h3><div class="muted">'+fmtDT(s.scheduledAt)+' · '+(s.durationMin||0)+' min'+(s.instructorName?(' · '+esc(s.instructorName)):'')+'</div></div>'+
+(s.joinUrl?'<a class="btn btn-ghost btn-sm" target="_blank" href="'+esc(s.joinUrl)+'">Join</a>':'')+
+'<button class="btn btn-ghost btn-sm" onclick="att(\''+s._id+'\')">Attendance</button>'+
+'<button class="btn btn-ghost btn-sm" onclick="openRec(\''+s._id+'\',\''+esc(s.recordingUrl||"")+'\',\''+s.status+'\')">Update</button>'+
+'<button class="btn btn-rose btn-sm" onclick="del(\''+s._id+'\')">✕</button></div></div>';
+}).join(""):'<div class="empty">No classes scheduled.</div>';}
+function openNew(){$("s-title").value="";$("s-when").value="";$("s-dur").value=60;$("s-url").value="";$("s-inst").value="";$("m-new").classList.add("on");}
+async function save(){if(!CUR){toast("Pick a course");return;}var body={course:CUR,title:$("s-title").value.trim(),scheduledAt:$("s-when").value,durationMin:Number($("s-dur").value)||60,joinUrl:$("s-url").value.trim(),instructorName:$("s-inst").value.trim()};if(!body.title||!body.scheduledAt){toast("Title and time required");return;}
+var r=await apiRequest("/lms/sessions","POST",body);if(r&&!r.error){closeM('m-new');load();toast("Scheduled");}else toast((r&&r.msg)||"Error");}
+async function del(id){if(!confirm("Delete this class?"))return;var r=await apiRequest("/lms/sessions/"+id,"DELETE");if(r&&!r.error){load();toast("Deleted");}}
+async function att(id){attSession=id;var d=await apiRequest("/lms/sessions/"+id+"/attendance");ROSTER=(d&&d.roster)||[];
+$("att-body").innerHTML=ROSTER.length?ROSTER.map(function(r,i){return '<div class="item"><div class="it-t"><div class="nm">'+esc(r.name||"Student")+'</div><div class="sb">'+esc(r.email||"")+'</div></div><select class="sel" id="at-'+i+'" style="width:auto"><option value="">—</option><option value="present"'+(r.status==="present"?" selected":"")+'>Present</option><option value="late"'+(r.status==="late"?" selected":"")+'>Late</option><option value="absent"'+(r.status==="absent"?" selected":"")+'>Absent</option></select></div>';}).join(""):'<div class="empty">No enrolled students with logins. Provision student logins first.</div>';$("m-att").classList.add("on");}
+async function saveAtt(){var records=[];ROSTER.forEach(function(r,i){var v=$("at-"+i).value;if(v)records.push({student:r.student,status:v});});
+var res=await apiRequest("/lms/sessions/"+attSession+"/attendance","POST",{records:records});if(res&&!res.error){closeM('m-att');toast("Attendance saved");}else toast((res&&res.msg)||"Error");}
+function openRec(id,url,st){recSession=id;$("r-url").value=url||"";$("r-status").value=st||"scheduled";$("m-rec").classList.add("on");}
+async function saveRec(){var r=await apiRequest("/lms/sessions/"+recSession,"PATCH",{recordingUrl:$("r-url").value.trim(),status:$("r-status").value});if(r&&!r.error){closeM('m-rec');load();toast("Updated");}else toast((r&&r.msg)||"Error");}
 function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
 </script></body></html>

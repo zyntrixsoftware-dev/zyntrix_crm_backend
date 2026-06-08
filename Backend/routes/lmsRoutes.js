@@ -3,6 +3,7 @@ const jwt     = require("jsonwebtoken");
 const router  = express.Router();
 const C       = require("../controllers/lmsController");
 const A       = require("../controllers/lmsActivityController");
+const L       = require("../controllers/lmsLiveController");
 
 // Auth that accepts a Bearer header OR ?token= (so <video src> and downloads work)
 function auth(req, res, next) {
@@ -74,5 +75,15 @@ router.post("/discussions/:id/reply",A.replyDiscussion);
 // ── Phase 2: Student provisioning ────────────────────────────
 router.post("/students/provision",     A.provisionStudent);
 router.post("/students/provision-all",  A.provisionAll);
+
+// ── Phase 3: Live classes + attendance ───────────────────────
+router.get   ("/sessions",                 L.listSessions);
+router.post  ("/sessions",                 L.createSession);
+router.patch ("/sessions/:id",             L.updateSession);
+router.delete("/sessions/:id",             L.deleteSession);
+router.get   ("/sessions/:id/attendance",  L.sessionAttendance);
+router.post  ("/sessions/:id/attendance",  L.markAttendance);
+router.post  ("/sessions/:id/attend",      L.attendSession);
+router.get   ("/my/sessions",              L.mySessions);
 
 module.exports = router;
