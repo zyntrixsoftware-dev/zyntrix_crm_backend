@@ -643,11 +643,50 @@ exports.listEnrollments = async (req, res) => {
         select: "fullName email phone assignedTo",
         populate: { path: "assignedTo", select: "name email" }
       })
-      .populate("batch",     "batchCode startDate")
-      .populate("course",    "title")
-      .populate("createdBy", "name email");
+      .populate("batch",        "batchCode startDate")
+      .populate("course",       "title")
+      .populate("createdBy",    "name email")
+      .populate("postSalesRep", "name email");
     return res.json({ enrollments });
   } catch (err) {
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// Roles allowed to view / use the pre- & post-sales panels
+function canPanel(req, res) {
+  const ok = req.user && ["sales","presales","postsales","super_admin","admin"].includes(req.user.role);
+  if (!ok) res.status(403).json({ msg: "Access denied" });
+  return ok;
+}
+
+// GET /sales/postsales-reps - active users who can be allocated post-sales work
+exports.listPostSalesReps = async (req, res) => {
+  if (!canPanel(req, res)) return;
+  try {
+    const reps = await User.find({ role: "postsales", active: true })
+      .select("name email").sort({ name: 1 }).lean();
+    return res.json({ reps });
+  } catch (e) {
+    console.error("listPostSalesReps:", e);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// PATCH /sales/enrollments/:id/postsales-rep - allocate (or clear) a post-sales rep
+exports.assignPostSalesRep = async (req, res) => {
+  if (!canPanel(req, res)) return;
+  try {
+    const repId = req.body.repId;
+    const upd = (repId && validId(repId))
+      ? { postSalesRep: repId, postSalesAssignedAt: new Date() }
+      : { postSalesRep: null, postSalesAssignedAt: null };
+    const enrollment = await Enrollment.findByIdAndUpdate(req.params.id, upd, { new: true })
+      .populate("postSalesRep", "name email");
+    if (!enrollment) return res.status(404).json({ msg: "Enrollment not found" });
+    return res.json({ enrollment });
+  } catch (err) {
+    console.error("assignPostSalesRep:", err);
     return res.status(500).json({ msg: "Server error" });
   }
 };

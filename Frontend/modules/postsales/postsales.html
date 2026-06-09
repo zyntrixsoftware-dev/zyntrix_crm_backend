@@ -101,7 +101,7 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
   </div>
 
   <div class="kpi-strip">
-    <div class="kpi" style="--kc:var(--green)"><div class="kpi-val" id="k-active">—</div><div class="kpi-lbl">Active Students</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="kpi-val" id="k-active">—</div><div class="kpi-lbl">Paying Students</div></div>
     <div class="kpi" style="--kc:var(--accent)"><div class="kpi-val" id="k-collected">—</div><div class="kpi-lbl">Collected (Month)</div></div>
     <div class="kpi" style="--kc:var(--amber)"><div class="kpi-val" id="k-outstanding">—</div><div class="kpi-lbl">Outstanding</div></div>
     <div class="kpi" style="--kc:var(--rose)"><div class="kpi-val" id="k-overdue">—</div><div class="kpi-lbl">Overdue</div></div>
@@ -117,9 +117,10 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
     <!-- ONBOARDING & PAYMENTS -->
     <div class="pane on" id="pane-onboard">
       <div class="card">
-        <h3>Enrolled Students <span class="chip" id="enr-count"></span></h3>
+        <h3>Paid Students <span class="chip" id="enr-count"></span></h3>
+        <p class="muted" style="margin:-8px 0 12px">All students who have paid pre-fees (partial) or full fees. Partial payers can be allocated to a post-sales rep to collect the balance.</p>
         <div style="overflow-x:auto"><table>
-          <thead><tr><th>Student</th><th>Course</th><th>Batch</th><th>Plan</th><th>Fee Progress</th><th>Balance</th><th>Next Due</th><th>Status</th></tr></thead>
+          <thead><tr><th>Student</th><th>Course</th><th>Batch</th><th>Paid / Fee</th><th>Balance</th><th>Pay Status</th><th>Closed By</th><th>Post-Sales Rep</th></tr></thead>
           <tbody id="enr-body"></tbody>
         </table></div>
       </div>
@@ -168,7 +169,7 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
 <script src="../../assets/js/api.js"></script>
 <script>
 (function(){var t=localStorage.getItem("token");var u;try{u=JSON.parse(localStorage.getItem("user"))}catch(e){}if(!t||!u){location.href=location.origin+"/crm/index.html";return;}if(['super_admin','sales','postsales'].indexOf(u.role)<0){alert("You do not have access to this panel.");location.href=location.origin+"/crm/index.html";}})();
-var ENR=[], SUMMARY={};
+var ENR=[], SUMMARY={}, REPS=[];
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function inr(n){return "₹"+Number(n||0).toLocaleString("en-IN");}
@@ -183,16 +184,28 @@ document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click"
 });});
 
 async function loadAll(){
-  var r=await Promise.all([ apiRequest("/sales/enrollments"), apiRequest("/sales/payments/summary") ]);
-  ENR=(r[0]&&r[0].enrollments)||[]; SUMMARY=r[1]||{};
+  var r=await Promise.all([ apiRequest("/sales/enrollments"), apiRequest("/sales/payments/summary"), apiRequest("/sales/postsales-reps") ]);
+  ENR=(r[0]&&r[0].enrollments)||[]; SUMMARY=r[1]||{}; REPS=(r[2]&&r[2].reps)||[];
   renderKPIs(); renderEnrollments(); renderRenewals(); renderTickets();
 }
 
+function payers(){return ENR.filter(function(e){return Number(e.feePaid||0)>0;});}
+function closerOf(e){var a=(e.lead&&e.lead.assignedTo)?e.lead.assignedTo.name:""; if(a)return a; return (e.createdBy&&e.createdBy.name)?e.createdBy.name:""; }
+function repOptions(selId){
+  var o='<option value="">— assign —</option>';
+  REPS.forEach(function(r){o+='<option value="'+r._id+'"'+(selId===r._id?' selected':'')+'>'+esc(r.name||r.email)+'</option>';});
+  return o;
+}
+async function assignRep(id,repId){
+  var r=await apiRequest("/sales/enrollments/"+id+"/postsales-rep","PATCH",{repId:repId});
+  if(r&&!r.error){var e=ENR.find(function(x){return x._id===id;}); if(e)e.postSalesRep=(r.enrollment&&r.enrollment.postSalesRep)||null;}
+  else alert((r&&r.msg)||"Could not assign post-sales rep");
+}
 function renderKPIs(){
-  var active=ENR.filter(function(e){return e.status==="active";});
-  $("k-active").textContent=active.length;
+  var p=payers();
+  $("k-active").textContent=p.length;
   $("k-collected").textContent=inr(SUMMARY.monthTotal||0);
-  var outstanding=active.reduce(function(a,e){return a+balance(e);},0);
+  var outstanding=p.reduce(function(a,e){return a+balance(e);},0);
   $("k-outstanding").textContent=inr(outstanding);
   $("k-overdue").textContent=SUMMARY.overdueCount!=null?SUMMARY.overdueCount:0;
 }
@@ -204,10 +217,9 @@ function statusBadge(s){
 }
 
 function renderEnrollments(){
-  var rows=ENR.slice().sort(function(a,b){return new Date(b.enrolledAt)-new Date(a.enrolledAt);});
-  $("enr-count").textContent=rows.length+" students";
-  if(!rows.length){$("enr-body").innerHTML='<tr><td colspan="8"><div class="empty">No enrollments yet.</div></td></tr>';return;}
-  var now=Date.now();
+  var rows=payers().sort(function(a,b){return new Date(b.enrolledAt)-new Date(a.enrolledAt);});
+  $("enr-count").textContent=rows.length+(rows.length===1?" student":" students");
+  if(!rows.length){$("enr-body").innerHTML='<tr><td colspan="8"><div class="empty">No paying students yet.</div></td></tr>';return;}
   $("enr-body").innerHTML=rows.map(function(e){
     var nm=e.lead&&e.lead.fullName?e.lead.fullName:"Student";
     var em=e.lead&&e.lead.email?e.lead.email:"";
@@ -215,14 +227,28 @@ function renderEnrollments(){
     var bt=e.batch&&e.batch.batchCode?e.batch.batchCode:"—";
     var fee=effFee(e); var paid=e.feePaid||0; var pct=fee?Math.min(100,Math.round(paid/fee*100)):0;
     var col=pct>=100?"var(--green)":pct>=50?"var(--accent)":"var(--amber)";
-    var overdue=e.nextDueDate&&new Date(e.nextDueDate).getTime()<now&&balance(e)>0;
+    var bal=balance(e);
+    var payBadge=bal>0
+      ?'<span class="badge" style="background:var(--amber);color:var(--bg)">Pre-Fees</span>'
+      :'<span class="badge" style="background:var(--green);color:var(--bg)">Fully Paid</span>';
+    var closer=closerOf(e);
+    // Post-sales rep cell: dropdown only for not-fully-paid students
+    var repCell;
+    if(bal>0){
+      var sel=(e.postSalesRep&&e.postSalesRep._id)?e.postSalesRep._id:"";
+      repCell = REPS.length
+        ? '<select class="sel" onchange="assignRep(\''+e._id+'\',this.value)">'+repOptions(sel)+'</select>'
+        : '<span class="muted">no post-sales users</span>';
+    } else {
+      repCell = '<span class="muted">— fully paid —</span>';
+    }
     return '<tr><td><div class="nm">'+esc(nm)+'</div><div class="sub">'+esc(em)+'</div></td>'+
       '<td>'+esc(co)+'</td><td><span class="chip">'+esc(bt)+'</span></td>'+
-      '<td style="text-transform:capitalize">'+esc(e.paymentPlan||"full")+'</td>'+
-      '<td><div style="display:flex;align-items:center;gap:8px"><div class="bar"><div class="bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div><span class="muted">'+pct+'%</span></div></td>'+
-      '<td>'+(balance(e)>0?'<span style="color:var(--amber);font-weight:600">'+inr(balance(e))+'</span>':'<span style="color:var(--green)">Paid</span>')+'</td>'+
-      '<td>'+(overdue?'<span style="color:var(--rose);font-weight:600">'+fmtD(e.nextDueDate)+' ⚠</span>':fmtD(e.nextDueDate))+'</td>'+
-      '<td>'+statusBadge(e.status)+'</td></tr>';
+      '<td><div style="display:flex;align-items:center;gap:8px"><div class="bar"><div class="bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div><span class="muted">'+inr(paid)+' / '+inr(fee)+'</span></div></td>'+
+      '<td>'+(bal>0?'<span style="color:var(--amber);font-weight:600">'+inr(bal)+'</span>':'<span style="color:var(--green)">₹0</span>')+'</td>'+
+      '<td>'+payBadge+'</td>'+
+      '<td>'+(closer?esc(closer):'<span class="muted">—</span>')+'</td>'+
+      '<td>'+repCell+'</td></tr>';
   }).join("");
 }
 

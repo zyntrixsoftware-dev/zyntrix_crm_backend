@@ -109,32 +109,72 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
   </div>
 
   <div class="kpi-strip">
-    <div class="kpi" style="--kc:var(--accent)"><div class="kpi-val" id="k-total">—</div><div class="kpi-lbl">Paying Students</div></div>
-    <div class="kpi" style="--kc:var(--green)"><div class="kpi-val" id="k-full">—</div><div class="kpi-lbl">Fully Paid</div></div>
-    <div class="kpi" style="--kc:var(--amber)"><div class="kpi-val" id="k-partial">—</div><div class="kpi-lbl">Pre-Fees (Partial)</div></div>
-    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-val" id="k-collected">—</div><div class="kpi-lbl">Total Collected</div></div>
+    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-val" id="k-prospects">—</div><div class="kpi-lbl">Active Prospects</div></div>
+    <div class="kpi" style="--kc:var(--purple)"><div class="kpi-val" id="k-qualified">—</div><div class="kpi-lbl">Qualified</div></div>
+    <div class="kpi" style="--kc:var(--amber)"><div class="kpi-val" id="k-demos">—</div><div class="kpi-lbl">Upcoming Demos</div></div>
+    <div class="kpi" style="--kc:var(--accent)"><div class="kpi-val" id="k-conv">—</div><div class="kpi-lbl">Conversion Rate</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" data-pane="pipeline">Pipeline</div>
+    <div class="tab" data-pane="inquiries">Inquiries &amp; Qualification</div>
+    <div class="tab" data-pane="demos">Demos &amp; Follow-ups</div>
+    <div class="tab" data-pane="quotes">Quotes</div>
   </div>
 
   <div class="content">
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-        <h3 style="margin:0;flex:1">Paid Students <span class="chip" id="ps-count"></span></h3>
-        <input class="input" id="f-search" placeholder="Search student, course, salesperson…" style="max-width:260px" oninput="render()">
-        <select class="sel" id="f-status" onchange="render()">
-          <option value="">All payers</option>
-          <option value="full">Fully Paid</option>
-          <option value="partial">Pre-Fees (Partial)</option>
-        </select>
-        <select class="sel" id="f-rep" onchange="render()"><option value="">All salespeople</option></select>
+    <!-- PIPELINE -->
+    <div class="pane on" id="pane-pipeline">
+      <div class="grid2">
+        <div class="card"><h3>Pre-Sales Funnel</h3><div id="funnel"></div></div>
+        <div class="card"><h3>Lead Sources</h3><div id="sources"></div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
+            <span class="muted">Pipeline value (budget of active prospects)</span>
+            <span class="nm" id="pipe-value">—</span>
+          </div>
+        </div>
       </div>
-      <div style="overflow-x:auto"><table>
-        <thead><tr>
-          <th>Student</th><th>Course</th><th>Batch</th>
-          <th style="text-align:right">Total Fee</th><th style="text-align:right">Paid</th><th style="text-align:right">Balance</th>
-          <th>Status</th><th>Assigned Counsellor</th><th>Recorded By</th><th>Enrolled</th>
-        </tr></thead>
-        <tbody id="ps-body"></tbody>
-      </table></div>
+    </div>
+
+    <!-- INQUIRIES -->
+    <div class="pane" id="pane-inquiries">
+      <div class="card">
+        <h3>Inquiry Queue <span class="chip" id="inq-count"></span></h3>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Prospect</th><th>Source</th><th>Course Interest</th><th>Score</th><th>Stage</th><th></th></tr></thead>
+          <tbody id="inq-body"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- DEMOS & FOLLOWUPS -->
+    <div class="pane" id="pane-demos">
+      <div class="grid2">
+        <div class="card"><h3>Upcoming Demos <span class="chip" id="demo-count"></span></h3><div id="demo-list"></div></div>
+        <div class="card"><h3>Pending Follow-ups <span class="chip" id="fu-count"></span></h3><div id="fu-list"></div></div>
+      </div>
+    </div>
+
+    <!-- QUOTES -->
+    <div class="pane" id="pane-quotes">
+      <div class="grid2">
+        <div class="card"><h3>New Quote / Proposal</h3>
+          <label class="fl">Prospect name</label>
+          <input class="input" id="q-name" placeholder="Student name" style="margin-bottom:12px">
+          <label class="fl">Course</label>
+          <select class="input" id="q-course" style="margin-bottom:12px"></select>
+          <div style="display:flex;gap:12px;margin-bottom:12px">
+            <div style="flex:1"><label class="fl">Discount %</label><input class="input" id="q-disc" type="number" min="0" max="100" value="0"></div>
+            <div style="flex:1"><label class="fl">GST %</label><input class="input" id="q-gst" type="number" min="0" max="28" value="18"></div>
+          </div>
+          <button class="btn btn-prim" style="width:100%;justify-content:center" onclick="genQuote()">Generate Quote</button>
+          <div id="q-preview" style="margin-top:16px"></div>
+        </div>
+        <div class="card"><h3>Saved Quotes <span class="chip" id="sq-count"></span></h3>
+          <div id="saved-quotes"></div>
+          <p class="muted" style="margin-top:10px">Saved to the server — shared across the Pre-Sales team.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -143,83 +183,165 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
 <script src="../../assets/js/api.js"></script>
 <script>
 (function(){var t=localStorage.getItem("token");var u;try{u=JSON.parse(localStorage.getItem("user"))}catch(e){}if(!t||!u){location.href=location.origin+"/crm/index.html";return;}if(['super_admin','sales','presales'].indexOf(u.role)<0){alert("You do not have access to this panel.");location.href=location.origin+"/crm/index.html";}})();
-var ENR=[];
+var LEADS=[], STATS={}, DEMOS=[], FOLLOWUPS=[], COURSES=[];
+var PRESALE_STAGES=[["new_lead","New Lead","var(--blue)"],["contacted","Contacted","var(--teal)"],["demo_scheduled","Demo Scheduled","var(--amber)"],["demo_attended","Demo Attended","var(--purple)"],["enrolled","Enrolled (Won)","var(--green)"]];
+var STAGE_LABELS={new_lead:"New Lead",contacted:"Contacted",demo_scheduled:"Demo Scheduled",demo_attended:"Demo Attended",enrolled:"Enrolled",dropped:"Dropped",completed:"Completed"};
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function inr(n){return "₹"+Number(n||0).toLocaleString("en-IN");}
-function fmtDate(d){if(!d)return "—";var x=new Date(d);return x.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});}
-function feeOf(e){return Number(e.discountedFee||e.totalFee||0);}
-function nameOf(u){return u&&u.name?u.name:"";}
+function fmtDate(d){if(!d)return "—";var x=new Date(d);return x.toLocaleDateString("en-IN",{day:"2-digit",month:"short"})+" "+x.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});}
+function stageCount(st){var s=(STATS.stages||[]).find(function(x){return x._id===st;});return s?s.count:0;}
+function leadScore(l){return l.leadScore!=null?l.leadScore:(l.score&&l.score.total!=null?l.score.total:null);}
 
-// only students who paid something (pre-fees / partial OR fully paid)
-function payers(){return ENR.filter(function(e){return Number(e.feePaid||0)>0;});}
-function statusOf(e){var fee=feeOf(e),paid=Number(e.feePaid||0);return (fee>0&&paid<fee)?"partial":"full";}
+// tabs
+document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");});
+  document.querySelectorAll(".pane").forEach(function(x){x.classList.remove("on");});
+  t.classList.add("on"); $("pane-"+t.dataset.pane).classList.add("on");
+});});
 
 async function loadAll(){
-  var r=await apiRequest("/sales/enrollments?limit=1000");
-  ENR=(r&&r.enrollments)||[];
-  buildRepFilter(); renderKPIs(); render();
+  var r = await Promise.all([
+    apiRequest("/sales/leads?archived=false&limit=500"),
+    apiRequest("/sales/leads/stats"),
+    apiRequest("/sales/demos"),
+    apiRequest("/sales/followups"),
+    apiRequest("/sales/courses?active=true")
+  ]);
+  LEADS=(r[0]&&r[0].leads)||[]; STATS=r[1]||{}; DEMOS=(r[2]&&r[2].demos)||[]; FOLLOWUPS=(r[3]&&r[3].followups)||[]; COURSES=(r[4]&&r[4].courses)||[];
+  renderKPIs(); renderFunnel(); renderSources(); renderInquiries(); renderDemos(); renderFollowups(); fillCourseSelect(); renderSavedQuotes();
 }
 
 function renderKPIs(){
-  var p=payers();
-  var full=p.filter(function(e){return statusOf(e)==="full";}).length;
-  $("k-total").textContent=p.length;
-  $("k-full").textContent=full;
-  $("k-partial").textContent=p.length-full;
-  $("k-collected").textContent=inr(p.reduce(function(a,e){return a+Number(e.feePaid||0);},0));
+  var prospects = LEADS.filter(function(l){return ["new_lead","contacted","demo_scheduled","demo_attended"].indexOf(l.pipelineStage)>=0;});
+  var qualified = LEADS.filter(function(l){return ["contacted","demo_scheduled","demo_attended"].indexOf(l.pipelineStage)>=0;});
+  var now=Date.now();
+  var upDemos = DEMOS.filter(function(d){return new Date(d.scheduledAt).getTime()>=now && !d.attended;});
+  var total = STATS.total||LEADS.length||0;
+  var won = stageCount("enrolled");
+  var conv = total? Math.round(won/total*100):0;
+  $("k-prospects").textContent=prospects.length;
+  $("k-qualified").textContent=qualified.length;
+  $("k-demos").textContent=upDemos.length;
+  $("k-conv").textContent=conv+"%";
+  var pv = prospects.reduce(function(a,l){return a+(l.budget||0);},0);
+  $("pipe-value").textContent=inr(pv);
 }
 
-function repsOf(e){
-  return {
-    assigned: (e.lead&&e.lead.assignedTo)?nameOf(e.lead.assignedTo):"",
-    recorded: nameOf(e.createdBy)
-  };
-}
-
-function buildRepFilter(){
-  var set={};
-  payers().forEach(function(e){var r=repsOf(e);if(r.assigned)set[r.assigned]=1;if(r.recorded)set[r.recorded]=1;});
-  $("f-rep").innerHTML='<option value="">All salespeople</option>'+
-    Object.keys(set).sort().map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+'</option>';}).join("");
-}
-
-function render(){
-  var q=($("f-search").value||"").toLowerCase().trim();
-  var st=$("f-status").value;
-  var rep=$("f-rep").value;
-  var rows=payers().filter(function(e){
-    if(st&&statusOf(e)!==st)return false;
-    var r=repsOf(e);
-    if(rep&&r.assigned!==rep&&r.recorded!==rep)return false;
-    if(q){
-      var L=e.lead||{};
-      var hay=[L.fullName||"",L.email||"",L.phone||"",(e.course&&e.course.title)||"",r.assigned,r.recorded].join(" ").toLowerCase();
-      if(hay.indexOf(q)<0)return false;
-    }
-    return true;
-  });
-  $("ps-count").textContent=rows.length+(rows.length===1?" student":" students");
-  if(!rows.length){$("ps-body").innerHTML='<tr><td colspan="10"><div class="empty">No paying students match.</div></td></tr>';return;}
-  $("ps-body").innerHTML=rows.map(function(e){
-    var L=e.lead||{};var fee=feeOf(e);var paid=Number(e.feePaid||0);var bal=Math.max(0,fee-paid);
-    var badge=statusOf(e)==="full"
-      ?'<span class="badge" style="background:var(--green);color:var(--bg)">Fully Paid</span>'
-      :'<span class="badge" style="background:var(--amber);color:var(--bg)">Pre-Fees</span>';
-    var r=repsOf(e);
-    return '<tr>'+
-      '<td><div class="nm">'+esc(L.fullName||"Unknown")+'</div><div class="sub">'+esc(L.email||L.phone||"")+'</div></td>'+
-      '<td>'+esc((e.course&&e.course.title)||"—")+'</td>'+
-      '<td>'+esc((e.batch&&e.batch.batchCode)||"—")+'</td>'+
-      '<td style="text-align:right">'+inr(fee)+'</td>'+
-      '<td style="text-align:right;color:var(--green);font-weight:600">'+inr(paid)+'</td>'+
-      '<td style="text-align:right;color:'+(bal>0?"var(--amber)":"var(--text3)")+'">'+inr(bal)+'</td>'+
-      '<td>'+badge+'</td>'+
-      '<td>'+(r.assigned?esc(r.assigned):'<span class="muted">— unassigned</span>')+'</td>'+
-      '<td>'+(r.recorded?esc(r.recorded):'<span class="muted">—</span>')+'</td>'+
-      '<td class="muted">'+fmtDate(e.enrolledAt||e.createdAt)+'</td>'+
-    '</tr>';
+function renderFunnel(){
+  var max=Math.max(1,stageCount("new_lead"),stageCount("contacted"),stageCount("demo_scheduled"),stageCount("demo_attended"),stageCount("enrolled"));
+  $("funnel").innerHTML = PRESALE_STAGES.map(function(s){
+    var c=stageCount(s[0]); var pct=Math.round(c/max*100);
+    return '<div class="funnel-row"><div class="funnel-lbl">'+s[1]+'</div>'+
+      '<div class="funnel-bar"><div class="funnel-fill" style="width:'+Math.max(pct,6)+'%;background:'+s[2]+'">'+c+'</div></div>'+
+      '<div class="funnel-pct">'+pct+'%</div></div>';
   }).join("");
+}
+
+function renderSources(){
+  var src=STATS.sources||[]; var tot=src.reduce(function(a,s){return a+s.count;},0)||1;
+  var colors=["var(--accent)","var(--blue)","var(--purple)","var(--amber)","var(--teal)","var(--rose)"];
+  if(!src.length){$("sources").innerHTML='<p class="empty">No data</p>';return;}
+  $("sources").innerHTML = src.map(function(s,i){
+    var pct=Math.round(s.count/tot*100);
+    return '<div class="funnel-row"><div class="funnel-lbl" style="text-transform:capitalize">'+esc((s._id||"other").replace("_"," "))+'</div>'+
+      '<div class="funnel-bar"><div class="funnel-fill" style="width:'+Math.max(pct,6)+'%;background:'+colors[i%colors.length]+'">'+s.count+'</div></div>'+
+      '<div class="funnel-pct">'+pct+'%</div></div>';
+  }).join("");
+}
+
+function badgeForStage(st){
+  var map={new_lead:"var(--blue)",contacted:"var(--teal)",demo_scheduled:"var(--amber)",demo_attended:"var(--purple)",enrolled:"var(--green)",dropped:"var(--rose)",completed:"var(--accent)"};
+  var c=map[st]||"var(--text3)";
+  return '<span class="badge" style="background:'+c.replace("var(--","var(--").replace(")",")")+';color:var(--bg)">'+(STAGE_LABELS[st]||st)+'</span>';
+}
+
+function renderInquiries(){
+  var rows = LEADS.filter(function(l){return l.pipelineStage!=="completed";})
+    .sort(function(a,b){return new Date(b.createdAt)-new Date(a.createdAt);}).slice(0,150);
+  $("inq-count").textContent=rows.length+" prospects";
+  if(!rows.length){$("inq-body").innerHTML='<tr><td colspan="6"><div class="empty">No inquiries yet.</div></td></tr>';return;}
+  var stageOpts=Object.keys(STAGE_LABELS).map(function(k){return '<option value="'+k+'">'+STAGE_LABELS[k]+'</option>';}).join("");
+  $("inq-body").innerHTML = rows.map(function(l){
+    var sc=leadScore(l);
+    var ci=l.courseInterest&&l.courseInterest.title?l.courseInterest.title:"—";
+    return '<tr><td><div class="nm">'+esc(l.fullName||"Unknown")+'</div><div class="sub">'+esc(l.email||l.phone||"")+'</div></td>'+
+      '<td><span class="chip" style="text-transform:capitalize">'+esc((l.source||"other").replace("_"," "))+'</span></td>'+
+      '<td>'+esc(ci)+'</td>'+
+      '<td><span class="score">'+(sc==null?"—":sc)+'</span></td>'+
+      '<td><select class="sel" onchange="moveStage(\''+l._id+'\',this.value)">'+
+        stageOpts.replace('value="'+l.pipelineStage+'"','value="'+l.pipelineStage+'" selected')+'</select></td>'+
+      '<td><a class="btn btn-ghost btn-sm" href="../sales_system/leads.html">Open</a></td></tr>';
+  }).join("");
+}
+
+async function moveStage(id,stage){
+  var r=await apiRequest("/sales/leads/"+id+"/stage","PATCH",{stage:stage});
+  if(r&&!r.error){ var l=LEADS.find(function(x){return x._id===id;}); if(l)l.pipelineStage=stage; var s=await apiRequest("/sales/leads/stats"); if(s)STATS=s; renderKPIs(); renderFunnel(); }
+  else alert((r&&r.msg)||"Could not update stage");
+}
+
+function renderDemos(){
+  var now=Date.now();
+  var rows=DEMOS.filter(function(d){return new Date(d.scheduledAt).getTime()>=now-3600000 && !d.attended;})
+    .sort(function(a,b){return new Date(a.scheduledAt)-new Date(b.scheduledAt);});
+  $("demo-count").textContent=rows.length;
+  $("demo-list").innerHTML = rows.length? rows.map(function(d){
+    var nm=d.lead&&d.lead.fullName?d.lead.fullName:"Lead";
+    var co=d.course&&d.course.title?d.course.title:"";
+    return '<div class="list-item"><span class="dot" style="background:var(--amber)"></span>'+
+      '<div style="flex:1"><div class="nm">'+esc(nm)+'</div><div class="sub">'+esc(co)+' · '+esc(d.mode||"online")+'</div></div>'+
+      '<div class="muted">'+fmtDate(d.scheduledAt)+'</div></div>';
+  }).join("") : '<p class="empty">No upcoming demos.</p>';
+}
+
+function renderFollowups(){
+  var rows=FOLLOWUPS.filter(function(f){return !f.isCompleted;})
+    .sort(function(a,b){return new Date(a.scheduledAt)-new Date(b.scheduledAt);});
+  $("fu-count").textContent=rows.length;
+  var now=Date.now();
+  $("fu-list").innerHTML = rows.length? rows.map(function(f){
+    var nm=f.lead&&f.lead.fullName?f.lead.fullName:"Lead";
+    var overdue=new Date(f.scheduledAt).getTime()<now;
+    return '<div class="list-item"><span class="dot" style="background:'+(overdue?"var(--rose)":"var(--teal)")+'"></span>'+
+      '<div style="flex:1"><div class="nm">'+esc(nm)+'</div><div class="sub" style="text-transform:capitalize">'+esc(f.type||"call")+(overdue?' · <span style="color:var(--rose)">overdue</span>':'')+'</div></div>'+
+      '<div class="muted">'+fmtDate(f.scheduledAt)+'</div></div>';
+  }).join("") : '<p class="empty">No pending follow-ups.</p>';
+}
+
+// ── Quotes (client-side) ──
+function coursePrice(c){return c.price!=null?c.price:(c.fee!=null?c.fee:0);}
+function fillCourseSelect(){
+  $("q-course").innerHTML = COURSES.map(function(c){return '<option value="'+c._id+'">'+esc(c.title)+' — '+inr(coursePrice(c))+'</option>';}).join("");
+}
+function genQuote(){
+  var c=COURSES.find(function(x){return x._id===$("q-course").value;});
+  if(!c){alert("Pick a course");return;}
+  var name=$("q-name").value.trim()||"Prospect";
+  var base=coursePrice(c); var disc=Number($("q-disc").value)||0; var gst=Number($("q-gst").value)||0;
+  var afterDisc=base*(1-disc/100); var gstAmt=afterDisc*gst/100; var total=afterDisc+gstAmt;
+  $("q-preview").innerHTML='<div class="quote-card"><div style="font-weight:700;margin-bottom:8px">Quote for '+esc(name)+'</div>'+
+    '<div class="quote-line"><span>'+esc(c.title)+'</span><span>'+inr(base)+'</span></div>'+
+    '<div class="quote-line"><span>Discount ('+disc+'%)</span><span>-'+inr(base-afterDisc)+'</span></div>'+
+    '<div class="quote-line"><span>GST ('+gst+'%)</span><span>'+inr(gstAmt)+'</span></div>'+
+    '<div class="quote-total"><span>Total</span><span>'+inr(Math.round(total))+'</span></div>'+
+    '<div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-prim btn-sm" onclick="saveQuote(\''+c._id+'\','+Math.round(total)+')">Save</button>'+
+    '<button class="btn btn-ghost btn-sm" onclick="window.print()">Print</button></div></div>';
+}
+async function saveQuote(cid,total){
+  var c=COURSES.find(function(x){return x._id===cid;});
+  var body={prospectName:$("q-name").value.trim()||"Prospect",course:cid,courseTitle:c?c.title:"",basePrice:coursePrice(c),discountPct:Number($("q-disc").value)||0,gstPct:Number($("q-gst").value)||0,total:total};
+  var r=await apiRequest("/sales/quotes","POST",body);
+  if(r&&!r.error){renderSavedQuotes();}else alert((r&&r.msg)||"Could not save quote");
+}
+async function delQuote(id){var r=await apiRequest("/sales/quotes/"+id,"DELETE");if(r&&!r.error)renderSavedQuotes();}
+async function renderSavedQuotes(){
+  var d=await apiRequest("/sales/quotes"); var q=(d&&d.quotes)||[]; $("sq-count").textContent=q.length;
+  $("saved-quotes").innerHTML = q.length? q.map(function(x){
+    return '<div class="list-item"><div style="flex:1"><div class="nm">'+esc(x.prospectName)+'</div><div class="sub">'+esc(x.courseTitle||"")+' · '+new Date(x.createdAt).toLocaleDateString("en-IN")+'</div></div>'+
+      '<div class="nm" style="color:var(--accent)">'+inr(x.total)+'</div>'+
+      '<button class="btn btn-ghost btn-sm" onclick="delQuote(\''+x._id+'\')" style="margin-left:8px">✕</button></div>';
+  }).join("") : '<p class="empty">No saved quotes yet.</p>';
 }
 
 function salesLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}

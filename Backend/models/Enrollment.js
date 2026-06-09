@@ -33,6 +33,10 @@ const enrollmentSchema = new mongoose.Schema(
 
     referral:     { type: mongoose.Schema.Types.ObjectId, ref: "Referral", default: null },
 
+    // Post-sales: rep assigned to follow up on the remaining (unpaid) balance
+    postSalesRep:        { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    postSalesAssignedAt: { type: Date, default: null },
+
     notes:     { type: String, default: "" },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
   },

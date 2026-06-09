@@ -64,8 +64,12 @@ router.post  ("/sales/demos/:id/send-reminder", C.sendDemoReminder);
 router.get   ("/sales/enrollments",             C.listEnrollments);
 router.post  ("/sales/enrollments",             C.createEnrollment);
 router.get   ("/sales/enrollments/:id",         C.getEnrollment);
+router.patch ("/sales/enrollments/:id/postsales-rep", C.assignPostSalesRep); // allocate post-sales rep
 router.patch ("/sales/enrollments/:id",         C.updateEnrollment);
 router.delete("/sales/enrollments/:id",         C.deleteEnrollment);
+
+// ── Post-sales allocation ─────────────────────────────────────
+router.get   ("/sales/postsales-reps",          C.listPostSalesReps);
 
 // ── Payments ──────────────────────────────────────────────────
 router.get   ("/sales/payments/summary",        C.paymentSummary);
