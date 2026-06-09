@@ -638,9 +638,14 @@ exports.listEnrollments = async (req, res) => {
 
     const enrollments = await Enrollment.find(q)
       .sort({ enrolledAt: -1 })
-      .populate("lead",   "fullName email phone")
-      .populate("batch",  "batchCode startDate")
-      .populate("course", "title");
+      .populate({
+        path: "lead",
+        select: "fullName email phone assignedTo",
+        populate: { path: "assignedTo", select: "name email" }
+      })
+      .populate("batch",     "batchCode startDate")
+      .populate("course",    "title")
+      .populate("createdBy", "name email");
     return res.json({ enrollments });
   } catch (err) {
     return res.status(500).json({ msg: "Server error" });
