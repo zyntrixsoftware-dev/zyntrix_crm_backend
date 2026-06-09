@@ -3,6 +3,8 @@ const MODULES = {
   admin:      { name: "Admin",      file: "modules/admin.html" },
   hr:         { name: "HR",         file: "modules/HRMS/dashboard/hr.html" },
   sales:      { name: "Sales",      file: "modules/sales_system/leads.html" },
+  presales:   { name: "Pre-Sales",  file: "modules/presales/presales.html" },
+  postsales:  { name: "Post-Sales", file: "modules/postsales/postsales.html" },
   marketing:  { name: "Marketing",  file: "modules/marketing.html" },
   lms:        { name: "LMS",        file: "modules/lms.html" },
   attendance: { name: "Attendance", file: "modules/attendance.html" },

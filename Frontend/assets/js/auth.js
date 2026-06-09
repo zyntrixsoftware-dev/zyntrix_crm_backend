@@ -109,10 +109,10 @@ function redirectByRole(role) {
       window.location.href = base + "/crm/modules/lms.html";
       break;
     case "presales":
-      window.location.href = base + "/crm/modules/sales_system/presales.html";
+      window.location.href = base + "/crm/modules/presales/presales.html";
       break;
     case "postsales":
-      window.location.href = base + "/crm/modules/sales_system/postsales.html";
+      window.location.href = base + "/crm/modules/postsales/postsales.html";
       break;
     case "leadgen":
       window.location.href = base + "/crm/modules/leadgen/index.html";
