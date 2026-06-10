@@ -9,30 +9,63 @@
 <link rel="stylesheet" href="../assets/css/theme.css">
 <script src="../assets/js/appearance.js"></script>
 <style>
-.ws-wrap{display:flex;flex-direction:column;gap:18px}
-.ws-hello{font-size:18px;font-weight:700;color:var(--text)}
-.ws-sub{font-size:12.5px;color:var(--muted);margin-top:2px}
-.ws-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.ws-kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
-.ws-kpi-v{font-size:24px;font-weight:800;color:var(--text);line-height:1}
-.ws-kpi-l{font-size:11px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.4px}
-.ws-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.ws-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
-.ws-card h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.ws-card h3 a{font-size:11px;color:var(--cyan);text-decoration:none;font-weight:600}
-.ws-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--border-soft)}
+.ws-wrap{display:flex;flex-direction:column;gap:20px}
+.ws-hello{font-size:21px;font-weight:800;color:var(--text);letter-spacing:-.2px}
+.ws-sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+.ws-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.ws-kpi{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:border-color .15s,transform .15s}
+.ws-kpi:hover{transform:translateY(-2px)}
+.ws-kpi-ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ws-kpi-v{font-size:26px;font-weight:800;color:var(--text);line-height:1}
+.ws-kpi-l{font-size:10.5px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.k-blue   .ws-kpi-ic{background:rgba(61,142,240,.13);color:#5aa2f5}.k-blue:hover{border-color:rgba(61,142,240,.4)}
+.k-amber  .ws-kpi-ic{background:rgba(245,166,35,.13);color:#f5a623}.k-amber:hover{border-color:rgba(245,166,35,.4)}
+.k-purple .ws-kpi-ic{background:rgba(167,109,255,.14);color:#a76dff}.k-purple:hover{border-color:rgba(167,109,255,.4)}
+.k-teal   .ws-kpi-ic{background:rgba(0,229,176,.13);color:#00e5b0}.k-teal:hover{border-color:rgba(0,229,176,.4)}
+.ws-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ws-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px 20px}
+.ws-card h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ws-card h3 .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ws-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--border-soft)}
 .ws-row:first-child{border-top:none}
 .ws-row .nm{font-size:12.5px;font-weight:600;color:var(--text)}
 .ws-row .mt{font-size:11px;color:var(--muted);margin-top:1px}
+.ws-lead{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--border-soft)}
+.ws-lead:first-child{border-top:none}
+.ws-lead .nm{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-lead .mt{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono,monospace)}
+.ws-av{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+.ws-oc{font-size:11.5px;font-weight:600;border-radius:9px;padding:7px 10px;min-width:148px;cursor:pointer;outline:none;border:1px solid var(--border-soft);background:var(--muted-panel);color:var(--text);transition:all .15s}
+.ws-oc.oc-in_progress{color:#f5a623;border-color:rgba(245,166,35,.4);background:rgba(245,166,35,.1)}
+.ws-oc.oc-interested{color:#22c55e;border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.1)}
+.ws-oc.oc-follow_up{color:#5aa2f5;border-color:rgba(61,142,240,.4);background:rgba(61,142,240,.1)}
+.ws-oc.oc-not_interested{color:#ff4d6d;border-color:rgba(255,77,109,.4);background:rgba(255,77,109,.1)}
 .ws-badge{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;background:var(--muted-panel);border:1px solid var(--border-soft)}
-.ws-empty{font-size:12px;color:var(--faint);padding:10px 0}
-.ws-prog{display:flex;flex-direction:column;gap:9px}
-.ws-prog-row{display:flex;align-items:center;gap:8px}
-.ws-prog-lbl{font-size:11px;color:var(--muted);width:84px;flex-shrink:0}
-.ws-prog-bar{flex:1;height:6px;background:var(--muted-panel);border-radius:3px;overflow:hidden}
-.ws-prog-fill{height:100%;border-radius:3px}
-.ws-prog-num{font-size:10.5px;color:var(--faint);width:74px;text-align:right;font-family:monospace}
+.ws-empty{font-size:12.5px;color:var(--faint);padding:24px 0;text-align:center}
+.ws-empty .ico{font-size:26px;display:block;margin-bottom:6px;opacity:.65}
+.ws-prog{display:flex;flex-direction:column;gap:11px}
+.ws-prog-row{display:flex;align-items:center;gap:10px}
+.ws-prog-lbl{font-size:11px;color:var(--muted);width:84px;flex-shrink:0;font-weight:600}
+.ws-prog-bar{flex:1;height:7px;background:var(--muted-panel);border-radius:4px;overflow:hidden}
+.ws-prog-fill{height:100%;border-radius:4px;transition:width .4s}
+.ws-prog-num{font-size:10.5px;color:var(--faint);width:80px;text-align:right;font-family:monospace}
 @media(max-width:1000px){.ws-kpis{grid-template-columns:repeat(2,1fr)}.ws-grid{grid-template-columns:1fr}}
+.ws-count{font-size:11px;font-weight:600;color:var(--faint);background:var(--muted-panel);border:1px solid var(--border-soft);padding:2px 9px;border-radius:20px}
+.ws-table{width:100%;border-collapse:collapse}
+.ws-table th{text-align:left;font-size:9.5px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.6px;padding:0 12px 11px;border-bottom:1px solid var(--border)}
+.ws-table td{padding:11px 12px;border-bottom:1px solid var(--border-soft);font-size:12.5px;color:var(--muted);vertical-align:middle}
+.ws-table tbody tr:last-child td{border-bottom:none}
+.ws-table tbody tr:hover td{background:var(--muted-panel)}
+.ws-stu{display:flex;align-items:center;gap:11px}
+.ws-stu .nm{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap}
+.ws-col-ph{font-family:var(--mono,monospace);font-size:12px;color:var(--text);white-space:nowrap}
+.ws-col-st{width:170px}
+.ws-oc{font-size:11.5px;font-weight:600;border-radius:9px;padding:7px 10px;width:100%;max-width:170px;cursor:pointer;outline:none;border:1px solid var(--border-soft);background:var(--muted-panel);color:var(--text);transition:all .15s}
+.ws-oc.oc-in_progress{color:#f5a623;border-color:rgba(245,166,35,.4);background:rgba(245,166,35,.1)}
+.ws-oc.oc-interested{color:#22c55e;border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.1)}
+.ws-oc.oc-follow_up{color:#5aa2f5;border-color:rgba(61,142,240,.4);background:rgba(61,142,240,.1)}
+.ws-oc.oc-not_interested{color:#ff4d6d;border-color:rgba(255,77,109,.4);background:rgba(255,77,109,.1)}
+@media(max-width:640px){.ws-col-hide{display:none}.ws-col-st{width:auto}}
 </style>
 </head>
 <body>
@@ -83,17 +116,17 @@
           <div class="ws-sub" id="ws-date"></div>
         </div>
         <div class="ws-kpis">
-          <div class="ws-kpi"><div class="ws-kpi-v" id="k-leads">—</div><div class="ws-kpi-l">My Active Leads</div></div>
-          <div class="ws-kpi"><div class="ws-kpi-v" id="k-fu">—</div><div class="ws-kpi-l">Follow-ups Today</div></div>
-          <div class="ws-kpi"><div class="ws-kpi-v" id="k-demos">—</div><div class="ws-kpi-l">My Upcoming Demos</div></div>
-          <div class="ws-kpi"><div class="ws-kpi-v" id="k-enr">—</div><div class="ws-kpi-l">Enrolled This Month</div></div>
+          <div class="ws-kpi k-blue"><div class="ws-kpi-ic">📋</div><div><div class="ws-kpi-v" id="k-leads">—</div><div class="ws-kpi-l">My Active Leads</div></div></div>
+          <div class="ws-kpi k-amber"><div class="ws-kpi-ic">🔔</div><div><div class="ws-kpi-v" id="k-fu">—</div><div class="ws-kpi-l">Follow-ups Today</div></div></div>
+          <div class="ws-kpi k-purple"><div class="ws-kpi-ic">🎥</div><div><div class="ws-kpi-v" id="k-demos">—</div><div class="ws-kpi-l">Upcoming Demos</div></div></div>
+          <div class="ws-kpi k-teal"><div class="ws-kpi-ic">🎓</div><div><div class="ws-kpi-v" id="k-enr">—</div><div class="ws-kpi-l">Enrolled This Month</div></div></div>
         </div>
         <div class="ws-grid">
-          <div class="ws-card"><h3>Today's Follow-Ups</h3><div id="ws-fu"><div class="ws-empty">Loading…</div></div></div>
-          <div class="ws-card"><h3>My Upcoming Demos</h3><div id="ws-demos"><div class="ws-empty">Loading…</div></div></div>
-          <div class="ws-card"><h3>My Active Leads</h3><div id="ws-leads"><div class="ws-empty">Loading…</div></div></div>
-          <div class="ws-card"><h3>My Target &mdash; <span id="ws-month"></span></h3><div id="ws-target"><div class="ws-empty">Loading…</div></div></div>
+          <div class="ws-card"><h3><span class="dot" style="background:#f5a623"></span>Today's Follow-Ups</h3><div id="ws-fu"><div class="ws-empty">Loading…</div></div></div>
+          <div class="ws-card"><h3><span class="dot" style="background:#a76dff"></span>My Upcoming Demos</h3><div id="ws-demos"><div class="ws-empty">Loading…</div></div></div>
         </div>
+        <div class="ws-card"><h3><span class="dot" style="background:#5aa2f5"></span>My Active Leads <span id="ws-leadcount" class="ws-count"></span></h3><div id="ws-leads"><div class="ws-empty">Loading…</div></div></div>
+        <div class="ws-card"><h3><span class="dot" style="background:#00e5b0"></span>My Target &mdash; <span id="ws-month"></span></h3><div id="ws-target"><div class="ws-empty">Loading…</div></div></div>
       </div>
     </section>
   </main>
@@ -127,10 +160,13 @@ function wsOutcomeOf(l){
   if (l.pipelineStage==='dropped')   return 'not_interested';
   return 'in_progress';
 }
+function wsInitials(n){ return String(n||'?').trim().split(/\s+/).map(function(w){return w[0];}).filter(Boolean).slice(0,2).join('').toUpperCase()||'?'; }
+var WS_AV=['linear-gradient(135deg,#3d8ef0,#00e5b0)','linear-gradient(135deg,#a76dff,#5aa2f5)','linear-gradient(135deg,#f5a623,#ff7a59)','linear-gradient(135deg,#00e5b0,#22c55e)','linear-gradient(135deg,#ff4d6d,#a76dff)','linear-gradient(135deg,#5aa2f5,#a76dff)'];
+function wsAvColor(n){ var s=String(n||''),h=0,i; for(i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; } return WS_AV[h%WS_AV.length]; }
 function wsContactSelect(l){
   var cur=wsOutcomeOf(l);
   var opts=WS_OC.map(function(o){ return '<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  return '<select onclick="event.stopPropagation()" onchange="markContact(\''+l._id+'\',this.value)" style="background:var(--muted-panel);border:1px solid var(--border-soft);border-radius:6px;color:var(--text);font-size:11px;padding:4px 6px;max-width:150px;cursor:pointer">'+opts+'</select>';
+  return '<select onclick="event.stopPropagation()" onchange="this.className=\'ws-oc oc-\'+this.value;markContact(\''+l._id+'\',this.value)" class="ws-oc oc-'+cur+'">'+opts+'</select>';
 }
 
 window.markContact = async function(id, outcome){
@@ -177,13 +213,28 @@ async function loadWS(){
   document.getElementById('k-enr').textContent=stat?stat.enrollments:0;
 
   var ICON={call:'\ud83d\udcde',whatsapp:'\ud83d\udcac',email:'\u2709\ufe0f',sms:'\u2709\ufe0f',meeting:'\ud83e\udd1d',other:'\ud83d\udccc'};
-  document.getElementById('ws-fu').innerHTML=fus.length?fus.map(function(f){ var nm=(f.lead&&(f.lead.fullName||f.lead.name))||'Lead'; return '<div class="ws-row"><div><div class="nm">'+(ICON[f.type]||'\ud83d\udccc')+' '+esc(nm)+'</div><div class="mt">'+esc(f.type||'call')+' \u00b7 '+new Date(f.scheduledAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</div></div></div>'; }).join(''):'<div class="ws-empty">No follow-ups due today \ud83c\udf89</div>';
+  document.getElementById('ws-fu').innerHTML=fus.length?fus.map(function(f){ var nm=(f.lead&&(f.lead.fullName||f.lead.name))||'Lead'; return '<div class="ws-row"><div><div class="nm">'+(ICON[f.type]||'\ud83d\udccc')+' '+esc(nm)+'</div><div class="mt">'+esc(f.type||'call')+' \u00b7 '+new Date(f.scheduledAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</div></div></div>'; }).join(''):'<div class="ws-empty"><span class="ico">\u2705</span>No follow-ups due today</div>';
 
-  document.getElementById('ws-demos').innerHTML=myDemos.length?myDemos.map(function(d){ var nm=(d.lead&&d.lead.fullName)||'Student'; return '<div class="ws-row"><div><div class="nm">'+esc(nm)+'</div><div class="mt">'+(d.course&&d.course.title?esc(d.course.title)+' \u00b7 ':'')+new Date(d.scheduledAt).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</div></div></div>'; }).join(''):'<div class="ws-empty">No upcoming demos.</div>';
+  document.getElementById('ws-demos').innerHTML=myDemos.length?myDemos.map(function(d){ var nm=(d.lead&&d.lead.fullName)||'Student'; return '<div class="ws-row"><div><div class="nm">'+esc(nm)+'</div><div class="mt">'+(d.course&&d.course.title?esc(d.course.title)+' \u00b7 ':'')+new Date(d.scheduledAt).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</div></div></div>'; }).join(''):'<div class="ws-empty"><span class="ico">\ud83c\udfa5</span>No upcoming demos scheduled.</div>';
 
-  document.getElementById('ws-leads').innerHTML=active.length?active.slice(0,12).map(function(l){
-    return '<div class="ws-row"><div><div class="nm">'+esc(l.fullName)+'</div><div class="mt">'+esc(l.phone||'')+(l.courseInterest&&l.courseInterest.title?' \u00b7 '+esc(l.courseInterest.title):'')+'</div></div>'+wsContactSelect(l)+'</div>';
-  }).join('')+(active.length>12?'<div class="ws-empty">+'+(active.length-12)+' more</div>':''):'<div class="ws-empty">No active leads assigned to you.</div>';
+  var lc=document.getElementById('ws-leadcount'); if(lc) lc.textContent=active.length?active.length:'';
+  if(!active.length){
+    document.getElementById('ws-leads').innerHTML='<div class="ws-empty"><span class="ico">📭</span>No active leads assigned to you yet.</div>';
+  } else {
+    var rows=active.map(function(l){
+      var course=(l.courseInterest&&l.courseInterest.title)||'\u2014';
+      return '<tr>'+
+        '<td><div class="ws-stu"><div class="ws-av" style="background:'+wsAvColor(l.fullName)+'">'+wsInitials(l.fullName)+'</div><div class="nm">'+esc(l.fullName)+'</div></div></td>'+
+        '<td class="ws-col-ph ws-col-hide">'+esc(l.phone||'\u2014')+'</td>'+
+        '<td class="ws-col-hide">'+esc(course)+'</td>'+
+        '<td class="ws-col-st">'+wsContactSelect(l)+'</td>'+
+      '</tr>';
+    }).join('');
+    document.getElementById('ws-leads').innerHTML=
+      '<div style="overflow-x:auto"><table class="ws-table"><thead><tr>'+
+      '<th>Student</th><th class="ws-col-hide">Phone</th><th class="ws-col-hide">Course</th><th class="ws-col-st">Contact Status</th>'+
+      '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
 
   var box=document.getElementById('ws-target');
   if(!stat){ box.innerHTML='<div class="ws-empty">No target set for this month. Ask your manager to set one in Targets.</div>'; }
