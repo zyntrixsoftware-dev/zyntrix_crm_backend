@@ -113,71 +113,93 @@ if (user) {
 }
 </script>
 <script>
-(async function loadWorkstation(){
-  const user = (function(){ try{ return JSON.parse(localStorage.getItem('user'))||{}; }catch(e){ return {}; } })();
-  function tokId(){ try{ return JSON.parse(atob(localStorage.getItem('token').split('.')[1])).id; }catch(e){ return user._id||user.id||''; } }
-  const myId = tokId();
-  const esc = v => String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const now = new Date();
-  document.getElementById('ws-hello').textContent = 'My Work' + (user&&user.name? ' \u2014 '+user.name : '');
-  document.getElementById('ws-date').textContent  = now.toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  document.getElementById('ws-month').textContent = now.toLocaleDateString('en-IN',{month:'long'});
-  if (typeof apiRequest !== 'function') {
-    ['ws-fu','ws-demos','ws-leads','ws-target'].forEach(function(id){ var el=document.getElementById(id); if(el) el.innerHTML='<div class="ws-empty">Open the Sales CRM to load this section.</div>'; });
-    return;
+/* My Work loader — lets a sales employee contact assigned leads and set the
+   Contact Status right here; the same /sales/leads/:id/contact endpoint writes
+   back to the Sales system, so the Sales Admin sees the update automatically. */
+function esc(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function wsUser(){ try{ return JSON.parse(localStorage.getItem('user'))||{}; }catch(e){ return {}; } }
+function wsMyId(){ try{ return JSON.parse(atob(localStorage.getItem('token').split('.')[1])).id; }catch(e){ var u=wsUser(); return u._id||u.id||''; } }
+
+var WS_OC = [['in_progress','⏳ In Progress'],['interested','✅ Interested'],['follow_up','🔔 Follow Up'],['not_interested','✖ Not Interested']];
+function wsOutcomeOf(l){
+  if (l.contactOutcome && l.contactOutcome!=='in_progress') return l.contactOutcome;
+  if (l.pipelineStage==='contacted') return 'interested';
+  if (l.pipelineStage==='dropped')   return 'not_interested';
+  return 'in_progress';
+}
+function wsContactSelect(l){
+  var cur=wsOutcomeOf(l);
+  var opts=WS_OC.map(function(o){ return '<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
+  return '<select onclick="event.stopPropagation()" onchange="markContact(\''+l._id+'\',this.value)" style="background:var(--muted-panel);border:1px solid var(--border-soft);border-radius:6px;color:var(--text);font-size:11px;padding:4px 6px;max-width:150px;cursor:pointer">'+opts+'</select>';
+}
+
+window.markContact = async function(id, outcome){
+  var body={ outcome:outcome };
+  if (outcome==='follow_up'){
+    var dt=prompt('Schedule a follow-up — enter date (YYYY-MM-DD):');
+    if(!dt){ loadWS(); return; }
+    body.followUpDate=dt;
   }
-  const m = now.getMonth()+1, y = now.getFullYear();
-  const todayStart = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  if (outcome==='not_interested'){
+    if(!confirm('Mark this lead as Not Interested? It will leave your active list.')){ loadWS(); return; }
+  }
+  var d=await apiRequest('/sales/leads/'+id+'/contact','PATCH',body);
+  if(!d || d.error){ alert((d&&d.msg)||'Update failed'); loadWS(); return; }
+  loadWS();
+};
 
-  const [ld, fu, dm, st] = await Promise.all([
-    apiRequest('/sales/leads?assignedTo='+myId+'&archived=false&limit=500').catch(()=>({})),
-    apiRequest('/sales/followups/today').catch(()=>({})),
-    apiRequest('/sales/demos').catch(()=>({})),
-    apiRequest('/sales/reps/stats?month='+m+'&year='+y).catch(()=>({}))
+async function loadWS(){
+  var user=wsUser(); var myId=wsMyId();
+  var now=new Date();
+  document.getElementById('ws-hello').textContent='My Work'+(user&&user.name?' \u2014 '+user.name:'');
+  document.getElementById('ws-date').textContent=now.toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('ws-month').textContent=now.toLocaleDateString('en-IN',{month:'long'});
+  if(typeof apiRequest!=='function'){ ['ws-fu','ws-demos','ws-leads','ws-target'].forEach(function(id){ var el=document.getElementById(id); if(el) el.innerHTML='<div class="ws-empty">Open the Sales CRM to load this section.</div>'; }); return; }
+  var m=now.getMonth()+1, y=now.getFullYear();
+  var todayStart=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  var res=await Promise.all([
+    apiRequest('/sales/leads?assignedTo='+myId+'&archived=false&limit=500').catch(function(){return {};}),
+    apiRequest('/sales/followups/today').catch(function(){return {};}),
+    apiRequest('/sales/demos').catch(function(){return {};}),
+    apiRequest('/sales/reps/stats?month='+m+'&year='+y).catch(function(){return {};})
   ]);
-  const leads = (ld&&ld.leads)||[];
-  const myLeadIds = new Set(leads.map(l=>l._id));
-  const active = leads.filter(l => ['new_lead','contacted'].includes(l.pipelineStage) && l.contactOutcome!=='follow_up');
-  const fus = (fu&&fu.followups)||[];
-  const myDemos = ((dm&&dm.demos)||[]).filter(d => d.lead && myLeadIds.has(d.lead._id||d.lead) && !d.attended && !d.cancelled && new Date(d.scheduledAt)>=todayStart);
-  const stat = ((st&&st.reps)||[]).find(r => r.rep && r.rep._id===myId);
+  var ld=res[0], fu=res[1], dm=res[2], st=res[3];
+  var leads=(ld&&ld.leads)||[];
+  var myLeadIds=new Set(leads.map(function(l){return l._id;}));
+  var active=leads.filter(function(l){ return ['new_lead','contacted'].indexOf(l.pipelineStage)>=0 && l.contactOutcome!=='follow_up'; });
+  var fus=(fu&&fu.followups)||[];
+  var myDemos=((dm&&dm.demos)||[]).filter(function(d){ return d.lead&&myLeadIds.has(d.lead._id||d.lead)&&!d.attended&&!d.cancelled&&new Date(d.scheduledAt)>=todayStart; });
+  var stat=((st&&st.reps)||[]).find(function(r){ return r.rep&&r.rep._id===myId; });
 
-  document.getElementById('k-leads').textContent = active.length;
-  document.getElementById('k-fu').textContent    = fus.length;
-  document.getElementById('k-demos').textContent = myDemos.length;
-  document.getElementById('k-enr').textContent   = stat? stat.enrollments : 0;
+  document.getElementById('k-leads').textContent=active.length;
+  document.getElementById('k-fu').textContent=fus.length;
+  document.getElementById('k-demos').textContent=myDemos.length;
+  document.getElementById('k-enr').textContent=stat?stat.enrollments:0;
 
-  const ICON={call:'\ud83d\udcde',whatsapp:'\ud83d\udcac',email:'\u2709\ufe0f',sms:'\u2709\ufe0f',meeting:'\ud83e\udd1d',other:'\ud83d\udccc'};
-  document.getElementById('ws-fu').innerHTML = fus.length ? fus.map(f=>{
-    const nm=(f.lead&&(f.lead.fullName||f.lead.name))||'Lead';
-    return '<div class="ws-row"><div><div class="nm">'+(ICON[f.type]||'\ud83d\udccc')+' '+esc(nm)+'</div><div class="mt">'+esc(f.type||'call')+' \u00b7 '+new Date(f.scheduledAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</div></div></div>';
-  }).join('') : '<div class="ws-empty">No follow-ups due today \ud83c\udf89</div>';
+  var ICON={call:'\ud83d\udcde',whatsapp:'\ud83d\udcac',email:'\u2709\ufe0f',sms:'\u2709\ufe0f',meeting:'\ud83e\udd1d',other:'\ud83d\udccc'};
+  document.getElementById('ws-fu').innerHTML=fus.length?fus.map(function(f){ var nm=(f.lead&&(f.lead.fullName||f.lead.name))||'Lead'; return '<div class="ws-row"><div><div class="nm">'+(ICON[f.type]||'\ud83d\udccc')+' '+esc(nm)+'</div><div class="mt">'+esc(f.type||'call')+' \u00b7 '+new Date(f.scheduledAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</div></div></div>'; }).join(''):'<div class="ws-empty">No follow-ups due today \ud83c\udf89</div>';
 
-  document.getElementById('ws-demos').innerHTML = myDemos.length ? myDemos.map(d=>{
-    const nm=(d.lead&&d.lead.fullName)||'Student';
-    return '<div class="ws-row"><div><div class="nm">'+esc(nm)+'</div><div class="mt">'+(d.course&&d.course.title?esc(d.course.title)+' \u00b7 ':'')+new Date(d.scheduledAt).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</div></div></div>';
-  }).join('') : '<div class="ws-empty">No upcoming demos.</div>';
+  document.getElementById('ws-demos').innerHTML=myDemos.length?myDemos.map(function(d){ var nm=(d.lead&&d.lead.fullName)||'Student'; return '<div class="ws-row"><div><div class="nm">'+esc(nm)+'</div><div class="mt">'+(d.course&&d.course.title?esc(d.course.title)+' \u00b7 ':'')+new Date(d.scheduledAt).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</div></div></div>'; }).join(''):'<div class="ws-empty">No upcoming demos.</div>';
 
-  document.getElementById('ws-leads').innerHTML = active.length ? active.slice(0,10).map(l=>{
-    const interested = l.contactOutcome==='interested';
-    const o = interested ? {t:'Interested',c:'var(--teal)'} : {t:'In Progress',c:'var(--yellow)'};
-    return '<div class="ws-row"><div><div class="nm">'+esc(l.fullName)+'</div><div class="mt">'+esc(l.phone||'')+(l.courseInterest&&l.courseInterest.title?' \u00b7 '+esc(l.courseInterest.title):'')+'</div></div><span class="ws-badge" style="color:'+o.c+'">'+o.t+'</span></div>';
-  }).join('') + (active.length>10?'<div class="ws-empty">+'+(active.length-10)+' more</div>':'') : '<div class="ws-empty">No active leads assigned to you.</div>';
+  document.getElementById('ws-leads').innerHTML=active.length?active.slice(0,12).map(function(l){
+    return '<div class="ws-row"><div><div class="nm">'+esc(l.fullName)+'</div><div class="mt">'+esc(l.phone||'')+(l.courseInterest&&l.courseInterest.title?' \u00b7 '+esc(l.courseInterest.title):'')+'</div></div>'+wsContactSelect(l)+'</div>';
+  }).join('')+(active.length>12?'<div class="ws-empty">+'+(active.length-12)+' more</div>':''):'<div class="ws-empty">No active leads assigned to you.</div>';
 
-  const box=document.getElementById('ws-target');
+  var box=document.getElementById('ws-target');
   if(!stat){ box.innerHTML='<div class="ws-empty">No target set for this month. Ask your manager to set one in Targets.</div>'; }
   else {
-    const t=stat.target||{};
-    const bar=(lbl,a,tg,col)=>{ const pct=tg?Math.min(100,Math.round(a/tg*100)):0; return '<div class="ws-prog-row"><div class="ws-prog-lbl">'+lbl+'</div><div class="ws-prog-bar"><div class="ws-prog-fill" style="width:'+pct+'%;background:'+col+'"></div></div><div class="ws-prog-num">'+a+'/'+(tg||0)+'</div></div>'; };
-    const revPct = t.targetRevenue?Math.min(100,Math.round((stat.revenue||0)/t.targetRevenue*100)):0;
-    box.innerHTML = '<div class="ws-prog">'+
+    var t=stat.target||{};
+    var bar=function(lbl,a,tg,col){ var pct=tg?Math.min(100,Math.round(a/tg*100)):0; return '<div class="ws-prog-row"><div class="ws-prog-lbl">'+lbl+'</div><div class="ws-prog-bar"><div class="ws-prog-fill" style="width:'+pct+'%;background:'+col+'"></div></div><div class="ws-prog-num">'+a+'/'+(tg||0)+'</div></div>'; };
+    var revPct=t.targetRevenue?Math.min(100,Math.round((stat.revenue||0)/t.targetRevenue*100)):0;
+    box.innerHTML='<div class="ws-prog">'+
       bar('Leads',stat.leads,t.targetLeads||0,'var(--blue-soft)')+
       bar('Demos',stat.demos,t.targetDemos||0,'var(--purple)')+
       bar('Enrollments',stat.enrollments,t.targetEnrollments||0,'var(--teal)')+
       '<div class="ws-prog-row"><div class="ws-prog-lbl">Revenue</div><div class="ws-prog-bar"><div class="ws-prog-fill" style="width:'+revPct+'%;background:var(--cyan)"></div></div><div class="ws-prog-num">\u20b9'+(stat.revenue||0).toLocaleString('en-IN')+'</div></div>'+
     '</div>';
   }
-})();
+}
+loadWS();
 </script>
 </body>
 </html>

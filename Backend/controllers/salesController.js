@@ -181,7 +181,15 @@ exports.moveStage = async (req, res) => {
 //   not_interested → dropped
 exports.setContactOutcome = async (req, res) => {
   try {
-    if (!isSalesOrAdmin(req, res)) return;
+    const lead = await StudentLead.findById(req.params.id);
+    if (!lead) return res.status(404).json({ msg: "Lead not found" });
+
+    // Sales-side roles may update any lead; a sales employee may update only a
+    // lead currently assigned to them (so they can mark contact status from
+    // their Workstation, and it reflects straight back in the Sales system).
+    const privileged = ["sales","hr","super_admin","admin","leadgen"].includes(req.user?.role);
+    const ownLead = req.user?.role === "employee" && lead.assignedTo && String(lead.assignedTo) === String(req.user.id);
+    if (!privileged && !ownLead) return res.status(403).json({ msg: "Access denied" });
 
     const { outcome, followUpDate, note, type } = req.body;
     const STAGE_MAP = {
@@ -196,9 +204,6 @@ exports.setContactOutcome = async (req, res) => {
     if (outcome === "follow_up" && !followUpDate) {
       return res.status(400).json({ msg: "Follow-up date is required" });
     }
-
-    const lead = await StudentLead.findById(req.params.id);
-    if (!lead) return res.status(404).json({ msg: "Lead not found" });
 
     const newStage = STAGE_MAP[outcome];
 
