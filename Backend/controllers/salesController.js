@@ -25,6 +25,17 @@ function validId(id) {
   return mongoose.isValidObjectId(id);
 }
 
+// Sales reps = dedicated sales-role logins (legacy) + employees tagged to the
+// Sales department. Sales employees use normal employee attendance accounts but
+// can be assigned leads by the Sales Admin and see them on their Workstation.
+const SALES_REP_FILTER = {
+  active: true,
+  $or: [
+    { role: "sales" },
+    { role: "employee", department: { $regex: /sales/i } }
+  ]
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ══ STUDENT LEADS ════════════════════════════════════════════════════════════
 // ─────────────────────────────────────────────────────────────────────────────
@@ -37,6 +48,8 @@ exports.listLeads = async (req, res) => {
     if (stage)      q.pipelineStage = stage;
     if (source)     q.source        = source;
     if (assignedTo && validId(assignedTo)) q.assignedTo = assignedTo;
+    // A sales employee (employee role) may only ever see leads assigned to them.
+    if (req.user && req.user.role === "employee") q.assignedTo = req.user.id;
     q.isArchived = archived === "true";
     if (search) {
       q.$or = [
@@ -1485,7 +1498,7 @@ const User = require("../models/user");
 // GET /api/sales/reps — sales reps for assignment dropdowns
 exports.listReps = async (req, res) => {
   try {
-    const reps = await User.find({ role: { $in: ["sales", "admin", "super_admin"] } }, "name email role").sort({ name: 1 });
+    const reps = await User.find(SALES_REP_FILTER, "name email role department").sort({ name: 1 });
     return res.json({ reps });
   } catch (err) {
     console.error("listReps:", err);
@@ -1501,7 +1514,7 @@ exports.repStats = async (req, res) => {
     const end   = new Date(year, month, 1);
 
     // All sales users
-    const reps = await User.find({ role: { $in: ["sales", "admin", "super_admin"] } }, "name email role");
+    const reps = await User.find(SALES_REP_FILTER, "name email role department");
 
     // Aggregate leads per rep this month
     const leadAgg = await StudentLead.aggregate([
@@ -1684,7 +1697,7 @@ exports.autoDistribute = async (req, res) => {
   try {
     if (!isSalesOrAdmin(req, res)) return;
     const User = require("../models/user");
-    const reps = await User.find({ role: "sales" }).select("_id name").lean();
+    const reps = await User.find(SALES_REP_FILTER).select("_id name").lean();
     if (!reps.length) return res.status(400).json({ msg: "No sales employees found. Create sales logins first." });
     const leads = await StudentLead.find({ isArchived: false, $or: [{ assignedTo: null }, { assignedTo: { $exists: false } }] }).select("_id").lean();
     if (!leads.length) return res.json({ msg: "No unassigned leads to distribute.", distributed: 0, reps: reps.length });

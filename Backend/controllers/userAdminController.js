@@ -19,7 +19,7 @@ exports.listUsers = async (req, res) => {
       const rx = new RegExp(String(req.query.search).trim(), "i");
       q.$or = [{ name: rx }, { email: rx }];
     }
-    const users = await User.find(q).select("name email role active createdAt").sort({ createdAt: -1 }).limit(500).lean();
+    const users = await User.find(q).select("name email role active department createdAt").sort({ createdAt: -1 }).limit(500).lean();
     return res.json({ users, roles: ROLES });
   } catch (e) { console.error("listUsers:", e); return res.status(500).json({ msg: "Server error" }); }
 };
@@ -37,11 +37,12 @@ exports.createUser = async (req, res) => {
     const hash = await bcrypt.hash(pass, 10);
     if (user) {
       user.role = role; user.active = true; if (req.body.name) user.name = req.body.name;
+      if (req.body.department !== undefined) user.department = req.body.department;
       if (provided) user.password = hash;
       await user.save();
       return res.json({ user: { _id: user._id, name: user.name, email: user.email, role: user.role }, created: false });
     }
-    user = await User.create({ name: req.body.name || email.split("@")[0], email, password: hash, role, active: true });
+    user = await User.create({ name: req.body.name || email.split("@")[0], email, password: hash, role, active: true, department: req.body.department || "" });
     let emailed = false;
     if (req.body.sendEmail !== false) {
       try { await sendEmail(email, "Your Zyntrix CRM Login", `Hello ${user.name},\n\nYour Zyntrix CRM account has been created.\n\nPortal : https://zyntrixsoftware.com/crm/index.html\nEmail  : ${email}\nPassword: ${pass}\nRole   : ${role}\n\n— Zyntrix CRM`); emailed = true; } catch (e) {}
@@ -57,7 +58,8 @@ exports.updateUser = async (req, res) => {
     if (req.body.name !== undefined) upd.name = req.body.name;
     if (req.body.role !== undefined) { if (!ROLES.includes(req.body.role)) return res.status(400).json({ msg: "Invalid role" }); upd.role = req.body.role; }
     if (req.body.active !== undefined) upd.active = !!req.body.active;
-    const user = await User.findByIdAndUpdate(req.params.id, upd, { new: true }).select("name email role active");
+    if (req.body.department !== undefined) upd.department = req.body.department;
+    const user = await User.findByIdAndUpdate(req.params.id, upd, { new: true }).select("name email role active department");
     if (!user) return res.status(404).json({ msg: "Not found" });
     return res.json({ user });
   } catch (e) { console.error("updateUser:", e); return res.status(500).json({ msg: "Server error" }); }

@@ -6,6 +6,19 @@
 <title>Referrals moved — ZyntrixCRM</title>
 </head>
 <body style="background:#080e18;color:#8ba3bf;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh">
+<script>
+/* SALES-ADMIN-GUARD: the Sales panel is restricted to the Sales Admin
+   (sales@zyntrixsoftware.com) and super admins. Sales employees use their
+   employee attendance account + Workstation instead. */
+(function(){
+  var t=localStorage.getItem("token"),u={};
+  try{u=JSON.parse(localStorage.getItem("user")||"{}");}catch(e){}
+  var em=String(u.email||"").trim().toLowerCase();
+  var ok=em==="sales@zyntrixsoftware.com"||u.role==="super_admin"||u.role==="admin";
+  if(!t||!ok){alert("Access denied — the Sales panel is restricted to the Sales Admin.");location.replace(location.origin+"/crm/index.html");}
+})();
+</script>
+
 <script>location.replace("coupons.html");</script>
 <p>Referrals are now in <a href="coupons.html" style="color:#00e5b0">Coupons &amp; Referrals</a>…</p>
 </body>

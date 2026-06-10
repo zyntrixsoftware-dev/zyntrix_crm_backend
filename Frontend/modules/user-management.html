@@ -36,6 +36,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;colo
 <div><label class="fl">Name</label><input class="input" id="u-name" placeholder="Full name"></div>
 <div><label class="fl">Email</label><input class="input" id="u-email" placeholder="user@zyntrixsoftware.com"></div>
 <div><label class="fl">Role</label><select class="input" id="u-role"></select></div>
+<div><label class="fl">Department</label><select class="input" id="u-dept"><option value="">—</option><option value="Sales">Sales</option><option value="Marketing">Marketing</option><option value="HR">HR</option><option value="Operations">Operations</option><option value="Engineering">Engineering</option><option value="Support">Support</option><option value="Finance">Finance</option></select><div class="muted" style="margin-top:4px">Sales employees: role <b>employee</b> + dept <b>Sales</b></div></div>
 <div><label class="fl">Password (blank = auto)</label><input class="input" id="u-pass" placeholder="optional"></div>
 </div>
 <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
@@ -69,7 +70,7 @@ async function load(){
   var users=d.users||[];
   $("tbl").innerHTML=users.length?users.map(function(x){
     var ropts=ROLES.map(function(r){return '<option value="'+r+'"'+(x.role===r?" selected":"")+'>'+r+'</option>';}).join("");
-    return '<tr><td><div class="nm">'+esc(x.name||"")+'</div><div class="muted">'+esc(x.email||"")+'</div></td>'+
+    return '<tr><td><div class="nm">'+esc(x.name||"")+'</div><div class="muted">'+esc(x.email||"")+(x.department?" \u00b7 "+esc(x.department):"")+'</div></td>'+
       '<td><select class="sel" onchange="setRole(\''+x._id+'\',this.value)">'+ropts+'</select></td>'+
       '<td><span class="badge" style="background:'+(x.active?"rgba(34,197,94,.15);color:var(--green)":"rgba(255,77,109,.15);color:var(--rose)")+'">'+(x.active?"active":"inactive")+'</span></td>'+
       '<td><button class="btn btn-ghost btn-sm" onclick="toggle(\''+x._id+'\','+(!x.active)+')">'+(x.active?"Deactivate":"Activate")+'</button> '+
@@ -77,10 +78,10 @@ async function load(){
   }).join(""):'<tr><td colspan="4"><div class="empty">No users.</div></td></tr>';
 }
 async function createUser(){
-  var body={name:$("u-name").value.trim(),email:$("u-email").value.trim(),role:$("u-role").value,password:$("u-pass").value.trim(),sendEmail:$("u-mail").checked};
+  var body={name:$("u-name").value.trim(),email:$("u-email").value.trim(),role:$("u-role").value,department:$("u-dept").value,password:$("u-pass").value.trim(),sendEmail:$("u-mail").checked};
   if(!body.email){toast("Email required");return;}
   var r=await apiRequest("/admin/users","POST",body);
-  if(r&&!r.error){$("c-res").innerHTML=r.created?('✅ Created'+(r.emailed?' — credentials emailed.':' — temp password: <b>'+esc(r.tempPassword||"")+'</b>')):'ℹ️ Existing user updated.';$("u-name").value="";$("u-email").value="";$("u-pass").value="";load();}
+  if(r&&!r.error){$("c-res").innerHTML=r.created?('✅ Created'+(r.emailed?' — credentials emailed.':' — temp password: <b>'+esc(r.tempPassword||"")+'</b>')):'ℹ️ Existing user updated.';$("u-name").value="";$("u-email").value="";$("u-pass").value="";$("u-dept").value="";load();}
   else $("c-res").textContent=(r&&r.msg)||"Error";
 }
 async function setRole(id,role){var r=await apiRequest("/admin/users/"+id,"PATCH",{role:role});if(r&&!r.error)toast("Role updated");else toast((r&&r.msg)||"Error");}
