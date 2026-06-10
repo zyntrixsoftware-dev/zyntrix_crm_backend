@@ -669,6 +669,72 @@ exports.listEnrollments = async (req, res) => {
   }
 };
 
+// GET /api/sales/enrollments/my-fee-collection
+// Pre-fee-paid students assigned to the logged-in sales employee, with a full-
+// fee balance still pending. (Privileged roles may pass ?rep=<userId>.)
+exports.myFeeCollection = async (req, res) => {
+  try {
+    const privileged = ["sales","hr","super_admin","admin"].includes(req.user?.role);
+    const repId = (privileged && req.query.rep && validId(req.query.rep)) ? req.query.rep : req.user.id;
+    const leadIds = await StudentLead.find({ assignedTo: repId }).distinct("_id");
+    if (!leadIds.length) return res.json({ enrollments: [] });
+    const all = await Enrollment.find({ lead: { $in: leadIds } })
+      .sort({ enrolledAt: -1 })
+      .populate({ path: "lead", select: "fullName email phone assignedTo" })
+      .populate("batch",  "batchCode startDate")
+      .populate("course", "title");
+    const payable = e => Number(e.discountedFee > 0 ? e.discountedFee : (e.totalFee || 0));
+    const enrollments = all.filter(e => {
+      const paid = Number(e.feePaid || 0);
+      return paid > 0 && paid < payable(e);
+    });
+    return res.json({ enrollments });
+  } catch (err) {
+    console.error("myFeeCollection:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// POST /api/sales/enrollments/:id/collect  { amount, method?, transactionId?, remarks? }
+// The assigned sales employee records full-fee payments. When the balance hits
+// zero the student automatically surfaces in Post-Sales (fully-paid).
+exports.collectFee = async (req, res) => {
+  try {
+    const enr = await Enrollment.findById(req.params.id).populate("lead", "assignedTo fullName email");
+    if (!enr) return res.status(404).json({ msg: "Enrollment not found" });
+    const privileged = ["sales","hr","super_admin","admin"].includes(req.user?.role);
+    const assignedTo = (enr.lead && enr.lead.assignedTo) ? String(enr.lead.assignedTo) : "";
+    const ownsIt = req.user?.role === "employee" && assignedTo === String(req.user.id);
+    if (!privileged && !ownsIt) return res.status(403).json({ msg: "Access denied" });
+
+    const payable = Number(enr.discountedFee > 0 ? enr.discountedFee : (enr.totalFee || 0));
+    const balance = Math.max(0, payable - Number(enr.feePaid || 0));
+    if (balance <= 0) return res.status(400).json({ msg: "Already fully paid" });
+
+    let amount = Math.round(Number(req.body.amount));
+    if (!amount || amount <= 0) return res.status(400).json({ msg: "Enter a valid amount" });
+    if (amount > balance) amount = balance;
+
+    await Payment.create({
+      enrollment: enr._id, lead: enr.lead._id, course: enr.course,
+      amount, method: req.body.method || "upi",
+      transactionId: req.body.transactionId || "", remarks: req.body.remarks || "Full-fee collection",
+      createdBy: req.user.id
+    });
+    enr.feePaid = Number(enr.feePaid || 0) + amount;
+    await enr.save();
+
+    const newBal = Math.max(0, payable - enr.feePaid);
+    return res.json({
+      msg: newBal <= 0 ? "Fully paid — student moved to Post-Sales" : ("Recorded ₹" + amount),
+      feePaid: enr.feePaid, balance: newBal, fullyPaid: newBal <= 0
+    });
+  } catch (err) {
+    console.error("collectFee:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
 // Roles allowed to view / use the pre- & post-sales panels
 function canPanel(req, res) {
   const ok = req.user && ["sales","presales","postsales","super_admin","admin"].includes(req.user.role);

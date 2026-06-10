@@ -50,6 +50,9 @@
 .ws-prog-fill{height:100%;border-radius:4px;transition:width .4s}
 .ws-prog-num{font-size:10.5px;color:var(--faint);width:80px;text-align:right;font-family:monospace}
 @media(max-width:1000px){.ws-kpis{grid-template-columns:repeat(2,1fr)}.ws-grid{grid-template-columns:1fr}}
+.ws-mono{font-family:var(--mono,monospace);font-size:12px;color:var(--text);white-space:nowrap}
+.ws-pay{font-size:11.5px;font-weight:600;border:1px solid rgba(0,229,176,.4);background:rgba(0,229,176,.12);color:#00e5b0;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.ws-pay:hover{background:rgba(0,229,176,.22)}
 .ws-count{font-size:11px;font-weight:600;color:var(--faint);background:var(--muted-panel);border:1px solid var(--border-soft);padding:2px 9px;border-radius:20px}
 .ws-table{width:100%;border-collapse:collapse}
 .ws-table th{text-align:left;font-size:9.5px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.6px;padding:0 12px 11px;border-bottom:1px solid var(--border)}
@@ -126,6 +129,7 @@
           <div class="ws-card"><h3><span class="dot" style="background:#a76dff"></span>My Upcoming Demos</h3><div id="ws-demos"><div class="ws-empty">Loading…</div></div></div>
         </div>
         <div class="ws-card"><h3><span class="dot" style="background:#5aa2f5"></span>My Active Leads <span id="ws-leadcount" class="ws-count"></span></h3><div id="ws-leads"><div class="ws-empty">Loading…</div></div></div>
+        <div class="ws-card"><h3><span class="dot" style="background:#f5a623"></span>Full-Fee Collection <span id="ws-feecount" class="ws-count"></span></h3><p style="margin:-6px 0 12px;font-size:11.5px;color:var(--faint)">Students who paid a pre-fee &mdash; collect the remaining balance. At zero balance they move to Post-Sales.</p><div id="ws-fees"><div class="ws-empty">Loading…</div></div></div>
         <div class="ws-card"><h3><span class="dot" style="background:#00e5b0"></span>My Target &mdash; <span id="ws-month"></span></h3><div id="ws-target"><div class="ws-empty">Loading…</div></div></div>
       </div>
     </section>
@@ -184,6 +188,17 @@ window.markContact = async function(id, outcome){
   loadWS();
 };
 
+window.recordFee = async function(id, bal){
+  var a=prompt('Amount received (balance \u20b9'+bal+'):', bal);
+  if(a===null) return;
+  a=Math.round(Number(a));
+  if(!a || a<=0){ alert('Enter a valid amount'); return; }
+  var d=await apiRequest('/sales/enrollments/'+id+'/collect','POST',{amount:a});
+  if(!d || d.error){ alert((d&&d.msg)||'Could not record payment'); return; }
+  if(d.fullyPaid) alert(d.msg);
+  loadWS();
+};
+
 async function loadWS(){
   var user=wsUser(); var myId=wsMyId();
   var now=new Date();
@@ -197,9 +212,10 @@ async function loadWS(){
     apiRequest('/sales/leads?assignedTo='+myId+'&archived=false&limit=500').catch(function(){return {};}),
     apiRequest('/sales/followups/today').catch(function(){return {};}),
     apiRequest('/sales/demos').catch(function(){return {};}),
-    apiRequest('/sales/reps/stats?month='+m+'&year='+y).catch(function(){return {};})
+    apiRequest('/sales/reps/stats?month='+m+'&year='+y).catch(function(){return {};}),
+    apiRequest('/sales/enrollments/my-fee-collection').catch(function(){return {};})
   ]);
-  var ld=res[0], fu=res[1], dm=res[2], st=res[3];
+  var ld=res[0], fu=res[1], dm=res[2], st=res[3], fc=res[4];
   var leads=(ld&&ld.leads)||[];
   var myLeadIds=new Set(leads.map(function(l){return l._id;}));
   var active=leads.filter(function(l){ return ['new_lead','contacted'].indexOf(l.pipelineStage)>=0 && l.contactOutcome!=='follow_up'; });
@@ -234,6 +250,24 @@ async function loadWS(){
       '<div style="overflow-x:auto"><table class="ws-table"><thead><tr>'+
       '<th>Student</th><th class="ws-col-hide">Phone</th><th class="ws-col-hide">Course</th><th class="ws-col-st">Contact Status</th>'+
       '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+
+  var fees=(fc&&fc.enrollments)||[];
+  var feeEl=document.getElementById('ws-fees'); var feeCnt=document.getElementById('ws-feecount'); if(feeCnt) feeCnt.textContent=fees.length||'';
+  if(!fees.length){
+    if(feeEl) feeEl.innerHTML='<div class="ws-empty"><span class="ico">💰</span>No pending full-fee collections.</div>';
+  } else if(feeEl){
+    var frows=fees.map(function(e){
+      var L=e.lead||{}; var fee=Number(e.discountedFee>0?e.discountedFee:(e.totalFee||0)); var paid=Number(e.feePaid||0); var bal=Math.max(0,fee-paid);
+      return '<tr>'+
+        '<td><div class="ws-stu"><div class="ws-av" style="background:'+wsAvColor(L.fullName)+'">'+wsInitials(L.fullName)+'</div><div class="nm">'+esc(L.fullName||'Student')+'</div></div></td>'+
+        '<td class="ws-col-hide">'+esc((e.course&&e.course.title)||'\u2014')+'</td>'+
+        '<td class="ws-mono ws-col-hide">\u20b9'+paid.toLocaleString('en-IN')+' / \u20b9'+fee.toLocaleString('en-IN')+'</td>'+
+        '<td class="ws-mono" style="color:#f5a623;font-weight:700">\u20b9'+bal.toLocaleString('en-IN')+'</td>'+
+        '<td class="ws-col-st"><button class="ws-pay" onclick="recordFee(\''+e._id+'\','+bal+')">Record payment</button></td>'+
+      '</tr>';
+    }).join('');
+    feeEl.innerHTML='<div style="overflow-x:auto"><table class="ws-table"><thead><tr><th>Student</th><th class="ws-col-hide">Course</th><th class="ws-col-hide">Paid / Fee</th><th>Balance</th><th class="ws-col-st">Action</th></tr></thead><tbody>'+frows+'</tbody></table></div>';
   }
 
   var box=document.getElementById('ws-target');
