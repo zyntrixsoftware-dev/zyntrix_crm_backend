@@ -30,10 +30,8 @@ function validId(id) {
 // can be assigned leads by the Sales Admin and see them on their Workstation.
 const SALES_REP_FILTER = {
   active: true,
-  $or: [
-    { role: "sales" },
-    { role: "employee", department: { $regex: /sales/i } }
-  ]
+  role: "employee",
+  department: { $regex: /sales/i }
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
