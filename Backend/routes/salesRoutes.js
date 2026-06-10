@@ -27,6 +27,8 @@ router.get("/sales/leadgen/stats",              C.leadgenStats);
 router.get   ("/sales/leads/stats",             C.leadsStats);
 router.get   ("/sales/leads/recent-leadgen",    C.recentLeadgenLeads);
 router.post  ("/sales/leads/score-all",         C.scoreAllLeads);
+router.post  ("/sales/leads/bulk-assign",      C.bulkAssign);
+router.post  ("/sales/leads/auto-distribute", C.autoDistribute);
 router.get   ("/sales/leads",                   C.listLeads);
 router.post  ("/sales/leads",                   C.createLead);
 router.get   ("/sales/leads/:id",               C.getLead);

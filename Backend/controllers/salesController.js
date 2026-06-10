@@ -1665,3 +1665,31 @@ exports.leadgenStats = async (req, res) => {
     return res.status(500).json({ msg: "Server error" });
   }
 };
+
+// ── BULK LEAD ALLOCATION ─────────────────────────────────────────────────────
+// Assign a set of selected leads to one rep (or unassign with rep=null).
+exports.bulkAssign = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const ids = Array.isArray(req.body.leadIds) ? req.body.leadIds.filter(validId) : [];
+    if (!ids.length) return res.status(400).json({ msg: "No leads selected" });
+    const rep = req.body.rep && validId(req.body.rep) ? req.body.rep : null;
+    const r = await StudentLead.updateMany({ _id: { $in: ids } }, { $set: { assignedTo: rep } });
+    return res.json({ msg: `Assigned ${r.modifiedCount} lead(s)`, modified: r.modifiedCount });
+  } catch (e) { console.error("bulkAssign:", e); return res.status(500).json({ msg: "Server error" }); }
+};
+
+// Evenly distribute UNASSIGNED, non-archived leads across all sales employees (round-robin).
+exports.autoDistribute = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const User = require("../models/user");
+    const reps = await User.find({ role: "sales" }).select("_id name").lean();
+    if (!reps.length) return res.status(400).json({ msg: "No sales employees found. Create sales logins first." });
+    const leads = await StudentLead.find({ isArchived: false, $or: [{ assignedTo: null }, { assignedTo: { $exists: false } }] }).select("_id").lean();
+    if (!leads.length) return res.json({ msg: "No unassigned leads to distribute.", distributed: 0, reps: reps.length });
+    const ops = leads.map((l, i) => ({ updateOne: { filter: { _id: l._id }, update: { $set: { assignedTo: reps[i % reps.length]._id } } } }));
+    await StudentLead.bulkWrite(ops);
+    return res.json({ msg: `Distributed ${leads.length} leads across ${reps.length} reps`, distributed: leads.length, reps: reps.length });
+  } catch (e) { console.error("autoDistribute:", e); return res.status(500).json({ msg: "Server error" }); }
+};

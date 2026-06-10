@@ -167,10 +167,7 @@ tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
       <option value="in_progress">⏳ In Progress</option>
       <option value="interested">✅ Interested</option>
     </select>
-    <select class="fsel ml-auto" id="bulkRep" style="max-width:150px"><option value="">Assign to…</option></select>
-    <button class="btn btn-prim btn-sm" onclick="bulkAssign()">Assign selected (<span id="sel-count">0</span>)</button>
-    <button class="btn btn-ghost btn-sm" onclick="autoDistribute()">⇄ Auto-distribute</button>
-    <div class="count-badge" id="count-badge">— leads</div>
+    <div class="count-badge ml-auto" id="count-badge">— leads</div>
   </div>
 
   <!-- TABLE -->
@@ -178,7 +175,6 @@ tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th style="width:30px"><input type="checkbox" id="chk-all" onclick="toggleAll(this)"></th>
           <th>#</th>
           <th>Student</th>
           <th>Phone</th>
@@ -281,14 +277,14 @@ let allLeads = [], rawLeads = [], curLead = null, lastStats = null, pendingFuId 
 // ── LOAD LEADS (new_lead only) ────────────────────────────────────────────────
 async function loadLeads() {
   document.getElementById("tbl-body").innerHTML =
-    `<tr class="empty-row"><td colspan="9"><span class="spin">⟳</span> Loading…</td></tr>`;
+    `<tr class="empty-row"><td colspan="8"><span class="spin">⟳</span> Loading…</td></tr>`;
   const [ld, st] = await Promise.all([
     apiRequest("/sales/leads?archived=false&limit=500"),
     apiRequest("/sales/leads/stats")
   ]);
   if (ld.error) {
     document.getElementById("tbl-body").innerHTML =
-      `<tr class="empty-row"><td colspan="9"><div class="empty-icon">⚠️</div>${ld.msg}<br><button onclick="loadLeads()" style="margin-top:8px;background:var(--accent);color:var(--bg);border:none;padding:6px 14px;border-radius:7px;cursor:pointer;font-weight:600">Retry</button></td></tr>`;
+      `<tr class="empty-row"><td colspan="8"><div class="empty-icon">⚠️</div>${ld.msg}<br><button onclick="loadLeads()" style="margin-top:8px;background:var(--accent);color:var(--bg);border:none;padding:6px 14px;border-radius:7px;cursor:pointer;font-weight:600">Retry</button></td></tr>`;
     return;
   }
   rawLeads = ld.leads || [];
@@ -345,12 +341,11 @@ function filter() {
 function renderTable(leads) {
   const tbody = document.getElementById("tbl-body");
   if (!leads.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="9"><div class="empty-icon">📋</div><div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px">No leads</div><div style="font-size:12px">Use Import or Add Lead to add students</div></td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8"><div class="empty-icon">📋</div><div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px">No leads</div><div style="font-size:12px">Use Import or Add Lead to add students</div></td></tr>`;
     return;
   }
   tbody.innerHTML = leads.map((l, i) => {
     return `<tr onclick="openDetail('${l._id}')">
-      <td onclick="event.stopPropagation()"><input type="checkbox" class="lead-chk" value="${l._id}" onchange="updateSel()"></td>
       <td style="color:var(--text3);font-size:11px;font-family:var(--mono)">${i+1}</td>
       <td>
         <div class="nm">${esc(l.fullName)}</div>
@@ -368,28 +363,7 @@ function renderTable(leads) {
 
 // ── CONTACT OUTCOME ─────────────────────────────────────────────────
 // ── REP ASSIGNMENT ──────────────────────────────────────────────────
-async function loadReps(){ const d = await apiRequest("/sales/reps"); reps = (d && d.reps) ? d.reps : []; var br=document.getElementById("bulkRep"); if(br) br.innerHTML='<option value="">Assign to…</option>'+reps.map(function(r){return '<option value="'+r._id+'">'+esc(r.name)+'</option>';}).join(""); }
-// BULK ALLOCATION
-function toggleAll(cb){ document.querySelectorAll(".lead-chk").forEach(function(c){ c.checked=cb.checked; }); updateSel(); }
-function updateSel(){ var n=document.querySelectorAll(".lead-chk:checked").length; var e=document.getElementById("sel-count"); if(e) e.textContent=n; }
-async function bulkAssign(){
-  var ids=Array.prototype.map.call(document.querySelectorAll(".lead-chk:checked"),function(c){return c.value;});
-  if(!ids.length){ toast("Select at least one lead","err"); return; }
-  var rep=document.getElementById("bulkRep").value;
-  var d=await apiRequest("/sales/leads/bulk-assign","POST",{leadIds:ids,rep:rep||null});
-  if(d.error){ toast(d.msg||"Failed","err"); return; }
-  var repObj=rep?(reps.find(function(r){return r._id===rep;})||rep):null;
-  ids.forEach(function(id){ var l=rawLeads.find(function(x){return x._id===id;}); if(l) l.assignedTo=repObj; });
-  toast(d.msg||"Assigned","ok");
-  var ca=document.getElementById("chk-all"); if(ca) ca.checked=false;
-  filter(); updateSel();
-}
-async function autoDistribute(){
-  if(!confirm("Distribute all UNASSIGNED leads evenly across sales reps?")) return;
-  var d=await apiRequest("/sales/leads/auto-distribute","POST",{});
-  if(d.error){ toast(d.msg||"Failed","err"); return; }
-  toast(d.msg||"Distributed","ok"); loadLeads();
-}
+async function loadReps(){ const d = await apiRequest("/sales/reps"); reps = (d && d.reps) ? d.reps : []; }
 function repSelect(l){
   const cur = (l.assignedTo && l.assignedTo._id) ? l.assignedTo._id : (l.assignedTo || "");
   const opts = '<option value="">Unassigned</option>' +
@@ -656,3 +630,4 @@ function salesLogout(){ localStorage.removeItem("token"); localStorage.removeIte
 <script src="sales-import-modal.js"></script>
 </body>
 </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
