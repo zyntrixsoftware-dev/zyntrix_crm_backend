@@ -38,6 +38,8 @@ const enrollmentSchema = new mongoose.Schema(
     // reaches zero the student surfaces in Post-Sales.
     postLeadRep:         { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     postLeadAssignedAt:  { type: Date, default: null },
+    lastPaymentLinkId:   { type: String, default: "" },
+    lastPaymentLinkUrl:  { type: String, default: "" },
 
     // Post-sales: rep assigned to follow up on the remaining (unpaid) balance
     postSalesRep:        { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },

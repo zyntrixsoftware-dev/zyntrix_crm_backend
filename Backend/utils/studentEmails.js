@@ -137,7 +137,21 @@ async function notifyCertificate(enrollment, lead) {
   return sendEmail(lead.email, "Your Zyntrix certificate", `Hi ${lead.fullName || lead.name || ""}, congratulations on completing your course. ${enrollment.certificateUrl || ""}`, { html });
 }
 
+// ── Payment link ───────────────────────────────────────────────────────────
+async function notifyPaymentLink(lead, info) {
+  if (!lead || !lead.email) return;
+  const amt = "\u20b9" + Number(info.amount || 0).toLocaleString("en-IN");
+  const html = wrap(
+    "Complete your fee payment",
+    `Hi ${esc(lead.fullName || lead.name || "there")}, please complete your course fee payment of <b>${amt}</b> using the secure link below.`,
+    [["Course", info.courseTitle || "\u2014"], ["Amount due", amt]],
+    { text: "Pay " + amt + " now", url: info.url }
+  );
+  return sendEmail(lead.email, "Pay your course fee \u2014 Zyntrix", `Hi ${lead.fullName || ""}, pay your course fee of ${amt} here: ${info.url}`, { html });
+}
+
 module.exports = {
+  notifyPaymentLink,
   notifyWelcome,
   notifyDemoConfirmation,
   notifyDemoReminder,

@@ -24,6 +24,7 @@ const deploymentRoutes      = require("./routes/deploymentRoutes");
 const salesRoutes           = require("./routes/salesRoutes");
 const lmsRoutes = require("./routes/lmsRoutes");
 const userAdminRoutes = require("./routes/userAdminRoutes");
+const razorpayRoutes = require("./routes/razorpayRoutes");
 
 const app = express();
 
@@ -76,7 +77,7 @@ app.use(cors(corsOptions));
 // Default limit is generous enough for spreadsheet imports (Candidates page
 // posts the full 142-row × 16-column dataset including each row's raw payload).
 // Rate limiter below still protects against abuse.
-app.use(express.json({ limit: "25mb" }));
+app.use(express.json({ limit: "25mb", verify: (req, res, buf) => { req.rawBody = buf; } }));
 
 // ── RATE LIMITERS ────────────────────────────────────────────────
 const authLimiter = rateLimit({
@@ -129,6 +130,7 @@ app.use("/api/hr",         offboardingRoutes);      // employee offboarding / se
 app.use("/api/hr",         onboardingRoutes);       // candidate onboarding + doc webhook
 app.use("/api/hr",         orientationRoutes);      // candidate orientation + session schedule
 app.use("/api/hr",         deploymentRoutes);       // team deployment after orientation
+app.use("/api/sales/razorpay", razorpayRoutes);   // public Razorpay webhook (before auth)
 app.use("/api",            salesRoutes);             // student course sales system
 app.use("/api/lms",        lmsRoutes);              // learning management system
 app.use("/api/admin",      userAdminRoutes);        // admin user management

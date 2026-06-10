@@ -811,6 +811,103 @@ exports.assignPostLead = async (req, res) => {
   }
 };
 
+// POST /api/sales/enrollments/:id/payment-link
+// Generates a Razorpay payment link for the outstanding balance, emails it
+// (Graph) and returns WhatsApp/SMS share links. Webhook auto-confirms payment.
+exports.sendPaymentLink = async (req, res) => {
+  try {
+    const rzp = require("../utils/razorpay");
+    const enr = await Enrollment.findById(req.params.id)
+      .populate("lead", "fullName email phone assignedTo")
+      .populate("course", "title");
+    if (!enr) return res.status(404).json({ msg: "Enrollment not found" });
+    const privileged = ["sales","hr","super_admin","admin"].includes(req.user?.role);
+    const ownsIt = req.user?.role === "employee" && enr.postLeadRep && String(enr.postLeadRep) === String(req.user.id);
+    if (!privileged && !ownsIt) return res.status(403).json({ msg: "Access denied" });
+
+    const payable = Number(enr.discountedFee > 0 ? enr.discountedFee : (enr.totalFee || 0));
+    const balance = Math.max(0, payable - Number(enr.feePaid || 0));
+    if (balance <= 0) return res.status(400).json({ msg: "Already fully paid" });
+    if (!rzp.configured()) return res.status(400).json({ msg: "Razorpay not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in the server .env." });
+
+    const lead = enr.lead || {};
+    const courseTitle = (enr.course && enr.course.title) || "your course";
+    let link;
+    try {
+      link = await rzp.createPaymentLink({
+        amount: balance, name: lead.fullName || "", email: lead.email || "", contact: lead.phone || "",
+        description: "Fee for " + courseTitle,
+        referenceId: "enr_" + enr._id + "_" + Date.now(),
+        notifyEmail: false, notifySms: false,
+        notes: { enrollmentId: String(enr._id) }
+      });
+    } catch (e) {
+      return res.status(502).json({ msg: e.message || "Could not create payment link" });
+    }
+
+    enr.lastPaymentLinkId  = link.id || "";
+    enr.lastPaymentLinkUrl = link.short_url || "";
+    await enr.save();
+
+    let emailed = false;
+    if (lead.email) {
+      try { await emails().notifyPaymentLink(lead, { courseTitle, amount: balance, url: link.short_url }); emailed = true; }
+      catch (e) { console.warn("paylink email:", e.message); }
+    }
+    const digits  = String(lead.phone || "").replace(/\D/g, "");
+    const waNum   = digits ? (digits.length === 10 ? "91" + digits : digits) : "";
+    const msg = "Hi " + (lead.fullName || "") + ", please pay your course fee of \u20b9" +
+      balance.toLocaleString("en-IN") + " for " + courseTitle + ": " + link.short_url;
+    return res.json({
+      url: link.short_url, amount: balance, emailed,
+      whatsapp: waNum ? ("https://wa.me/" + waNum + "?text=" + encodeURIComponent(msg)) : "",
+      sms: digits ? ("sms:" + lead.phone + "?body=" + encodeURIComponent(msg)) : "",
+      message: msg
+    });
+  } catch (err) {
+    console.error("sendPaymentLink:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// POST /api/sales/razorpay/webhook  (PUBLIC — mounted before the auth guard)
+exports.razorpayWebhook = async (req, res) => {
+  try {
+    const rzp = require("../utils/razorpay");
+    const signature = req.headers["x-razorpay-signature"];
+    const raw = req.rawBody || Buffer.from(JSON.stringify(req.body || {}));
+    if (!rzp.verifyWebhook(raw, signature)) return res.status(400).json({ msg: "Invalid signature" });
+    if (req.body && req.body.event === "payment_link.paid") {
+      const pl  = (req.body.payload && req.body.payload.payment_link && req.body.payload.payment_link.entity) || {};
+      const pay = (req.body.payload && req.body.payload.payment && req.body.payload.payment.entity) || {};
+      const enrId = pl.notes && pl.notes.enrollmentId;
+      const amountPaise = pay.amount || pl.amount_paid || pl.amount || 0;
+      const amount = Math.round(Number(amountPaise) / 100);
+      const txnId = pl.id || pay.id || "";
+      if (enrId && amount > 0) {
+        const enr = await Enrollment.findById(enrId);
+        if (enr) {
+          const dup = txnId ? await Payment.findOne({ transactionId: txnId }) : null;
+          if (!dup) {
+            await Payment.create({
+              enrollment: enr._id, lead: enr.lead, course: enr.course,
+              amount, method: "upi", transactionId: txnId,
+              remarks: "Razorpay payment link", createdBy: enr.postLeadRep || enr.createdBy || undefined
+            });
+            enr.feePaid = Number(enr.feePaid || 0) + amount;
+            await enr.save();
+            console.log("\u2705 Razorpay payment_link.paid \u2014 enrollment", String(enr._id), "+\u20b9" + amount);
+          }
+        }
+      }
+    }
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("razorpayWebhook:", err);
+    return res.status(500).json({ msg: "error" });
+  }
+};
+
 // Roles allowed to view / use the pre- & post-sales panels
 function canPanel(req, res) {
   const ok = req.user && ["sales","presales","postsales","super_admin","admin"].includes(req.user.role);
