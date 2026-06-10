@@ -65,6 +65,10 @@ router.post  ("/sales/demos/:id/send-reminder", C.sendDemoReminder);
 // ── Enrollments ───────────────────────────────────────────────
 router.get   ("/sales/enrollments",             C.listEnrollments);
 router.post  ("/sales/enrollments",             C.createEnrollment);
+router.get   ("/sales/post-leads",               C.listPostLeads);          // partial-paid students to assign
+router.post  ("/sales/post-leads/bulk-assign",   C.bulkAssignPostLeads);
+router.post  ("/sales/post-leads/auto-distribute", C.autoDistributePostLeads);
+router.patch ("/sales/post-leads/:id",           C.assignPostLead);
 router.get   ("/sales/enrollments/my-fee-collection", C.myFeeCollection); // sales-employee full-fee queue
 router.post  ("/sales/enrollments/:id/collect", C.collectFee);             // record full-fee payment
 router.get   ("/sales/enrollments/:id",         C.getEnrollment);

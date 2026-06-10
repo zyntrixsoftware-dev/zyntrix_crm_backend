@@ -33,6 +33,12 @@ const enrollmentSchema = new mongoose.Schema(
 
     referral:     { type: mongoose.Schema.Types.ObjectId, ref: "Referral", default: null },
 
+    // Post-lead: salesperson the Sales Admin assigns to collect the remaining
+    // (full) fee from a student who has already paid a pre-fee. When the balance
+    // reaches zero the student surfaces in Post-Sales.
+    postLeadRep:         { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    postLeadAssignedAt:  { type: Date, default: null },
+
     // Post-sales: rep assigned to follow up on the remaining (unpaid) balance
     postSalesRep:        { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     postSalesAssignedAt: { type: Date, default: null },

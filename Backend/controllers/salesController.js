@@ -676,9 +676,7 @@ exports.myFeeCollection = async (req, res) => {
   try {
     const privileged = ["sales","hr","super_admin","admin"].includes(req.user?.role);
     const repId = (privileged && req.query.rep && validId(req.query.rep)) ? req.query.rep : req.user.id;
-    const leadIds = await StudentLead.find({ assignedTo: repId }).distinct("_id");
-    if (!leadIds.length) return res.json({ enrollments: [] });
-    const all = await Enrollment.find({ lead: { $in: leadIds } })
+    const all = await Enrollment.find({ postLeadRep: repId })
       .sort({ enrolledAt: -1 })
       .populate({ path: "lead", select: "fullName email phone assignedTo" })
       .populate("batch",  "batchCode startDate")
@@ -703,8 +701,7 @@ exports.collectFee = async (req, res) => {
     const enr = await Enrollment.findById(req.params.id).populate("lead", "assignedTo fullName email");
     if (!enr) return res.status(404).json({ msg: "Enrollment not found" });
     const privileged = ["sales","hr","super_admin","admin"].includes(req.user?.role);
-    const assignedTo = (enr.lead && enr.lead.assignedTo) ? String(enr.lead.assignedTo) : "";
-    const ownsIt = req.user?.role === "employee" && assignedTo === String(req.user.id);
+    const ownsIt = req.user?.role === "employee" && enr.postLeadRep && String(enr.postLeadRep) === String(req.user.id);
     if (!privileged && !ownsIt) return res.status(403).json({ msg: "Access denied" });
 
     const payable = Number(enr.discountedFee > 0 ? enr.discountedFee : (enr.totalFee || 0));
@@ -731,6 +728,85 @@ exports.collectFee = async (req, res) => {
     });
   } catch (err) {
     console.error("collectFee:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+const _payable = e => Number(e.discountedFee > 0 ? e.discountedFee : (e.totalFee || 0));
+const _isPartial = e => { const paid = Number(e.feePaid || 0); return paid > 0 && paid < _payable(e); };
+
+// GET /api/sales/post-leads
+// Students who paid a pre-fee but still owe a balance — the Sales Admin assigns
+// each to a salesperson here, who then collects the full fee.
+exports.listPostLeads = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const all = await Enrollment.find({})
+      .sort({ enrolledAt: -1 })
+      .populate({ path: "lead", select: "fullName email phone assignedTo", populate: { path: "assignedTo", select: "name email" } })
+      .populate("batch",  "batchCode startDate")
+      .populate("course", "title")
+      .populate("postLeadRep", "name email");
+    return res.json({ postLeads: all.filter(_isPartial) });
+  } catch (err) {
+    console.error("listPostLeads:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// POST /api/sales/post-leads/bulk-assign  { ids:[], rep }
+exports.bulkAssignPostLeads = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const ids = Array.isArray(req.body.ids) ? req.body.ids.filter(validId) : [];
+    if (!ids.length) return res.status(400).json({ msg: "No post-leads selected" });
+    const rep = req.body.rep && validId(req.body.rep) ? req.body.rep : null;
+    const r = await Enrollment.updateMany(
+      { _id: { $in: ids } },
+      { $set: { postLeadRep: rep, postLeadAssignedAt: rep ? new Date() : null } }
+    );
+    return res.json({ msg: `Assigned ${r.modifiedCount} post-lead(s)`, modified: r.modifiedCount });
+  } catch (err) {
+    console.error("bulkAssignPostLeads:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// POST /api/sales/post-leads/auto-distribute
+exports.autoDistributePostLeads = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const reps = await User.find(SALES_REP_FILTER).select("_id name").lean();
+    if (!reps.length) return res.status(400).json({ msg: "No sales employees found. Create logins with role 'employee' + department 'Sales' first." });
+    const all = await Enrollment.find({ $or: [{ postLeadRep: null }, { postLeadRep: { $exists: false } }] })
+      .select("_id feePaid discountedFee totalFee");
+    const pending = all.filter(_isPartial);
+    if (!pending.length) return res.json({ msg: "No unassigned post-leads to distribute.", distributed: 0, reps: reps.length });
+    const ops = pending.map((e, i) => ({
+      updateOne: { filter: { _id: e._id }, update: { $set: { postLeadRep: reps[i % reps.length]._id, postLeadAssignedAt: new Date() } } }
+    }));
+    await Enrollment.bulkWrite(ops);
+    return res.json({ msg: `Distributed ${pending.length} post-lead(s) across ${reps.length} salesperson(s)`, distributed: pending.length, reps: reps.length });
+  } catch (err) {
+    console.error("autoDistributePostLeads:", err);
+    return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// PATCH /api/sales/post-leads/:id  { rep }  — assign a single post-lead
+exports.assignPostLead = async (req, res) => {
+  try {
+    if (!isSalesOrAdmin(req, res)) return;
+    const rep = req.body.rep && validId(req.body.rep) ? req.body.rep : null;
+    const enr = await Enrollment.findByIdAndUpdate(
+      req.params.id,
+      { $set: { postLeadRep: rep, postLeadAssignedAt: rep ? new Date() : null } },
+      { new: true }
+    ).populate("postLeadRep", "name email");
+    if (!enr) return res.status(404).json({ msg: "Not found" });
+    return res.json({ enrollment: enr });
+  } catch (err) {
+    console.error("assignPostLead:", err);
     return res.status(500).json({ msg: "Server error" });
   }
 };
