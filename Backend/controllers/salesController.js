@@ -828,38 +828,59 @@ exports.sendPaymentLink = async (req, res) => {
     const payable = Number(enr.discountedFee > 0 ? enr.discountedFee : (enr.totalFee || 0));
     const balance = Math.max(0, payable - Number(enr.feePaid || 0));
     if (balance <= 0) return res.status(400).json({ msg: "Already fully paid" });
-    if (!rzp.configured()) return res.status(400).json({ msg: "Razorpay not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in the server .env." });
 
     const lead = enr.lead || {};
     const courseTitle = (enr.course && enr.course.title) || "your course";
-    let link;
-    try {
-      link = await rzp.createPaymentLink({
-        amount: balance, name: lead.fullName || "", email: lead.email || "", contact: lead.phone || "",
-        description: "Fee for " + courseTitle,
-        referenceId: "enr_" + enr._id + "_" + Date.now(),
-        notifyEmail: false, notifySms: false,
-        notes: { enrollmentId: String(enr._id) }
-      });
-    } catch (e) {
-      return res.status(502).json({ msg: e.message || "Could not create payment link" });
+
+    // Prefer Razorpay (auto-confirm) when configured; otherwise fall back to a
+    // direct UPI link to the company UPI ID (no gateway account / PAN needed —
+    // payment is then confirmed manually with the Record button).
+    const useRzp  = rzp.configured();
+    const upiId   = (process.env.COMPANY_UPI_ID   || "").trim();
+    const upiName = (process.env.COMPANY_UPI_NAME || process.env.COMPANY_NAME || "Zyntrix Software Solutions").trim();
+    if (!useRzp && !upiId) {
+      return res.status(400).json({ msg: "No payment method configured. Set COMPANY_UPI_ID (UPI) or RAZORPAY_KEY_ID/SECRET in the server .env." });
     }
 
-    enr.lastPaymentLinkId  = link.id || "";
-    enr.lastPaymentLinkUrl = link.short_url || "";
+    let payUrl = "", linkId = "";
+    if (useRzp) {
+      let link;
+      try {
+        link = await rzp.createPaymentLink({
+          amount: balance, name: lead.fullName || "", email: lead.email || "", contact: lead.phone || "",
+          description: "Fee for " + courseTitle,
+          referenceId: "enr_" + enr._id + "_" + Date.now(),
+          notifyEmail: false, notifySms: false,
+          notes: { enrollmentId: String(enr._id) }
+        });
+      } catch (e) {
+        return res.status(502).json({ msg: e.message || "Could not create payment link" });
+      }
+      payUrl = link.short_url || ""; linkId = link.id || "";
+    } else {
+      const params = new URLSearchParams({
+        pa: upiId, pn: upiName, am: String(balance), cu: "INR",
+        tn: ("Fee " + courseTitle).slice(0, 60), tr: "enr" + String(enr._id)
+      });
+      payUrl = "upi://pay?" + params.toString();
+    }
+
+    enr.lastPaymentLinkId  = linkId;
+    enr.lastPaymentLinkUrl = payUrl;
     await enr.save();
 
     let emailed = false;
     if (lead.email) {
-      try { await emails().notifyPaymentLink(lead, { courseTitle, amount: balance, url: link.short_url }); emailed = true; }
+      try { await emails().notifyPaymentLink(lead, { courseTitle, amount: balance, url: payUrl, upiId: useRzp ? "" : upiId }); emailed = true; }
       catch (e) { console.warn("paylink email:", e.message); }
     }
     const digits  = String(lead.phone || "").replace(/\D/g, "");
     const waNum   = digits ? (digits.length === 10 ? "91" + digits : digits) : "";
     const msg = "Hi " + (lead.fullName || "") + ", please pay your course fee of \u20b9" +
-      balance.toLocaleString("en-IN") + " for " + courseTitle + ": " + link.short_url;
+      balance.toLocaleString("en-IN") + " for " + courseTitle +
+      (useRzp ? (": " + payUrl) : (" to UPI ID " + upiId + " (or tap on phone: " + payUrl + ")"));
     return res.json({
-      url: link.short_url, amount: balance, emailed,
+      url: payUrl, amount: balance, emailed, upiId: useRzp ? "" : upiId,
       whatsapp: waNum ? ("https://wa.me/" + waNum + "?text=" + encodeURIComponent(msg)) : "",
       sms: digits ? ("sms:" + lead.phone + "?body=" + encodeURIComponent(msg)) : "",
       message: msg

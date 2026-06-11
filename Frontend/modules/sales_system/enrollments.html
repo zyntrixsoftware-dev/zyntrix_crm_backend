@@ -443,6 +443,7 @@ function showShareModal(d){
   ov.innerHTML='<div style="background:#0d1624;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:22px;width:380px;max-width:92vw;color:#e8f0fe">'+
     '<div style="font-size:16px;font-weight:800;margin-bottom:4px">Payment link ready</div>'+
     '<div style="font-size:12.5px;color:#8ba3bf;margin-bottom:14px">Amount due: <b style="color:#00e5b0">\u20b9'+Number(d.amount||0).toLocaleString("en-IN")+'</b></div>'+
+    (d.upiId?'<div style="font-size:12.5px;color:#8ba3bf;margin-bottom:12px">Pay to UPI ID: <b style="color:#e8f0fe">'+d.upiId+'</b> &middot; open on a phone to pay</div>':'')+
     '<div style="display:flex;gap:6px"><input readonly value="'+d.url+'" onclick="this.select()" style="flex:1;background:#111e30;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#e8f0fe;font-size:12px;padding:8px 10px"><button id="smCopy" style="background:#00e5b0;color:#080e18;border:none;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer">Copy</button></div>'+
     emailed+
     (wa||sms?'<div style="display:flex;gap:8px;margin-top:14px">'+wa+sms+'</div>':'')+

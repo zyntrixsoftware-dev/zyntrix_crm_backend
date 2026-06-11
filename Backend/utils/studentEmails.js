@@ -141,13 +141,17 @@ async function notifyCertificate(enrollment, lead) {
 async function notifyPaymentLink(lead, info) {
   if (!lead || !lead.email) return;
   const amt = "\u20b9" + Number(info.amount || 0).toLocaleString("en-IN");
-  const html = wrap(
-    "Complete your fee payment",
-    `Hi ${esc(lead.fullName || lead.name || "there")}, please complete your course fee payment of <b>${amt}</b> using the secure link below.`,
-    [["Course", info.courseTitle || "\u2014"], ["Amount due", amt]],
-    { text: "Pay " + amt + " now", url: info.url }
-  );
-  return sendEmail(lead.email, "Pay your course fee \u2014 Zyntrix", `Hi ${lead.fullName || ""}, pay your course fee of ${amt} here: ${info.url}`, { html });
+  const rows = [["Course", info.courseTitle || "\u2014"], ["Amount due", amt]];
+  if (info.upiId) rows.push(["Pay to UPI ID", info.upiId]);
+  const intro = info.upiId
+    ? `Hi ${esc(lead.fullName || lead.name || "there")}, please pay your course fee of <b>${amt}</b> to our UPI ID <b>${esc(info.upiId)}</b> using any UPI app (GPay, PhonePe, Paytm, BHIM, etc.). On a phone you can also tap the button below to open your UPI app directly.`
+    : `Hi ${esc(lead.fullName || lead.name || "there")}, please complete your course fee payment of <b>${amt}</b> using the secure link below.`;
+  const cta = { text: "Pay " + amt + " now", url: info.url };
+  const html = wrap("Complete your fee payment", intro, rows, cta);
+  const textBody = info.upiId
+    ? `Hi ${lead.fullName || ""}, pay your course fee of ${amt} to UPI ID ${info.upiId} using any UPI app. Link: ${info.url}`
+    : `Hi ${lead.fullName || ""}, pay your course fee of ${amt} here: ${info.url}`;
+  return sendEmail(lead.email, "Pay your course fee \u2014 Zyntrix", textBody, { html });
 }
 
 module.exports = {
