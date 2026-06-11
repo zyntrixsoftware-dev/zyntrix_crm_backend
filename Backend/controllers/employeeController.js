@@ -1,4 +1,5 @@
 const User   = require("../models/user");
+const hrNotify = require("../utils/hrNotify");
 const bcrypt = require("bcryptjs");
 const gridfs = require("../utils/gridfs");
 
@@ -152,6 +153,13 @@ exports.updateMyProfile = async (req, res) => {
     const fresh = await User.findById(user._id)
       .select("-password -otpCode -otpExpiry -otpResetToken")
       .populate("reportingTo", "name designation");
+
+    (function () {
+      const who = user.name || user.email || "An employee";
+      hrNotify.notifyHr("Profile updated — " + who, "Employee profile updated",
+        who + " updated their profile in the Employee portal.",
+        [["Employee", who], ["Email", user.email || "—"]]);
+    })();
 
     return res.json({ msg: "Profile saved", profile: shapeProfile(fresh, apiHostFromReq(req)) });
   } catch (err) {
@@ -381,6 +389,13 @@ exports.deactivateAccount = async (req, res) => {
       user.employeeStatus = "On Leave";
     }
     await user.save();
+
+    (function () {
+      const who = user.name || user.email || "An employee";
+      hrNotify.notifyHr("Account deactivated — " + who, "Employee self-deactivated their account",
+        "<b>" + who + "</b> deactivated their own account from Settings. They will need HR to reactivate it.",
+        [["Employee", who], ["Email", user.email || "—"], ["Status", user.employeeStatus || "—"]]);
+    })();
 
     return res.json({ msg: "Account deactivated. Contact HR to reactivate." });
   } catch (err) {

@@ -1,4 +1,5 @@
 const Attendance = require("../models/attendance");
+const hrNotify = require("../utils/hrNotify");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TIME ZONE HELPERS
@@ -70,6 +71,14 @@ exports.punchIn = async (req, res) => {
       punchIn: new Date()
     });
 
+    (async () => {
+      const emp = await hrNotify.userInfo(req.user.id);
+      const who = emp.name || emp.email || "An employee";
+      hrNotify.notifyHr("Punch-in — " + who, "Employee punched in",
+        who + " punched in.",
+        [["Employee", who], ["Date", today], ["Time", new Date(record.punchIn).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" }) + " IST"]]);
+    })().catch(() => {});
+
     return res.json(record);
 
   } catch (err) {
@@ -122,6 +131,14 @@ exports.punchOut = async (req, res) => {
     ) - IST_OFFSET_MS);   // shift back to UTC for storage
     record.punchOut = cap;
     await record.save();
+
+    (async () => {
+      const emp = await hrNotify.userInfo(req.user.id);
+      const who = emp.name || emp.email || "An employee";
+      hrNotify.notifyHr("Punch-out — " + who, "Employee punched out",
+        who + " punched out.",
+        [["Employee", who], ["Date", today], ["Shift end", "5:00 PM IST"]]);
+    })().catch(() => {});
 
     return res.json(record);
 
