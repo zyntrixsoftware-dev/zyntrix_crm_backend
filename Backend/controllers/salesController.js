@@ -862,7 +862,7 @@ exports.sendPaymentLink = async (req, res) => {
         pa: upiId, pn: upiName, am: String(balance), cu: "INR",
         tn: ("Fee " + courseTitle).slice(0, 60), tr: "enr" + String(enr._id)
       });
-      payUrl = "upi://pay?" + params.toString();
+      payUrl = "upi://pay?" + params.toString().replace(/\+/g, "%20");
     }
 
     enr.lastPaymentLinkId  = linkId;
