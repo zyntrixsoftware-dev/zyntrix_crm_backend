@@ -181,6 +181,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log("ZyntrixCRM API running on port " + PORT);
   console.log("Allowed CORS origins:", allowedOrigins);
+  try { require("./utils/reminderScheduler").start(); } catch (e) { console.warn("reminderScheduler:", e.message); }
 });
 
 // ── ONE-TIME LEADGEN SEED (remove after first use) ────────────────
@@ -208,6 +209,7 @@ app.get("/setup-leadgen", async (req, res) => {
       credentials: { email:"lead@zyntrixsoftware.com", password:"Leadgen@2026" }
     });
   } catch (e) {
+    console.error("setup-leadgen:", e);
     return res.status(500).json({ ok:false, msg:e.message });
   }
 });
