@@ -102,6 +102,8 @@ function openLesson(id){
       var u=l.videoUrl, emb=u;
       var yt=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]+)/);
       if(yt)emb="https://www.youtube.com/embed/"+yt[1];
+      var vm=u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+      if(vm)emb="https://player.vimeo.com/video/"+vm[1];
       html='<div class="vwrap"><iframe src="'+esc(emb)+'" allowfullscreen></iframe></div>';
     }else{ html='<div class="ph">No video attached to this lesson yet.</div>'; }
     if(l.content) html+='<div class="body"><div class="txt">'+esc(l.content)+'</div></div>';

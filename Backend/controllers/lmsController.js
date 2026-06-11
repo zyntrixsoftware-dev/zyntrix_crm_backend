@@ -14,6 +14,18 @@ const LMSProgress = require("../models/LMSProgress");
 const LMS_DIR = path.join(__dirname, "..", "uploads", "lms");
 fs.mkdirSync(LMS_DIR, { recursive: true });
 
+// Map a video filename to a browser-friendly MIME type. Browsers refuse to play
+// when served as application/octet-stream, so derive it from the extension.
+const VIDEO_MIME = {
+  ".mp4": "video/mp4", ".m4v": "video/mp4", ".webm": "video/webm",
+  ".ogg": "video/ogg", ".ogv": "video/ogg", ".mov": "video/quicktime",
+  ".mkv": "video/x-matroska", ".avi": "video/x-msvideo", ".m3u8": "application/vnd.apple.mpegurl"
+};
+function videoMimeFor(filename, current) {
+  if (current && current !== "application/octet-stream" && current !== "binary/octet-stream") return current;
+  return VIDEO_MIME[path.extname(filename || "").toLowerCase()] || "video/mp4";
+}
+
 const validId  = (id) => mongoose.Types.ObjectId.isValid(id);
 const isStaff  = (req) => req.user && ["lms", "instructor", "super_admin"].includes(req.user.role);
 function staffOnly(req, res) {
@@ -126,7 +138,7 @@ exports.uploadVideo = async (req, res) => {
     const l = await LMSLesson.findById(req.params.id);
     if (!l) { try { fs.unlinkSync(req.file.path); } catch (_) {} return res.status(404).json({ msg: "Lesson not found" }); }
     if (l.videoFile) { try { fs.unlinkSync(path.join(LMS_DIR, l.videoFile)); } catch (_) {} }
-    l.videoFile = req.file.filename; l.videoMime = req.file.mimetype || "video/mp4"; l.type = "video";
+    l.videoFile = req.file.filename; l.videoMime = videoMimeFor(req.file.filename, req.file.mimetype); l.type = "video";
     await l.save();
     return res.json({ msg: "Video uploaded", lesson: l });
   } catch (e) { console.error("uploadVideo:", e); return res.status(500).json({ msg: "Server error" }); }
@@ -139,7 +151,7 @@ exports.streamVideo = async (req, res) => {
     if (!l || !l.videoFile) return res.status(404).json({ msg: "No video" });
     const fp = path.join(LMS_DIR, l.videoFile);
     if (!fs.existsSync(fp)) return res.status(404).json({ msg: "File missing" });
-    const stat = fs.statSync(fp); const total = stat.size; const mime = l.videoMime || "video/mp4";
+    const stat = fs.statSync(fp); const total = stat.size; const mime = videoMimeFor(l.videoFile, l.videoMime);
     const range = req.headers.range;
     if (range) {
       const m = /bytes=(\d+)-(\d*)/.exec(range);

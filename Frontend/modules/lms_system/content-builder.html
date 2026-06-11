@@ -95,8 +95,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <option value="document">Document</option><option value="assignment">Assignment</option><option value="quiz">Quiz</option>
   </select>
   <div id="ml-video-wrap">
-    <label class="fl">Video URL (external embed) — or upload below</label>
-    <input class="input" id="ml-videourl" placeholder="https://... (leave blank to upload a file)">
+    <label class="fl">Video URL (YouTube / Vimeo embed)</label>
+    <input class="input" id="ml-videourl" placeholder="https://youtu.be/... (leave blank to upload a file)">
+    <label class="fl" style="margin-top:10px">…or upload a video file from your computer</label>
+    <input type="file" id="ml-videofile" accept="video/*" class="input" style="padding:7px">
+    <div class="muted" style="font-size:11px;margin-top:4px">Pick a file and press Save — it uploads after the lesson is created.</div>
   </div>
   <div id="ml-text-wrap" style="display:none">
     <label class="fl">Content (text / notes)</label>
@@ -168,28 +171,51 @@ async function delModule(id){if(!confirm("Delete this module and its lessons?"))
 
 // lessons
 function lessonTypeUI(){var t=$("ml-type").value;$("ml-video-wrap").style.display=t==="video"?"block":"none";$("ml-text-wrap").style.display=(t==="text"||t==="document"||t==="assignment")?"block":"none";}
-function openLesson(moduleId){editLessonId=null;lessonModuleId=moduleId;$("ml-title").textContent="Add Lesson";$("ml-name").value="";$("ml-type").value="video";$("ml-videourl").value="";$("ml-content").value="";$("ml-dur").value=0;lessonTypeUI();$("m-lesson").classList.add("on");}
+function openLesson(moduleId){editLessonId=null;lessonModuleId=moduleId;$("ml-title").textContent="Add Lesson";$("ml-name").value="";$("ml-type").value="video";$("ml-videourl").value="";$("ml-content").value="";$("ml-dur").value=0;var _vf=$("ml-videofile");if(_vf)_vf.value="";lessonTypeUI();$("m-lesson").classList.add("on");}
 function editLesson(id){
   var l; MODULES.forEach(function(m){(m.lessons||[]).forEach(function(x){if(x._id===id)l=x;});});
-  editLessonId=id;lessonModuleId=l.module;$("ml-title").textContent="Edit Lesson";$("ml-name").value=l.title;$("ml-type").value=l.type;$("ml-videourl").value=l.videoUrl||"";$("ml-content").value=l.content||"";$("ml-dur").value=l.durationMin||0;lessonTypeUI();$("m-lesson").classList.add("on");
+  editLessonId=id;lessonModuleId=l.module;$("ml-title").textContent="Edit Lesson";$("ml-name").value=l.title;$("ml-type").value=l.type;$("ml-videourl").value=l.videoUrl||"";$("ml-content").value=l.content||"";$("ml-dur").value=l.durationMin||0;var _vf=$("ml-videofile");if(_vf)_vf.value="";lessonTypeUI();$("m-lesson").classList.add("on");
 }
 async function saveLesson(){
   var body={title:$("ml-name").value.trim(),type:$("ml-type").value,videoUrl:$("ml-videourl").value.trim(),content:$("ml-content").value,durationMin:Number($("ml-dur").value)||0};
   if(!body.title){toast("Title required");return;}
   var r=editLessonId?await apiRequest("/lms/lessons/"+editLessonId,"PATCH",body):await apiRequest("/lms/lessons","POST",Object.assign({module:lessonModuleId},body));
-  if(r&&!r.error){closeM('m-lesson');loadContent();toast("Saved");}else toast((r&&r.msg)||"Error");
+  if(!r||r.error){toast((r&&r.msg)||"Error");return;}
+  var lessonId=editLessonId||(r.lesson&&r.lesson._id);
+  var vf=$("ml-videofile"); var f=vf&&vf.files[0];
+  if(body.type==="video"&&f&&lessonId){
+    var ok=await uploadVideoFile(lessonId,f);
+    if(vf)vf.value="";
+    closeM('m-lesson');loadContent();
+    return;
+  }
+  closeM('m-lesson');loadContent();toast("Saved");
 }
 async function delLesson(id){if(!confirm("Delete this lesson?"))return;var r=await apiRequest("/lms/lessons/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Deleted");}}
 
-async function uploadVideo(lessonId,input){
+function uploadVideo(lessonId,input){
   var f=input.files[0];if(!f)return;
-  toast("Uploading video… ("+Math.round(f.size/1048576)+" MB)");
-  var fd=new FormData();fd.append("video",f);
-  try{
-    var res=await fetch(API_BASE+"/lms/lessons/"+lessonId+"/video",{method:"POST",headers:{Authorization:"Bearer "+TOKEN},body:fd});
-    var d=await res.json();
-    if(res.ok){toast("Video uploaded ✓");loadContent();}else toast(d.msg||"Upload failed");
-  }catch(e){toast("Upload failed: "+e.message);}
+  uploadVideoFile(lessonId,f).then(function(){ input.value=""; loadContent(); });
+}
+function uploadVideoFile(lessonId,f){
+  return new Promise(function(resolve){
+    var mb=Math.round(f.size/1048576);
+    var xhr=new XMLHttpRequest();
+    xhr.open("POST",API_BASE+"/lms/lessons/"+lessonId+"/video");
+    xhr.setRequestHeader("Authorization","Bearer "+TOKEN);
+    xhr.upload.onprogress=function(e){ if(e.lengthComputable){ toast("Uploading "+mb+" MB — "+Math.round(e.loaded/e.total*100)+"%"); } };
+    xhr.onload=function(){
+      if(xhr.status>=200&&xhr.status<300){ toast("Video uploaded ✓"); resolve(true); return; }
+      if(xhr.status===413){ toast("File too large — raise nginx client_max_body_size on api.zyntrixsoftware.com (Cloudflare free caps at 100MB)."); resolve(false); return; }
+      if(xhr.status===401||xhr.status===403){ toast("Not allowed — log in as an LMS staff/admin account to upload."); resolve(false); return; }
+      var m; try{ m=JSON.parse(xhr.responseText).msg; }catch(e){}
+      toast(m||("Upload failed (HTTP "+xhr.status+")")); resolve(false);
+    };
+    xhr.onerror=function(){ toast("Upload failed — network/server error. Large videos can hit a proxy size limit (nginx/Cloudflare)."); resolve(false); };
+    xhr.ontimeout=function(){ toast("Upload timed out — try a smaller file or raise the server timeout."); resolve(false); };
+    toast("Uploading video… ("+mb+" MB)");
+    var fd=new FormData();fd.append("video",f);xhr.send(fd);
+  });
 }
 function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
