@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema({
   profileNote:    { type: String, default: "" },
   workLocation:   { type: String, default: "On-site" },
 
+  // Weekly off day(s) set by HR — 0=Sun … 6=Sat. On these days the employee is
+  // shown as "Week Off" in attendance (not Absent) and isn't expected to punch in.
+  weekOffDays:    { type: [Number], default: [0] },
+
   // ── EMPLOYEE SELF-SERVICE PROFILE ───────────────────────────────
   photo:          { type: String, default: "" },
   photoFileId:    { type: mongoose.Schema.Types.ObjectId, default: null },

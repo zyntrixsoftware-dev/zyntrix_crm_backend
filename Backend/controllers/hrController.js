@@ -141,7 +141,7 @@ exports.getEmployeeAttendance = async (req, res) => {
     const endStr    = `${nextYear}-${pad2(nextMonth)}-01`;
 
     const [user, data] = await Promise.all([
-      User.findById(userId).select("name email role"),
+      User.findById(userId).select("name email role weekOffDays"),
       Attendance.find({
         userId,
         date: { $gte: startStr, $lt: endStr }
@@ -229,11 +229,15 @@ exports.updateEmployee = async (req, res) => {
     const allowed = [
       "name","phone","department","designation","employeeType",
       "dateOfJoining","salary","reportingTo","employeeStatus",
-      "address","emergencyContact","profileNote"
+      "address","emergencyContact","profileNote","weekOffDays"
     ];
 
     const update = {};
     allowed.forEach(f => { if (req.body[f] !== undefined) update[f] = req.body[f]; });
+    if (update.weekOffDays !== undefined) {
+      const arr = Array.isArray(update.weekOffDays) ? update.weekOffDays : [];
+      update.weekOffDays = [...new Set(arr.map(Number).filter(d => d >= 0 && d <= 6))];
+    }
 
     const emp = await User.findOneAndUpdate(
       { _id: req.params.id, role: { $nin: ["super_admin"] } },
@@ -258,7 +262,7 @@ exports.createEmployee = async (req, res) => {
       name, email, password,
       phone, department, designation, employeeType,
       dateOfJoining, salary, reportingTo, address,
-      emergencyContact, profileNote
+      emergencyContact, profileNote, weekOffDays
     } = req.body;
 
     if (!name || !email || !password)
@@ -279,6 +283,7 @@ exports.createEmployee = async (req, res) => {
       dateOfJoining, salary,
       reportingTo: reportingTo || null,
       address, emergencyContact, profileNote,
+      weekOffDays: Array.isArray(weekOffDays) ? [...new Set(weekOffDays.map(Number).filter(d => d >= 0 && d <= 6))] : [0],
       employeeStatus: "Active"
     });
 

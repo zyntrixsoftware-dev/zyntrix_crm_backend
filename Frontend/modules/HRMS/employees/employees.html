@@ -379,6 +379,21 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         </div>
       </div>
 
+      <div class="frow single">
+        <div class="fg">
+          <label>Weekly Off Day(s) — only HR can set this</label>
+          <div id="f-weekoff" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+            <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="0"> Sun</label>
+            <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="1"> Mon</label>
+            <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="2"> Tue</label>
+            <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="3"> Wed</label>
+            <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="4"> Thu</label>
+            <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="5"> Fri</label>
+            <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" value="6"> Sat</label>
+          </div>
+        </div>
+      </div>
+
       <div class="section-label">Additional Info</div>
       <div class="frow single">
         <div class="fg"><label>Address</label><input id="f-address" placeholder="e.g. 42 MG Road, Bangalore"></div>
@@ -684,6 +699,7 @@ async function openEditModal(id) {
   document.getElementById("f-address").value    = e.address     || "";
   document.getElementById("f-emergency").value  = e.emergencyContact || "";
   document.getElementById("f-notes").value      = e.profileNote || "";
+  setWeekOff(e.weekOffDays && e.weekOffDays.length ? e.weekOffDays : [0]);
 
   closePanel();
   openModal("emp-modal");
@@ -708,6 +724,7 @@ async function saveEmployee() {
     address:          document.getElementById("f-address").value.trim(),
     emergencyContact: document.getElementById("f-emergency").value.trim(),
     profileNote:      document.getElementById("f-notes").value.trim(),
+    weekOffDays:      getWeekOff(),
   };
 
   if (!payload.name) { showErr("Full name is required"); return; }
@@ -832,11 +849,14 @@ function closePanel() {
   document.getElementById("panel-overlay").classList.remove("open");
 }
 
+function getWeekOff(){ return Array.prototype.map.call(document.querySelectorAll("#f-weekoff input:checked"), function(c){ return Number(c.value); }); }
+function setWeekOff(arr){ var set=new Set((arr||[]).map(Number)); document.querySelectorAll("#f-weekoff input").forEach(function(c){ c.checked=set.has(Number(c.value)); }); }
 function clearForm() {
   ["f-name","f-email","f-phone","f-dept","f-designation","f-doj","f-salary","f-address","f-emergency","f-notes","f-password"]
     .forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
   document.getElementById("f-type").value   = "Full-time";
   document.getElementById("f-status").value = "Active";
+  setWeekOff([0]);
   document.getElementById("modal-err").style.display = "none";
 }
 function showErr(msg) {

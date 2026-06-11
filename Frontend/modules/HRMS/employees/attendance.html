@@ -635,6 +635,9 @@ function fillEmpHeader(u) {
     const cls = {Active:"b-green","On Leave":"b-amber",Terminated:"b-rose",Resigned:"b-gray"}[u.employeeStatus]||"b-gray";
     bEl.innerHTML += `<span class="badge ${cls}">${esc(u.employeeStatus)}</span>`;
   }
+  const DOWN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const wo = (Array.isArray(u.weekOffDays) && u.weekOffDays.length) ? u.weekOffDays : [0];
+  bEl.innerHTML += `<span class="badge b-gray">Week off: ${wo.slice().sort().map(d => DOWN[d]).join(", ")}</span>`;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -647,20 +650,22 @@ function buildRows(records, month) {
   const recMap  = {};
   records.forEach(r => { recMap[r.date] = r; });
 
+  const weekOff = (empData && Array.isArray(empData.weekOffDays) && empData.weekOffDays.length) ? empData.weekOffDays : [0];
+
   allRows = [];
   for (let d = 1; d <= daysInM; d++) {
     const dateStr    = `${y}-${pad(m)}-${pad(d)}`;
     const jsDate     = new Date(dateStr + "T00:00:00");
     const dow        = jsDate.getDay();
     const isFuture   = dateStr > tStr;
-    const isSunday   = dow === 0;
+    const isWeekOff  = weekOff.includes(dow);
     const isSaturday = dow === 6;
     const rec        = recMap[dateStr] || null;
     const hasPunchIn = rec && rec.punchIn;
 
     let status;
     if (isFuture)        status = "future";
-    else if (isSunday)   status = "weekend";
+    else if (isWeekOff)  status = "weekend";   // styled as a week-off day
     else if (hasPunchIn) status = "present";
     else                 status = "absent";
 
@@ -668,7 +673,7 @@ function buildRows(records, month) {
     if (rec && rec.punchIn && rec.punchOut) {
       hours = Math.max(0, Math.floor((new Date(rec.punchOut) - new Date(rec.punchIn)) / 60000));
     }
-    allRows.push({ dateStr, jsDate, dow, isFuture, isSunday, isSaturday, status, rec, hours });
+    allRows.push({ dateStr, jsDate, dow, isFuture, isWeekOff, isSaturday, status, rec, hours });
   }
 }
 
@@ -676,7 +681,7 @@ function buildRows(records, month) {
 //  KPIs
 // ══════════════════════════════════════════════════════════════════
 function renderKPIs() {
-  const working = allRows.filter(r => !r.isSunday && !r.isFuture);
+  const working = allRows.filter(r => !r.isWeekOff && !r.isFuture);
   const present = working.filter(r => r.status === "present");
   const absent  = working.filter(r => r.status === "absent");
   const rate    = working.length ? Math.round(present.length / working.length * 100) : 0;
@@ -725,7 +730,8 @@ function renderCalendar(month) {
 
     const todayCls = isToday ? " today" : "";
     const tipParts = [r.dateStr];
-    if (r.isSaturday && !r.isFuture) tipParts.push("Saturday (working day)");
+    if (r.isWeekOff) tipParts.push("Week off");
+    else if (r.isSaturday && !r.isFuture) tipParts.push("Saturday (working day)");
     if (r.rec && r.rec.punchIn)  tipParts.push("In: "  + fmtTime(r.rec.punchIn));
     if (r.rec && r.rec.punchOut) tipParts.push("Out: " + fmtTime(r.rec.punchOut));
 

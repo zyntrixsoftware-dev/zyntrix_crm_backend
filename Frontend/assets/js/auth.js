@@ -296,6 +296,7 @@ async function refreshUserAvatar() {
       : "";
     u.photo = photoUrl;
     if (p.name) u.name = p.name;
+    if (Array.isArray(p.weekOffDays)) u.weekOffDays = p.weekOffDays;
     localStorage.setItem("user", JSON.stringify(u));
     renderUserAvatar();
   } catch (_) { /* silent — avatar sync should never break a page */ }

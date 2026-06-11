@@ -75,7 +75,8 @@ function shapeProfile(u, host = "") {
     employeeStatus: u.employeeStatus || "Active",
     reportingTo:    u.reportingTo
       ? (u.reportingTo.name || "")
-      : ""
+      : "",
+    weekOffDays:    Array.isArray(u.weekOffDays) ? u.weekOffDays : []
   };
 }
 

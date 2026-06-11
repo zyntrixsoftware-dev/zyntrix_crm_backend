@@ -98,8 +98,12 @@ function formatTime(time) {
   });
 }
 
+function _weekOffDays() {
+  try { var u = JSON.parse(localStorage.getItem("user")) || {}; return (Array.isArray(u.weekOffDays) && u.weekOffDays.length) ? u.weekOffDays : [0]; }
+  catch (e) { return [0]; }
+}
 function getShift(date) {
-  const workingDay = date.getDay() !== 0;
+  const workingDay = !_weekOffDays().includes(date.getDay());
 
   return {
     workingDay,
@@ -256,7 +260,7 @@ function updateSelectedShift() {
 }
 
 function isWorkingDay(date) {
-  return date.getDay() !== 0;   // Sunday is the only off day (matches getShift)
+  return !_weekOffDays().includes(date.getDay());   // off days set by HR (default Sunday)
 }
 
 // On time = punched in before 10:00 AM. The punch-in window opens at 9:50 AM,
