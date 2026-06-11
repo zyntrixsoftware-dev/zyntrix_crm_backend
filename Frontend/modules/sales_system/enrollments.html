@@ -429,29 +429,32 @@ async function sendPayLink(){
   const e=currentEnrollment; if(!e) return;
   const d=await apiRequest('/sales/enrollments/'+e._id+'/payment-link','POST',{});
   if(!d||d.error){ toast((d&&d.msg)||'Could not create payment link','err'); return; }
-  showShareModal(d);
+  showShareModal(d, e._id);
 }
 
-function showShareModal(d){
+function showShareModal(d, id){
   var ov=document.createElement('div');
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center';
   ov.onclick=function(ev){ if(ev.target===ov) ov.remove(); };
-  var chBase='flex:1;text-align:center;text-decoration:none;padding:9px;border-radius:8px;font-size:12.5px;font-weight:700;border:1px solid;';
-  var wa = d.whatsapp ? '<a href="'+d.whatsapp+'" target="_blank" style="'+chBase+'background:rgba(37,211,102,.14);color:#25d366;border-color:rgba(37,211,102,.4)">\uD83D\uDCAC WhatsApp</a>' : '';
-  var sms = d.sms ? '<a href="'+d.sms+'" style="'+chBase+'background:rgba(61,142,240,.14);color:#5aa2f5;border-color:rgba(61,142,240,.4)">\u2709 SMS</a>' : '';
-  var emailed = d.emailed ? '<div style="font-size:11.5px;color:#22c55e;margin-top:6px">\u2713 Link emailed to the student</div>' : '<div style="font-size:11.5px;color:#8ba3bf;margin-top:6px">No email on file \u2014 share via WhatsApp/SMS</div>';
-  ov.innerHTML='<div style="background:#0d1624;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:22px;width:380px;max-width:92vw;color:#e8f0fe">'+
-    '<div style="font-size:16px;font-weight:800;margin-bottom:4px">Payment link ready</div>'+
-    '<div style="font-size:12.5px;color:#8ba3bf;margin-bottom:14px">Amount due: <b style="color:#00e5b0">\u20b9'+Number(d.amount||0).toLocaleString("en-IN")+'</b></div>'+
-    (d.upiId?'<div style="font-size:12.5px;color:#8ba3bf;margin-bottom:12px">Pay to UPI ID: <b style="color:#e8f0fe">'+d.upiId+'</b> &middot; open on a phone to pay</div>':'')+
-    '<div style="display:flex;gap:6px"><input readonly value="'+d.url+'" onclick="this.select()" style="flex:1;background:#111e30;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#e8f0fe;font-size:12px;padding:8px 10px"><button id="smCopy" style="background:#00e5b0;color:#080e18;border:none;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer">Copy</button></div>'+
-    emailed+
-    (wa||sms?'<div style="display:flex;gap:8px;margin-top:14px">'+wa+sms+'</div>':'')+
+  var chBase='flex:1;min-width:96px;text-align:center;text-decoration:none;padding:10px;border-radius:9px;font-size:12.5px;font-weight:700;border:1px solid;cursor:pointer;display:inline-block;font-family:inherit';
+  var emailBtn = d.hasEmail ? '<button id="smEmail" style="'+chBase+';background:rgba(0,229,176,.14);color:#00e5b0;border-color:rgba(0,229,176,.4)">\uD83D\uDCE7 Email</button>' : '';
+  var wa = d.whatsapp ? '<a href="'+d.whatsapp+'" target="_blank" style="'+chBase+';background:rgba(37,211,102,.14);color:#25d366;border-color:rgba(37,211,102,.4)">\uD83D\uDCAC WhatsApp</a>' : '';
+  var sms = d.sms ? '<a href="'+d.sms+'" style="'+chBase+';background:rgba(61,142,240,.14);color:#5aa2f5;border-color:rgba(61,142,240,.4)">\u2709 SMS</a>' : '';
+  var upiLine = d.upiId ? '<div style="font-size:12.5px;color:#8ba3bf;margin-bottom:12px">Pay to UPI ID: <b style="color:#e8f0fe">'+d.upiId+'</b> &middot; open on a phone to pay</div>' : '';
+  ov.innerHTML='<div style="background:#0d1624;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:22px;width:400px;max-width:92vw;color:#e8f0fe;font-family:inherit">'+
+    '<div style="font-size:16px;font-weight:800;margin-bottom:4px">Send payment link</div>'+
+    '<div style="font-size:12.5px;color:#8ba3bf;margin-bottom:12px">Amount due: <b style="color:#00e5b0">\u20b9'+Number(d.amount||0).toLocaleString("en-IN")+'</b></div>'+
+    upiLine+
+    '<div style="font-size:10.5px;font-weight:700;color:#4e6680;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Send via</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">'+(emailBtn+wa+sms||'<span style="color:#4e6680;font-size:12px">No email or phone on file \u2014 copy the link below.</span>')+'</div>'+
+    '<div style="display:flex;gap:6px"><input readonly value="'+d.url+'" onclick="this.select()" style="flex:1;background:#111e30;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#e8f0fe;font-size:12px;padding:8px 10px"><button id="smCopy" style="background:#162436;color:#e8f0fe;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer">Copy</button></div>'+
     '<button id="smClose" style="margin-top:16px;width:100%;background:transparent;border:1px solid rgba(255,255,255,.12);color:#8ba3bf;border-radius:8px;padding:9px;cursor:pointer;font-weight:600">Close</button>'+
   '</div>';
   document.body.appendChild(ov);
   ov.querySelector('#smCopy').onclick=function(){ try{navigator.clipboard.writeText(d.url);}catch(e){} this.textContent='Copied'; };
   ov.querySelector('#smClose').onclick=function(){ ov.remove(); };
+  var eb=ov.querySelector('#smEmail');
+  if(eb){ eb.onclick=async function(){ eb.disabled=true; eb.textContent='Sending\u2026'; var r=await apiRequest('/sales/enrollments/'+id+'/payment-link','POST',{email:true}); if(r&&!r.error&&r.emailed){ eb.textContent='\u2713 Emailed'; eb.style.opacity=.7; } else { eb.textContent='Retry email'; eb.disabled=false; } }; }
 }
 
 async function submitPayment() {

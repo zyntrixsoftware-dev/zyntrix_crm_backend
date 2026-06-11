@@ -870,7 +870,8 @@ exports.sendPaymentLink = async (req, res) => {
     await enr.save();
 
     let emailed = false;
-    if (lead.email) {
+    const wantEmail = req.body && (req.body.email === true || req.body.channel === "email" || req.body.sendEmail === true);
+    if (wantEmail && lead.email) {
       try { await emails().notifyPaymentLink(lead, { courseTitle, amount: balance, url: payUrl, upiId: useRzp ? "" : upiId }); emailed = true; }
       catch (e) { console.warn("paylink email:", e.message); }
     }
@@ -880,7 +881,7 @@ exports.sendPaymentLink = async (req, res) => {
       balance.toLocaleString("en-IN") + " for " + courseTitle +
       (useRzp ? (": " + payUrl) : (" to UPI ID " + upiId + " (or tap on phone: " + payUrl + ")"));
     return res.json({
-      url: payUrl, amount: balance, emailed, upiId: useRzp ? "" : upiId,
+      url: payUrl, amount: balance, emailed, hasEmail: !!lead.email, email: lead.email || "", upiId: useRzp ? "" : upiId,
       whatsapp: waNum ? ("https://wa.me/" + waNum + "?text=" + encodeURIComponent(msg)) : "",
       sms: digits ? ("sms:" + lead.phone + "?body=" + encodeURIComponent(msg)) : "",
       message: msg
