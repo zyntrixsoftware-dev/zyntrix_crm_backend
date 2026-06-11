@@ -19,6 +19,8 @@ router.use(auth);
 // Staff dashboard / roster
 router.get("/dashboard", C.dashboard);
 router.get("/roster",    C.roster);
+router.get("/students",      C.listStudents);   // staff: student list
+router.get("/students/:id",  C.studentDetail);  // staff: one student's full detail
 
 // Catalogue + content
 router.get("/courses",                  C.listCourses);

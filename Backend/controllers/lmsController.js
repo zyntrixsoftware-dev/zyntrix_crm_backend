@@ -308,6 +308,89 @@ exports.roster = async (req, res) => {
     return res.json({ roster: out });
   } catch (e) { console.error("roster:", e); return res.status(500).json({ msg: "Server error" }); }
 };
+// ── STAFF: students list + rich detail (HRMS-style) ──────────────────────────
+exports.listStudents = async (req, res) => {
+  if (!staffOnly(req, res)) return;
+  try {
+    const User = require("../models/user");
+    const q = { role: "student" };
+    if (req.query.search) {
+      const rx = new RegExp(String(req.query.search).trim(), "i");
+      q.$or = [{ name: rx }, { email: rx }];
+    }
+    const students = await User.find(q).select("name email phone active createdAt").sort({ createdAt: -1 }).limit(1000).lean();
+    return res.json({ students });
+  } catch (e) { console.error("listStudents:", e); return res.status(500).json({ msg: "Server error" }); }
+};
+
+exports.studentDetail = async (req, res) => {
+  if (!staffOnly(req, res)) return;
+  try {
+    const User           = require("../models/user");
+    const LMSAttendance  = require("../models/LMSAttendance");
+    const LMSSubmission  = require("../models/LMSSubmission");
+    const LMSQuizAttempt = require("../models/LMSQuizAttempt");
+    const LMSCertificate = require("../models/LMSCertificate");
+
+    const u = await User.findById(req.params.id).select("name email phone active createdAt role").lean();
+    if (!u || u.role !== "student") return res.status(404).json({ msg: "Student not found" });
+    const sid = new mongoose.Types.ObjectId(req.params.id);
+
+    // Enrollments (linked by lead email) + per-course progress
+    const leads   = await StudentLead.find({ email: u.email }).select("_id fullName phone city").lean();
+    const leadIds = leads.map(l => l._id);
+    const enrolls = leadIds.length
+      ? await Enrollment.find({ lead: { $in: leadIds } }).populate("course", "title").populate("batch", "batchCode startDate").lean()
+      : [];
+
+    const courses = [];
+    for (const e of enrolls) {
+      const cid = e.course && e.course._id;
+      let total = 0, done = 0;
+      if (cid) {
+        total = await LMSLesson.countDocuments({ course: cid });
+        done  = await LMSProgress.countDocuments({ student: sid, course: cid, status: "completed" });
+      }
+      const fee = Number(e.discountedFee > 0 ? e.discountedFee : (e.totalFee || 0));
+      courses.push({
+        course: e.course, batch: e.batch, status: e.status,
+        totalLessons: total, completed: done, pct: total ? Math.round(done / total * 100) : 0,
+        feePaid: e.feePaid || 0, totalFee: fee, balance: Math.max(0, fee - (e.feePaid || 0))
+      });
+    }
+
+    // Attendance (LMS live sessions)
+    const attAgg = await LMSAttendance.aggregate([{ $match: { student: sid } }, { $group: { _id: "$status", n: { $sum: 1 } } }]);
+    const attendance = { present: 0, absent: 0, late: 0 };
+    attAgg.forEach(a => { if (attendance[a._id] !== undefined) attendance[a._id] = a.n; });
+    const attTotal = attendance.present + attendance.absent + attendance.late;
+    attendance.total = attTotal;
+    attendance.pct = attTotal ? Math.round((attendance.present + attendance.late) / attTotal * 100) : 0;
+
+    // Assignments
+    const subs = await LMSSubmission.find({ student: sid }).select("status marks").lean();
+    const graded = subs.filter(x => x.status === "graded" && x.marks != null);
+    const submissions = {
+      total: subs.length,
+      graded: graded.length,
+      avgMarks: graded.length ? Math.round(graded.reduce((a, b) => a + b.marks, 0) / graded.length) : null
+    };
+
+    // Quizzes
+    const qa = await LMSQuizAttempt.find({ student: sid }).select("score passed").lean();
+    const quizzes = {
+      attempts: qa.length,
+      passed: qa.filter(x => x.passed).length,
+      avgScore: qa.length ? Math.round(qa.reduce((a, b) => a + (b.score || 0), 0) / qa.length) : null
+    };
+
+    // Certificates
+    const certs = await LMSCertificate.find({ student: sid }).select("certificateNo courseTitle issuedAt").sort({ issuedAt: -1 }).lean();
+
+    return res.json({ student: u, lead: leads[0] || null, courses, attendance, submissions, quizzes, certificates: certs });
+  } catch (e) { console.error("studentDetail:", e); return res.status(500).json({ msg: "Server error" }); }
+};
+
 exports.dashboard = async (req, res) => {
   if (!staffOnly(req, res)) return;
   try {

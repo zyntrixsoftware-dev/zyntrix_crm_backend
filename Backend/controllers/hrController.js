@@ -35,7 +35,7 @@ exports.getDashboard = async (req, res) => {
     const today = getUTCDate();
 
     const [employees, todayAttendance, pendingRequests] = await Promise.all([
-      User.find({ role: { $nin: ["super_admin"] } }).select("name email role"),
+      User.find({ role: { $nin: ["super_admin", "student"] } }).select("name email role"),
       Attendance.find({ date: today }).select("userId punchIn"),
       ShiftRequest.countDocuments({ status: "pending" })
     ]);
@@ -163,7 +163,7 @@ exports.getEmployees = async (req, res) => {
     if (!checkHrAccess(req, res)) return;
 
     const { search, department, status, type } = req.query;
-    const query = { role: { $nin: ["super_admin"] } };
+    const query = { role: { $nin: ["super_admin", "student"] } };
 
     if (department) query.department = department;
     if (status)     query.employeeStatus = status;
@@ -195,7 +195,7 @@ exports.getEmployee = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    const emp = await User.findOne({ _id: req.params.id, role: { $nin: ["super_admin"] } })
+    const emp = await User.findOne({ _id: req.params.id, role: { $nin: ["super_admin", "student"] } })
       .select("-password -otpCode -otpExpiry -otpResetToken")
       .populate("reportingTo", "name designation department");
 
@@ -240,7 +240,7 @@ exports.updateEmployee = async (req, res) => {
     }
 
     const emp = await User.findOneAndUpdate(
-      { _id: req.params.id, role: { $nin: ["super_admin"] } },
+      { _id: req.params.id, role: { $nin: ["super_admin", "student"] } },
       update,
       { new: true, runValidators: true }
     ).select("-password -otpCode -otpExpiry -otpResetToken");
@@ -311,12 +311,12 @@ exports.terminateEmployee = async (req, res) => {
       if (req.user.role !== "super_admin")
         return res.status(403).json({ msg: "Only super_admin can permanently delete employees" });
 
-      await User.findOneAndDelete({ _id: req.params.id, role: { $nin: ["super_admin"] } });
+      await User.findOneAndDelete({ _id: req.params.id, role: { $nin: ["super_admin", "student"] } });
       return res.json({ msg: "Employee permanently deleted" });
     }
 
     const emp = await User.findOneAndUpdate(
-      { _id: req.params.id, role: { $nin: ["super_admin"] } },
+      { _id: req.params.id, role: { $nin: ["super_admin", "student"] } },
       { employeeStatus: "Terminated" },
       { new: true }
     ).select("-password -otpCode -otpExpiry -otpResetToken");
@@ -338,7 +338,7 @@ exports.reactivateEmployee = async (req, res) => {
     if (!checkHrAccess(req, res)) return;
 
     const emp = await User.findOneAndUpdate(
-      { _id: req.params.id, role: { $nin: ["super_admin"] } },
+      { _id: req.params.id, role: { $nin: ["super_admin", "student"] } },
       { active: true, employeeStatus: "Active" },
       { new: true }
     ).select("-password -otpCode -otpExpiry -otpResetToken");
@@ -355,7 +355,7 @@ exports.reactivateEmployee = async (req, res) => {
 exports.getDepartments = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
-    const depts = await User.distinct("department", { role: { $nin: ["super_admin"] }, department: { $ne: "" } });
+    const depts = await User.distinct("department", { role: { $nin: ["super_admin", "student"] }, department: { $ne: "" } });
     return res.json({ departments: depts.filter(Boolean).sort() });
   } catch (err) {
     return res.status(500).json({ msg: "Server error" });
@@ -377,16 +377,16 @@ exports.getHrmsDashboard = async (req, res) => {
       deptBreakdown,
       recentHires
     ] = await Promise.all([
-      User.countDocuments({ role: { $nin: ["super_admin"] } }),
-      User.countDocuments({ role: { $nin: ["super_admin"] }, employeeStatus: "Active" }),
+      User.countDocuments({ role: { $nin: ["super_admin", "student"] } }),
+      User.countDocuments({ role: { $nin: ["super_admin", "student"] }, employeeStatus: "Active" }),
       require("../models/attendance").find({ date: today }).select("userId punchIn"),
       ShiftRequest.countDocuments({ status: "pending" }),
       User.aggregate([
-        { $match: { role: { $nin: ["super_admin"] }, department: { $ne: "" } } },
+        { $match: { role: { $nin: ["super_admin", "student"] }, department: { $ne: "" } } },
         { $group: { _id: "$department", count: { $sum: 1 } } },
         { $sort: { count: -1 } }
       ]),
-      User.find({ role: { $nin: ["super_admin"] } })
+      User.find({ role: { $nin: ["super_admin", "student"] } })
         .sort({ createdAt: -1 })
         .limit(5)
         .select("name designation department employeeStatus createdAt")
@@ -418,7 +418,7 @@ exports.exportEmployees = async (req, res) => {
   try {
     if (!checkHrAccess(req, res)) return;
 
-    const employees = await User.find({ role: { $nin: ["super_admin"] } })
+    const employees = await User.find({ role: { $nin: ["super_admin", "student"] } })
       .select("-password -otpCode -otpExpiry -otpResetToken -photo")
       .populate("reportingTo", "name")
       .sort({ name: 1 });
