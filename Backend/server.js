@@ -35,7 +35,11 @@ connectDB();
 app.set("trust proxy", 1);
 
 // ── SECURITY HEADERS ─────────────────────────────────────────────
-app.use(helmet());
+// Allow the frontend (zyntrixsoftware.com) to embed resources served by this
+// API on a different origin (api.zyntrixsoftware.com) — e.g. LMS videos, images,
+// downloads. Without this, helmet's default CORP: same-origin blocks them
+// (Firefox is strict about this).
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 // ── CORS ─────────────────────────────────────────────────────────
 const allowedOrigins = [

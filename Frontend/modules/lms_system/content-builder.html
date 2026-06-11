@@ -167,7 +167,7 @@ async function saveModule(){
   var r=editModuleId?await apiRequest("/lms/modules/"+editModuleId,"PATCH",body):await apiRequest("/lms/modules","POST",Object.assign({course:CURRENT},body));
   if(r&&!r.error){closeM('m-module');loadContent();toast("Saved");}else toast((r&&r.msg)||"Error");
 }
-async function delModule(id){if(!confirm("Delete this module and its lessons?"))return;var r=await apiRequest("/lms/modules/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Deleted");}}
+async function delModule(id){if(!confirm("Delete this module and its lessons?"))return;var r=await apiRequest("/lms/modules/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Module deleted");}else{toast((r&&r.msg)||"Delete failed");}}
 
 // lessons
 function lessonTypeUI(){var t=$("ml-type").value;$("ml-video-wrap").style.display=t==="video"?"block":"none";$("ml-text-wrap").style.display=(t==="text"||t==="document"||t==="assignment")?"block":"none";}
@@ -191,7 +191,7 @@ async function saveLesson(){
   }
   closeM('m-lesson');loadContent();toast("Saved");
 }
-async function delLesson(id){if(!confirm("Delete this lesson?"))return;var r=await apiRequest("/lms/lessons/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Deleted");}}
+async function delLesson(id){if(!confirm("Delete this lesson?"))return;var r=await apiRequest("/lms/lessons/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Lesson deleted");}else{toast((r&&r.msg)||"Delete failed");}}
 
 function uploadVideo(lessonId,input){
   var f=input.files[0];if(!f)return;
