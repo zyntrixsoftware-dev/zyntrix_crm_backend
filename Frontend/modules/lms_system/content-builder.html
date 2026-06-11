@@ -122,6 +122,7 @@ var COURSES=[], CURRENT=null, MODULES=[], editModuleId=null, editLessonId=null, 
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2200);}
+function myRole(){ try{ return JSON.parse(atob(TOKEN.split(".")[1])).role||""; }catch(e){ return ""; } }
 function closeM(id){$(id).classList.remove("on");}
 
 async function init(){
@@ -167,7 +168,13 @@ async function saveModule(){
   var r=editModuleId?await apiRequest("/lms/modules/"+editModuleId,"PATCH",body):await apiRequest("/lms/modules","POST",Object.assign({course:CURRENT},body));
   if(r&&!r.error){closeM('m-module');loadContent();toast("Saved");}else toast((r&&r.msg)||"Error");
 }
-async function delModule(id){if(!confirm("Delete this module and its lessons?"))return;var r=await apiRequest("/lms/modules/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Module deleted");}else{toast((r&&r.msg)||"Delete failed");}}
+async function delModule(id){
+  if(!confirm("Delete this module and its lessons?"))return;
+  var r=await apiRequest("/lms/modules/"+id,"DELETE");
+  if(r&&!r.error){loadContent();toast("Module deleted");return;}
+  console.error("delModule failed:",r);
+  alert("Could not delete the module.\n\nReason: "+((r&&r.msg)||"unknown error")+"\nYour login role: "+(myRole()||"?")+"\n\nDeleting needs an LMS staff account (role: lms, instructor or super_admin).");
+}
 
 // lessons
 function lessonTypeUI(){var t=$("ml-type").value;$("ml-video-wrap").style.display=t==="video"?"block":"none";$("ml-text-wrap").style.display=(t==="text"||t==="document"||t==="assignment")?"block":"none";}
@@ -191,7 +198,13 @@ async function saveLesson(){
   }
   closeM('m-lesson');loadContent();toast("Saved");
 }
-async function delLesson(id){if(!confirm("Delete this lesson?"))return;var r=await apiRequest("/lms/lessons/"+id,"DELETE");if(r&&!r.error){loadContent();toast("Lesson deleted");}else{toast((r&&r.msg)||"Delete failed");}}
+async function delLesson(id){
+  if(!confirm("Delete this lesson?"))return;
+  var r=await apiRequest("/lms/lessons/"+id,"DELETE");
+  if(r&&!r.error){loadContent();toast("Lesson deleted");return;}
+  console.error("delLesson failed:",r);
+  alert("Could not delete the lesson.\n\nReason: "+((r&&r.msg)||"unknown error")+"\nYour login role: "+(myRole()||"?")+"\n\nDeleting needs an LMS staff account (role: lms, instructor or super_admin).");
+}
 
 function uploadVideo(lessonId,input){
   var f=input.files[0];if(!f)return;
