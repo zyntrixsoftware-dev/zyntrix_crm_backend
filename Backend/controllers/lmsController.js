@@ -152,6 +152,13 @@ exports.streamVideo = async (req, res) => {
     const fp = path.join(LMS_DIR, l.videoFile);
     if (!fs.existsSync(fp)) return res.status(404).json({ msg: "File missing" });
     const stat = fs.statSync(fp); const total = stat.size; const mime = videoMimeFor(l.videoFile, l.videoMime);
+    const cors = {
+      "Cross-Origin-Resource-Policy": "cross-origin",
+      "Access-Control-Allow-Origin": req.headers.origin || "*",
+      "Access-Control-Allow-Credentials": "true",
+      "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
+      "Vary": "Origin",
+    };
     const range = req.headers.range;
     if (range) {
       const m = /bytes=(\d+)-(\d*)/.exec(range);
@@ -162,10 +169,11 @@ exports.streamVideo = async (req, res) => {
         "Accept-Ranges": "bytes",
         "Content-Length": end - start + 1,
         "Content-Type": mime,
+        ...cors,
       });
       fs.createReadStream(fp, { start, end }).pipe(res);
     } else {
-      res.writeHead(200, { "Content-Length": total, "Content-Type": mime, "Accept-Ranges": "bytes" });
+      res.writeHead(200, { "Content-Length": total, "Content-Type": mime, "Accept-Ranges": "bytes", ...cors });
       fs.createReadStream(fp).pipe(res);
     }
   } catch (e) { console.error("streamVideo:", e); return res.status(500).json({ msg: "Server error" }); }
