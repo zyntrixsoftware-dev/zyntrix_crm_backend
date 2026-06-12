@@ -146,6 +146,12 @@ exports.uploadVideo = async (req, res) => {
 
 // GET /lms/lessons/:id/video  → range-stream (auth)
 exports.streamVideo = async (req, res) => {
+  // CORS/CORP on every path so error responses aren't masked by CORB and the
+  // success stream is readable cross-origin (frontend on a different domain).
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Vary", "Origin");
   try {
     const l = await LMSLesson.findById(req.params.id);
     if (!l || !l.videoFile) return res.status(404).json({ msg: "No video" });

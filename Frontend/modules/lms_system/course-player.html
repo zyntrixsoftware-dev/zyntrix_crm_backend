@@ -97,7 +97,7 @@ function openLesson(id){
   var html="";
   if(l.type==="video"){
     if(l.videoFile){
-      html='<div class="vwrap"><video id="vid" controls preload="metadata" src="'+API_BASE+'/lms/lessons/'+l._id+'/video?token='+encodeURIComponent(TOKEN)+'"></video></div>';
+      html='<div class="vwrap"><video id="vid" controls preload="metadata" crossorigin="anonymous" src="'+API_BASE+'/lms/lessons/'+l._id+'/video?token='+encodeURIComponent(TOKEN)+'"></video></div>';
     }else if(l.videoUrl){
       var u=l.videoUrl, emb=u;
       var yt=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]+)/);

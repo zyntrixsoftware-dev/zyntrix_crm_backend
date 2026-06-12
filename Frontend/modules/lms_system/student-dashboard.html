@@ -144,21 +144,27 @@ function renderCourses(cs){
 
 function renderLive(sx){
   var now=Date.now();
-  var past=sx.filter(function(s){return new Date(s.scheduledAt).getTime()<now;});
+  var past=sx.filter(function(s){return (new Date(s.scheduledAt).getTime()+(s.durationMin||60)*60000) < now;});
   var attended=past.filter(function(s){return s.myAttendance==="present"||s.myAttendance==="late";}).length;
   $("k-att").textContent=(past.length?Math.round(attended/past.length*100):0)+"%";
-  var upcoming=sx.filter(function(s){return new Date(s.scheduledAt).getTime()>=now-2*3600000;}).sort(function(a,b){return new Date(a.scheduledAt)-new Date(b.scheduledAt);}).slice(0,5);
-  var list=upcoming.length?upcoming:sx.slice(0,4);
+  // upcoming + ongoing first; otherwise show the most recent
+  sx=sx.slice().sort(function(a,b){return new Date(b.scheduledAt)-new Date(a.scheduledAt);});
+  var list=sx.slice(0,6);
   if(!list.length){$("live").innerHTML='<div class="empty"><span class="ico">🎥</span>No live classes scheduled.</div>';return;}
   $("live").innerHTML=list.map(function(s){
     var st=new Date(s.scheduledAt).getTime();
-    var soon=st-now<30*60000 && st-now>-(s.durationMin||60)*60000;  // window: 30m before to end
-    var done=st<now;
-    var attBadge=s.myAttendance?('<span class="badge '+(s.myAttendance==="present"?"b-green":s.myAttendance==="late"?"b-amber":"b-rose")+'">'+s.myAttendance+'</span>'):(done?'<span class="badge b-gray">missed</span>':'');
+    var endsAt=st+(s.durationMin||60)*60000;
+    var liveNow=["live","ongoing","started"].indexOf(s.status)>=0;
+    var startingSoon=st-now<=30*60000 && now<endsAt;            // 30m before start until it ends
+    var joinable=liveNow || startingSoon || now < endsAt + 24*3600000;  // stays joinable up to 24h after end
+    var future=st>now;
+    var label=liveNow?"🔴 Join live":(startingSoon?"Join now":(future?"Join":"Join class"));
+    var attBadge=s.myAttendance?('<span class="badge '+(s.myAttendance==="present"?"b-green":s.myAttendance==="late"?"b-amber":"b-rose")+'">'+s.myAttendance+'</span>'):"";
     var actions='';
-    if(!done || soon){ actions='<button class="btn btn-prim btn-sm" onclick="joinClass(\''+s._id+'\')">'+(soon?"Join now":"Join")+'</button>'; }
-    else if(s.recordingUrl){ actions='<a class="btn btn-ghost btn-sm" href="'+esc(s.recordingUrl)+'" target="_blank">Recording</a>'; }
-    return '<div class="live-row"><div style="flex:1"><div class="nm">'+esc(s.title||"Class")+'</div>'+
+    if(joinable){ actions='<button class="btn btn-prim btn-sm" onclick="joinClass(\''+s._id+'\')">'+label+'</button>'; }
+    if(s.recordingUrl){ actions+=' <a class="btn btn-ghost btn-sm" href="'+esc(s.recordingUrl)+'" target="_blank">Recording</a>'; }
+    if(!actions){ attBadge=attBadge||'<span class="badge b-gray">ended</span>'; }
+    return '<div class="live-row"><div style="flex:1"><div class="nm">'+esc(s.title||"Class")+(liveNow?' <span class="badge b-rose" style="margin-left:6px">LIVE</span>':'')+'</div>'+
       '<div class="mt">'+esc((s.course&&s.course.title)||"")+' &middot; '+fmtDT(s.scheduledAt)+(s.instructorName?' &middot; '+esc(s.instructorName):'')+'</div></div>'+
       attBadge+actions+'</div>';
   }).join("");
