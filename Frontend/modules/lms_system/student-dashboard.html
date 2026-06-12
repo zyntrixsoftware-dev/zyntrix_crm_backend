@@ -6,30 +6,50 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--accent:#00e5b0;--blue:#3d8ef0;--green:#22c55e;--amber:#f5a623;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--accent-dim:rgba(0,229,176,.10);--rose:#ff4d6d;--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
+:root{--bg:#080e18;--bg2:#0d1624;--bg3:#111e30;--bg4:#162436;--accent:#00e5b0;--blue:#3d8ef0;--green:#22c55e;--amber:#f5a623;--purple:#b57bee;--rose:#ff4d6d;--text:#e8f0fe;--text2:#8ba3bf;--text3:#4e6680;--border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);--accent-dim:rgba(0,229,176,.10);--font:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono',monospace;--sidebar:230px}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden}
 .shell{display:flex;height:100vh}
-.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
 .brand{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
 .brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--blue));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:800;color:var(--bg)}
 .nav-grp{padding:12px 8px 4px}.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px 6px}
-.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:var(--text2);font-size:12.5px;text-decoration:none}
-.nav-a.on{background:var(--accent-dim);color:var(--accent)}.nav-ico{width:16px;text-align:center}
-.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
+.nav-a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:var(--text2);font-size:12.5px;text-decoration:none;cursor:pointer;margin-bottom:1px}
+.nav-a:hover{background:rgba(255,255,255,.04);color:var(--text)}.nav-a.on{background:var(--accent-dim);color:var(--accent)}
+.nav-ico{width:16px;text-align:center}.sb-foot{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border)}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px}
+.topbar{height:58px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px}
 .pg-title{font-family:var(--display);font-size:15px;font-weight:700;flex:1}
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;text-decoration:none}
-.btn-prim{background:var(--accent);color:var(--bg)}.btn-rose{background:rgba(255,77,109,.12);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-sm{padding:5px 11px;font-size:11.5px}
-.content{flex:1;overflow-y:auto;padding:18px 22px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.cc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
-.cc-top{height:90px;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:28px;font-weight:800;color:var(--bg)}
+.btn-prim{background:var(--accent);color:var(--bg)}.btn-prim:hover{filter:brightness(1.05)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{color:var(--text)}
+.btn-rose{background:rgba(255,77,109,.12);color:var(--rose);border:1px solid rgba(255,77,109,.2)}.btn-sm{padding:5px 11px;font-size:11.5px}
+.content{flex:1;overflow-y:auto;padding:20px 22px}
+.hi{font-family:var(--display);font-size:22px;font-weight:800;margin-bottom:2px}.hi-sub{font-size:12.5px;color:var(--text2);margin-bottom:18px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:15px 17px;display:flex;align-items:center;gap:13px}
+.kpi-ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.kpi-v{font-family:var(--display);font-size:23px;font-weight:800;line-height:1}.kpi-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-top:4px;font-weight:600}
+.sec-hd{display:flex;align-items:center;gap:8px;margin:6px 0 12px}.sec-hd h2{font-family:var(--display);font-size:15px;font-weight:700;flex:1}.sec-hd a{font-size:11.5px;color:var(--accent);text-decoration:none}
+.dot{width:7px;height:7px;border-radius:50%}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px}
+.cc{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.cc-top{height:80px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:26px;font-weight:800;color:#06121f}
 .cc-body{padding:14px;flex:1;display:flex;flex-direction:column}
-.cc-title{font-weight:700;font-size:14px;margin-bottom:4px}.cc-sub{font-size:11px;color:var(--text3);margin-bottom:12px}
+.cc-title{font-weight:700;font-size:14px;margin-bottom:3px}.cc-sub{font-size:11px;color:var(--text3);margin-bottom:10px}
 .bar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:6px}.bar-fill{height:100%;background:var(--green);border-radius:4px}
 .pct{font-size:11px;color:var(--text2);margin-bottom:12px}
-.empty{text-align:center;color:var(--text3);padding:50px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:1000px){.two{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.panel h3{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.row{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--border)}.row:first-of-type{border-top:none}
+.row .nm{font-size:13px;font-weight:600;color:var(--text)}.row .mt{font-size:11px;color:var(--text3);margin-top:2px}
+.badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.b-green{background:rgba(34,197,94,.14);color:var(--green)}.b-amber{background:rgba(245,166,35,.14);color:var(--amber)}.b-rose{background:rgba(255,77,109,.14);color:var(--rose)}.b-blue{background:rgba(61,142,240,.14);color:var(--blue)}.b-gray{background:var(--bg3);color:var(--text3)}
+.live-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}.live-row:first-of-type{border-top:none}
+.empty{text-align:center;color:var(--text3);padding:26px;font-size:12.5px}
+.empty .ico{font-size:24px;display:block;margin-bottom:6px;opacity:.6}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:13px;display:none;z-index:60}.toast.on{display:block}
 </style>
 </head>
 <body>
@@ -37,39 +57,160 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <aside class="sidebar">
   <div class="brand"><div class="brand-mark">Z</div><div><div style="font-family:var(--display);font-size:13px;font-weight:800">Zyntrix LMS</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">Learner</div></div></div>
   <div class="nav-grp"><div class="nav-lbl">Learn</div>
-    <a class="nav-a on" href="student-dashboard.html"><span class="nav-ico">◉</span> My Courses</a>
-    <a class="nav-a" href="my-assignments.html"><span class="nav-ico">▤</span> Assignments</a>
+    <a class="nav-a on" href="student-dashboard.html"><span class="nav-ico">&#9673;</span> Dashboard</a>
+    <a class="nav-a" href="my-assignments.html"><span class="nav-ico">&#9636;</span> Assignments</a>
     <a class="nav-a" href="my-quizzes.html"><span class="nav-ico">?</span> Quizzes</a>
-    <a class="nav-a" href="live.html"><span class="nav-ico">⏵</span> Live Classes</a>
-    <a class="nav-a" href="doubts.html"><span class="nav-ico">✎</span> Doubts</a>
-    <a class="nav-a" href="my-certificates.html"><span class="nav-ico">★</span> Certificates</a>
+    <a class="nav-a" href="live.html"><span class="nav-ico">&#9205;</span> Live Classes</a>
+    <a class="nav-a" href="doubts.html"><span class="nav-ico">&#9998;</span> Doubts</a>
+    <a class="nav-a" href="my-certificates.html"><span class="nav-ico">&#9733;</span> Certificates</a>
   </div>
-  <div class="sb-foot"><button class="btn btn-rose btn-sm" style="width:100%;justify-content:center" onclick="lmsLogout()">⏻ Logout</button></div>
+  <div class="sb-foot"><button class="btn btn-rose btn-sm" style="width:100%;justify-content:center" onclick="lmsLogout()">&#9211; Logout</button></div>
 </aside>
 <div class="main">
-  <div class="topbar"><div class="pg-title">My Learning</div><button class="btn btn-rose btn-sm" style="visibility:hidden">x</button></div>
-  <div class="content"><div class="grid" id="grid"></div></div>
+  <div class="topbar"><div class="pg-title">My Learning</div><button class="btn btn-ghost btn-sm" onclick="loadAll()">&#8635; Refresh</button></div>
+  <div class="content">
+    <div class="hi" id="hi">Welcome back</div>
+    <div class="hi-sub" id="hi-sub"></div>
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-ic" style="background:rgba(61,142,240,.14);color:#5aa2f5">&#128218;</div><div><div class="kpi-v" id="k-courses">&mdash;</div><div class="kpi-l">My Courses</div></div></div>
+      <div class="kpi"><div class="kpi-ic" style="background:rgba(0,229,176,.14);color:#00e5b0">&#128200;</div><div><div class="kpi-v" id="k-prog">&mdash;</div><div class="kpi-l">Avg Progress</div></div></div>
+      <div class="kpi"><div class="kpi-ic" style="background:rgba(245,166,35,.14);color:#f5a623">&#9745;</div><div><div class="kpi-v" id="k-att">&mdash;</div><div class="kpi-l">Attendance</div></div></div>
+      <div class="kpi"><div class="kpi-ic" style="background:rgba(167,109,255,.14);color:#b57bee">&#127891;</div><div><div class="kpi-v" id="k-cert">&mdash;</div><div class="kpi-l">Certificates</div></div></div>
+    </div>
+
+    <div class="sec-hd"><span class="dot" style="background:#5aa2f5"></span><h2>Continue Learning</h2></div>
+    <div class="grid" id="courses"><div class="empty">Loading&hellip;</div></div>
+
+    <div class="sec-hd"><span class="dot" style="background:#f5a623"></span><h2>Live Classes</h2><a href="live.html">All classes &rsaquo;</a></div>
+    <div class="panel" id="live" style="margin-bottom:24px"><div class="empty">Loading&hellip;</div></div>
+
+    <div class="two">
+      <div class="panel"><h3><span class="dot" style="background:#00e5b0"></span>Pending Assignments <a href="my-assignments.html" style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none">Open</a></h3><div id="assign"><div class="empty">Loading&hellip;</div></div></div>
+      <div class="panel"><h3><span class="dot" style="background:#b57bee"></span>Quizzes <a href="my-quizzes.html" style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none">Open</a></h3><div id="quiz"><div class="empty">Loading&hellip;</div></div></div>
+    </div>
+
+    <div class="two">
+      <div class="panel"><h3><span class="dot" style="background:#3d8ef0"></span>Announcements</h3><div id="ann"><div class="empty">Loading&hellip;</div></div></div>
+      <div class="panel"><h3><span class="dot" style="background:#22c55e"></span>My Certificates <a href="my-certificates.html" style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none">Open</a></h3><div id="cert"><div class="empty">Loading&hellip;</div></div></div>
+    </div>
+  </div>
 </div>
 </div>
+<div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
 if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
-async function load(){
-  var d=await apiRequest("/lms/my/courses");
-  var cs=(d&&d.courses)||[];
-  if(!cs.length){$("grid").innerHTML='<div class="empty" style="grid-column:1/-1">You are not enrolled in any course yet, or your login email doesn\'t match an enrollment. Contact your coordinator.</div>';return;}
-  $("grid").innerHTML=cs.map(function(c){
-    var t=c.course.title||"Course";var pct=c.progress&&c.progress.pct||0;
-    return '<div class="cc"><div class="cc-top">'+esc(t.charAt(0).toUpperCase())+'</div><div class="cc-body">'+
-      '<div class="cc-title">'+esc(t)+'</div><div class="cc-sub">'+(c.progress.completed||0)+' / '+(c.progress.total||0)+' lessons</div>'+
+function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2800);}
+function user(){try{return JSON.parse(localStorage.getItem("user"))||{};}catch(e){return {};}}
+var GRAD=['linear-gradient(135deg,#3d8ef0,#00e5b0)','linear-gradient(135deg,#b57bee,#3d8ef0)','linear-gradient(135deg,#f5a623,#ff7a59)','linear-gradient(135deg,#00e5b0,#22c55e)','linear-gradient(135deg,#ff4d6d,#b57bee)'];
+function grad(s){s=String(s||"");var h=0,i;for(i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return GRAD[h%GRAD.length];}
+function fmtDT(d){if(!d)return "";return new Date(d).toLocaleString("en-IN",{weekday:"short",day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
+function fmtD(d){if(!d)return "";return new Date(d).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});}
+
+async function loadAll(){
+  var u=user();
+  $("hi").textContent="Welcome back"+(u.name?", "+u.name.split(" ")[0]:"")+" &#128075;";
+  $("hi").innerHTML="Welcome back"+(u.name?", "+esc(u.name.split(" ")[0]):"")+" 👋";
+  $("hi-sub").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+  var res=await Promise.all([
+    apiRequest("/lms/my/courses").catch(function(){return {};}),
+    apiRequest("/lms/my/sessions").catch(function(){return {};}),
+    apiRequest("/lms/assignments").catch(function(){return {};}),
+    apiRequest("/lms/quizzes").catch(function(){return {};}),
+    apiRequest("/lms/announcements").catch(function(){return {};}),
+    apiRequest("/lms/my/certificates").catch(function(){return {};})
+  ]);
+  renderCourses((res[0]&&res[0].courses)||[]);
+  renderLive((res[1]&&res[1].sessions)||[]);
+  renderAssign((res[2]&&res[2].assignments)||[]);
+  renderQuiz((res[3]&&res[3].quizzes)||[]);
+  renderAnn((res[4]&&res[4].announcements)||[]);
+  renderCert((res[5]&&res[5].certificates)||[]);
+}
+
+function renderCourses(cs){
+  $("k-courses").textContent=cs.length;
+  $("k-prog").textContent=(cs.length?Math.round(cs.reduce(function(a,c){return a+((c.progress&&c.progress.pct)||0);},0)/cs.length):0)+"%";
+  $("courses").innerHTML=cs.length?cs.map(function(c){
+    var t=(c.course&&c.course.title)||"Course";var pct=(c.progress&&c.progress.pct)||0;
+    return '<div class="cc"><div class="cc-top" style="background:'+grad(t)+'">'+esc(t.charAt(0).toUpperCase())+'</div>'+
+      '<div class="cc-body"><div class="cc-title">'+esc(t)+'</div><div class="cc-sub">'+((c.progress&&c.progress.completed)||0)+' / '+((c.progress&&c.progress.total)||0)+' lessons</div>'+
       '<div class="bar"><div class="bar-fill" style="width:'+pct+'%"></div></div><div class="pct">'+pct+'% complete</div>'+
-      '<a class="btn btn-prim btn-sm" style="margin-top:auto;justify-content:center" href="course-player.html?course='+c.course._id+'">'+(pct>0?"Continue":"Start")+'</a></div></div>';
+      '<a class="btn btn-prim btn-sm" style="margin-top:auto;justify-content:center" href="course-player.html?course='+(c.course&&c.course._id)+'">'+(pct>0?"Continue":"Start")+'</a></div></div>';
+  }).join(""):'<div class="empty" style="grid-column:1/-1"><span class="ico">📚</span>No courses yet. Contact your coordinator if you\'ve enrolled.</div>';
+}
+
+function renderLive(sx){
+  var now=Date.now();
+  var past=sx.filter(function(s){return new Date(s.scheduledAt).getTime()<now;});
+  var attended=past.filter(function(s){return s.myAttendance==="present"||s.myAttendance==="late";}).length;
+  $("k-att").textContent=(past.length?Math.round(attended/past.length*100):0)+"%";
+  var upcoming=sx.filter(function(s){return new Date(s.scheduledAt).getTime()>=now-2*3600000;}).sort(function(a,b){return new Date(a.scheduledAt)-new Date(b.scheduledAt);}).slice(0,5);
+  var list=upcoming.length?upcoming:sx.slice(0,4);
+  if(!list.length){$("live").innerHTML='<div class="empty"><span class="ico">🎥</span>No live classes scheduled.</div>';return;}
+  $("live").innerHTML=list.map(function(s){
+    var st=new Date(s.scheduledAt).getTime();
+    var soon=st-now<30*60000 && st-now>-(s.durationMin||60)*60000;  // window: 30m before to end
+    var done=st<now;
+    var attBadge=s.myAttendance?('<span class="badge '+(s.myAttendance==="present"?"b-green":s.myAttendance==="late"?"b-amber":"b-rose")+'">'+s.myAttendance+'</span>'):(done?'<span class="badge b-gray">missed</span>':'');
+    var actions='';
+    if(!done || soon){ actions='<button class="btn btn-prim btn-sm" onclick="joinClass(\''+s._id+'\')">'+(soon?"Join now":"Join")+'</button>'; }
+    else if(s.recordingUrl){ actions='<a class="btn btn-ghost btn-sm" href="'+esc(s.recordingUrl)+'" target="_blank">Recording</a>'; }
+    return '<div class="live-row"><div style="flex:1"><div class="nm">'+esc(s.title||"Class")+'</div>'+
+      '<div class="mt">'+esc((s.course&&s.course.title)||"")+' &middot; '+fmtDT(s.scheduledAt)+(s.instructorName?' &middot; '+esc(s.instructorName):'')+'</div></div>'+
+      attBadge+actions+'</div>';
   }).join("");
 }
+
+window.joinClass=async function(id){
+  var d=await apiRequest("/lms/sessions/"+id+"/attend","POST",{});
+  if(!d||d.error){toast((d&&d.msg)||"Could not join");return;}
+  toast("Attendance marked ✓");
+  if(d.joinUrl){ window.open(d.joinUrl,"_blank"); }
+  else { toast("No meeting link set for this class yet."); }
+  loadAll();
+};
+
+function renderAssign(ax){
+  var pending=ax.filter(function(a){return !a.mySubmission;});
+  $("assign").innerHTML=ax.length?(pending.length?pending:ax).slice(0,6).map(function(a){
+    var sub=a.mySubmission;
+    var badge=sub?(sub.status==="graded"?'<span class="badge b-green">'+(sub.marks!=null?sub.marks+" marks":"graded")+'</span>':'<span class="badge b-blue">submitted</span>'):'<span class="badge b-amber">pending</span>';
+    var due=a.dueDate?("Due "+fmtD(a.dueDate)):"No due date";
+    return '<div class="row"><div style="flex:1"><div class="nm">'+esc(a.title||"Assignment")+'</div><div class="mt">'+esc((a.course&&a.course.title)||"")+' &middot; '+due+'</div></div>'+badge+
+      (sub?'':'<a class="btn btn-ghost btn-sm" href="my-assignments.html">Submit</a>')+'</div>';
+  }).join(""):'<div class="empty"><span class="ico">📝</span>No assignments.</div>';
+}
+
+function renderQuiz(qx){
+  $("quiz").innerHTML=qx.length?qx.slice(0,6).map(function(q){
+    var attempts=(q.myAttempts||[]).length;
+    var best=null;(q.myAttempts||[]).forEach(function(a){if(best===null||a.score>best)best=a.score;});
+    var passed=(q.myAttempts||[]).some(function(a){return a.passed;});
+    var badge=attempts?(passed?'<span class="badge b-green">passed</span>':'<span class="badge b-amber">'+attempts+' attempt'+(attempts>1?"s":"")+'</span>'):'<span class="badge b-gray">not taken</span>';
+    return '<div class="row"><div style="flex:1"><div class="nm">'+esc(q.title||"Quiz")+'</div><div class="mt">'+(q.questionCount||0)+' questions &middot; pass '+(q.passMark||0)+(q.timeLimitMin?' &middot; '+q.timeLimitMin+'m':'')+'</div></div>'+badge+
+      '<a class="btn btn-ghost btn-sm" href="my-quizzes.html">'+(attempts?"View":"Take")+'</a></div>';
+  }).join(""):'<div class="empty"><span class="ico">❓</span>No quizzes yet.</div>';
+}
+
+function renderAnn(ax){
+  $("ann").innerHTML=ax.length?ax.slice(0,6).map(function(a){
+    return '<div class="row"><div style="flex:1"><div class="nm">'+esc(a.title||"Announcement")+'</div><div class="mt">'+esc((a.body||"").slice(0,90))+(a.body&&a.body.length>90?"…":"")+'</div></div><div class="mt" style="white-space:nowrap">'+fmtD(a.createdAt)+'</div></div>';
+  }).join(""):'<div class="empty"><span class="ico">📢</span>No announcements.</div>';
+}
+
+function renderCert(cx){
+  $("k-cert").textContent=cx.length;
+  $("cert").innerHTML=cx.length?cx.slice(0,6).map(function(c){
+    return '<div class="row"><div style="flex:1"><div class="nm">'+esc((c.course&&c.course.title)||c.courseTitle||"Certificate")+'</div><div class="mt">No: '+esc(c.certificateNo||"")+' &middot; '+fmtD(c.issuedAt)+'</div></div>'+
+      '<a class="btn btn-ghost btn-sm" href="certificate.html?id='+c._id+'" target="_blank">View</a></div>';
+  }).join(""):'<div class="empty"><span class="ico">🎓</span>Complete a course to earn a certificate.</div>';
+}
+
 function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
-load();
+loadAll();
 </script>
 </body>
 </html>
