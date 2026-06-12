@@ -25,6 +25,7 @@ const salesRoutes           = require("./routes/salesRoutes");
 const lmsRoutes = require("./routes/lmsRoutes");
 const userAdminRoutes = require("./routes/userAdminRoutes");
 const razorpayRoutes = require("./routes/razorpayRoutes");
+const publicRoutes = require("./routes/publicRoutes");
 
 const app = express();
 
@@ -139,6 +140,7 @@ app.use("/api/sales/razorpay", razorpayRoutes);   // public Razorpay webhook (be
 // (header-only) and, on the broad /api path, would shadow /api/lms/* and break the
 // ?token= <video> stream auth (returns "No token"). lmsRoutes has its own auth that
 // accepts ?token=, so it must run first.
+app.use("/api/public",     publicRoutes);           // PUBLIC website courses + enrol (no auth)
 app.use("/api/lms",        lmsRoutes);              // learning management system
 app.use("/api",            salesRoutes);             // student course sales system
 app.use("/api/admin",      userAdminRoutes);        // admin user management
