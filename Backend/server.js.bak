@@ -206,14 +206,4 @@ app.get("/setup-leadgen", async (req, res) => {
     );
     return res.json({
       ok: true,
-      msg: "LeadGen user created / updated",
-      id:    doc._id,
-      email: doc.email,
-      role:  doc.role,
-      credentials: { email:"lead@zyntrixsoftware.com", password:"Leadgen@2026" }
-    });
-  } catch (e) {
-    console.error("setup-leadgen:", e);
-    return res.status(500).json({ ok:false, msg:e.message });
-  }
-});
+      msg: "LeadGen user created
