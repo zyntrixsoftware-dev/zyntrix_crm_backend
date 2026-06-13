@@ -56,7 +56,7 @@ if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.ht
 var TOKEN=localStorage.getItem("token");
 var HOST=API_BASE.replace(/\/api$/,"");
 var COURSE_ID=new URLSearchParams(location.search).get("course");
-var DATA=null, CUR=null, saveTimer=0;
+var DATA=null, CUR=null, saveTimer=0, segs=[], segN=20, vidDur=0;
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 var ICON={video:"▷",text:"☰",document:"⎙",assignment:"✎",quiz:"?"};
@@ -118,27 +118,46 @@ function openLesson(id){
       l.resources.map(function(r){return '<a class="res" href="'+HOST+r.fileUrl+'?token='+encodeURIComponent(TOKEN)+'" target="_blank">⬇ '+esc(r.fileName||"Download")+'</a>';}).join("")+'</div>';
   }
   $("stage").innerHTML=html;
-  // resume + autosave for video
+  // ── video watch-tracking (anti-skip) + complete gating ──
+  segs=[]; segN=20; vidDur=0;
   var v=$("vid");
-  if(v){
-    var pos=l.progress.lastPositionSec||0;
-    v.addEventListener("loadedmetadata",function(){ if(pos>0&&pos<v.duration) v.currentTime=pos; });
+  var pos=(l.progress&&l.progress.lastPositionSec)||0;
+  if(v && l.videoFile){
+    var saved=(l.progress&&l.progress.segments)||[];
+    segs=(saved.length===segN)?saved.slice():new Array(segN).fill(false);
+    gateComplete(l,watchedPct());
+    v.addEventListener("loadedmetadata",function(){ vidDur=v.duration||0; if(pos>0&&pos<v.duration) v.currentTime=pos; });
     v.addEventListener("timeupdate",function(){
-      if(Date.now()-saveTimer>15000){ saveTimer=Date.now(); saveProgress(l._id,Math.floor(v.currentTime)); }
+      if(v.duration){ vidDur=v.duration; var idx=Math.floor(v.currentTime/v.duration*segN); if(idx<0)idx=0; if(idx>segN-1)idx=segN-1; segs[idx]=true; }
+      gateComplete(l,watchedPct());
+      if(Date.now()-saveTimer>12000){ saveTimer=Date.now(); pushProgress(l._id); }
     });
-    v.addEventListener("ended",function(){ markComplete(); });
+    v.addEventListener("pause",function(){ pushProgress(l._id); });
+    v.addEventListener("ended",function(){ pushProgress(l._id); if(watchedPct()>=90) markComplete(); });
+  } else {
+    setBtn($("completeBtn"),true,"\u2713 Mark complete");
   }
 }
-async function saveProgress(id,pos){ try{ await apiRequest("/lms/lessons/"+id+"/progress","PATCH",{lastPositionSec:pos}); }catch(e){} }
-function flushSave(){ var v=$("vid"); if(v&&CUR){ saveProgress(CUR._id,Math.floor(v.currentTime||0)); } }
+function setBtn(b,en,txt,tip){ if(!b)return; b.disabled=!en; b.textContent=txt; b.title=tip||""; b.style.opacity=en?"1":".55"; b.style.cursor=en?"pointer":"not-allowed"; }
+function watchedPct(){ var c=0; for(var i=0;i<segs.length;i++){ if(segs[i]) c++; } return segN?Math.round(c/segN*100):0; }
+function gateComplete(l,wp){
+  var b=$("completeBtn"); if(!b)return;
+  if(l.progress && l.progress.status==="completed"){ setBtn(b,true,"\u2713 Completed"); return; }
+  if(l.videoFile){
+    if(wp>=90) setBtn(b,true,"\u2713 Mark complete");
+    else setBtn(b,false,"Watch 90% to unlock ("+wp+"%)","Keep watching to enable completion");
+  } else { setBtn(b,true,"\u2713 Mark complete"); }
+}
+async function pushProgress(id){ var v=$("vid"); try{ await apiRequest("/lms/lessons/"+id+"/progress","PATCH",{lastPositionSec:Math.floor((v&&v.currentTime)||0),durationSec:Math.floor(vidDur||0),segments:segs}); }catch(e){} }
+function flushSave(){ if($("vid")&&CUR) pushProgress(CUR._id); }
 async function markComplete(){
   if(!CUR)return;
   var r=await apiRequest("/lms/lessons/"+CUR._id+"/complete","POST",{});
-  if(r&&!r.error){
-    CUR.progress.status="completed";
-    var el=$("les-"+CUR._id);if(el){var t=el.querySelector(".tick");t.classList.add("done");t.textContent="✓";}
-    updateProgress();
-  }
+  if(r&&r.error){ alert(r.msg||"Could not mark complete."); return; }
+  CUR.progress.status="completed";
+  var el=$("les-"+CUR._id);if(el){var t=el.querySelector(".tick");if(t){t.classList.add("done");t.textContent="\u2713";}}
+  setBtn($("completeBtn"),true,"\u2713 Completed");
+  updateProgress();
 }
 window.addEventListener("beforeunload",flushSave);
 load();

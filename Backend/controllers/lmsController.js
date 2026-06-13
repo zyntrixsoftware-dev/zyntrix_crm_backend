@@ -258,14 +258,14 @@ exports.coursePlayer = async (req, res) => {
     const modules = await LMSModule.find({ course: courseId, isPublished: true }).sort({ order: 1 }).lean();
     const lessons = await LMSLesson.find({ course: courseId, isPublished: true }).sort({ order: 1 }).lean();
     const prog = await LMSProgress.find({ student: req.user.id, course: courseId }).lean();
-    const pmap = {}; prog.forEach(p => pmap[p.lesson] = { status: p.status, lastPositionSec: p.lastPositionSec });
+    const pmap = {}; prog.forEach(p => pmap[p.lesson] = { status: p.status, lastPositionSec: p.lastPositionSec, watchedPercent: p.watchedPercent || 0, segments: p.segments || [] });
     const byMod = {};
     lessons.forEach(l => {
       (byMod[l.module] = byMod[l.module] || []).push({
         _id: l._id, title: l.title, type: l.type, durationMin: l.durationMin,
         hasVideo: !!(l.videoFile || l.videoUrl), videoUrl: l.videoUrl, videoFile: !!l.videoFile,
         content: l.content, resources: l.resources, order: l.order,
-        progress: pmap[l._id] || { status: "not_started", lastPositionSec: 0 },
+        progress: pmap[l._id] || { status: "not_started", lastPositionSec: 0, watchedPercent: 0, segments: [] },
       });
     });
     const out = modules.map(m => ({ _id: m._id, title: m.title, description: m.description, lessons: byMod[m._id] || [] }));
@@ -274,10 +274,31 @@ exports.coursePlayer = async (req, res) => {
   } catch (e) { console.error("coursePlayer:", e); return res.status(500).json({ msg: "Server error" }); }
 };
 
+// Minimum % of a self-hosted video the student must actually watch (anti-skip)
+// before the lesson can be marked complete.
+const WATCH_THRESHOLD = 90;
+
 exports.markComplete = async (req, res) => {
   try {
     const l = await LMSLesson.findById(req.params.id).lean();
     if (!l) return res.status(404).json({ msg: "Lesson not found" });
+
+    // Gate: for self-hosted video lessons, require genuine watch coverage.
+    // (External videoUrl / text / document lessons can't be segment-tracked,
+    //  so they complete freely.)
+    if (l.videoFile) {
+      const pr = await LMSProgress.findOne({ student: req.user.id, lesson: l._id }).lean();
+      const wp = pr ? (pr.watchedPercent || 0) : 0;
+      if (pr && pr.status === "completed") {
+        // already completed (e.g. re-watch) — allow
+      } else if (wp < WATCH_THRESHOLD) {
+        return res.status(400).json({
+          msg: "Please watch at least " + WATCH_THRESHOLD + "% of the video before marking it complete. You've watched " + wp + "%.",
+          watchedPercent: wp, need: WATCH_THRESHOLD
+        });
+      }
+    }
+
     await LMSProgress.findOneAndUpdate(
       { student: req.user.id, lesson: l._id },
       { $set: { course: l.course, status: "completed", completedAt: new Date() } },
@@ -286,16 +307,46 @@ exports.markComplete = async (req, res) => {
     return res.json({ msg: "Marked complete", progress: p });
   } catch (e) { console.error("markComplete:", e); return res.status(500).json({ msg: "Server error" }); }
 };
+
 exports.saveProgress = async (req, res) => {
   try {
     const l = await LMSLesson.findById(req.params.id).lean();
     if (!l) return res.status(404).json({ msg: "Lesson not found" });
-    const pos = Number(req.body.lastPositionSec) || 0;
+    const pos      = Math.max(0, Number(req.body.lastPositionSec) || 0);
+    const duration = Math.max(0, Number(req.body.durationSec) || 0);
+    const incoming = Array.isArray(req.body.segments) ? req.body.segments.map(Boolean) : null;
+
+    const pr = await LMSProgress.findOne({ student: req.user.id, lesson: l._id }).lean();
+
+    // Merge watched buckets (OR) so progress only ever grows. A different bucket
+    // count (duration changed) resets to the new array.
+    let segs = (pr && Array.isArray(pr.segments)) ? pr.segments.slice() : [];
+    if (incoming) {
+      segs = (segs.length === incoming.length)
+        ? segs.map((v, i) => v || incoming[i])
+        : incoming.slice();
+    }
+    const N = segs.length;
+    const covered = segs.filter(Boolean).length;
+    const watchedPercent = N ? Math.round(covered / N * 100) : (pr ? pr.watchedPercent || 0 : 0);
+    const watchedSeconds = duration ? Math.round(watchedPercent / 100 * duration) : (pr ? pr.watchedSeconds || 0 : 0);
+
+    const set = { course: l.course, lastPositionSec: pos, segments: segs, watchedPercent, watchedSeconds };
+    if (duration) set.videoDurationSec = duration;
+
+    // Auto-complete once the threshold is genuinely reached; never downgrade.
+    if (pr && pr.status === "completed") {
+      set.status = "completed";
+    } else if (l.videoFile && watchedPercent >= WATCH_THRESHOLD) {
+      set.status = "completed";
+      set.completedAt = new Date();
+    } else {
+      set.status = "in_progress";
+    }
+
     await LMSProgress.findOneAndUpdate(
-      { student: req.user.id, lesson: l._id },
-      { $set: { course: l.course, lastPositionSec: pos }, $setOnInsert: { status: "in_progress" } },
-      { upsert: true });
-    return res.json({ ok: true });
+      { student: req.user.id, lesson: l._id }, { $set: set }, { upsert: true });
+    return res.json({ ok: true, watchedPercent, status: set.status });
   } catch (e) { console.error("saveProgress:", e); return res.status(500).json({ msg: "Server error" }); }
 };
 
