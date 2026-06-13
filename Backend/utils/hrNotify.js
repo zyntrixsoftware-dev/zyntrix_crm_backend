@@ -15,6 +15,14 @@ function esc(s) {
 }
 
 async function getHrEmails() {
+  // Explicit override: when set, route ALL HR notifications ONLY to these
+  // mailboxes (comma-separated in .env). Use this when a role account (e.g. the
+  // super_admin "admin@") has no real Microsoft 365 mailbox and bounces every
+  // notification. Set:  HR_NOTIFY_EMAILS=hr@zyntrixsoftware.com
+  const override = String(process.env.HR_NOTIFY_EMAILS || "").trim();
+  if (override) {
+    return [...new Set(override.split(",").map(e => e.trim().toLowerCase()).filter(Boolean))];
+  }
   try {
     const hrs = await User.find({ role: { $in: ["hr", "super_admin"] }, active: true }).select("email").lean();
     return [...new Set(hrs.map(u => String(u.email || "").trim().toLowerCase()).filter(Boolean))];
