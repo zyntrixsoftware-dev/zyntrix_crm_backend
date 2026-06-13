@@ -327,8 +327,8 @@ if (window.pdfjsLib) {
 
 window.addEventListener("DOMContentLoaded", () => {
   // Auth guard — only leadgen (or admin) can access this panel
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const token = localStorage.getItem("token");
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+  const token = sessionStorage.getItem("token");
   const allowed = ["leadgen","super_admin","admin","sales","hr"];
   if (!token || !allowed.includes(user.role)) {
     window.location.href = "../../index.html";
@@ -687,8 +687,8 @@ function setImportStatus(msg) { document.getElementById("import-status").innerHT
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
   window.location.href = "../../index.html";
 }
 

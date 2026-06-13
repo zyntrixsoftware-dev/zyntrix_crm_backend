@@ -40,13 +40,13 @@ function isSalesUser(user) {
 
 // ── SESSION HELPERS ───────────────────────────────────────────────────────────
 function setSession(data) {
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
+  sessionStorage.setItem("token", data.token);
+  sessionStorage.setItem("user", JSON.stringify(data.user));
 }
 
 function getUser() {
   try {
-    return JSON.parse(localStorage.getItem("user"));
+    return JSON.parse(sessionStorage.getItem("user"));
   } catch {
     return null;
   }
@@ -64,8 +64,8 @@ function isTokenExpired(token) {
 
 // ── LOGOUT ────────────────────────────────────────────────────────────────────
 window.logout = function () {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
   window.location.href = window.location.origin + "/crm/index.html";
 };
 
@@ -153,11 +153,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ── AUTH GUARD ────────────────────────────────────────────────────────────────
 function requireAuth() {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token || isTokenExpired(token)) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
     window.location.href = window.location.origin + "/crm/index.html";
   }
 }
@@ -283,7 +283,7 @@ function renderUserAvatar() {
 async function refreshUserAvatar() {
   try {
     if (typeof apiRequest !== "function") return;          // api.js not loaded
-    if (!localStorage.getItem("token"))    return;          // not logged in
+    if (!sessionStorage.getItem("token"))    return;          // not logged in
     const res = await apiRequest("/employee/profile");
     if (!res || res.error) return;
     const p = res.profile || res;
@@ -297,7 +297,7 @@ async function refreshUserAvatar() {
     u.photo = photoUrl;
     if (p.name) u.name = p.name;
     if (Array.isArray(p.weekOffDays)) u.weekOffDays = p.weekOffDays;
-    localStorage.setItem("user", JSON.stringify(u));
+    sessionStorage.setItem("user", JSON.stringify(u));
     renderUserAvatar();
   } catch (_) { /* silent — avatar sync should never break a page */ }
 }

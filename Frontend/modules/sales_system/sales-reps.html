@@ -89,8 +89,8 @@ select.mon-sel:focus{border-color:var(--accent)}
    (sales@zyntrixsoftware.com) and super admins. Sales employees use their
    employee attendance account + Workstation instead. */
 (function(){
-  var t=localStorage.getItem("token"),u={};
-  try{u=JSON.parse(localStorage.getItem("user")||"{}");}catch(e){}
+  var t=sessionStorage.getItem("token"),u={};
+  try{u=JSON.parse(sessionStorage.getItem("user")||"{}");}catch(e){}
   var em=String(u.email||"").trim().toLowerCase();
   var ok=em==="sales@zyntrixsoftware.com"||u.role==="super_admin"||u.role==="admin";
   if(!t||!ok){alert("Access denied — the Sales panel is restricted to the Sales Admin.");location.replace(location.origin+"/crm/index.html");}
@@ -156,7 +156,7 @@ const AVATAR_COLORS = ['#3d8ef0','#00e5b0','#b57bee','#f5a623','#ff4d6d','#22d3e
 let lastReps = [];
 
 async function apiRequest(path,opts={}){
-  const token=localStorage.getItem('token');
+  const token=sessionStorage.getItem('token');
   const r=await fetch(API+path,{headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})}, ...opts});
   if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.msg||'Request failed');}
   return r.json();
@@ -309,8 +309,8 @@ load();
 </script>
 <script>
 function salesLogout(){
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
   window.location.href = window.location.origin + "/crm/index.html";
 }
 </script>

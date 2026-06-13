@@ -801,7 +801,7 @@ async function exportToExcel() {
   btn.disabled = true;
   btn.textContent = "Exporting…";
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const res = await fetch(API_BASE + "/hr/employees/export", {
       headers: { ...(token && { Authorization: "Bearer " + token }) }
     });

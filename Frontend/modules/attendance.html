@@ -385,7 +385,7 @@
 requireAuth();
 requireModuleAccess("attendance");
 
-const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(sessionStorage.getItem("user"));
 if (user) {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
   set("userName", user.name || "Zyntrix Employee");

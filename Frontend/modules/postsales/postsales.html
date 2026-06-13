@@ -148,7 +148,7 @@ label.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin:
 
 <script src="../../assets/js/api.js"></script>
 <script>
-(function(){var t=localStorage.getItem("token");var u;try{u=JSON.parse(localStorage.getItem("user"))}catch(e){}if(!t||!u){location.href=location.origin+"/crm/index.html";return;}if(['super_admin','sales','postsales'].indexOf(u.role)<0){alert("You do not have access to this panel.");location.href=location.origin+"/crm/index.html";}})();
+(function(){var t=sessionStorage.getItem("token");var u;try{u=JSON.parse(sessionStorage.getItem("user"))}catch(e){}if(!t||!u){location.href=location.origin+"/crm/index.html";return;}if(['super_admin','sales','postsales'].indexOf(u.role)<0){alert("You do not have access to this panel.");location.href=location.origin+"/crm/index.html";}})();
 var ENR=[], SUMMARY={}, REPS=[];
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -266,7 +266,7 @@ async function renderTickets(){
   }).join(""):'<p class="empty">No tickets yet.</p>';
 }
 
-function salesLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function salesLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 loadAll();
 </script>
 </body>

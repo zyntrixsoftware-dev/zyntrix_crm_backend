@@ -897,11 +897,11 @@ function buildAndDownloadXlsx(data) {
 // ── Danger Zone ───────────────────────────────────────────────────
 function clearCache() {
   if (!confirm("Clear all local preferences and cached data?")) return;
-  const token = localStorage.getItem("token");
-  const user  = localStorage.getItem("user");
+  const token = sessionStorage.getItem("token");
+  const user  = sessionStorage.getItem("user");
   localStorage.clear();
-  if (token) localStorage.setItem("token", token);
-  if (user)  localStorage.setItem("user", user);
+  if (token) sessionStorage.setItem("token", token);
+  if (user)  sessionStorage.setItem("user", user);
   showToast("settingsToast", "Cache cleared!", "ok");
 }
 

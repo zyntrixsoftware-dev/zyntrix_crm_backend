@@ -63,7 +63,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var COURSES=[],CUR="",editId=null,subAssignId=null;
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -89,10 +89,10 @@ async function del(id){if(!confirm("Delete assignment and its submissions?"))ret
 async function viewSubs(id){subAssignId=id;var d=await apiRequest("/lms/assignments/"+id+"/submissions");var subs=(d&&d.submissions)||[];
 $("subs-body").innerHTML=subs.length?subs.map(function(s){var nm=s.student&&s.student.name?s.student.name:"Student";
 return '<div class="card"><div class="nm">'+esc(nm)+' <span class="chip">'+esc(s.status)+'</span></div><div class="muted" style="margin:4px 0">'+esc(s.text||"(no text)")+'</div>'+
-(s.files&&s.files.length?s.files.map(function(f){return '<a class="chip" style="text-decoration:none;margin-right:6px" target="_blank" href="'+API_BASE.replace(/\/api$/,"")+f.fileUrl+'?token='+encodeURIComponent(localStorage.getItem("token"))+'">⬇ '+esc(f.fileName)+'</a>';}).join(""):"")+
+(s.files&&s.files.length?s.files.map(function(f){return '<a class="chip" style="text-decoration:none;margin-right:6px" target="_blank" href="'+API_BASE.replace(/\/api$/,"")+f.fileUrl+'?token='+encodeURIComponent(sessionStorage.getItem("token"))+'">⬇ '+esc(f.fileName)+'</a>';}).join(""):"")+
 '<div class="row2" style="margin-top:8px;align-items:flex-end"><div style="max-width:110px"><label class="fl">Marks</label><input class="input" id="mk-'+s._id+'" type="number" value="'+(s.marks!=null?s.marks:"")+'"></div><div><label class="fl">Feedback</label><input class="input" id="fb-'+s._id+'" value="'+esc(s.feedback||"")+'"></div><button class="btn btn-prim btn-sm" onclick="grade(\''+s._id+'\')">Save</button></div></div>';
 }).join(""):'<div class="empty">No submissions.</div>';$("m-subs").classList.add("on");}
 async function grade(sid){var body={marks:Number($("mk-"+sid).value),feedback:$("fb-"+sid).value};var r=await apiRequest("/lms/submissions/"+sid+"/grade","PATCH",body);if(r&&!r.error){toast("Graded");viewSubs(subAssignId);load();}else toast((r&&r.msg)||"Error");}
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
 </script></body></html>

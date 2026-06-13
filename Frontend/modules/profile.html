@@ -528,7 +528,7 @@ document.getElementById("avatarInput").addEventListener("change", async function
     const fd   = new FormData();
     fd.append("photo", blob, "profile.jpg");
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const resp = await fetch(API_BASE + "/employee/photo", {
       method:  "POST",
       headers: { ...(token && { Authorization: "Bearer " + token }) },
@@ -547,7 +547,7 @@ document.getElementById("avatarInput").addEventListener("change", async function
     if (fresh) setAvatarEverywhere(fresh);
 
     // Keep a copy on the local user object for instant display elsewhere
-    if (user) { user.photo = data.photoUrl || ""; localStorage.setItem("user", JSON.stringify(user)); }
+    if (user) { user.photo = data.photoUrl || ""; sessionStorage.setItem("user", JSON.stringify(user)); }
 
     // Re-pull the canonical profile so every other field stays in sync too.
     await loadProfile();
@@ -597,7 +597,7 @@ async function savePersonal() {
   // Persist updated name locally
   if (user) {
     user.name = payload.name;
-    localStorage.setItem("user", JSON.stringify(user));
+    sessionStorage.setItem("user", JSON.stringify(user));
     document.getElementById("userName").innerText      = payload.name;
     const sideName = document.getElementById("sideUserName"); if (sideName) sideName.innerText = payload.name;
     document.getElementById("profileName").innerText   = payload.name;

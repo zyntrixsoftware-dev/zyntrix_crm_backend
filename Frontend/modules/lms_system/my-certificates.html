@@ -43,11 +43,11 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;colo
 <div class="content" id="list"><div class="empty">Loading…</div></div></div></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 async function load(){var d=await apiRequest("/lms/my/certificates");var cs=(d&&d.certificates)||[];
-$("list").innerHTML=cs.length?cs.map(function(c){return '<div class="card"><div style="display:flex;gap:10px;align-items:center"><div style="flex:1"><h3>'+esc(c.courseTitle||(c.course&&c.course.title)||"Course")+'</h3><div class="muted">Certificate No: '+esc(c.certificateNo)+' · '+new Date(c.issuedAt).toLocaleDateString("en-IN")+'</div></div><a class="btn btn-prim btn-sm" target="_blank" href="certificate.html?id='+c._id+'">View / Download</a></div></div>';}).join(""):'<div class="empty">No certificates yet. Complete a course to earn one.</div>';}
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+$("list").innerHTML=cs.length?cs.map(function(c){return '<div class="card"><div style="display:flex;gap:10px;align-items:center"><div style="flex:1"><h3>'+esc(c.courseTitle||(c.course&&c.course.title)||"Course")+'</h3><div class="muted">Certificate No: '+esc(c.certificateNo)+' · '+new Date(c.issuedAt).toLocaleDateString("en-IN")+'</div></div><a class="btn btn-prim btn-sm" href="certificate.html?id='+c._id+'">View / Download</a></div></div>';}).join(""):'<div class="empty">No certificates yet. Complete a course to earn one.</div>';}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 load();
 </script></body></html>

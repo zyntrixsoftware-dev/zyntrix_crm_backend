@@ -113,8 +113,8 @@ tr:hover td{background:rgba(255,255,255,.015);cursor:pointer}
    (sales@zyntrixsoftware.com) and super admins. Sales employees use their
    employee attendance account + Workstation instead. */
 (function(){
-  var t=localStorage.getItem("token"),u={};
-  try{u=JSON.parse(localStorage.getItem("user")||"{}");}catch(e){}
+  var t=sessionStorage.getItem("token"),u={};
+  try{u=JSON.parse(sessionStorage.getItem("user")||"{}");}catch(e){}
   var em=String(u.email||"").trim().toLowerCase();
   var ok=em==="sales@zyntrixsoftware.com"||u.role==="super_admin"||u.role==="admin";
   if(!t||!ok){alert("Access denied — the Sales panel is restricted to the Sales Admin.");location.replace(location.origin+"/crm/index.html");}
@@ -287,7 +287,7 @@ let allLeads = [], rawLeads = [], curLead = null, lastStats = null, pendingFuId 
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 (async () => {
-  const u = JSON.parse(localStorage.getItem("user") || "{}");
+  const u = JSON.parse(sessionStorage.getItem("user") || "{}");
   await Promise.all([loadLeads(), loadCourses(), loadReps()]);
   setInterval(silentPoll, 120000);
 })();
@@ -665,7 +665,7 @@ function toast(msg, type="ok") {
 }
 function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function fmt(s){ return String(s||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()); }
-function salesLogout(){ localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.href = window.location.origin+"/crm/index.html"; }
+function salesLogout(){ sessionStorage.removeItem("token"); sessionStorage.removeItem("user"); window.location.href = window.location.origin+"/crm/index.html"; }
 </script>
 <script src="sales-import-modal.js"></script>
 </body>

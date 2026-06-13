@@ -96,7 +96,7 @@ function downloadPayslip() {
     return;
   }
 
-  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const user = JSON.parse(sessionStorage.getItem("user")) || {};
 
   const slip = [
     "Zyntrix Payroll Payslip",

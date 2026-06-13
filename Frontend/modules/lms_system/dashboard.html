@@ -71,7 +71,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;colo
 </div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
+if(!sessionStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function fmtD(d){return d?new Date(d).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"2-digit"}):"—";}
@@ -87,7 +87,7 @@ async function load(){
     return '<tr><td><div class="nm">'+esc(nm)+'</div><div class="sub">'+esc(em)+'</div></td><td>'+esc(co)+'</td><td><span class="chip">'+esc(x.status||"")+'</span></td><td>'+fmtD(x.enrolledAt)+'</td></tr>';
   }).join(""):'<tr><td colspan="4"><div class="empty">No learners yet.</div></td></tr>';
 }
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 load();
 </script>
 </body>

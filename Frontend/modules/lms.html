@@ -10,7 +10,7 @@
   <script>
     (function () {
       var role = "";
-      try { role = (JSON.parse(localStorage.getItem("user") || "{}").role || ""); } catch (e) {}
+      try { role = (JSON.parse(sessionStorage.getItem("user") || "{}").role || ""); } catch (e) {}
       var staff = ["lms", "instructor", "super_admin", "admin"].indexOf(role) >= 0;
       window.location.replace(staff ? "lms_system/dashboard.html" : "lms_system/student-dashboard.html");
     })();

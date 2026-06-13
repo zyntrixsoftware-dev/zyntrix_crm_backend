@@ -921,7 +921,7 @@ async function downloadPdf() {
   if (!current.offer || !current.offer._id) return;
 
   setSync("loading", "Building PDF preview…");
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   try {
     const r = await fetch(API_BASE + `/hr/offers/${current.offer._id}/pdf`, {
       headers: { Authorization: "Bearer " + token }

@@ -99,11 +99,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
+if(!sessionStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2800);}
-function user(){try{return JSON.parse(localStorage.getItem("user"))||{};}catch(e){return {};}}
+function user(){try{return JSON.parse(sessionStorage.getItem("user"))||{};}catch(e){return {};}}
 var GRAD=['linear-gradient(135deg,#3d8ef0,#00e5b0)','linear-gradient(135deg,#b57bee,#3d8ef0)','linear-gradient(135deg,#f5a623,#ff7a59)','linear-gradient(135deg,#00e5b0,#22c55e)','linear-gradient(135deg,#ff4d6d,#b57bee)'];
 function grad(s){s=String(s||"");var h=0,i;for(i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return GRAD[h%GRAD.length];}
 function fmtDT(d){if(!d)return "";return new Date(d).toLocaleString("en-IN",{weekday:"short",day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
@@ -211,11 +211,11 @@ function renderCert(cx){
   $("k-cert").textContent=cx.length;
   $("cert").innerHTML=cx.length?cx.slice(0,6).map(function(c){
     return '<div class="row"><div style="flex:1"><div class="nm">'+esc((c.course&&c.course.title)||c.courseTitle||"Certificate")+'</div><div class="mt">No: '+esc(c.certificateNo||"")+' &middot; '+fmtD(c.issuedAt)+'</div></div>'+
-      '<a class="btn btn-ghost btn-sm" href="certificate.html?id='+c._id+'" target="_blank">View</a></div>';
+      '<a class="btn btn-ghost btn-sm" href="certificate.html?id='+c._id+'">View</a></div>';
   }).join(""):'<div class="empty"><span class="ico">🎓</span>Complete a course to earn a certificate.</div>';
 }
 
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 loadAll();
 </script>
 </body>

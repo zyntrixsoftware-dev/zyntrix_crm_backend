@@ -56,7 +56,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2200);}
@@ -65,6 +65,6 @@ async function load(){var d=await apiRequest("/lms/announcements");var a=(d&&d.a
 $("list").innerHTML=a.length?a.map(function(x){return '<div class="card"><div style="display:flex;gap:10px"><div style="flex:1"><h3>'+esc(x.title)+'</h3><div class="muted">'+(x.course&&x.course.title?esc(x.course.title):"All courses")+' · '+new Date(x.createdAt).toLocaleString("en-IN")+'</div></div><button class="btn btn-rose btn-sm" onclick="del(\''+x._id+'\')">✕</button></div><div style="margin-top:8px;color:var(--text2);font-size:13px;white-space:pre-wrap">'+esc(x.body||"")+'</div></div>';}).join(""):'<div class="empty">No announcements yet.</div>';}
 async function post(){var body={course:$("an-course").value||null,title:$("an-title").value.trim(),body:$("an-body").value.trim()};if(!body.title){toast("Title required");return;}var r=await apiRequest("/lms/announcements","POST",body);if(r&&!r.error){$("an-title").value="";$("an-body").value="";load();toast("Posted");}else toast((r&&r.msg)||"Error");}
 async function del(id){if(!confirm("Delete?"))return;var r=await apiRequest("/lms/announcements/"+id,"DELETE");if(r&&!r.error){load();toast("Deleted");}}
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
 </script></body></html>

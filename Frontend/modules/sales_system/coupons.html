@@ -131,8 +131,8 @@ tr:hover td{background:rgba(255,255,255,.015)}
    (sales@zyntrixsoftware.com) and super admins. Sales employees use their
    employee attendance account + Workstation instead. */
 (function(){
-  var t=localStorage.getItem("token"),u={};
-  try{u=JSON.parse(localStorage.getItem("user")||"{}");}catch(e){}
+  var t=sessionStorage.getItem("token"),u={};
+  try{u=JSON.parse(sessionStorage.getItem("user")||"{}");}catch(e){}
   var em=String(u.email||"").trim().toLowerCase();
   var ok=em==="sales@zyntrixsoftware.com"||u.role==="super_admin"||u.role==="admin";
   if(!t||!ok){alert("Access denied — the Sales panel is restricted to the Sales Admin.");location.replace(location.origin+"/crm/index.html");}
@@ -395,7 +395,7 @@ const API = (window.location.hostname === 'localhost' || window.location.hostnam
 let allCoupons = [], filterType = '', searchQ = '', debTimer = null;
 
 async function apiRequest(path, opts = {}) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const res = await fetch(API + path, {
     headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
     ...opts
@@ -725,8 +725,8 @@ init();
 <script src="sales-import-modal.js"></script>
 <script>
 function salesLogout(){
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
   window.location.href = window.location.origin + "/crm/index.html";
 }
 </script>

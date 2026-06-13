@@ -61,7 +61,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var COURSES=[],CUR="",QZ=[];
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -89,6 +89,6 @@ var r=await apiRequest("/lms/quizzes","POST",body);if(r&&!r.error){closeM('m-new
 async function del(id){if(!confirm("Delete quiz and attempts?"))return;var r=await apiRequest("/lms/quizzes/"+id,"DELETE");if(r&&!r.error){load();toast("Deleted");}}
 async function viewAtt(id){var d=await apiRequest("/lms/quizzes/"+id+"/attempts");var a=(d&&d.attempts)||[];
 $("att-body").innerHTML=a.length?a.map(function(x){var nm=x.student&&x.student.name?x.student.name:"Student";return '<div class="item"><div class="it-t"><div class="nm">'+esc(nm)+'</div><div class="sb">'+new Date(x.submittedAt).toLocaleString("en-IN")+'</div></div><span class="chip" style="color:'+(x.passed?'var(--green)':'var(--rose)')+'">'+x.percent+'% '+(x.passed?'PASS':'FAIL')+'</span></div>';}).join(""):'<div class="empty">No attempts yet.</div>';$("m-att").classList.add("on");}
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
 </script></body></html>

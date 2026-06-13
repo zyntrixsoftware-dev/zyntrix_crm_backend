@@ -52,8 +52,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 </div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
-var TOKEN=localStorage.getItem("token");
+if(!sessionStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
+var TOKEN=sessionStorage.getItem("token");
 var HOST=API_BASE.replace(/\/api$/,"");
 var COURSE_ID=new URLSearchParams(location.search).get("course");
 var DATA=null, CUR=null, saveTimer=0, segs=[], segN=20, vidDur=0;

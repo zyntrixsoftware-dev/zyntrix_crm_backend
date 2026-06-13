@@ -85,17 +85,21 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "25mb", verify: (req, res, buf) => { req.rawBody = buf; } }));
 
 // ── RATE LIMITERS ────────────────────────────────────────────────
+// NOTE: limits are PER IP. A whole office behind one public IP shares a bucket,
+// so these must comfortably cover all staff at that location at once. Each page
+// load fires several API calls (incl. an avatar-sync on every page), so keep
+// generous. Brute-force protection still applies on the /api/auth/ window.
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 100,                       // login/OTP attempts per IP per 15 min
   standardHeaders: true,
   legacyHeaders: false,
-  message: { msg: "Too many requests — try again in 15 minutes." }
+  message: { msg: "Too many login attempts — please try again in 15 minutes." }
 });
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 5000,                      // ~40 office users × heavy use, shared IP-safe
   standardHeaders: true,
   legacyHeaders: false,
   message: { msg: "Too many requests — please slow down." }
@@ -188,34 +192,4 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log("ZyntrixCRM API running on port " + PORT);
   console.log("Allowed CORS origins:", allowedOrigins);
   try { require("./utils/reminderScheduler").start(); } catch (e) { console.warn("reminderScheduler:", e.message); }
-});
-
-// ── ONE-TIME LEADGEN SEED (remove after first use) ────────────────
-// Hit: GET /setup-leadgen?key=ZyntrixLeadgen2026
-// This creates lead@zyntrixsoftware.com with role=leadgen
-app.get("/setup-leadgen", async (req, res) => {
-  if (req.query.key !== "ZyntrixLeadgen2026") {
-    return res.status(403).json({ msg: "Forbidden" });
-  }
-  try {
-    const bcrypt = require("bcryptjs");
-    const User   = require("./models/user");
-    const hash   = await bcrypt.hash("Leadgen@2026", 10);
-    const doc    = await User.findOneAndUpdate(
-      { email: "lead@zyntrixsoftware.com" },
-      { $set: { name:"LeadGen Team", email:"lead@zyntrixsoftware.com", password:hash, role:"leadgen", isActive:true } },
-      { upsert:true, new:true }
-    );
-    return res.json({
-      ok: true,
-      msg: "LeadGen user created / updated",
-      id:    doc._id,
-      email: doc.email,
-      role:  doc.role,
-      credentials: { email:"lead@zyntrixsoftware.com", password:"Leadgen@2026" }
-    });
-  } catch (e) {
-    console.error("setup-leadgen:", e);
-    return res.status(500).json({ ok:false, msg:e.message });
-  }
 });

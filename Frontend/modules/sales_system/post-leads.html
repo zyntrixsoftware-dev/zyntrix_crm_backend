@@ -59,8 +59,8 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <script>
 /* SALES-ADMIN-GUARD */
 (function(){
-  var t=localStorage.getItem("token"),u={};
-  try{u=JSON.parse(localStorage.getItem("user")||"{}");}catch(e){}
+  var t=sessionStorage.getItem("token"),u={};
+  try{u=JSON.parse(sessionStorage.getItem("user")||"{}");}catch(e){}
   var em=String(u.email||"").trim().toLowerCase();
   var ok=em==="sales@zyntrixsoftware.com"||u.role==="super_admin"||u.role==="admin";
   if(!t||!ok){alert("Access denied — the Sales panel is restricted to the Sales Admin.");location.replace(location.origin+"/crm/index.html");}
@@ -147,7 +147,7 @@ function effFee(e){return Number(e.discountedFee>0?e.discountedFee:(e.totalFee||
 function balance(e){return Math.max(0,effFee(e)-Number(e.feePaid||0));}
 function repId(e){return (e.postLeadRep&&e.postLeadRep._id)?e.postLeadRep._id:(e.postLeadRep||"");}
 function toast(msg,kind){var w=$("toast-wrap");var d=document.createElement("div");d.className="toast-item "+(kind||"ok");d.textContent=msg;w.appendChild(d);setTimeout(function(){d.remove();},3200);}
-function salesLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function salesLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 
 async function loadAll(){
   var r=await Promise.all([ apiRequest("/sales/post-leads"), apiRequest("/sales/reps") ]);

@@ -81,8 +81,8 @@ tr:hover td{background:rgba(255,255,255,.015)}
    (sales@zyntrixsoftware.com) and super admins. Sales employees use their
    employee attendance account + Workstation instead. */
 (function(){
-  var t=localStorage.getItem("token"),u={};
-  try{u=JSON.parse(localStorage.getItem("user")||"{}");}catch(e){}
+  var t=sessionStorage.getItem("token"),u={};
+  try{u=JSON.parse(sessionStorage.getItem("user")||"{}");}catch(e){}
   var em=String(u.email||"").trim().toLowerCase();
   var ok=em==="sales@zyntrixsoftware.com"||u.role==="super_admin"||u.role==="admin";
   if(!t||!ok){alert("Access denied — the Sales panel is restricted to the Sales Admin.");location.replace(location.origin+"/crm/index.html");}
@@ -235,7 +235,7 @@ const TYPE_COLORS = {call:'b-call',whatsapp:'b-whatsapp',email:'b-email',sms:'b-
 const OUTCOME_COLORS = {connected:'#22c55e',not_answered:'#f59e0b',busy:'#f59e0b',wrong_number:'#ff4d6d',callback_requested:'#3d8ef0',not_applicable:'#4e6680'};
 
 async function apiRequest(path, opts={}) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const r = await fetch(API+path, { headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})}, ...opts });
   if (!r.ok) { const e=await r.json().catch(()=>({})); throw new Error(e.msg||'Request failed'); }
   return r.json();
@@ -378,8 +378,8 @@ init();
 <script src="sales-import-modal.js"></script>
 <script>
 function salesLogout(){
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
   window.location.href = window.location.origin + "/crm/index.html";
 }
 </script>

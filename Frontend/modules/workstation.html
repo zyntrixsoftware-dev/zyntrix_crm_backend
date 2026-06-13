@@ -143,7 +143,7 @@
 requireAuth();
 requireModuleAccess("attendance");
 
-const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(sessionStorage.getItem("user"));
 if (user) {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
   set("userName", user.name || "Zyntrix Employee");
@@ -155,8 +155,8 @@ if (user) {
    Contact Status right here; the same /sales/leads/:id/contact endpoint writes
    back to the Sales system, so the Sales Admin sees the update automatically. */
 function esc(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function wsUser(){ try{ return JSON.parse(localStorage.getItem('user'))||{}; }catch(e){ return {}; } }
-function wsMyId(){ try{ return JSON.parse(atob(localStorage.getItem('token').split('.')[1])).id; }catch(e){ var u=wsUser(); return u._id||u.id||''; } }
+function wsUser(){ try{ return JSON.parse(sessionStorage.getItem('user'))||{}; }catch(e){ return {}; } }
+function wsMyId(){ try{ return JSON.parse(atob(sessionStorage.getItem('token').split('.')[1])).id; }catch(e){ var u=wsUser(); return u._id||u.id||''; } }
 
 var WS_OC = [['in_progress','⏳ In Progress'],['interested','✅ Interested'],['follow_up','🔔 Follow Up'],['not_interested','✖ Not Interested']];
 function wsOutcomeOf(l){

@@ -48,7 +48,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var $=function(i){return document.getElementById(i);};var TAKE=null,ANS=[];
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2500);}
@@ -75,6 +75,6 @@ async function submitQ(){var r=await apiRequest("/lms/quizzes/"+TAKE._id+"/attem
     $("qz-result").innerHTML='<div class="card" style="text-align:center"><div style="font-size:30px;font-weight:800;font-family:var(--display);color:'+(a.passed?'var(--green)':'var(--rose)')+'">'+a.percent+'%</div><div class="muted">'+a.score+' / '+a.total+' marks · '+(a.passed?'PASSED ✓':'Not passed')+'</div></div>';load();}
   else toast((r&&r.msg)||"Error");
 }
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 load();
 </script></body></html>

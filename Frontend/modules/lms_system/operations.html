@@ -74,7 +74,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;colo
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var $=function(i){return document.getElementById(i);};var COURSES=[],INS=[];
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2500);}
@@ -94,6 +94,6 @@ async function addIns(){var email=$("i-email").value.trim();if(!email){toast("Em
 if(r&&!r.error){$("i-res").innerHTML=r.created?('✅ Created. '+(r.emailed?'Login emailed.':'Temp password: <b>'+esc(r.tempPassword||"")+'</b>')):'ℹ️ Existing user promoted to instructor.';$("i-email").value="";$("i-name").value="";loadIns();}else $("i-res").textContent=(r&&r.msg)||"Error";}
 async function assign(){var c=$("a-course").value,i=$("a-ins").value;if(!c||!i){toast("Pick course and instructor");return;}var r=await apiRequest("/lms/course-staff","POST",{course:c,instructor:i});if(r&&!r.error){toast("Assigned");loadIns();}else toast((r&&r.msg)||"Error");}
 async function unassign(c){if(!c)return;var r=await apiRequest("/lms/course-staff/"+c,"DELETE");if(r&&!r.error){toast("Removed");loadIns();}}
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 loadOps();loadIns();
 </script></body></html>

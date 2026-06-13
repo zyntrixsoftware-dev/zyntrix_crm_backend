@@ -602,7 +602,7 @@ function viewDetails(id) {
   if (c.resumeUrl) {
     _resumeHref = /^https?:\/\//i.test(c.resumeUrl)
       ? c.resumeUrl
-      : `${API_BASE}/hr/resume/${c._id}?token=${encodeURIComponent(localStorage.getItem("token") || "")}`;
+      : `${API_BASE}/hr/resume/${c._id}?token=${encodeURIComponent(sessionStorage.getItem("token") || "")}`;
   }
   const resumeRow = c.resumeUrl
     ? `<div style="display:grid;grid-template-columns:160px 1fr;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);">

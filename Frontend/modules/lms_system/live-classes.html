@@ -67,7 +67,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var COURSES=[],CUR="",attSession=null,recSession=null,ROSTER=[];
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -94,6 +94,6 @@ async function saveAtt(){var records=[];ROSTER.forEach(function(r,i){var v=$("at
 var res=await apiRequest("/lms/sessions/"+attSession+"/attendance","POST",{records:records});if(res&&!res.error){closeM('m-att');toast("Attendance saved");}else toast((res&&res.msg)||"Error");}
 function openRec(id,url,st){recSession=id;$("r-url").value=url||"";$("r-status").value=st||"scheduled";$("m-rec").classList.add("on");}
 async function saveRec(){var r=await apiRequest("/lms/sessions/"+recSession,"PATCH",{recordingUrl:$("r-url").value.trim(),status:$("r-status").value});if(r&&!r.error){closeM('m-rec');load();toast("Updated");}else toast((r&&r.msg)||"Error");}
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
 </script></body></html>

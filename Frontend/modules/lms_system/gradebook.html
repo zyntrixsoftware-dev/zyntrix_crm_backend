@@ -48,7 +48,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;colo
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var COURSES=[],CUR="";
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -63,6 +63,6 @@ $("wrap").innerHTML='<div class="card"><div class="muted" style="margin-bottom:1
 '<td>'+(r.certified?'<span class="chip" style="color:var(--green)">Issued ✓</span>':'<button class="btn btn-ghost btn-sm" onclick="issue(\''+r.student+'\',this)">Issue</button>')+'</td></tr>';}).join(""):'<tr><td colspan="6"><div class="empty">No students with logins. Provision student logins first.</div></td></tr>')+
 '</tbody></table></div></div>';}
 async function issue(student,btn){btn.disabled=true;var r=await apiRequest("/lms/certificates","POST",{student:student,course:CUR});if(r&&!r.error){toast(r.already?"Already issued":"Certificate issued");load();}else{btn.disabled=false;toast((r&&r.msg)||"Error");}}
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
 </script></body></html>

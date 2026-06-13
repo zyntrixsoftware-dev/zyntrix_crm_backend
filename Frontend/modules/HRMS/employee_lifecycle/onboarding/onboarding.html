@@ -452,7 +452,7 @@ let activeTab  = "info";
 // ── SIDEBAR ──────────────────────────────────────────────────────────────────
 (function(){
   try {
-    const u = JSON.parse(localStorage.getItem("user")||"{}");
+    const u = JSON.parse(sessionStorage.getItem("user")||"{}");
     if (u.name) {
       document.getElementById("sidebar-name").textContent = u.name;
       document.getElementById("sidebar-role").textContent = u.role||"HR";
@@ -841,7 +841,7 @@ function renderDocsTab(ob) {
     const _origin = (typeof API_BASE !== "undefined" ? API_BASE : "").replace(/\/api$/, "");
     const docHref = !doc.url ? "#"
       : /^https?:\/\//i.test(doc.url) ? doc.url
-      : _origin + doc.url + "?token=" + encodeURIComponent(localStorage.getItem("token") || "");
+      : _origin + doc.url + "?token=" + encodeURIComponent(sessionStorage.getItem("token") || "");
     const cls     = hasFile ? "has-file" : "";
     const verifiedBadge = verified
       ? `<span class="badge b-green" style="font-size:10px;">✓ Verified</span>`

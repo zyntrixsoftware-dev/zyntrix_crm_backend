@@ -13,7 +13,7 @@ const API_BASE = (
 
 // ── API REQUEST ───────────────────────────────────────────────────
 async function apiRequest(url, method = "GET", body = null) {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   try {
     const res = await fetch(API_BASE + url, {
@@ -44,8 +44,8 @@ async function apiRequest(url, method = "GET", body = null) {
 
     // Auto-logout on 401 (expired / invalid token)
     if (res.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
       window.location.href = window.location.origin + "/crm/index.html";
       return { error: true, msg: "Session expired. Please log in again." };
     }
@@ -82,7 +82,7 @@ function _resolveRootPath() {
  * @param {Array}  mapping  - [{excelHeader, systemKey, label, dataType}]
  */
 async function importExcel(file, system, type, mapping) {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const fd = new FormData();
   fd.append("file", file);
   fd.append("system", system);

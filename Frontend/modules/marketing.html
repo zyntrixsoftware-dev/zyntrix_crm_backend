@@ -82,7 +82,7 @@
 requireAuth();
 requireModuleAccess("marketing");
 
-const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(sessionStorage.getItem("user"));
 if (user) {
 	document.getElementById("userName").innerText = user.name || "Zyntrix Marketing";
 	document.getElementById("sideUserName").innerText = user.name || "Zyntrix Marketing";

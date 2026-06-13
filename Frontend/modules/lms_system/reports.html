@@ -56,7 +56,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;colo
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var $=function(i){return document.getElementById(i);};var chart=null;
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 async function load(){var d=await apiRequest("/lms/reports");var cs=(d&&d.courses)||[];var t=(d&&d.totals)||{};
@@ -66,6 +66,6 @@ var labels=cs.map(function(c){return c.course;});var comp=cs.map(function(c){ret
 if(chart)chart.destroy();
 if(window.Chart){chart=new Chart($("chart"),{type:"bar",data:{labels:labels,datasets:[{label:"Learners",data:learn,backgroundColor:"rgba(61,142,240,.6)"},{label:"Completed",data:comp,backgroundColor:"rgba(0,229,176,.7)"}]},options:{responsive:true,plugins:{legend:{labels:{color:"#8ba3bf"}}},scales:{x:{ticks:{color:"#8ba3bf"},grid:{display:false}},y:{ticks:{color:"#8ba3bf"},grid:{color:"rgba(255,255,255,.05)"}}}}});}
 }
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 load();
 </script></body></html>

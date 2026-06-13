@@ -48,7 +48,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <div class="toast" id="toast"></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 var $=function(i){return document.getElementById(i);};var CUR="",COURSES=[];
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},2500);}
@@ -61,6 +61,6 @@ async function load(){CUR=$("courseSel").value||CUR;if(!CUR)return;var d=await a
     '<div style="display:flex;gap:8px;margin-top:8px"><input class="input" id="r-'+x._id+'" placeholder="Reply..."><button class="btn btn-ghost btn-sm" onclick="reply(\''+x._id+'\')">Reply</button></div></div>';}).join(""):'<div class="empty">No questions yet. Be the first to ask.</div>';}
 async function ask(){var msg=$("d-msg").value.trim();if(!msg){toast("Type a question");return;}if(!CUR){toast("No course");return;}var r=await apiRequest("/lms/discussions","POST",{course:CUR,message:msg});if(r&&!r.error){$("d-msg").value="";load();toast("Posted");}else toast((r&&r.msg)||"Error");}
 async function reply(id){var m=$("r-"+id).value.trim();if(!m)return;var r=await apiRequest("/lms/discussions/"+id+"/reply","POST",{message:m});if(r&&!r.error){load();toast("Replied");}else toast((r&&r.msg)||"Error");}
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
 </script></body></html>

@@ -99,7 +99,7 @@ function formatTime(time) {
 }
 
 function _weekOffDays() {
-  try { var u = JSON.parse(localStorage.getItem("user")) || {}; return (Array.isArray(u.weekOffDays) && u.weekOffDays.length) ? u.weekOffDays : [0]; }
+  try { var u = JSON.parse(sessionStorage.getItem("user")) || {}; return (Array.isArray(u.weekOffDays) && u.weekOffDays.length) ? u.weekOffDays : [0]; }
   catch (e) { return [0]; }
 }
 function getShift(date) {

@@ -113,8 +113,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
-var TOKEN=localStorage.getItem("token");
+if(!sessionStorage.getItem("token")){ location.href=location.origin+"/crm/index.html"; }
+var TOKEN=sessionStorage.getItem("token");
 var COURSES=[], CURRENT=null, MODULES=[], editModuleId=null, editLessonId=null, lessonModuleId=null;
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -227,7 +227,7 @@ function uploadVideoFile(lessonId,f){
     var fd=new FormData();fd.append("video",f);xhr.send(fd);
   });
 }
-function lmsLogout(){localStorage.removeItem("token");localStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
+function lmsLogout(){sessionStorage.removeItem("token");sessionStorage.removeItem("user");location.href=location.origin+"/crm/index.html";}
 init();
 </script>
 </body>

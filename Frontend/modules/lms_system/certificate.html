@@ -28,7 +28,7 @@ body{background:#0b1220;font-family:'Instrument Sans',sans-serif;min-height:100v
 <div id="root"><div class="err">Loading…</div></div>
 <script src="../../assets/js/api.js"></script>
 <script>
-if(!localStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
+if(!sessionStorage.getItem("token")){location.href=location.origin+"/crm/index.html";}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 async function load(){
   var id=new URLSearchParams(location.search).get("id");

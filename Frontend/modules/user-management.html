@@ -52,7 +52,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px;colo
 <script src="../assets/js/api.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script>
-(function(){var u=getUser&&getUser();if(!localStorage.getItem("token")||!u){location.href=location.origin+"/crm/index.html";return;}
+(function(){var u=getUser&&getUser();if(!sessionStorage.getItem("token")||!u){location.href=location.origin+"/crm/index.html";return;}
 if(u.role!=="super_admin"&&u.role!=="admin"){alert("Admins only");location.href=location.origin+"/crm/modules/admin.html";}})();
 var ROLES=[],dt=null;
 var $=function(i){return document.getElementById(i);};

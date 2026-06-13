@@ -131,8 +131,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
    (sales@zyntrixsoftware.com) and super admins. Sales employees use their
    employee attendance account + Workstation instead. */
 (function(){
-  var t=localStorage.getItem("token"),u={};
-  try{u=JSON.parse(localStorage.getItem("user")||"{}");}catch(e){}
+  var t=sessionStorage.getItem("token"),u={};
+  try{u=JSON.parse(sessionStorage.getItem("user")||"{}");}catch(e){}
   var em=String(u.email||"").trim().toLowerCase();
   var ok=em==="sales@zyntrixsoftware.com"||u.role==="super_admin"||u.role==="admin";
   if(!t||!ok){alert("Access denied — the Sales panel is restricted to the Sales Admin.");location.replace(location.origin+"/crm/index.html");}
@@ -332,7 +332,7 @@ const TYPE_META = {
 let selectedType = null, uploadedFile = null, parsedHeaders = [], parsedSample = [], totalRows = 0, templates = {};
 
 async function apiRequest(path, opts={}) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const r = await fetch(API + path, {
     headers: { ...(token ? { Authorization: 'Bearer ' + token } : {}), ...( opts.body && !(opts.body instanceof FormData) ? {'Content-Type':'application/json'} : {}) },
     ...opts
@@ -417,7 +417,7 @@ async function handleFile(file) {
   try {
     const data = await fetch(API + '/sales/import/preview', {
       method: 'POST',
-      headers: { Authorization: 'Bearer ' + (localStorage.getItem('token') || '') },
+      headers: { Authorization: 'Bearer ' + (sessionStorage.getItem('token') || '') },
       body: fd
     }).then(r => r.json());
 
@@ -512,7 +512,7 @@ async function runImport() {
     const fd = new FormData();
     fd.append('file', uploadedFile);
 
-    const token = localStorage.getItem('token') || '';
+    const token = sessionStorage.getItem('token') || '';
     const r = await fetch(API + '/sales/import/' + selectedType, {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + token },
@@ -592,8 +592,8 @@ init();
 </script>
 <script>
 function salesLogout(){
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
   window.location.href = window.location.origin + "/crm/index.html";
 }
 </script>

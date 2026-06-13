@@ -171,7 +171,7 @@ async function simFetchFromLink() {
     const res = await fetch(API_BASE + "/hr/candidates/import-from-link", {
       method: "POST",
       headers: { "Content-Type": "application/json",
-        Authorization: "Bearer " + (localStorage.getItem("token") || "") },
+        Authorization: "Bearer " + (sessionStorage.getItem("token") || "") },
       body: JSON.stringify({ url })
     });
     const data = await res.json();
@@ -336,7 +336,7 @@ async function simCommitImport() {
   try {
     const res = await fetch(API_BASE + "/sales/import/" + _importType, {
       method: "POST",
-      headers: { Authorization: "Bearer " + (localStorage.getItem("token") || "") },
+      headers: { Authorization: "Bearer " + (sessionStorage.getItem("token") || "") },
       body: fd
     });
     const data = await res.json();

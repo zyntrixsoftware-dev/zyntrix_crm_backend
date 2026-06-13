@@ -29,7 +29,7 @@ router.post("/forgot-password", forgotPassword);
 // GET  /api/auth/_smtp-check?to=<email>  — verifies outbound SMTP delivery
 router.get ("/_smtp-check", auth, smtpCheck);
 router.post("/_smtp-check", auth, smtpCheck);
-router.get ("/_gas-check",  gasCheck);   // no auth — diagnostic only
-router.post("/_gas-check",  gasCheck);
+router.get ("/_gas-check",  auth, gasCheck);   // hr/super_admin only (sends email)
+router.post("/_gas-check",  auth, gasCheck);
 
 module.exports = router;
