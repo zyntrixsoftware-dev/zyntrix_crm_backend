@@ -29,7 +29,14 @@ function videoMimeFor(filename, current) {
 const validId  = (id) => mongoose.Types.ObjectId.isValid(id);
 const isStaff  = (req) => req.user && ["lms", "instructor", "super_admin"].includes(req.user.role);
 function staffOnly(req, res) {
-  if (!isStaff(req)) { res.status(403).json({ msg: "LMS staff only" }); return false; }
+  if (!isStaff(req)) {
+    const role = (req.user && req.user.role) || "unknown";
+    res.status(403).json({
+      msg: "LMS staff only — this needs an LMS, instructor or admin login, but your current session role is '" + role + "'. If you have another panel open in this browser it may have replaced your login; log out and sign back in to your LMS account.",
+      role
+    });
+    return false;
+  }
   return true;
 }
 
